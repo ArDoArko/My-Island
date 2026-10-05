@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
-<title>My Island 0.12 — Twoja wyspa w chmurze</title>
+<title>My Island 0.13 — Konto My Island</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -42,6 +42,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 #roomActive{display:none}#roomResume{display:none}
 #accountPanel{z-index:48;inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 28px));max-height:calc(100dvh - 28px)}
 #accountPanel p{font-size:14px}#accountPanel button{font-size:14px;white-space:normal}#accountLabel{overflow-wrap:anywhere;color:#ffe087}#cloudStatus{line-height:1.6}#cloudStatus.warning{color:#ffb09c}.cloud-note{font-size:14px;color:#b8d9db;line-height:1.6}.cloud-state{margin:16px 0;padding:14px;background:#ffffff0b;border:1px solid #ffffff20;border-radius:14px}.card .cloud-entry{font-size:14px;padding:10px 18px;margin:8px 0;background:#bdebd8}#cloudStartStatus{font-size:12px;line-height:1.5;color:#c5e5e2;margin:4px 0 12px}.cloud-fallback{background:#b8ddd9!important}#cloudConflict{display:none;border-top:1px solid #ffffff25;margin-top:18px;padding-top:8px}#cloudSigned{display:none}
+.account-tabs{display:flex;gap:8px;margin:12px 0}.account-tabs button{flex:1;background:#ffffff12;color:#d7e9e9}.account-tabs button[aria-pressed="true"]{background:#ffe087;color:#153b40}.account-form{display:grid;gap:9px;margin:18px 0}.account-form label{font-size:14px;font-weight:750}.account-form input{font:inherit;font-size:16px;color:#fff;background:#ffffff0b;border:1px solid #ffffff45;border-radius:12px;width:100%;padding:12px;min-width:0;touch-action:auto;user-select:text}.account-form input:focus-visible{outline:3px solid #ffe087;outline-offset:2px}.account-form .account-field{display:grid;gap:7px}.account-form small{font-size:12px;line-height:1.6;color:#b8d9db}.account-form h3{margin:0 0 4px}#cloudAuthError{color:#ffb09c;line-height:1.6;margin:0;font-size:14px}.account-form button[type="submit"]{min-height:46px}.account-link{background:transparent!important;color:#c7e7df!important;padding:7px 0!important;text-decoration:underline;text-underline-offset:3px}.recovery-box{padding:16px;border:1px solid #ffe08785;border-radius:14px;background:#ffe0870a;margin:18px 0}#cloudRecoveryKey{font:700 15px ui-monospace,monospace;line-height:1.5;resize:none;width:100%;padding:12px;border:1px solid #ffffff35;border-radius:10px;color:#ffe087;background:#052c3b;touch-action:auto;user-select:text}#cloudRecovery,#cloudLegacy,#cloudRotate{display:none}
 .pad-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.pad-tools button{background:#b8ddd9}
 .pad-live{display:flex;align-items:center;gap:14px;margin:14px 0;font-size:12px;color:#b8d9db}
 .stick-test{position:relative;flex:none;width:52px;height:52px;border:1px solid #ffffff35;border-radius:50%;background:#ffffff08}
@@ -74,7 +75,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 </head>
 <body>
 <div id="start" class="start"><div class="card">
- <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version">0.12 • Twoja wyspa w chmurze</p>
+ <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version">0.13 • Konto My Island</p>
  <p class="desc">Odkrywaj wyspę sam albo z przyjaciółmi.<br>Do czterech graczy, wspólna baza i wyprawa po skarb.</p>
  <div class="play-choice"><button onclick="startGame()">GRAJ SOLO</button><button class="online-choice" onclick="toggle('roomPanel',1)">GRAJ ONLINE</button></div><p class="keys">WASD lub strzałki • E działaj • Shift sprint • spacja atak</p>
  <button class="cloud-entry" onclick="toggle('accountPanel',1)">☁️ Konto i zapis</button><p id="cloudStartStatus" role="status">Zaloguj się, aby kontynuować na innym urządzeniu.</p>
@@ -91,7 +92,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <button id="accountButton" class="p pad-button" onclick="toggle('accountPanel',1)" aria-label="Konto gracza i zapis w chmurze">☁️ KONTO</button>
  <button id="newSoloButton" class="p pad-button" onclick="askNewSoloGame()" aria-label="Nowa gra solo">↻ NOWA GRA</button>
 </div>
-<div id="questBox" class="q">📜 <b id="qt">Wyprawa 0.12</b><br><span id="qx"></span><br><small id="qp"></small></div>
+<div id="questBox" class="q">📜 <b id="qt">Wyprawa 0.13</b><br><span id="qx"></span><br><small id="qp"></small></div>
 <canvas id="game" aria-label="Wyspa, postacie i świat gry"></canvas>
 <div id="msg" class="msg" role="status"></div><div id="hint" class="hint"></div>
 <div class="ctrl"><button class="u" data-k="ArrowUp" aria-label="Idź w górę">▲</button><button class="l" data-k="ArrowLeft" aria-label="Idź w lewo">◀</button><button class="d" data-k="ArrowDown" aria-label="Idź w dół">▼</button><button class="r" data-k="ArrowRight" aria-label="Idź w prawo">▶</button></div>
@@ -102,8 +103,24 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <button class="close" aria-label="Zamknij konto gracza" onclick="toggle('accountPanel',0)">✕</button><h2>☁️ Twoja wyspa</h2>
  <p class="intro">Ten sam postęp solo na telefonie i komputerze.</p>
  <div class="cloud-state"><b id="accountLabel">Grasz bez konta</b><p id="cloudStatus" role="status">Twój zapis jest tylko w tej przeglądarce.</p></div>
- <div id="cloudAnonymous"><p>Użyj konta ChatGPT. Na nowym urządzeniu zaloguj się na to samo konto i wybierz GRAJ SOLO.</p><button id="cloudLogin" onclick="beginCloudSignIn()">Zaloguj przez ChatGPT</button><p class="cloud-note">Pierwsze logowanie przeniesie obecny zapis solo na konto. Jeśli masz już wyspę w chmurze, wczytamy ją, a zapis gościa pozostanie na tym urządzeniu.</p></div>
+ <div id="cloudLegacy"><p>Dodaj e-mail i hasło do obecnego konta. Zachowasz tę samą wyspę i wszystkie zasoby.</p><button id="cloudLinkEmail" onclick="showAccountForm('register')">Dodaj e-mail i hasło</button></div>
+ <div id="cloudAnonymous">
+  <div id="cloudAuthTabs" class="account-tabs"><button id="cloudLoginTab" aria-pressed="true" onclick="showAccountForm('login')">Zaloguj się</button><button id="cloudRegisterTab" aria-pressed="false" onclick="showAccountForm('register')">Załóż konto</button></div>
+  <form id="cloudAuthForm" class="account-form" onsubmit="event.preventDefault();submitAccountForm()">
+   <h3 id="cloudFormTitle">Zaloguj się do My Island</h3>
+   <div id="cloudEmailField" class="account-field"><label for="cloudEmail">E-mail</label><input id="cloudEmail" type="email" autocomplete="username" inputmode="email" maxlength="254" spellcheck="false" autocapitalize="none" required></div>
+   <div id="cloudRecoveryField" class="account-field" style="display:none"><label for="cloudRecoveryInput">Kod odzyskiwania</label><input id="cloudRecoveryInput" autocomplete="off" maxlength="100" placeholder="MI-…" spellcheck="false" autocapitalize="characters"></div>
+   <div class="account-field"><label id="cloudPasswordLabel" for="cloudPassword">Hasło</label><input id="cloudPassword" type="password" autocomplete="current-password" minlength="15" maxlength="128" required><small id="cloudPasswordHint">Hasło ma od 15 do 128 znaków. Możesz użyć zdania, które łatwo zapamiętasz.</small></div>
+   <div id="cloudRepeatField" class="account-field" style="display:none"><label for="cloudPasswordRepeat">Powtórz hasło</label><input id="cloudPasswordRepeat" type="password" autocomplete="new-password" minlength="15" maxlength="128"></div>
+   <p id="cloudAuthError" role="alert"></p><button id="cloudLogin" type="submit">Zaloguj się</button>
+   <button id="cloudForgot" type="button" class="account-link" onclick="showAccountForm('recover')">Nie pamiętam hasła</button><button id="cloudAuthCancel" type="button" class="account-link" style="display:none" onclick="hideAccountForm()">Anuluj</button>
+   <small id="cloudFormNote">Na innym urządzeniu wpisz ten sam e-mail i hasło, aby wczytać swoją wyspę.</small>
+  </form>
+  <p id="cloudImportNote" class="cloud-note">Pierwsze konto przeniesie obecny zapis solo do chmury. Jeśli masz już wyspę na koncie, wczytamy ją, a zapis gościa pozostanie na tym urządzeniu.</p>
+ </div>
+ <div id="cloudRecovery" class="recovery-box"><h3>Zachowaj kod odzyskiwania</h3><p>Zapisz go poza telefonem, na przykład na kartce lub w menedżerze haseł. Kod pozwala ustawić nowe hasło i odzyskać wyspę. Każdy nowy kod zastępuje poprzedni.</p><label for="cloudRecoveryKey" class="cloud-note">Twój kod — udostępniaj go tylko sobie</label><textarea id="cloudRecoveryKey" rows="2" readonly spellcheck="false" aria-label="Twój kod odzyskiwania konta"></textarea><div class="room-actions"><button onclick="copyRecoveryCode()">Kopiuj kod</button><button class="cloud-fallback" onclick="dismissRecoveryCode()">Kod mam zapisany</button></div><p id="cloudRecoveryStatus" role="status" class="cloud-note"></p></div>
  <div id="cloudSigned"><div class="room-actions"><button id="cloudSaveNow" onclick="saveCloudNow()">Zapisz teraz</button><button id="cloudRetry" class="cloud-fallback" onclick="retryCloud()">Ponów połączenie</button><button id="cloudLogout" class="cloud-fallback" onclick="signOutCloud()">Wyloguj z gry</button></div><p class="cloud-note">Gra zapisuje postęp podczas gry i po zebraniu zasobów. Sprawdź „Zapisano w chmurze” przed zmianą urządzenia. Gdy nie ma sieci, bieżący postęp czeka na tym urządzeniu na ponowne połączenie.</p></div>
+ <div id="cloudRotate"><button class="account-link" onclick="showAccountForm('rotate-recovery')">Utwórz nowy kod odzyskiwania</button></div>
  <div id="cloudConflict"><h3>Dwie wersje wyspy</h3><p>Nowszy zapis pochodzi z innego urządzenia. Wybierz, którą wyspę kontynuować. Zasoby z dwóch wersji nie sumują się.</p><div class="room-actions"><button onclick="resolveCloudConflict(false)">Wczytaj nowszy zapis z chmury</button><button class="cloud-fallback" onclick="resolveCloudConflict(true)">Zapisz tę wyspę na koncie</button></div></div>
  <p class="cloud-note">Konto chroni twoją przygodę solo. Pokoje online mają osobny, wspólny postęp i działają przez 24 godziny od ostatniej gry.</p>
 </div>
@@ -200,7 +217,7 @@ const ROOM_API='https://my-island-online.arekpoczta734.chatgpt.site/api/rooms',R
 const playerLooks=[{shirt:'#4c9cba',skin:'#e3b185',hair:'#463b32'},{shirt:'#df8168',skin:'#be895f',hair:'#382d29'},{shirt:'#9974c7',skin:'#efc69d',hair:'#725039'},{shirt:'#76b677',skin:'#a67152',hair:'#2f302b'}];
 const net={room:null,token:null,you:null,players:[],worldRev:-1,connected:false,busy:false,joining:false,epoch:0,lastOk:0,actions:[],timer:null,solo:null,reset:0,joinAbort:null};
 const ACCOUNT_ORIGIN='https://my-island-online.arekpoczta734.chatgpt.site',ACCOUNT_API=ACCOUNT_ORIGIN+'/api/account',CLOUD_AUTH_KEY='myIslandAccountV1',CLOUD_CACHE_PREFIX='myIslandCloudV1:',CLOUD_LOGIN_KEY='myIslandLoginV1';
-const cloud={session:null,cache:null,ready:true,loading:false,busy:false,promise:null,revision:0,updatedAt:0,conflict:null,error:'',needsLogin:false,resetting:false,nextTry:0,epoch:0};
+const cloud={session:null,cache:null,ready:true,loading:false,busy:false,promise:null,revision:0,updatedAt:0,conflict:null,error:'',needsLogin:false,resetting:false,nextTry:0,epoch:0,form:'login',authBusy:false,authError:'',recovery:null};
 try{const s=JSON.parse(localStorage.getItem(CLOUD_AUTH_KEY));if(s&&/^[a-f0-9]{64}$/.test(s.token)&&typeof s.id==='string'){cloud.session=s;cloud.ready=false}}catch(e){}
 let lastRoom=null;try{const r=JSON.parse(localStorage.getItem(ROOM_KEY));if(r&&/^[A-HJ-NP-Z2-9]{8}$/.test(r.code)&&/^[a-f0-9]{64}$/.test(r.token))lastRoom=r}catch(e){}
 const PAD_KEY='myIslandPadV1',padDefaults={interact:0,back:1,attack:2,bag:3,base:4,fish:5,block:6,sprint:7,craft:8,menu:9};
@@ -784,7 +801,7 @@ function load(){
  if(cloud.session){if(cloud.cache?.state)applySoloSnapshot(cloud.cache.state);return}
  try{const state=JSON.parse(localStorage.getItem(SAVE_KEY))||JSON.parse(localStorage.getItem('myIsland08'));if(state)applySoloSnapshot(state)}catch(e){}
 }
-function soloReady(){return !!net.room||!cloud.session||cloud.ready&&!cloud.loading&&!cloud.conflict&&!cloud.resetting}
+function soloReady(){return !!net.room||!cloud.authBusy&&(!cloud.session||cloud.ready&&!cloud.loading&&!cloud.conflict&&!cloud.resetting)}
 function cloudID(){return typeof crypto.randomUUID==='function'?crypto.randomUUID():Array.from(crypto.getRandomValues(new Uint8Array(20)),n=>n.toString(16).padStart(2,'0')).join('')}
 function persistCloudCache(){if(!cloud.session||!cloud.cache)return;try{localStorage.setItem(CLOUD_CACHE_PREFIX+cloud.session.id,JSON.stringify(cloud.cache))}catch(e){cloud.error='Nie mogę zapisać kopii na tym urządzeniu. Sprawdź zapis w chmurze przed zamknięciem gry.'}}
 function updateCloudUI(){
@@ -793,9 +810,20 @@ function updateCloudUI(){
  else if(cloud.error)status=cloud.error;
  $('accountLabel').textContent=s?s.label:'Grasz bez konta';$('cloudStatus').textContent=status;$('cloudStatus').classList.toggle('warning',!!cloud.error||!!cloud.conflict);$('cloudStartStatus').textContent=status;
  $('accountButton').textContent=!s?'☁️ KONTO':cloud.conflict||cloud.needsLogin?'☁️ SPRAWDŹ ZAPIS':cloud.loading?'☁️ WCZYTUJĘ…':cloud.busy?'☁️ ZAPISUJĘ…':cloud.cache?.dirty?'☁️ CZEKA NA SIEĆ':'☁️ ZAPISANO';
- $('cloudAnonymous').style.display=!s||cloud.needsLogin?'block':'none';$('cloudSigned').style.display=s?'block':'none';$('cloudConflict').style.display=cloud.conflict?'block':'none';
- $('cloudLogin').textContent=cloud.needsLogin?'Zaloguj ponownie przez ChatGPT':'Zaloguj przez ChatGPT';$('cloudLogin').disabled=!!net.room||net.joining||cloud.loading||cloud.busy||cloud.resetting;
- $('cloudSaveNow').disabled=!!net.room||cloud.loading||cloud.busy||!cloud.ready||!!cloud.conflict;$('cloudLogout').disabled=!!net.room||cloud.loading||cloud.busy||cloud.resetting||!!cloud.conflict;
+ const legacy=s&&s.authMode==='legacy'&&!cloud.needsLogin,linking=legacy&&cloud.form==='register',rotating=s&&!cloud.needsLogin&&cloud.form==='rotate-recovery';
+ $('cloudAnonymous').style.display=!s||cloud.needsLogin||linking||rotating?'block':'none';$('cloudLegacy').style.display=legacy&&!linking?'block':'none';$('cloudSigned').style.display=s&&!cloud.needsLogin?'block':'none';$('cloudConflict').style.display=cloud.conflict?'block':'none';$('cloudRotate').style.display=s?.authMode==='email'&&!cloud.needsLogin&&!rotating&&!cloud.recovery?'block':'none';
+ const disabled=!!net.room||net.joining||cloud.loading||cloud.busy||cloud.resetting||cloud.authBusy;
+ const mode=cloud.form,creating=mode==='register',recovering=mode==='recover';
+ $('cloudFormTitle').textContent=rotating?'Nowy kod odzyskiwania':recovering?'Odzyskaj swoją wyspę':creating?(linking?'Dodaj e-mail do obecnej wyspy':'Załóż konto My Island'):'Zaloguj się do My Island';
+ $('cloudLogin').textContent=cloud.authBusy?'Chwileczkę…':rotating?'Utwórz nowy kod':recovering?'Ustaw nowe hasło':creating?'Załóż konto i zachowaj wyspę':'Zaloguj się';$('cloudLogin').disabled=disabled;
+ for(const id of ['cloudEmail','cloudPassword','cloudPasswordRepeat','cloudRecoveryInput','cloudLoginTab','cloudRegisterTab','cloudForgot','cloudAuthCancel','cloudLinkEmail'])$(id).disabled=disabled;
+ $('cloudLoginTab').setAttribute('aria-pressed',String(mode==='login'));$('cloudRegisterTab').setAttribute('aria-pressed',String(creating));$('cloudAuthTabs').style.display=linking||rotating?'none':'flex';
+ $('cloudEmailField').style.display=rotating?'none':'grid';$('cloudEmail').required=!rotating;$('cloudPassword').autocomplete=creating||recovering?'new-password':'current-password';$('cloudPasswordLabel').textContent=recovering?'Nowe hasło':'Hasło';
+ $('cloudRepeatField').style.display=creating||recovering?'grid':'none';$('cloudPasswordRepeat').required=creating||recovering;$('cloudRecoveryField').style.display=recovering?'grid':'none';$('cloudRecoveryInput').required=recovering;
+ $('cloudForgot').style.display=mode==='login'?'block':'none';$('cloudAuthCancel').style.display=linking||rotating||recovering?'block':'none';$('cloudAuthError').textContent=cloud.authError;
+ $('cloudFormNote').textContent=rotating?'Potwierdź obecnym hasłem. Zapisz nowy kod poza telefonem. Poprzedni kod przestanie działać.':recovering?'Wpisz kod zachowany przy zakładaniu konta. Po zmianie hasła otrzymasz nowy kod odzyskiwania.':creating?'Po założeniu konta otrzymasz kod odzyskiwania. Zapisz go poza telefonem, aby móc odzyskać konto po zapomnieniu hasła.':'Na innym urządzeniu wpisz ten sam e-mail i hasło, aby wczytać swoją wyspę.';
+ $('cloudImportNote').style.display=!s&&!recovering?'block':'none';$('cloudRecovery').style.display=cloud.recovery?'block':'none';
+ $('cloudSaveNow').disabled=disabled||!cloud.ready||!!cloud.conflict;$('cloudLogout').disabled=disabled||!!cloud.conflict;
  $('cloudRetry').style.display=s&&(cloud.error||cloud.cache?.dirty)&&!cloud.needsLogin&&!cloud.conflict?'inline-block':'none';$('cloudRetry').disabled=cloud.loading||cloud.busy;
 }
 async function accountRequest(payload,keepalive=false){
@@ -804,20 +832,45 @@ async function accountRequest(payload,keepalive=false){
   if(!response.ok||data.error)throw Object.assign(new Error(data.error||'Nie mogę połączyć się z chmurą.'),{status:response.status,data});return data;
  }catch(error){if(error.name==='AbortError')throw new Error('Zapis w chmurze nie odpowiada. Postęp czeka na tym urządzeniu.');throw error}finally{clearTimeout(timeout)}
 }
-async function beginCloudSignIn(){
- if(net.room||net.joining)return say('Wróć do solo przed zalogowaniem.');if(cloud.loading||cloud.busy||cloud.resetting)return;
- try{if(play)save();else load();if(!cloud.session)save();
-  const hex=()=>Array.from(crypto.getRandomValues(new Uint8Array(32)),n=>n.toString(16).padStart(2,'0')).join(''),verifier=hex(),state=hex();const challenge=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier))),n=>n.toString(16).padStart(2,'0')).join('');
-  sessionStorage.setItem(CLOUD_LOGIN_KEY,JSON.stringify({verifier,state,startedAt:Date.now()}));location.assign(ACCOUNT_ORIGIN+'/account?state='+state+'&challenge='+challenge);
- }catch(e){cloud.error='Nie udało się rozpocząć logowania. Sprawdź, czy przeglądarka pozwala zapisywać dane gry.';updateCloudUI()}
+function showAccountForm(mode){
+ if(cloud.authBusy)return;cloud.form=mode;cloud.authError='';$('cloudPassword').value='';$('cloudPasswordRepeat').value='';$('cloudRecoveryInput').value='';
+ if(cloud.session&&!cloud.needsLogin&&cloud.session.authMode==='legacy'&&mode==='register')$('cloudEmail').value=cloud.session.label.includes('@')?cloud.session.label:'';
+ updateCloudUI();if(mode==='rotate-recovery')$('cloudPassword').focus();else $('cloudEmail').focus();
 }
+function hideAccountForm(){if(cloud.authBusy)return;showAccountForm('login')}
+async function submitAccountForm(){
+ if(net.room||net.joining)return say('Wróć do solo przed zalogowaniem.');if(cloud.loading||cloud.busy||cloud.resetting||cloud.authBusy)return;
+ const op=cloud.form,email=$('cloudEmail').value.trim().toLowerCase(),password=$('cloudPassword').value.normalize('NFC');
+ cloud.authError='';if(op!=='rotate-recovery'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))cloud.authError='Wpisz prawidłowy adres e-mail.';
+ else if(Array.from(password).length<15||Array.from(password).length>128)cloud.authError='Hasło musi mieć od 15 do 128 znaków.';
+ else if(['register','recover'].includes(op)&&password!==$('cloudPasswordRepeat').value.normalize('NFC'))cloud.authError='Oba hasła muszą być takie same.';
+ else if(op==='recover'&&!$('cloudRecoveryInput').value.trim())cloud.authError='Wpisz zachowany kod odzyskiwania.';
+ if(cloud.authError){updateCloudUI();return}
+ if(!cloud.session&&!play)load();save();const guestState=!cloud.session?soloSnapshot():null;cloud.authBusy=true;updateCloudUI();resetInput();
+ try{
+  const linking=op==='register'&&cloud.session&&!cloud.needsLogin&&cloud.session.authMode==='legacy';
+  if(linking&&!await flushCloud(true))throw new Error('Najpierw zapisz obecną wyspę w chmurze, a potem dodaj e-mail i hasło.');
+  if(op==='rotate-recovery')await flushCloud(true);
+  const data=await accountRequest({op,email,password,...(op==='recover'?{recoveryCode:$('cloudRecoveryInput').value}:{}),...(linking||op==='rotate-recovery'?{token:cloud.session.token}:{})});
+  if(op!=='rotate-recovery'){cloud.epoch++;cloud.nextTry=0;await acceptCloudAccount(data,data.token,guestState)}
+  $('cloudPassword').value='';$('cloudPasswordRepeat').value='';$('cloudRecoveryInput').value='';cloud.form='login';cloud.authError='';
+  if(data.recoveryCode){cloud.recovery=data.recoveryCode;$('cloudRecoveryKey').value=data.recoveryCode;$('cloudRecoveryStatus').textContent='Kod jest wyświetlany teraz. Zachowaj go przed zamknięciem strony.'}
+  else dismissRecoveryCode();
+  say(op==='recover'?'Hasło zmienione. Twoja wyspa jest zachowana.':op==='rotate-recovery'?'Nowy kod gotowy — zapisz go.':'Konto połączone. Sprawdź stan zapisu w chmurze.');
+ }catch(error){cloud.authError=error.message||'Nie udało się połączyć z kontem. Spróbuj ponownie.';if(error.status===401&&cloud.session&&op==='rotate-recovery')cloud.authError='Sprawdź hasło lub zaloguj się ponownie.'}
+ finally{cloud.authBusy=false;updateCloudUI()}
+}
+async function copyRecoveryCode(){
+ if(!cloud.recovery)return;try{if(!navigator.clipboard?.writeText)throw new Error();await navigator.clipboard.writeText(cloud.recovery);$('cloudRecoveryStatus').textContent='Kod skopiowany. Zachowaj go poza telefonem.'}catch{$('cloudRecoveryKey').focus();$('cloudRecoveryKey').select();$('cloudRecoveryStatus').textContent='Zaznaczyłem kod. Skopiuj go lub zapisz na kartce.'}
+}
+function dismissRecoveryCode(){cloud.recovery=null;$('cloudRecoveryKey').value='';$('cloudRecoveryStatus').textContent='';updateCloudUI()}
 function cacheForAccount(id){try{const c=JSON.parse(localStorage.getItem(CLOUD_CACHE_PREFIX+id));if(c&&c.state?.version===10&&Number.isInteger(c.revision))return c}catch(e){}return null}
-async function acceptCloudAccount(data,token){
- const session={token:token||cloud.session.token,id:data.account.id,label:data.account.label};cloud.session=session;try{localStorage.setItem(CLOUD_AUTH_KEY,JSON.stringify(session))}catch(e){}
+async function acceptCloudAccount(data,token,guestState=null){
+ const session={token:token||cloud.session.token,id:data.account.id,label:data.account.label,authMode:data.account.authMode||'legacy'};cloud.session=session;try{localStorage.setItem(CLOUD_AUTH_KEY,JSON.stringify(session))}catch(e){}
  const cache=cacheForAccount(data.account.id);cloud.error='';cloud.needsLogin=false;cloud.conflict=null;
  if(cache?.dirty){cloud.cache=cache;cloud.revision=cache.revision;cloud.updatedAt=cache.updatedAt||0;applySoloSnapshot(cache.state)}
  else if(data.save){cloud.revision=data.save.revision;cloud.updatedAt=data.save.updatedAt;cloud.cache={state:data.save.state,revision:cloud.revision,updatedAt:cloud.updatedAt,dirty:false,pending:null};applySoloSnapshot(data.save.state)}
- else{cloud.revision=0;cloud.updatedAt=0;cloud.session=null;load();cloud.session=session;cloud.cache={state:soloSnapshot(),revision:0,updatedAt:0,dirty:true,pending:null}}
+ else{cloud.revision=0;cloud.updatedAt=0;if(guestState)applySoloSnapshot(guestState);else{cloud.session=null;load();cloud.session=session}cloud.cache={state:soloSnapshot(),revision:0,updatedAt:0,dirty:true,pending:null}}
  cloud.ready=true;cloud.loading=false;persistCloudCache();updateCloudUI();if(cloud.cache.dirty)await flushCloud(true);
 }
 async function bootCloud(){
@@ -850,7 +903,7 @@ async function resolveCloudConflict(useCurrent){
 }
 async function signOutCloud(){
  if(!cloud.session||net.room||cloud.loading||cloud.busy||cloud.conflict)return;save();if(!await flushCloud(true)){cloud.error='Najpierw zapisz postęp w chmurze. Twój zapis na urządzeniu jest zachowany.';updateCloudUI();return}
- try{await accountRequest({op:'logout',token:cloud.session.token});cloud.epoch++;try{localStorage.removeItem(CLOUD_AUTH_KEY)}catch(e){}cloud.session=cloud.cache=cloud.conflict=null;cloud.ready=true;cloud.needsLogin=false;cloud.revision=cloud.updatedAt=0;cloud.error='';populateSoloWorld();loadSoloState({version:10,P:{x:1500,y:1100},questsDone:{}});load();updateCloudUI();say('Wylogowano z gry. Zapis pozostaje na koncie.')}catch(error){cloud.error=error.message;updateCloudUI()}
+ try{await accountRequest({op:'logout',token:cloud.session.token});cloud.epoch++;try{localStorage.removeItem(CLOUD_AUTH_KEY)}catch(e){}cloud.session=cloud.cache=cloud.conflict=null;cloud.ready=true;cloud.needsLogin=false;cloud.revision=cloud.updatedAt=0;cloud.error='';cloud.form='login';dismissRecoveryCode();populateSoloWorld();loadSoloState({version:10,P:{x:1500,y:1100},questsDone:{}});load();updateCloudUI();say('Wylogowano z gry. Zapis pozostaje na koncie.')}catch(error){cloud.error=error.message;updateCloudUI()}
 }
 async function restartCloudSoloGame(fresh){
  if(!soloReady())return;cloud.resetting=true;$('newGameError').textContent='Zapisuję nową przygodę w chmurze…';for(const b of $('newGamePanel').querySelectorAll('button'))b.disabled=true;
