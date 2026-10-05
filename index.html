@@ -299,7 +299,7 @@ function draw(){
  const fire=firePosition();if(campfire&&fire&&visible(fire.x,fire.y))things.push({y:fire.y,draw:()=>drawFire(fire.x,fire.y)});
  if(!treasure&&visible(chest.x,chest.y))things.push({y:chest.y,draw:drawChest});
  for(const [person,kind,name] of [[nela,'nela','NELA · ZADANIA'],[leon,'leon','LEON · HANDLARZ']]){
-  if(visible(person.x,person.y))things.push({y:person.y,draw:()=>{drawPerson(person.x,person.y,kind,Math.abs(P.x-person.x)>Math.abs(P.y-person.y)?P.x<person.x?'left':'right':P.y<person.y?'up':'down');label(person.x,person.y-80,name)}});
+  if(visible(person.x,person.y))things.push({y:person.y,draw:()=>{drawPerson(person.x,person.y,kind,Math.abs(P.x-person.x)>Math.abs(P.y-person.y)?P.x<person.x?'left':'right':P.y<person.y?'up':'down');label(person.x,P.y>person.y&&distance(P,person)<140?person.y-80:person.y+23,name)}});
  }
  things.push({y:P.y,draw:()=>{const wet=sea(P.x,P.y);if(wet&&raft)drawRaft(P.x,P.y);drawPerson(P.x,P.y,'player',face,moving?walkPhase:0,wet&&!raft);if(Date.now()-lastAttack<180&&spear){X.strokeStyle='#f6efd3';X.lineWidth=3;X.beginPath();X.arc(P.x,P.y-18,43,walkPhase,walkPhase+1.9);X.stroke()}}});
  things.sort((a,b)=>a.y-b.y);for(const t of things)t.draw();
