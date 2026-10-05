@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
-<title>My Island 0.10.1 — Pad i joystick</title>
+<title>My Island 0.11 — Wspólna wyspa</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -33,6 +33,12 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 .panel button:disabled{opacity:.4;cursor:default}
 .panel .pad-selected{outline:3px solid #c5f4bc;outline-offset:3px;box-shadow:0 0 0 6px #c5f4bc18}
 #controllerPanel{z-index:45}.pad-device{background:#ffffff0b;border-radius:12px;padding:12px;font-size:13px;overflow-wrap:anywhere}
+#roomPanel{z-index:46}.play-choice{display:flex;gap:10px;justify-content:center}.card .play-choice button{flex:1;padding:15px 18px;max-width:220px}.card .play-choice .online-choice{background:#bdebd8}
+.room-form{display:grid;gap:8px;margin:16px 0}.room-form label{font-weight:750;font-size:14px}.room-form input,.room-code{border:1px solid #ffffff35;border-radius:12px;background:#ffffff0b;color:#fff;padding:13px;font:inherit;width:100%;min-width:0;touch-action:auto;user-select:text}
+.room-form input:focus-visible,.room-code:focus-visible{outline:3px solid #ffe087;outline-offset:2px}#roomJoinCode{text-transform:uppercase;letter-spacing:3px;font-weight:850}
+.room-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.room-actions button{min-height:43px}.room-note{font-size:13px;color:#b8d9db;line-height:1.6}#roomStatus{font-size:14px;color:#ffe087;min-height:24px;line-height:1.5}
+.room-code{font-weight:900;font-size:clamp(23px,6vw,35px);letter-spacing:5px;text-align:center;color:#ffe087}.room-members{padding:0;list-style:none;display:grid;gap:8px}.room-members li{display:flex;gap:10px;align-items:center;padding:11px;background:#ffffff0b;border-radius:12px;font-size:14px}.member-color{width:16px;height:16px;border-radius:50%;flex:none}.member-health{margin-left:auto;color:#b8d9db;font-size:12px}
+#roomActive{display:none}#roomResume{display:none}
 .pad-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.pad-tools button{background:#b8ddd9}
 .pad-live{display:flex;align-items:center;gap:14px;margin:14px 0;font-size:12px;color:#b8d9db}
 .stick-test{position:relative;flex:none;width:52px;height:52px;border:1px solid #ffffff35;border-radius:50%;background:#ffffff08}
@@ -65,11 +71,11 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 </head>
 <body>
 <div id="start" class="start"><div class="card">
- <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version">0.10.1 • Pad i joystick</p>
- <p class="desc">Odkrywaj wyspę, rozpal ognisko i poznaj mieszkańców.<br>Twój skarb to dopiero początek przygody.</p>
- <button onclick="startGame()">GRAJ</button><p class="keys">WASD lub strzałki • E działaj • Shift sprint • spacja atak</p>
+ <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version">0.11 • Wspólna wyspa</p>
+ <p class="desc">Odkrywaj wyspę sam albo z przyjaciółmi.<br>Do czterech graczy, wspólna baza i wyprawa po skarb.</p>
+ <div class="play-choice"><button onclick="startGame()">GRAJ SOLO</button><button class="online-choice" onclick="toggle('roomPanel',1)">GRAJ ONLINE</button></div><p class="keys">WASD lub strzałki • E działaj • Shift sprint • spacja atak</p>
  <button class="pad-guide" onclick="toggle('controllerPanel',1)">🎮 Sterowanie padem i joystickiem</button><p id="padStartInfo" class="pad-start">Podłącz kontroler i naciśnij na nim przycisk.</p>
- <p class="desc">ognisko · jedzenie · handel · nowe zadania</p>
+ <p class="desc">wspólna wyspa · kod pokoju · pad i joystick</p>
 </div></div>
 <div class="hud">
  <div class="p">❤️ <b id="hp">100</b></div><div class="p">⚡ <b id="en">100</b></div><div class="p">⭐ <b id="xp">0</b></div>
@@ -77,21 +83,32 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <div class="p">🥥 <b id="fo">0</b></div><div class="p">🐚 <b id="sh">0</b></div><div class="p">🐟 <b id="fi">0</b></div>
  <div class="p">🏠 L<b id="bl">0</b></div><div class="p">🧭 <b id="zn">Laguna</b></div>
  <button id="padButton" class="p pad-button" onclick="toggle('controllerPanel',1)" aria-label="Sterowanie padem i joystickiem">🎮 PAD</button>
+ <button id="roomButton" class="p pad-button" onclick="toggle('roomPanel',1)" aria-label="Pokój online i gracze">👥 ONLINE</button>
 </div>
-<div class="q">📜 <b id="qt">Wyprawa 0.10</b><br><span id="qx"></span><br><small id="qp"></small></div>
+<div id="questBox" class="q">📜 <b id="qt">Wyprawa 0.11</b><br><span id="qx"></span><br><small id="qp"></small></div>
 <canvas id="game" aria-label="Wyspa, postacie i świat gry"></canvas>
 <div id="msg" class="msg" role="status"></div><div id="hint" class="hint"></div>
 <div class="ctrl"><button class="u" data-k="ArrowUp" aria-label="Idź w górę">▲</button><button class="l" data-k="ArrowLeft" aria-label="Idź w lewo">◀</button><button class="d" data-k="ArrowDown" aria-label="Idź w dół">▼</button><button class="r" data-k="ArrowRight" aria-label="Idź w prawo">▶</button></div>
 <button class="btn sprint">🏃 SPRINT</button><button class="btn block" onclick="block()">🛡️ BLOK</button><button class="btn attack" onclick="attack()">⚔️ ATAK</button>
 <button class="side base" onclick="toggle('basePanel',1)">🏠 BAZA</button><button class="side bag" onclick="toggle('bag',1)">🎒 PLECAK</button><button class="side build" onclick="toggle('craft',1)">🔨 BUDUJ</button><button class="side fish" onclick="goFish()">🎣 ŁÓW</button><button class="act" onclick="interact()">DZIAŁAJ</button>
 <div class="help">WASD / strzałki · E działaj · Shift sprint · spacja atak</div>
+<div id="roomPanel" class="panel" role="dialog" aria-label="Pokój online">
+ <button class="close" aria-label="Zamknij pokój online" onclick="toggle('roomPanel',0)">✕</button><h2>👥 Wspólna wyspa</h2>
+ <p class="intro">Maksymalnie cztery osoby. Każdy gra na swoim urządzeniu.</p><p id="roomStatus" role="status">Utwórz pokój albo wpisz kod od znajomego.</p>
+ <div id="roomLobby">
+  <div class="room-form"><label for="roomName">Twoje imię w grze</label><input id="roomName" maxlength="16" placeholder="Gracz" autocomplete="nickname"><label for="roomJoinCode">Kod pokoju od znajomego</label><input id="roomJoinCode" maxlength="12" placeholder="8 znaków" autocomplete="off" spellcheck="false"></div>
+  <div class="room-actions"><button id="roomCreate" onclick="connectRoom('create')">Utwórz nowy pokój</button><button id="roomJoin" onclick="connectRoom('join')">Dołącz kodem</button><button id="roomResume" onclick="connectRoom('resume')">Wróć do ostatniego pokoju</button></div>
+  <p class="room-note">W pokoju zaczynacie wspólną przygodę. Zasoby, narzędzia, monety, baza i zadania są wspólne. Każdy ma własne zdrowie i energię. Twój zapis solo pozostaje osobno.</p>
+ </div>
+ <div id="roomActive"><h3>Kod dla znajomych</h3><input id="roomCode" class="room-code" readonly aria-label="Kod bieżącego pokoju"><div class="room-actions"><button onclick="copyRoomCode()">Kopiuj kod</button><button onclick="toggle('roomPanel',0)">Wróć na wyspę</button></div><h3>Gracze <span id="roomCount">1/4</span></h3><ul id="roomMembers" class="room-members"></ul><p class="room-note">Pokój i wspólny postęp pozostają dostępne przez 24 godziny od ostatniej gry. Po utracie połączenia wolne miejsce zwalnia się po 45 sekundach.</p><div class="room-actions"><button onclick="leaveRoom()">Opuść pokój i wróć do solo</button></div></div>
+</div>
 <div id="controllerPanel" class="panel" role="dialog" aria-label="Sterowanie padem i joystickiem">
  <button class="close" aria-label="Zamknij sterowanie" onclick="toggle('controllerPanel',0)">✕</button><h2>🎮 Pad i joystick</h2>
  <p class="intro">Podłącz kontroler przez USB lub sparuj go przez Bluetooth z urządzeniem. Wróć do gry i naciśnij przycisk na kontrolerze.</p>
  <div id="padStatus" class="pad-device" role="status">Czekam na kontroler…</div>
  <div class="pad-live"><div class="stick-test"><span id="stickDot"></span></div><span id="padLive">Tutaj sprawdzisz ruch drążka i przyciski.</span></div>
  <p id="bindPrompt" role="status">Drążek: ruch. W menu wybieraj góra/dół, zatwierdzaj przyciskiem DZIAŁAJ.</p>
- <div class="pad-tools"><button id="padCycle" onclick="cyclePad()">Zmień kontroler</button><button id="padRestore" onclick="restorePadDefaults()">Przywróć przyciski</button></div>
+ <div class="pad-tools"><button id="padCycle" onclick="cyclePad()">Zmień kontroler</button><button id="padRestore" onclick="restorePadDefaults()">Przywróć przyciski</button><button onclick="toggle('roomPanel',1)">👥 Pokoje online</button></div>
  <h3>Przyciski</h3><p class="intro">Kliknij „Zmień”, potem naciśnij wybrany przycisk na kontrolerze. Ustawienia zapamiętują się dla tego urządzenia.</p>
  <div class="recipe"><span>DZIAŁAJ / zatwierdź / GRAJ</span><button id="bind-interact" onclick="bindPad('interact')">A / ✕ · Zmień</button></div>
  <div class="recipe"><span>ATAK</span><button id="bind-attack" onclick="bindPad('attack')">X / □ · Zmień</button></div>
@@ -114,7 +131,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <div class="recipe"><span>🛶 Tratwa<small>12 drewna + 6 muszelek</small></span><button onclick="craftRaft()">Zbuduj</button></div>
 </div>
 <div id="basePanel" class="panel" role="dialog" aria-label="Centrum bazy">
- <button class="close" aria-label="Zamknij bazę" onclick="toggle('basePanel',0)">✕</button><h2>🏠 Centrum bazy</h2><p class="intro">Twoje miejsce odpoczynku.</p><p>Poziom bazy: <b id="baseLevel">0</b>/3</p>
+ <button class="close" aria-label="Zamknij bazę" onclick="toggle('basePanel',0)">✕</button><h2>🏠 Centrum bazy</h2><p id="baseIntro" class="intro">Twoje miejsce odpoczynku.</p><p>Poziom bazy: <b id="baseLevel">0</b>/3</p>
  <div class="recipe"><span>🏠 Baza L1<small>12 drewna + 8 kamieni</small></span><button onclick="upgradeBase(1)">Buduj</button></div>
  <div class="recipe"><span>🛖 Baza L2<small>18 drewna + 12 kamieni + 50 monet</small></span><button onclick="upgradeBase(2)">Ulepsz</button></div>
  <div class="recipe"><span>🏡 Baza L3<small>28 drewna + 18 kamieni + 100 monet</small></span><button onclick="upgradeBase(3)">Ulepsz</button></div>
@@ -124,7 +141,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <div class="recipe"><span>Odpoczynek<small>5 sekund · do +40 zdrowia i +70 energii</small></span><button id="restButton" onclick="restAtFire()">Odpocznij</button></div>
 </div>
 <div id="bag" class="panel" role="dialog" aria-label="Plecak">
- <button class="close" aria-label="Zamknij plecak" onclick="toggle('bag',0)">✕</button><h2>🎒 Plecak</h2><p class="intro">Zjedz coś przed kolejną wyprawą.</p>
+ <button class="close" aria-label="Zamknij plecak" onclick="toggle('bag',0)">✕</button><h2>🎒 Plecak</h2><p id="bagIntro" class="intro">Zjedz coś przed kolejną wyprawą.</p>
  <div class="stock"><span>🪵 <b id="bw">0</b></span><span>🪨 <b id="bs">0</b></span><span>🐚 <b id="bsh">0</b></span></div>
  <div class="recipe"><span>🥥 Kokosy: <b id="bf">0</b><small>+20 zdrowia · +15 energii</small></span><button onclick="eat('coconut')">Zjedz kokos</button></div>
  <div class="recipe"><span>🐟 Surowe ryby: <b id="bfi">0</b><small>Upiecz je przy ognisku lub sprzedaj.</small></span></div>
@@ -157,7 +174,11 @@ let wood=0,stone=0,food=0,shells=0,fish=0,cookedFish=0,totalCaught=0,xpv=0,coins
 let spear=0,rod=0,raft=0,treasure=0,sprint=0,blocking=0,lastAttack=0,secondFound=0,returned=0,baseLevel=0,basePos=null,campfire=0;
 let questsDone={fish:0,supplies:0},activePanel=null,resting=0,face='down',moving=false,walkPhase=0,time=0,lastTime=0,lastAutosave=0,lastUI=0,hitFlash=0,msgTimer=0;
 const O=[],E=[],F=[],nela={x:3370,y:430},leon={x:1630,y:1160};
-const chest={x:4200,y:2450},panels=['craft','basePanel','bag','shop','nelaPanel','controllerPanel'];
+const chest={x:4200,y:2450},panels=['craft','basePanel','bag','shop','nelaPanel','controllerPanel','roomPanel'];
+const ROOM_API='https://my-island-online.arekpoczta734.chatgpt.site/api/rooms',ROOM_KEY='myIslandRoomV1';
+const playerLooks=[{shirt:'#4c9cba',skin:'#e3b185',hair:'#463b32'},{shirt:'#df8168',skin:'#be895f',hair:'#382d29'},{shirt:'#9974c7',skin:'#efc69d',hair:'#725039'},{shirt:'#76b677',skin:'#a67152',hair:'#2f302b'}];
+const net={room:null,token:null,you:null,players:[],worldRev:-1,connected:false,busy:false,joining:false,epoch:0,lastOk:0,actions:[],timer:null,solo:null,reset:0,joinAbort:null};
+let lastRoom=null;try{const r=JSON.parse(localStorage.getItem(ROOM_KEY));if(r&&/^[A-HJ-NP-Z2-9]{8}$/.test(r.code)&&/^[a-f0-9]{64}$/.test(r.token))lastRoom=r}catch(e){}
 const PAD_KEY='myIslandPadV1',padDefaults={interact:0,back:1,attack:2,bag:3,base:4,fish:5,block:6,sprint:7,craft:8,menu:9};
 const padLabels={interact:'A / ✕',back:'B / ○',attack:'X / □',bag:'Y / △',base:'LB / L1',fish:'RB / R1',block:'LT / L2',sprint:'RT / R2',craft:'View / Share',menu:'Menu / Options'};
 const padNames={interact:'DZIAŁAJ',back:'WRÓĆ',attack:'ATAK',bag:'PLECAK',base:'BAZA',fish:'ŁÓW',block:'BLOK',sprint:'SPRINT',craft:'BUDUJ',menu:'MENU'};
@@ -216,6 +237,7 @@ function resize(){
  waterGradient=X.createLinearGradient(0,0,W,H);waterGradient.addColorStop(0,'#239cb2');waterGradient.addColorStop(.6,'#168ca7');waterGradient.addColorStop(1,'#10688e');
 }
 addEventListener('resize',resize);resize();
+if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>{const r=document.querySelector('.hud').getBoundingClientRect();$('questBox').style.top=Math.max(r.bottom+12,r.top+(innerWidth<=700?94:62))+'px'}).observe(document.querySelector('.hud'));
 function visible(x,y,pad=120){return x>cam.x-pad&&x<cam.x+W+pad&&y>cam.y-pad&&y<cam.y+H+pad}
 function label(x,y,text,color='#e9f3dc'){
  X.font='700 10px system-ui';const w=X.measureText(text).width+16;rounded(X,x-w/2,y-12,w,20,7,'#07333dd9');X.fillStyle=color;X.textAlign='center';X.fillText(text,x,y+1);X.textAlign='left';
@@ -249,8 +271,8 @@ function drawFish(f){
  X.save();X.translate(x,y);X.rotate(Math.sin(time*.001+f.phase)*.25);X.globalAlpha=.55;
  ellipse(X,0,0,11,4,'#85d9d9');X.fillStyle='#69c4c7';X.beginPath();X.moveTo(-9,0);X.lineTo(-17,-5);X.lineTo(-15,5);X.fill();ellipse(X,7,-1,1,1,'#0b718c');X.restore();
 }
-function drawPerson(x,y,kind='player',direction='down',walk=0,wet=false){
- const skin=kind==='leon'?'#b9825e':'#e3b185',shirt=kind==='nela'?'#dd876f':kind==='leon'?'#ded1a5':'#4c9cba',hair=kind==='nela'?'#945039':'#463b32';
+function drawPerson(x,y,kind='player',direction='down',walk=0,wet=false,look=null){
+ const skin=look?.skin||(kind==='leon'?'#b9825e':'#e3b185'),shirt=look?.shirt||(kind==='nela'?'#dd876f':kind==='leon'?'#ded1a5':'#4c9cba'),hair=look?.hair||(kind==='nela'?'#945039':'#463b32');
  const bob=walk?Math.abs(Math.sin(walk))*1.8:Math.sin(time*.002+kind.length)*.7,step=walk?Math.sin(walk)*5:0;
  X.save();X.translate(x,y);shadow(0,0,14,5);if(direction==='left')X.scale(-1,1);
  if(wet){X.strokeStyle='#b5ece0a0';X.lineWidth=2;X.beginPath();X.ellipse(0,0,18+Math.sin(time*.006)*2,5,0,0,6.28);X.stroke();X.translate(0,23)}
@@ -278,8 +300,8 @@ function drawPerson(x,y,kind='player',direction='down',walk=0,wet=false){
  if(kind==='leon'){ellipse(X,0,-59-bob,15,3,'#b49a64');rounded(X,-9,-68-bob,18,10,3,'#d2bc86');X.fillStyle='#c3ae79';X.fillRect(-9,-60-bob,18,2)}
  if(kind==='nela')ellipse(X,11,-49-bob,5,9,'#b26642');
  if(kind==='player'&&spear&&!wet){X.strokeStyle='#755738';X.lineWidth=3;X.beginPath();X.moveTo(18,-4);X.lineTo(21,-51);X.stroke();X.fillStyle='#b8c8c6';X.beginPath();X.moveTo(21,-59);X.lineTo(16,-49);X.lineTo(24,-49);X.fill()}
- if(kind==='player'&&blocking){ellipse(X,-16,-25,11,14,'#768f9a');ellipse(X,-16,-25,7,10,'#aebcb5')}
- if(kind==='player'&&hitFlash>0){X.strokeStyle='#ffb7a3';X.lineWidth=2;X.beginPath();X.ellipse(0,-29,18,32,0,0,6.28);X.stroke()}
+ if(kind==='player'&&(look?.blocked??(blocking||pad.blocking))){ellipse(X,-16,-25,11,14,'#768f9a');ellipse(X,-16,-25,7,10,'#aebcb5')}
+ if(kind==='player'&&!look?.remote&&hitFlash>0){X.strokeStyle='#ffb7a3';X.lineWidth=2;X.beginPath();X.ellipse(0,-29,18,32,0,0,6.28);X.stroke()}
  X.restore();
 }
 function drawBoar(e){
@@ -311,7 +333,7 @@ function drawBase(){
  }else{
   rounded(X,-35,-45,70,47,3,baseLevel===2?'#bda16e':'#e3d1a2');X.fillStyle=baseLevel===2?'#527c51':'#b67c56';X.beginPath();X.moveTo(-46,-41);X.lineTo(0,-78);X.lineTo(46,-41);X.closePath();X.fill();
   rounded(X,-8,-29,18,31,2,'#6a6e50');rounded(X,-26,-31,13,14,2,'#91bdc4');rounded(X,17,-31,13,14,2,'#91bdc4');X.strokeStyle='#f2e0a6';X.lineWidth=2;X.beginPath();X.moveTo(-20,-30);X.lineTo(-20,-17);X.moveTo(23,-30);X.lineTo(23,-17);X.stroke();
- }X.restore();label(x,y-87,'TWOJA BAZA · L'+baseLevel);
+ }X.restore();label(x,y-87,(net.room?'WSPÓLNA BAZA':'TWOJA BAZA')+' · L'+baseLevel);
 }
 function drawChest(){shadow(chest.x,chest.y,22,8);rounded(X,chest.x-20,chest.y-25,40,28,4,'#a77a40');rounded(X,chest.x-20,chest.y-33,40,14,4,'#be9455');X.fillStyle='#e2c67b';X.fillRect(chest.x-12,chest.y-32,4,34);X.fillRect(chest.x+8,chest.y-32,4,34);rounded(X,chest.x-4,chest.y-17,8,9,2,'#f6d779')}
 function drawStall(){
@@ -342,7 +364,11 @@ function draw(){
  for(const [person,kind,name] of [[nela,'nela','NELA · ZADANIA'],[leon,'leon','LEON · HANDLARZ']]){
   if(visible(person.x,person.y))things.push({y:person.y,draw:()=>{drawPerson(person.x,person.y,kind,Math.abs(P.x-person.x)>Math.abs(P.y-person.y)?P.x<person.x?'left':'right':P.y<person.y?'up':'down');label(person.x,P.y>person.y&&distance(P,person)<140?person.y-80:person.y+23,name)}});
  }
- things.push({y:P.y,draw:()=>{const wet=sea(P.x,P.y);if(wet&&raft)drawRaft(P.x,P.y);drawPerson(P.x,P.y,'player',face,moving?walkPhase:0,wet&&!raft);if(Date.now()-lastAttack<180&&spear){X.strokeStyle='#f6efd3';X.lineWidth=3;X.beginPath();X.arc(P.x,P.y-18,43,walkPhase,walkPhase+1.9);X.stroke()}}});
+ if(net.room)for(const person of net.players){
+  if(person.id===net.you)continue;const point=remotePosition(person,time),look=playerLooks[person.slot]||playerLooks[0];
+  if(visible(point.x,point.y))things.push({y:point.y,draw:()=>{const wet=sea(point.x,point.y);if(wet&&raft)drawRaft(point.x,point.y);ellipse(X,point.x,point.y+3,17,6,look.shirt+'aa');drawPerson(point.x,point.y,'player',person.face,person.moving?time*.012:0,wet&&!raft,{...look,blocked:person.blocked,remote:true});label(point.x,point.y-80,person.name,look.shirt)}});
+ }
+ things.push({y:P.y,draw:()=>{const wet=sea(P.x,P.y),me=net.players.find(p=>p.id===net.you),look=net.room?playerLooks[me?.slot||0]:null;if(wet&&raft)drawRaft(P.x,P.y);if(look)ellipse(X,P.x,P.y+3,17,6,look.shirt+'aa');drawPerson(P.x,P.y,'player',face,moving?walkPhase:0,wet&&!raft,look);if(me)label(P.x,P.y-80,me.name+' · TY',look.shirt);if(Date.now()-lastAttack<180&&spear){X.strokeStyle='#f6efd3';X.lineWidth=3;X.beginPath();X.arc(P.x,P.y-18,43,walkPhase,walkPhase+1.9);X.stroke()}}});
  things.sort((a,b)=>a.y-b.y);for(const t of things)t.draw();
  if(visible(3380,220))label(3380,205,'PÓŁNOCNA ZATOKA','#f5e7ba');
  if(visible(4100,2120))label(4100,2110,'WYSPA SKARBU','#f5e7ba');
@@ -363,6 +389,85 @@ function enemies(step){
   }
  }
 }
+function gameState(){return {version:10,P,wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,health,energy,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone}}
+function copyState(value){return JSON.parse(JSON.stringify(value))}
+function applyBank(b){({wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone}=b)}
+function captureSolo(){return {state:copyState(gameState()),resources:copyState(O),enemies:copyState(E),seed,face,walkPhase}}
+function restoreSolo(saved){
+ if(!saved)return;const s=saved.state;applyBank(s);P={...s.P};health=s.health;energy=s.energy;O.splice(0,O.length,...saved.resources);E.splice(0,E.length,...saved.enemies);seed=saved.seed;face=saved.face;walkPhase=saved.walkPhase;resting=0;moving=false;
+}
+function remotePosition(person,now){const t=Math.max(0,Math.min(1,(now-person.received)/180));return {x:person.fromX+(person.x-person.fromX)*t,y:person.fromY+(person.y-person.fromY)*t}}
+function updateRoomUI(){
+ $('roomLobby').style.display=net.room?'none':'block';$('roomActive').style.display=net.room?'block':'none';
+ $('roomCreate').disabled=$('roomJoin').disabled=$('roomResume').disabled=net.joining;
+ $('roomResume').style.display=lastRoom&&!net.room?'inline-block':'none';
+ if(!$('roomName').value)$('roomName').value=lastRoom?.name||'';
+ $('roomButton').textContent=net.room?net.connected?'👥 '+net.players.length+'/4':'👥 ŁĄCZĘ…':'👥 ONLINE';
+ if(!net.room)return;
+ $('roomCode').value=net.room;$('roomCount').textContent=net.players.length+'/4';
+ $('roomStatus').textContent=net.ended?'Sesja zakończona. Wróć do solo i dołącz ponownie.':net.connected?'Jesteście na wspólnej wyspie. Podaj znajomym kod pokoju.':'Połączenie przerwane. Ponawiam — postać czeka bezpiecznie.';
+ const members=net.players.map(p=>{const li=document.createElement('li'),color=document.createElement('span'),name=document.createElement('span'),hp=document.createElement('span');color.className='member-color';color.style.background=(playerLooks[p.slot]||playerLooks[0]).shirt;name.textContent=p.name+(p.id===net.you?' (ty)':'');hp.className='member-health';hp.textContent='❤️ '+Math.round(p.health);li.append(color,name,hp);return li});
+ $('roomMembers').replaceChildren(...members);
+}
+async function roomRequest(payload,signal){
+ const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),8000);if(signal)signal.addEventListener('abort',()=>controller.abort(),{once:true});
+ try{const response=await fetch(ROOM_API,{method:'POST',mode:'cors',cache:'no-store',credentials:'omit',headers:{'Content-Type':'application/json'},body:JSON.stringify({version:11,...payload}),signal:controller.signal});
+  let data;try{data=await response.json()}catch(e){throw new Error('Nie mogę teraz odczytać pokoju. Spróbuj ponownie.')}
+  if(!response.ok||data.error)throw Object.assign(new Error(data.error||'Nie mogę teraz połączyć się z pokojem.'),{ended:!!data.ended,status:response.status});return data;
+ }finally{clearTimeout(timeout)}
+}
+function applyRoomSnapshot(data,initial=false){
+ if(data.version!==11||!Array.isArray(data.players)||data.players.length>4||!data.bank)return;
+ const mine=data.players.find(p=>p.id===data.you);if(!mine)return;
+ const now=performance.now(),previous=net.players;
+ net.players=data.players.map(p=>{const old=previous.find(q=>q.id===p.id),start=old?remotePosition(old,now):p,teleport=Math.hypot(start.x-p.x,start.y-p.y)>350;return {...p,fromX:teleport?p.x:start.x,fromY:teleport?p.y:start.y,received:now}});
+ applyBank(data.bank);if(Array.isArray(data.resources))O.splice(0,O.length,...data.resources);if(Array.isArray(data.enemies))E.splice(0,E.length,...data.enemies.map(e=>({...e,hit:0})));
+ if(initial||mine.reset!==net.reset||Math.hypot(P.x-mine.x,P.y-mine.y)>130){P={x:mine.x,y:mine.y};resetInput()}
+ if(mine.health<health)hitFlash=12;health=mine.health;energy=mine.energy;resting=mine.resting;net.reset=mine.reset;net.you=data.you;net.worldRev=data.worldRev;net.connected=true;net.lastOk=now;net.ended=false;
+ update();updateRoomUI();
+}
+function cancelRoomJoin(){if(!net.joining)return;net.epoch++;net.joinAbort?.abort();net.joining=false;updateRoomUI()}
+async function connectRoom(mode){
+ if(net.room||net.joining)return;
+ const name=String($('roomName').value||'Gracz').trim().slice(0,16)||'Gracz',code=String($('roomJoinCode').value||'').toUpperCase().replace(/[\s-]/g,'');
+ if(mode==='join'&&!/^[A-HJ-NP-Z2-9]{8}$/.test(code)){return $('roomStatus').textContent='Wpisz osiem znaków kodu od znajomego.'}
+ if(mode==='resume'&&!lastRoom)return;
+ if(!play)load();save();const solo=captureSolo(),epoch=++net.epoch;net.joining=true;net.joinAbort=new AbortController();updateRoomUI();$('roomStatus').textContent=mode==='create'?'Tworzę wspólną wyspę…':'Dołączam do wyspy…';
+ try{
+  const payload=mode==='create'?{op:'create',name}:mode==='resume'?{op:'join',name,code:lastRoom.code,token:lastRoom.token}:{op:'join',name,code};
+  const data=await roomRequest(payload,net.joinAbort.signal);if(epoch!==net.epoch)return;
+  net.joining=false;net.solo=solo;net.room=data.code;net.token=data.token||lastRoom?.token;net.actions=[];net.worldRev=-1;net.reset=-1;net.players=[];
+  if(!net.token)throw new Error('Nie udało się rozpocząć sesji. Dołącz ponownie.');
+  lastRoom={code:net.room,token:net.token,name};try{localStorage.setItem(ROOM_KEY,JSON.stringify(lastRoom))}catch(e){}
+  $('start').style.display='none';play=1;toggle('roomPanel',0);applyRoomSnapshot(data,true);net.timer=setInterval(()=>syncRoom(),180);syncRoom();say('Wspólna wyspa gotowa! Kod: '+net.room);
+ }catch(error){if(epoch!==net.epoch)return;if(error.ended&&mode==='resume'){lastRoom=null;try{localStorage.removeItem(ROOM_KEY)}catch(e){}}$('roomStatus').textContent=error.name==='AbortError'?'Połączenie trwa zbyt długo. Spróbuj ponownie.':error.message||'Nie mogę połączyć się z wyspą.';
+  if(net.room){net.room=null;net.token=null;restoreSolo(solo)}
+ }finally{if(epoch===net.epoch){net.joining=false;updateRoomUI()}}
+}
+function onlineReady(){return !net.room||(net.connected&&!net.ended&&performance.now()-net.lastOk<2500)}
+function roomAction(action){
+ if(!net.room)return false;if(!onlineReady()){say('Czekam na połączenie z wyspą.');return true}
+ if(net.actions.length){say('Chwileczkę — kończę poprzednią czynność.');return true}
+ const id=typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
+ net.actions.push({...action,id,fromPanel:activePanel});syncRoom();return true;
+}
+async function syncRoom(){
+ if(!net.room||net.busy||net.ended)return;const epoch=net.epoch,action=net.actions[0];net.busy=true;
+ try{
+  const input={x:P.x,y:P.y,face,moving:!activePanel&&inputFocused&&moving,sprint:!!(sprint||pad.sprinting),blocked:!!(blocking||pad.blocking),paused:!!activePanel||!inputFocused||document.hidden};
+  const data=await roomRequest({op:'sync',code:net.room,token:net.token,worldRev:net.worldRev,input,...(action?{action}: {})});if(epoch!==net.epoch||!net.room)return;
+  applyRoomSnapshot(data);
+  if(action&&data.actionId===action.id){net.actions.shift();const result=data.result;if(result){if(result.message)say(result.message);if(result.panel&&!activePanel)toggle(result.panel,1);if(result.closePanel&&activePanel===action.fromPanel)toggle(activePanel,0);if(action.kind==='attack'&&result.ok)lastAttack=Date.now()}}
+ }catch(error){if(epoch!==net.epoch||!net.room)return;net.connected=false;resetInput();if(error.ended){net.ended=true;clearInterval(net.timer);lastRoom=null;try{localStorage.removeItem(ROOM_KEY)}catch(e){}}updateRoomUI();
+ }finally{if(epoch===net.epoch)net.busy=false}
+}
+async function leaveRoom(){
+ if(!net.room){cancelRoomJoin();return}
+ const session={op:'leave',code:net.room,token:net.token},saved=net.solo;net.epoch++;clearInterval(net.timer);net.timer=null;net.room=null;net.token=null;net.players=[];net.actions=[];net.connected=false;net.busy=false;net.ended=false;net.solo=null;lastRoom=null;
+ try{localStorage.removeItem(ROOM_KEY)}catch(e){}restoreSolo(saved);resetInput();toggle('roomPanel',0);save();updateRoomUI();$('roomStatus').textContent='Utwórz pokój albo wpisz kod od znajomego.';say('Wróciłeś do swojego zapisu solo.');
+ try{await roomRequest(session)}catch(e){}
+}
+async function copyRoomCode(){if(!net.room)return;try{await navigator.clipboard.writeText(net.room);say('Kod pokoju skopiowany: '+net.room)}catch(e){$('roomCode').focus();$('roomCode').select();say('Zaznaczyłem kod. Skopiuj go i podaj znajomym.')}}
 function readPads(){
  if(!padAvailable)return [];try{return Array.from(navigator.getGamepads()||[]).filter(p=>p&&p.connected!==false)}catch(e){padAvailable=false;return []}
 }
@@ -471,18 +576,19 @@ addEventListener('gamepaddisconnected',e=>{if(e.gamepad.index===pad.index)select
 function loop(timestamp=performance.now()){
  const step=lastTime?Math.max(.1,Math.min(3,(timestamp-lastTime)/16.667)):1;lastTime=timestamp;time=timestamp;
  pollController(timestamp);
+ if(net.room&&net.connected&&timestamp-net.lastOk>2500){net.connected=false;resetInput();updateRoomUI()}
  if(play){
-  let dx=0,dy=0;if(!activePanel){if(K.ArrowUp||K.w)dy--;if(K.ArrowDown||K.s)dy++;if(K.ArrowLeft||K.a)dx--;if(K.ArrowRight||K.d)dx++;
+  let dx=0,dy=0;if(!activePanel&&onlineReady()){if(K.ArrowUp||K.w)dy--;if(K.ArrowDown||K.s)dy++;if(K.ArrowLeft||K.a)dx--;if(K.ArrowRight||K.d)dx++;
    if(dx&&dy){dx*=Math.SQRT1_2;dy*=Math.SQRT1_2}else if(!dx&&!dy){dx=pad.x;dy=pad.y}
   }
   moving=!!(dx||dy);if(moving){face=Math.abs(dx)>Math.abs(dy)?dx<0?'left':'right':dy<0?'up':'down';walkPhase+=step*.2;if(resting){resting=0;say('Odpoczynek przerwany.')}}
   const wet=sea(P.x,P.y),fast=(sprint||pad.sprinting)&&energy>0&&moving,speed=wet?(raft?6:2):(fast?7:4);
-  if(!activePanel)energy=Math.max(0,Math.min(100,energy+(wet&&!raft?-.2:fast?-.28:.12)*step));
+  if(!net.room&&!activePanel)energy=Math.max(0,Math.min(100,energy+(wet&&!raft?-.2:fast?-.28:.12)*step));
   let nx=Math.max(60,Math.min(4540,P.x+dx*speed*step)),ny=Math.max(60,Math.min(2840,P.y+dy*speed*step));
   if(deep(nx,ny)&&!raft){nx=P.x;ny=P.y}P.x=nx;P.y=ny;
-  if(island2(P.x,P.y)&&!secondFound){secondFound=1;xpv+=150;coins+=75;say('Odkryto Wyspę Skarbu!');save()}
-  if(resting>0){const seconds=step/60;health=Math.min(100,health+seconds*8);energy=Math.min(100,energy+seconds*14);resting=Math.max(0,resting-seconds);if(!resting){save();say('Odpoczynek zakończony. Czas na przygodę!')}}
-  if(!activePanel&&mainLand(P.x,P.y))enemies(step);hitFlash=Math.max(0,hitFlash-step);
+  if(!net.room&&island2(P.x,P.y)&&!secondFound){secondFound=1;xpv+=150;coins+=75;say('Odkryto Wyspę Skarbu!');save()}
+  if(!net.room&&resting>0){const seconds=step/60;health=Math.min(100,health+seconds*8);energy=Math.min(100,energy+seconds*14);resting=Math.max(0,resting-seconds);if(!resting){save();say('Odpoczynek zakończony. Czas na przygodę!')}}
+  if(!net.room&&!activePanel&&mainLand(P.x,P.y))enemies(step);hitFlash=Math.max(0,hitFlash-step);
   if(timestamp-lastAutosave>5000){save();lastAutosave=timestamp}
  }
  cam.x=Math.max(0,Math.min(Math.max(0,WORLD.w-W),P.x-W/2));cam.y=Math.max(0,Math.min(Math.max(0,WORLD.h-H),P.y-H/2));
@@ -500,15 +606,16 @@ addEventListener('blur',()=>{inputFocused=false;resetInput()});addEventListener(
 function holdControl(b,on,off){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);on()};b.onpointerup=b.onpointercancel=b.onlostpointercapture=off}
 document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;holdControl(b,()=>{if(!activePanel)K[k]=1},()=>K[k]=0)});
 holdControl(document.querySelector('.sprint'),()=>{if(!activePanel)sprint=1},()=>sprint=0);
-function startGame(){if(play)return;load();$('start').style.display='none';play=1;resetInput();lastAutosave=performance.now();update();say('Witaj na żywej wyspie! Leon czeka przy obozowisku.')}
+function startGame(){if(play)return;cancelRoomJoin();load();$('start').style.display='none';play=1;resetInput();lastAutosave=performance.now();update();say('Witaj na żywej wyspie! Leon czeka przy obozowisku.')}
 function block(){if(activePanel)return;blocking=1;setTimeout(()=>blocking=0,1200)}
 function attack(){
- if(activePanel)return;if(!spear)return say('Potrzebujesz włóczni. Zrobisz ją w warsztacie.');if(Date.now()-lastAttack<650)return;lastAttack=Date.now();
+ if(activePanel)return;if(net.room)return roomAction({kind:'attack'});if(!spear)return say('Potrzebujesz włóczni. Zrobisz ją w warsztacie.');if(Date.now()-lastAttack<650)return;lastAttack=Date.now();
  let target=null,d=105;for(const e of E){const q=distance(P,e);if(q<d){d=q;target=e}}if(!target)return say('Nic w zasięgu włóczni.');
  target.hp-=2;if(target.hp<=0){E.splice(E.indexOf(target),1);coins+=20;xpv+=35;save();update();say('Dzik pokonany: +20 monet, +35 XP.')}
 }
 function interact(){
  if(activePanel)return;
+ if(net.room){let target=null,d=75;for(const o of O){const q=distance(P,o);if(q<d){d=q;target=o}}return roomAction({kind:'interact',...(target?{target:target.id}:{})})}
  if(distance(P,leon)<110)return toggle('shop',1);
  if(distance(P,nela)<110){
   if(treasure&&!returned){returned=1;coins+=250;xpv+=300;save();say('Nela: Skarb odnaleziony! +250 monet, +300 XP.')}return toggle('nelaPanel',1);
@@ -523,14 +630,15 @@ function interact(){
  xpv+=10;coins+=2;save();update();say('Zebrano: '+found+'.');
 }
 function goFish(){
- if(activePanel)return;if(!rod)return say('Najpierw zrób wędkę w warsztacie.');
+ if(activePanel)return;if(net.room)return roomAction({kind:'fish'});if(!rod)return say('Najpierw zrób wędkę w warsztacie.');
  if(!sea(P.x,P.y)&&![[-80,0],[80,0],[0,-80],[0,80]].some(([x,y])=>sea(P.x+x,P.y+y)))return say('Podejdź do brzegu, żeby łowić.');
  if(rand()<.7){fish++;totalCaught++;xpv+=20;say('Złowiona ryba! Upiecz ją lub sprzedaj Leonowi.')}else say('Ryba uciekła. Spróbuj ponownie.');save();update();
 }
-function craftSpear(){if(spear)return say('Masz już włócznię.');if(wood<6||stone<4)return say('Potrzebujesz 6 drewna i 4 kamieni.');wood-=6;stone-=4;spear=1;done('Włócznia gotowa!')}
-function craftRod(){if(rod)return say('Masz już wędkę.');if(wood<5||shells<2)return say('Potrzebujesz 5 drewna i 2 muszelek.');wood-=5;shells-=2;rod=1;done('Wędka gotowa!')}
-function craftRaft(){if(raft)return say('Masz już tratwę.');if(wood<12||shells<6)return say('Potrzebujesz 12 drewna i 6 muszelek.');wood-=12;shells-=6;raft=1;done('Tratwa gotowa! Możesz przemierzać głębokie wody.')}
+function craftSpear(){if(net.room)return roomAction({kind:'craft',item:'spear'});if(spear)return say('Masz już włócznię.');if(wood<6||stone<4)return say('Potrzebujesz 6 drewna i 4 kamieni.');wood-=6;stone-=4;spear=1;done('Włócznia gotowa!')}
+function craftRod(){if(net.room)return roomAction({kind:'craft',item:'rod'});if(rod)return say('Masz już wędkę.');if(wood<5||shells<2)return say('Potrzebujesz 5 drewna i 2 muszelek.');wood-=5;shells-=2;rod=1;done('Wędka gotowa!')}
+function craftRaft(){if(net.room)return roomAction({kind:'craft',item:'raft'});if(raft)return say('Masz już tratwę.');if(wood<12||shells<6)return say('Potrzebujesz 12 drewna i 6 muszelek.');wood-=12;shells-=6;raft=1;done('Tratwa gotowa! Możesz przemierzać głębokie wody.')}
 function upgradeBase(level){
+ if(net.room)return roomAction({kind:'base',level});
  if(level!==baseLevel+1)return say('Zbuduj kolejno poziomy L1, L2 i L3.');if(level===1&&sea(P.x,P.y))return say('Bazę zbuduj na lądzie.');
  const w=[0,12,18,28][level],s=[0,8,12,18][level],c=[0,0,50,100][level];
  if(wood<w||stone<s||coins<c)return say('Brakuje materiałów lub monet.');wood-=w;stone-=s;coins-=c;baseLevel=level;
@@ -539,33 +647,39 @@ function upgradeBase(level){
 }
 function nearFire(){const f=firePosition();return campfire&&f&&distance(P,f)<150}
 function buildFire(){
+ if(net.room)return roomAction({kind:'fire'});
  if(campfire)return say('Ognisko już płonie.');if(!baseLevel)return say('Najpierw zbuduj bazę L1.');
  if(distance(P,basePos)>150)return say('Wróć do swojej bazy, żeby rozpalić ognisko.');if(wood<4||stone<2)return say('Potrzebujesz 4 drewna i 2 kamieni.');
  wood-=4;stone-=2;campfire=1;xpv+=40;save();update();say('Ognisko płonie. Możesz piec ryby i odpoczywać.');
 }
 function cookFish(){
+ if(net.room)return roomAction({kind:'cook'});
  if(!nearFire())return say('Podejdź do rozpalonego ogniska przy bazie.');if(fish<1||wood<1)return say('Potrzebujesz surowej ryby i 1 drewna.');
  fish--;wood--;cookedFish++;xpv+=10;save();update();say('Ryba upieczona! Znajdziesz ją w plecaku.');
 }
 function eat(kind){
+ if(net.room)return roomAction({kind:'eat',item:kind});
  if(health>=100&&energy>=100)return say('Masz pełne zdrowie i energię. Zachowaj jedzenie na później.');
  if(kind==='coconut'){if(food<1)return say('Nie masz kokosów.');food--;health=Math.min(100,health+20);energy=Math.min(100,energy+15)}
  else if(kind==='fish'){if(cookedFish<1)return say('Najpierw upiecz rybę przy ognisku.');cookedFish--;health=Math.min(100,health+45);energy=Math.min(100,energy+35)}
  else return;save();update();say('Jedzenie dodało ci sił.');
 }
 function restAtFire(){
+ if(net.room){resetInput();return roomAction({kind:'rest'})}
  if(resting)return;if(!nearFire())return say('Podejdź do rozpalonego ogniska.');
  if(health>=100&&energy>=100)return say('Jesteś już wypoczęty.');resetInput();resting=5;update();say('Odpoczywasz przy ognisku…');
 }
 const market={buy:{wood:{qty:5,price:20},stone:{qty:5,price:25},food:{qty:2,price:16}},sell:{wood:{qty:5,price:10},fish:{qty:1,price:12},shells:{qty:2,price:8}}};
 function resource(key,value){if(key==='wood'){if(value!==undefined)wood=value;return wood}if(key==='stone'){if(value!==undefined)stone=value;return stone}if(key==='food'){if(value!==undefined)food=value;return food}if(key==='fish'){if(value!==undefined)fish=value;return fish}if(key==='shells'){if(value!==undefined)shells=value;return shells}return 0}
 function trade(mode,key){
+ if(net.room)return roomAction({kind:'trade',mode,item:key});
  if(distance(P,leon)>=110)return say('Podejdź do Leona przy obozowisku.');const offer=market[mode]?.[key];if(!offer)return;
  if(mode==='buy'){if(coins<offer.price)return say('Za mało monet.');coins-=offer.price;resource(key,resource(key)+offer.qty)}
  else{if(resource(key)<offer.qty)return say('Za mało zasobów na sprzedaż.');resource(key,resource(key)-offer.qty);coins+=offer.price}
  save();update();say(mode==='buy'?'Zakup udany.':'Zasoby sprzedane.');
 }
 function deliverQuest(key){
+ if(net.room)return roomAction({kind:'quest',item:key});
  if(questsDone[key])return say('To zadanie jest już ukończone.');
  if(key==='supplies'){
   if(distance(P,leon)>=110)return say('Dostarcz materiały Leonowi.');if(wood<6||stone<4)return say('Leon potrzebuje 6 drewna i 4 kamieni.');
@@ -577,8 +691,9 @@ function deliverQuest(key){
  questsDone[key]=1;save();update();say('Dostawa przyjęta! Otrzymujesz monety i XP.');
 }
 function done(text){toggle('craft',0);xpv+=40;save();update();say(text)}
-function toggle(id,on){if(!panels.includes(id))return;for(const name of panels)$(name).style.display='none';activePanel=on?id:null;if(on)$(id).style.display='block';pad.capture=null;focusPadButton(null);resetInput();if(id==='controllerPanel')updatePadUI();if(on&&padDevice)focusPadMenu();update()}
+function toggle(id,on){if(!panels.includes(id))return;if(net.joining&&!net.room&&(id!=='roomPanel'||!on))cancelRoomJoin();for(const name of panels)$(name).style.display='none';activePanel=on?id:null;if(on)$(id).style.display='block';pad.capture=null;focusPadButton(null);resetInput();if(id==='controllerPanel')updatePadUI();if(id==='roomPanel')updateRoomUI();if(on&&padDevice)focusPadMenu();update()}
 function update(){
+ $('bagIntro').textContent=net.room?'Wspólne zasoby drużyny. Jedzenie leczy osobę, która je zjada.':'Zjedz coś przed kolejną wyprawą.';$('baseIntro').textContent=net.room?'Wspólna baza i ognisko całej drużyny.':'Twoje miejsce odpoczynku.';
  const values={hp:Math.round(health),en:Math.round(energy),xp:xpv,co:coins,wo:wood,st:stone,fo:food,sh:shells,fi:fish+cookedFish,bl:baseLevel,baseLevel,bw:wood,bs:stone,bf:food,bsh:shells,bfi:fish,bcf:cookedFish,bp:spear?'jest':'brak',br:rod?'jest':'brak',bra:raft?'jest':'brak',bt:treasure?'zdobyty':'brak',shopCoins:coins};
  for(const [id,value] of Object.entries(values))$(id).textContent=value;
  $('zn').textContent=island2(P.x,P.y)?'Wyspa Skarbu':deep(P.x,P.y)?'Głębokie wody':sea(P.x,P.y)?raft?'Na tratwie':'Pływanie':P.x>3050&&P.y<850?'Północna Zatoka':'Wnętrze wyspy';
@@ -602,7 +717,7 @@ function update(){
 }
 function say(text){$('msg').textContent=text;$('msg').classList.add('on');clearTimeout(msgTimer);msgTimer=setTimeout(()=>$('msg').classList.remove('on'),2600)}
 function save(){
- try{localStorage.setItem(SAVE_KEY,JSON.stringify({version:10,P,wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,health,energy,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone}))}catch(e){}
+ if(net.room)return;try{localStorage.setItem(SAVE_KEY,JSON.stringify(gameState()))}catch(e){}
 }
 function load(){
  try{
