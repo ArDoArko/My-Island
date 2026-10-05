@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
-<title>My Island 0.11 — Wspólna wyspa</title>
+<title>My Island 0.11.1 — Wspólna wyspa</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -33,7 +33,8 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 .panel button:disabled{opacity:.4;cursor:default}
 .panel .pad-selected{outline:3px solid #c5f4bc;outline-offset:3px;box-shadow:0 0 0 6px #c5f4bc18}
 #controllerPanel{z-index:45}.pad-device{background:#ffffff0b;border-radius:12px;padding:12px;font-size:13px;overflow-wrap:anywhere}
-#roomPanel{z-index:46}.play-choice{display:flex;gap:10px;justify-content:center}.card .play-choice button{flex:1;padding:15px 18px;max-width:220px}.card .play-choice .online-choice{background:#bdebd8}
+#roomPanel{z-index:46}#newGamePanel{z-index:47}.play-choice{display:flex;gap:10px;justify-content:center}.card .play-choice button{flex:1;padding:15px 18px;max-width:220px}.card .play-choice .online-choice{background:#bdebd8}
+#newGamePanel .cancel-new-game{background:#b8ddd9}#newGameError{color:#ffb09c;font-size:13px}
 .room-form{display:grid;gap:8px;margin:16px 0}.room-form label{font-weight:750;font-size:14px}.room-form input,.room-code{border:1px solid #ffffff35;border-radius:12px;background:#ffffff0b;color:#fff;padding:13px;font:inherit;width:100%;min-width:0;touch-action:auto;user-select:text}
 .room-form input:focus-visible,.room-code:focus-visible{outline:3px solid #ffe087;outline-offset:2px}#roomJoinCode{text-transform:uppercase;letter-spacing:3px;font-weight:850}
 .room-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.room-actions button{min-height:43px}.room-note{font-size:13px;color:#b8d9db;line-height:1.6}#roomStatus{font-size:14px;color:#ffe087;min-height:24px;line-height:1.5}
@@ -56,7 +57,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 .card{max-width:calc(100vw - 28px);width:520px;text-align:center;background:linear-gradient(145deg,#073a47f5,#052c3be8);border:1px solid #ffffff30;box-shadow:0 24px 70px #001e3850;padding:30px;border-radius:28px}
 .card .mark{font-size:44px}.card h1{font-size:clamp(28px,8vw,46px);letter-spacing:2px;margin:8px 0}.card .version{color:#ffe087;font-weight:750}.card .desc{color:#bed9db;font-size:13px;line-height:1.7}
 .card button{padding:15px 42px;border:0;border-radius:16px;background:#ffe087;color:#123944;font-weight:900;margin:8px 0}.card .keys{font-size:11px;color:#a9ccd0}
-.card .pad-guide{padding:8px 12px;background:#ffffff12;color:#d4ece4;font-size:11px;margin:0}.card .pad-start{font-size:11px;color:#b9d7d8;line-height:1.5;margin:9px 0}
+ .card .pad-guide{padding:8px 12px;background:#ffffff12;color:#d4ece4;font-size:11px;margin:0}.card .new-solo{margin:8px 4px;color:#ffe087}.card .pad-start{font-size:11px;color:#b9d7d8;line-height:1.5;margin:9px 0}
 @media(max-width:700px){
  .panel{inset:5% 3%;padding:18px}.panel h2{font-size:21px}.recipe{padding:10px;gap:8px;font-size:12px}.recipe button{padding:10px}
  .q{top:max(102px,calc(env(safe-area-inset-top) + 94px));max-width:220px;font-size:10px;padding:6px 9px}.hud{gap:4px}.p{font-size:9px;padding:5px 7px}
@@ -71,10 +72,10 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 </head>
 <body>
 <div id="start" class="start"><div class="card">
- <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version">0.11 • Wspólna wyspa</p>
+ <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version">0.11.1 • Wspólna wyspa</p>
  <p class="desc">Odkrywaj wyspę sam albo z przyjaciółmi.<br>Do czterech graczy, wspólna baza i wyprawa po skarb.</p>
  <div class="play-choice"><button onclick="startGame()">GRAJ SOLO</button><button class="online-choice" onclick="toggle('roomPanel',1)">GRAJ ONLINE</button></div><p class="keys">WASD lub strzałki • E działaj • Shift sprint • spacja atak</p>
- <button class="pad-guide" onclick="toggle('controllerPanel',1)">🎮 Sterowanie padem i joystickiem</button><p id="padStartInfo" class="pad-start">Podłącz kontroler i naciśnij na nim przycisk.</p>
+ <button id="newSoloStart" class="pad-guide new-solo" onclick="askNewSoloGame()">↻ Nowa gra solo</button><button class="pad-guide" onclick="toggle('controllerPanel',1)">🎮 Sterowanie padem i joystickiem</button><p id="padStartInfo" class="pad-start">Podłącz kontroler i naciśnij na nim przycisk.</p>
  <p class="desc">wspólna wyspa · kod pokoju · pad i joystick</p>
 </div></div>
 <div class="hud">
@@ -84,14 +85,21 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <div class="p">🏠 L<b id="bl">0</b></div><div class="p">🧭 <b id="zn">Laguna</b></div>
  <button id="padButton" class="p pad-button" onclick="toggle('controllerPanel',1)" aria-label="Sterowanie padem i joystickiem">🎮 PAD</button>
  <button id="roomButton" class="p pad-button" onclick="toggle('roomPanel',1)" aria-label="Pokój online i gracze">👥 ONLINE</button>
+ <button id="newSoloButton" class="p pad-button" onclick="askNewSoloGame()" aria-label="Nowa gra solo">↻ NOWA GRA</button>
 </div>
-<div id="questBox" class="q">📜 <b id="qt">Wyprawa 0.11</b><br><span id="qx"></span><br><small id="qp"></small></div>
+<div id="questBox" class="q">📜 <b id="qt">Wyprawa 0.11.1</b><br><span id="qx"></span><br><small id="qp"></small></div>
 <canvas id="game" aria-label="Wyspa, postacie i świat gry"></canvas>
 <div id="msg" class="msg" role="status"></div><div id="hint" class="hint"></div>
 <div class="ctrl"><button class="u" data-k="ArrowUp" aria-label="Idź w górę">▲</button><button class="l" data-k="ArrowLeft" aria-label="Idź w lewo">◀</button><button class="d" data-k="ArrowDown" aria-label="Idź w dół">▼</button><button class="r" data-k="ArrowRight" aria-label="Idź w prawo">▶</button></div>
 <button class="btn sprint">🏃 SPRINT</button><button class="btn block" onclick="block()">🛡️ BLOK</button><button class="btn attack" onclick="attack()">⚔️ ATAK</button>
 <button class="side base" onclick="toggle('basePanel',1)">🏠 BAZA</button><button class="side bag" onclick="toggle('bag',1)">🎒 PLECAK</button><button class="side build" onclick="toggle('craft',1)">🔨 BUDUJ</button><button class="side fish" onclick="goFish()">🎣 ŁÓW</button><button class="act" onclick="interact()">DZIAŁAJ</button>
 <div class="help">WASD / strzałki · E działaj · Shift sprint · spacja atak</div>
+<div id="newGamePanel" class="panel" role="dialog" aria-label="Zacznij nową grę solo" aria-describedby="newGameDescription">
+ <button class="close" aria-label="Zamknij nową grę" onclick="toggle('newGamePanel',0)">✕</button><h2>🏝️ Nowa gra solo</h2>
+ <p id="newGameDescription">Zacząć przygodę od początku? Twój dotychczasowy zapis solo zostanie zastąpiony. Postać, zasoby, narzędzia, baza, monety i zadania wrócą do stanu początkowego.</p>
+ <p class="intro">Ustawienia pada i wspólne pokoje online zostają zachowane.</p><p id="newGameError" role="status"></p>
+ <div class="room-actions"><button id="newGameCancel" class="cancel-new-game" onclick="toggle('newGamePanel',0)">Anuluj</button><button onclick="restartSoloGame()">Zacznij od nowa</button></div>
+</div>
 <div id="roomPanel" class="panel" role="dialog" aria-label="Pokój online">
  <button class="close" aria-label="Zamknij pokój online" onclick="toggle('roomPanel',0)">✕</button><h2>👥 Wspólna wyspa</h2>
  <p class="intro">Maksymalnie cztery osoby. Każdy gra na swoim urządzeniu.</p><p id="roomStatus" role="status">Utwórz pokój albo wpisz kod od znajomego.</p>
@@ -108,7 +116,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <div id="padStatus" class="pad-device" role="status">Czekam na kontroler…</div>
  <div class="pad-live"><div class="stick-test"><span id="stickDot"></span></div><span id="padLive">Tutaj sprawdzisz ruch drążka i przyciski.</span></div>
  <p id="bindPrompt" role="status">Drążek: ruch. W menu wybieraj góra/dół, zatwierdzaj przyciskiem DZIAŁAJ.</p>
- <div class="pad-tools"><button id="padCycle" onclick="cyclePad()">Zmień kontroler</button><button id="padRestore" onclick="restorePadDefaults()">Przywróć przyciski</button><button onclick="toggle('roomPanel',1)">👥 Pokoje online</button></div>
+ <div class="pad-tools"><button id="padCycle" onclick="cyclePad()">Zmień kontroler</button><button id="padRestore" onclick="restorePadDefaults()">Przywróć przyciski</button><button onclick="toggle('roomPanel',1)">👥 Pokoje online</button><button id="newSoloPad" onclick="askNewSoloGame()">↻ Nowa gra solo</button></div>
  <h3>Przyciski</h3><p class="intro">Kliknij „Zmień”, potem naciśnij wybrany przycisk na kontrolerze. Ustawienia zapamiętują się dla tego urządzenia.</p>
  <div class="recipe"><span>DZIAŁAJ / zatwierdź / GRAJ</span><button id="bind-interact" onclick="bindPad('interact')">A / ✕ · Zmień</button></div>
  <div class="recipe"><span>ATAK</span><button id="bind-attack" onclick="bindPad('attack')">X / □ · Zmień</button></div>
@@ -174,7 +182,7 @@ let wood=0,stone=0,food=0,shells=0,fish=0,cookedFish=0,totalCaught=0,xpv=0,coins
 let spear=0,rod=0,raft=0,treasure=0,sprint=0,blocking=0,lastAttack=0,secondFound=0,returned=0,baseLevel=0,basePos=null,campfire=0;
 let questsDone={fish:0,supplies:0},activePanel=null,resting=0,face='down',moving=false,walkPhase=0,time=0,lastTime=0,lastAutosave=0,lastUI=0,hitFlash=0,msgTimer=0;
 const O=[],E=[],F=[],nela={x:3370,y:430},leon={x:1630,y:1160};
-const chest={x:4200,y:2450},panels=['craft','basePanel','bag','shop','nelaPanel','controllerPanel','roomPanel'];
+const chest={x:4200,y:2450},panels=['craft','basePanel','bag','shop','nelaPanel','controllerPanel','roomPanel','newGamePanel'];
 const ROOM_API='https://my-island-online.arekpoczta734.chatgpt.site/api/rooms',ROOM_KEY='myIslandRoomV1';
 const playerLooks=[{shirt:'#4c9cba',skin:'#e3b185',hair:'#463b32'},{shirt:'#df8168',skin:'#be895f',hair:'#382d29'},{shirt:'#9974c7',skin:'#efc69d',hair:'#725039'},{shirt:'#76b677',skin:'#a67152',hair:'#2f302b'}];
 const net={room:null,token:null,you:null,players:[],worldRev:-1,connected:false,busy:false,joining:false,epoch:0,lastOk:0,actions:[],timer:null,solo:null,reset:0,joinAbort:null};
@@ -201,10 +209,13 @@ function spawnResources(type,count){
   O.push({t:type,x,y,hp:type==='tree'||type==='rock'?2:1,phase:rand()*6.28});
  }
 }
-spawnResources('tree',140);spawnResources('rock',85);spawnResources('food',38);
-for(let i=0;i<40;i++){const a=2*Math.PI*i/40;O.push({t:'shell',x:1750+1490*Math.cos(a),y:1300+915*Math.sin(a),hp:1,phase:0})}
-for(let i=0;i<6;i++){const x=rnd(2150,2850),y=rnd(650,1100);E.push({x,y,sx:x,sy:y,hp:3,hit:0,phase:rand()*6.28})}
-for(let i=0;i<28;i++){let x,y;do{x=rnd(100,4500);y=rnd(100,2800)}while(!sea(x,y));F.push({x,y,phase:rand()*6.28})}
+function populateSoloWorld(){
+ seed=710;O.length=E.length=F.length=0;spawnResources('tree',140);spawnResources('rock',85);spawnResources('food',38);
+ for(let i=0;i<40;i++){const a=2*Math.PI*i/40;O.push({t:'shell',x:1750+1490*Math.cos(a),y:1300+915*Math.sin(a),hp:1,phase:0})}
+ for(let i=0;i<6;i++){const x=rnd(2150,2850),y=rnd(650,1100);E.push({x,y,sx:x,sy:y,hp:3,hit:0,phase:rand()*6.28})}
+ for(let i=0;i<28;i++){let x,y;do{x=rnd(100,4500);y=rnd(100,2800)}while(!sea(x,y));F.push({x,y,phase:rand()*6.28})}
+}
+populateSoloWorld();
 function ellipse(ctx,x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}
 function rounded(ctx,x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
 function makeTerrain(){
@@ -607,6 +618,17 @@ function holdControl(b,on,off){b.onpointerdown=e=>{e.preventDefault();b.setPoint
 document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;holdControl(b,()=>{if(!activePanel)K[k]=1},()=>K[k]=0)});
 holdControl(document.querySelector('.sprint'),()=>{if(!activePanel)sprint=1},()=>sprint=0);
 function startGame(){if(play)return;cancelRoomJoin();load();$('start').style.display='none';play=1;resetInput();lastAutosave=performance.now();update();say('Witaj na żywej wyspie! Leon czeka przy obozowisku.')}
+function askNewSoloGame(){
+ if(net.room||net.joining)return;pad.capture=null;$('newGameError').textContent='';toggle('newGamePanel',1);if(!padDevice)$('newGameCancel').focus();else focusPadButton($('newGameCancel'));
+}
+function restartSoloGame(){
+ if(activePanel!=='newGamePanel'||net.room||net.joining)return;
+ const fresh={version:10,P:{x:1500,y:1100},wood:0,stone:0,food:0,shells:0,fish:0,cookedFish:0,totalCaught:0,xpv:0,coins:0,health:100,energy:100,spear:0,rod:0,raft:0,treasure:0,secondFound:0,returned:0,baseLevel:0,basePos:null,campfire:0,questsDone:{fish:0,supplies:0}};
+ try{localStorage.setItem(SAVE_KEY,JSON.stringify(fresh))}catch(e){$('newGameError').textContent='Nie udało się zapisać nowej gry. Poprzedni postęp został zachowany. Spróbuj ponownie.';return}
+ try{localStorage.removeItem('myIsland08')}catch(e){}
+ applyBank(fresh);P={...fresh.P};health=energy=100;populateSoloWorld();resting=blocking=lastAttack=hitFlash=walkPhase=0;face='down';moving=false;lastTime=0;lastAutosave=performance.now();lastUI=0;
+ $('start').style.display='none';play=1;toggle('newGamePanel',0);cam.x=Math.max(0,Math.min(Math.max(0,WORLD.w-W),P.x-W/2));cam.y=Math.max(0,Math.min(Math.max(0,WORLD.h-H),P.y-H/2));draw();say('Nowa przygoda rozpoczęta! Wyspa czeka na ciebie.');
+}
 function block(){if(activePanel)return;blocking=1;setTimeout(()=>blocking=0,1200)}
 function attack(){
  if(activePanel)return;if(net.room)return roomAction({kind:'attack'});if(!spear)return say('Potrzebujesz włóczni. Zrobisz ją w warsztacie.');if(Date.now()-lastAttack<650)return;lastAttack=Date.now();
@@ -693,6 +715,7 @@ function deliverQuest(key){
 function done(text){toggle('craft',0);xpv+=40;save();update();say(text)}
 function toggle(id,on){if(!panels.includes(id))return;if(net.joining&&!net.room&&(id!=='roomPanel'||!on))cancelRoomJoin();for(const name of panels)$(name).style.display='none';activePanel=on?id:null;if(on)$(id).style.display='block';pad.capture=null;focusPadButton(null);resetInput();if(id==='controllerPanel')updatePadUI();if(id==='roomPanel')updateRoomUI();if(on&&padDevice)focusPadMenu();update()}
 function update(){
+ for(const id of ['newSoloStart','newSoloButton','newSoloPad'])$(id).style.display=net.room?'none':'';
  $('bagIntro').textContent=net.room?'Wspólne zasoby drużyny. Jedzenie leczy osobę, która je zjada.':'Zjedz coś przed kolejną wyprawą.';$('baseIntro').textContent=net.room?'Wspólna baza i ognisko całej drużyny.':'Twoje miejsce odpoczynku.';
  const values={hp:Math.round(health),en:Math.round(energy),xp:xpv,co:coins,wo:wood,st:stone,fo:food,sh:shells,fi:fish+cookedFish,bl:baseLevel,baseLevel,bw:wood,bs:stone,bf:food,bsh:shells,bfi:fish,bcf:cookedFish,bp:spear?'jest':'brak',br:rod?'jest':'brak',bra:raft?'jest':'brak',bt:treasure?'zdobyty':'brak',shopCoins:coins};
  for(const [id,value] of Object.entries(values))$(id).textContent=value;
