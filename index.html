@@ -33,7 +33,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 .panel button:disabled{opacity:.4;cursor:default}
 .panel .pad-selected{outline:3px solid #c5f4bc;outline-offset:3px;box-shadow:0 0 0 6px #c5f4bc18}
 #controllerPanel{z-index:45}.pad-device{background:#ffffff0b;border-radius:12px;padding:12px;font-size:13px;overflow-wrap:anywhere}
-#roomPanel{z-index:46}#newGamePanel{z-index:47}.play-choice{display:flex;gap:10px;justify-content:center}.card .play-choice button{flex:1;padding:15px 18px;max-width:220px}.card .play-choice .online-choice{background:#bdebd8}
+#roomPanel{z-index:46}#newGamePanel{z-index:47;inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:min(520px,calc(100vw - 28px));max-height:calc(100vh - 28px);max-height:calc(100dvh - 28px)}.play-choice{display:flex;gap:10px;justify-content:center}.card .play-choice button{flex:1;padding:15px 18px;max-width:220px}.card .play-choice .online-choice{background:#bdebd8}
 #newGamePanel .cancel-new-game{background:#b8ddd9}#newGameError{color:#ffb09c;font-size:13px}
 .room-form{display:grid;gap:8px;margin:16px 0}.room-form label{font-weight:750;font-size:14px}.room-form input,.room-code{border:1px solid #ffffff35;border-radius:12px;background:#ffffff0b;color:#fff;padding:13px;font:inherit;width:100%;min-width:0;touch-action:auto;user-select:text}
 .room-form input:focus-visible,.room-code:focus-visible{outline:3px solid #ffe087;outline-offset:2px}#roomJoinCode{text-transform:uppercase;letter-spacing:3px;font-weight:850}
