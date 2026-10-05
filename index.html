@@ -46,7 +46,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 .msg{position:fixed;z-index:30;left:50%;bottom:174px;transform:translateX(-50%);max-width:90vw;width:max-content;background:#07303eee;border:1px solid #ffffff28;padding:11px 16px;border-radius:14px;opacity:0;pointer-events:none;text-align:center;font-size:13px;transition:opacity .15s}
 .msg.on{opacity:1}
 .hint{position:fixed;z-index:6;left:50%;bottom:80px;transform:translateX(-50%);border-radius:10px;background:#073441cc;color:#e9f4e2;font-size:11px;padding:6px 10px;pointer-events:none;display:none;text-align:center;max-width:45vw}
-.start{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#073a47c9,#073a4766)}
+.start{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;overflow:auto;touch-action:pan-y;padding:14px;background:linear-gradient(135deg,#073a47c9,#073a4766)}
 .card{max-width:calc(100vw - 28px);width:520px;text-align:center;background:linear-gradient(145deg,#073a47f5,#052c3be8);border:1px solid #ffffff30;box-shadow:0 24px 70px #001e3850;padding:30px;border-radius:28px}
 .card .mark{font-size:44px}.card h1{font-size:clamp(28px,8vw,46px);letter-spacing:2px;margin:8px 0}.card .version{color:#ffe087;font-weight:750}.card .desc{color:#bed9db;font-size:13px;line-height:1.7}
 .card button{padding:15px 42px;border:0;border-radius:16px;background:#ffe087;color:#123944;font-weight:900;margin:8px 0}.card .keys{font-size:11px;color:#a9ccd0}
@@ -59,6 +59,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  .card{padding:24px}.card .keys{display:none}
 }
 @media(max-width:1000px){.help{display:none}}
+@media(max-height:600px){.start{align-items:flex-start}}
 @media(max-height:450px) and (min-width:701px){.panel{inset:4% 12%;padding:16px}.help{display:none}}
 </style>
 </head>
