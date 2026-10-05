@@ -1,1 +1,474 @@
-<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"><title>My Island 0.9.1</title><style>*{box-sizing:border-box}body{margin:0;overflow:hidden;background:#087fa9;color:white;font-family:system-ui;touch-action:none}canvas{width:100vw;height:100vh;display:block}.hud{position:fixed;z-index:5;top:6px;left:2%;width:96%;display:flex;gap:4px;flex-wrap:wrap;justify-content:center}.p,.q{background:#102b3ddd;border-radius:15px;padding:5px 7px;font-weight:800;font-size:11px}.q{position:fixed;z-index:6;left:10px;top:65px;max-width:310px}.q b{color:#ffd34e}.ctrl{position:fixed;z-index:8;bottom:14px;left:14px;display:grid;grid-template-columns:46px 46px 46px;grid-template-rows:46px 46px;gap:4px}.ctrl button,.btn,.side,.act,.panel button{border:0;font-weight:900;color:#123;box-shadow:0 3px 9px #0005}.ctrl button{border-radius:13px;font-size:20px}.u{grid-column:2}.l{grid-column:1}.d{grid-column:2}.r{grid-column:3}.btn{position:fixed;z-index:9;bottom:18px;height:48px;border-radius:15px}.sprint{right:266px;background:#d8ff9e}.block{right:184px;background:#b9dcff}.attack{right:102px;background:#ff9b8f}.act{position:fixed;z-index:8;right:14px;bottom:18px;width:78px;height:78px;border:0;border-radius:50%;background:#ffd34e;font-weight:900}.side{position:fixed;z-index:8;right:20px;width:75px;height:39px;border-radius:12px}.fish{bottom:106px;background:#b5f3ff}.build{bottom:150px;background:#b8f08a}.bag{bottom:194px;background:#b9dcff}.base{bottom:238px;background:#ffc9e9}.panel{position:fixed;z-index:20;inset:8% 12%;display:none;overflow:auto;background:#082a3df8;border-radius:24px;padding:20px}.close{float:right}.recipe{display:flex;justify-content:space-between;align-items:center;background:#ffffff12;border-radius:13px;padding:10px;margin:8px}.msg{position:fixed;z-index:30;left:50%;bottom:105px;transform:translateX(-50%);background:#061b29ee;padding:10px 15px;border-radius:14px;opacity:0;white-space:nowrap}.msg.on{opacity:1}.start{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:linear-gradient(#087fa9,#72d4df)}.card{max-width:calc(100vw - 28px);text-align:center;background:#082a3deb;padding:28px;border-radius:28px}.card h1{font-size:clamp(28px,8vw,42px);margin:0}.card button{padding:14px 30px;border:0;border-radius:22px;background:#ffd34e;font-weight:900}@media(max-width:700px){.panel{inset:5% 3%}.q{top:88px}.p{font-size:9px}.btn{bottom:112px;width:66px;height:42px;padding:4px;font-size:10px}.attack{left:158px;right:auto}.block{left:86px;right:auto}.sprint{left:14px;right:auto}.side{right:14px}.act{bottom:18px}.fish{bottom:106px}.build{bottom:150px}.bag{bottom:194px}.base{bottom:238px}}</style></head><body><div id="start" class="start"><div class="card"><div style="font-size:64px">🏝️🛶🎣</div><h1>MY ISLAND</h1><p>0.9.1 • Wyspa Skarbu</p><button onclick="startGame()">GRAJ</button><p>tratwa • głęboka woda • ryby • druga wyspa • skarb</p></div></div><div class="hud"><div class="p">❤️ <span id="hp">100</span></div><div class="p">⚡ <span id="en">100</span></div><div class="p">⭐ <span id="xp">0</span></div><div class="p">🪙 <span id="co">0</span></div><div class="p">🪵 <span id="wo">0</span></div><div class="p">🪨 <span id="st">0</span></div><div class="p">🥥 <span id="fo">0</span></div><div class="p">🐚 <span id="sh">0</span></div><div class="p">🐟 <span id="fi">0</span></div><div class="p">🏠 L<span id="bl">0</span></div><div class="p">🧭 <span id="zn">Laguna</span></div></div><div class="q">📜 <b id="qt">Wyprawa 0.9.1</b><br><span id="qx"></span><br><span id="qp"></span></div><canvas id="game"></canvas><div id="msg" class="msg"></div><div class="ctrl"><button class="u" data-k="ArrowUp">▲</button><button class="l" data-k="ArrowLeft">◀</button><button class="d" data-k="ArrowDown">▼</button><button class="r" data-k="ArrowRight">▶</button></div><button class="btn sprint">🏃 SPRINT</button><button class="btn block" onclick="block()">🛡️ BLOK</button><button class="btn attack" onclick="attack()">⚔️ ATAK</button><button class="side base" onclick="toggle('basePanel',1)">🏠 BAZA</button><button class="side bag" onclick="toggle('bag',1)">🎒 PLECAK</button><button class="side build" onclick="toggle('craft',1)">🔨 BUDUJ</button><button class="side fish" onclick="goFish()">🎣 ŁÓW</button><button class="act" onclick="interact()">DZIAŁAJ</button><div id="craft" class="panel"><button class="close" onclick="toggle('craft',0)">✕</button><h2>🔨 Warsztat 0.9</h2><div class="recipe"><span>⚔️ Włócznia 6🪵 4🪨</span><button onclick="craftSpear()">Zrób</button></div><div class="recipe"><span>🎣 Wędka 5🪵 2🐚</span><button onclick="craftRod()">Zrób</button></div><div class="recipe"><span>🛶 Tratwa 12🪵 6🐚</span><button onclick="craftRaft()">Zbuduj</button></div></div><div id="basePanel" class="panel"><button class="close" onclick="toggle('basePanel',0)">✕</button><h2>🏠 Centrum bazy</h2><p>Poziom bazy: <b id="baseLevel">0</b>/3</p><div class="recipe"><span>🏠 L1 12🪵 8🪨</span><button onclick="upgradeBase(1)">Buduj</button></div><div class="recipe"><span>🛖 L2 18🪵 12🪨 +50🪙</span><button onclick="upgradeBase(2)">Ulepsz</button></div><div class="recipe"><span>🏡 L3 28🪵 18🪨 +100🪙</span><button onclick="upgradeBase(3)">Ulepsz</button></div></div><div id="bag" class="panel"><button class="close" onclick="toggle('bag',0)">✕</button><h2>🎒 Plecak</h2><p>🪵 <b id="bw">0</b> 🪨 <b id="bs">0</b> 🥥 <b id="bf">0</b> 🐚 <b id="bsh">0</b> 🐟 <b id="bfi">0</b></p><p>⚔️ <b id="bp">brak</b> 🎣 <b id="br">brak</b> 🛶 <b id="bra">brak</b> 💎 <b id="bt">brak</b></p></div><script>const C=document.getElementById('game'),X=C.getContext('2d');let W,H,K={},play=0,P={x:1500,y:1100},cam={x:0,y:0},wood=0,stone=0,food=0,shells=0,fish=0,xpv=0,coins=0,health=100,energy=100,spear=0,rod=0,raft=0,treasure=0,sprint=0,blocking=0,lastAttack=0,secondFound=0,returned=0,baseLevel=0,basePos=null;const WORLD={w:4600,h:2900},O=[],E=[],F=[],nela={x:3370,y:430},chest={x:4200,y:2450};function resize(){C.width=innerWidth*devicePixelRatio;C.height=innerHeight*devicePixelRatio;X.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);W=innerWidth;H=innerHeight}addEventListener('resize',resize);resize();function rnd(a,b){return a+Math.random()*(b-a)}for(let i=0;i<110;i++)O.push({t:'tree',x:rnd(300,3450),y:rnd(300,2100),hp:2});for(let i=0;i<65;i++)O.push({t:'rock',x:rnd(300,3450),y:rnd(300,2100),hp:2});for(let i=0;i<30;i++)O.push({t:'food',x:rnd(350,3400),y:rnd(350,2050),hp:1});for(let i=0;i<32;i++){const a=2*Math.PI*i/32;O.push({t:'shell',x:1750+1395*Math.cos(a),y:1300+835*Math.sin(a),hp:1})}for(let i=0;i<6;i++)E.push({x:rnd(2150,2850),y:rnd(450,1100),hp:3,hit:0});for(let i=0;i<18;i++)F.push({x:rnd(200,4400),y:rnd(200,2750)});function mainLand(x,y){return ((x-1750)/1450)**2+((y-1300)/880)**2<1}function island2(x,y){return ((x-4100)/360)**2+((y-2400)/260)**2<1}function sea(x,y){return !mainLand(x,y)&&!island2(x,y)}function deep(x,y){return sea(x,y)&&x>3500&&y>1150}function draw(){X.fillStyle='#087fa9';X.fillRect(0,0,W,H);X.save();X.translate(-cam.x,-cam.y);X.fillStyle='#075f91';X.fillRect(3500,1150,1100,1750);X.fillStyle='#efd589';X.beginPath();X.ellipse(1750,1300,1540,970,0,0,7);X.fill();X.fillStyle='#4fa858';X.beginPath();X.ellipse(1750,1300,1450,880,0,0,7);X.fill();X.fillStyle='#e9c77b';X.beginPath();X.ellipse(4100,2400,390,290,0,0,7);X.fill();X.fillStyle='#62a94f';X.beginPath();X.ellipse(4100,2400,330,230,0,0,7);X.fill();X.fillStyle='#e9c77b';X.beginPath();X.ellipse(3380,500,520,310,0,0,7);X.fill();X.fillStyle='#fff';X.font='20px system-ui';X.fillText('🌊 PÓŁNOCNA ZATOKA',3220,210);X.fillText('🏝️ WYSPA SKARBU',3970,2120);if(basePos){X.fillStyle='#a8f0b044';X.beginPath();X.arc(basePos.x,basePos.y,210,0,7);X.fill();X.font='60px serif';X.fillText(baseLevel<2?'⛺':baseLevel<3?'🛖':'🏡',basePos.x,basePos.y)}for(const f of F)if(sea(f.x,f.y)){X.font='18px serif';X.fillText('🐟',f.x,f.y)}for(const o of O){if(Math.abs(o.x-P.x)<W*.8&&Math.abs(o.y-P.y)<H*.8){X.font='28px serif';X.fillText(o.t==='tree'?'🌴':o.t==='rock'?'🪨':o.t==='shell'?'🐚':'🥥',o.x,o.y)}}for(const e of E){X.font='32px serif';X.fillText('🐗',e.x,e.y)}X.font='34px serif';X.fillText('👩‍🦰',nela.x,nela.y);if(!treasure){X.font='42px serif';X.fillText('🎁',chest.x,chest.y)}X.font='38px serif';X.fillText(sea(P.x,P.y)?(raft?'🛶':'🏊'):(blocking?'🛡️':'🧑'),P.x,P.y);X.restore()}function enemies(){for(const e of E){let d=Math.hypot(P.x-e.x,P.y-e.y);if(d<260){let a=Math.atan2(P.y-e.y,P.x-e.x);e.x+=Math.cos(a)*.65;e.y+=Math.sin(a)*.65}if(d<42&&Date.now()-e.hit>1500){e.hit=Date.now();health=Math.max(0,health-(blocking?2:6));if(health<=0){health=50;P=basePos?{x:basePos.x+70,y:basePos.y}:{x:1500,y:1100};say('☠️ Odrodzenie przy bazie.')}}}}function loop(){if(play){let dx=0,dy=0;if(K.ArrowUp||K.w)dy--;if(K.ArrowDown||K.s)dy++;if(K.ArrowLeft||K.a)dx--;if(K.ArrowRight||K.d)dx++;if(dx&&dy){dx*=.707;dy*=.707}let wet=sea(P.x,P.y),fast=sprint&&energy>0&&(dx||dy),sp=wet?(raft?6:2):(fast?7:4);energy=Math.max(0,Math.min(100,energy+(wet&&!raft?-.2:fast?-.28:.12)));let nx=Math.max(60,Math.min(4540,P.x+dx*sp)),ny=Math.max(60,Math.min(2840,P.y+dy*sp));if(deep(nx,ny)&&!raft){nx=P.x;ny=P.y}P.x=nx;P.y=ny;if(island2(P.x,P.y)&&!secondFound){secondFound=1;xpv+=150;coins+=75;say('🏝️ Odkryto Wyspę Skarbu!');save()}cam.x=Math.max(0,Math.min(WORLD.w-W,P.x-W/2));cam.y=Math.max(0,Math.min(WORLD.h-H,P.y-H/2));if(mainLand(P.x,P.y))enemies();draw();zone();update()}requestAnimationFrame(loop)}requestAnimationFrame(loop);function resetInput(){K={};sprint=0}addEventListener('keydown',e=>{if(!play)return;const k=e.key.length===1?e.key.toLowerCase():e.key;K[k]=1;if(e.key.startsWith('Arrow')||e.key===' ')e.preventDefault();if(e.key===' ')attack();if(e.key==='Shift')sprint=1});addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;K[k]=0;if(e.key==='Shift')sprint=0});addEventListener('blur',resetInput);document.addEventListener('visibilitychange',()=>{if(document.hidden)resetInput()});function holdControl(b,on,off){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);on()};b.onpointerup=b.onpointercancel=b.onlostpointercapture=off}document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;holdControl(b,()=>K[k]=1,()=>K[k]=0)});holdControl(document.querySelector('.sprint'),()=>sprint=1,()=>sprint=0);function startGame(){start.style.display='none';load();play=1;update();say('🌊 0.9.1: morska wyprawa rozpoczęta!')}function block(){blocking=1;setTimeout(()=>blocking=0,1200)}function attack(){if(!spear)return say('⚔️ Potrzebujesz włóczni.');if(Date.now()-lastAttack<650)return;lastAttack=Date.now();let t=null,d=105;for(const e of E){let q=Math.hypot(P.x-e.x,P.y-e.y);if(q<d){d=q;t=e}}if(!t)return say('⚔️ Nic w zasięgu.');t.hp-=2;if(t.hp<=0){E.splice(E.indexOf(t),1);food++;coins+=20;xpv+=35;save();say('🐗 Dzik pokonany.')}}function interact(){if(Math.hypot(P.x-nela.x,P.y-nela.y)<110){if(treasure&&!returned){returned=1;coins+=250;xpv+=300;save();return say('👩‍🦰 Nela: Skarb odnaleziony!')}return say('👩‍🦰 Nela: Znajdź drugą wyspę i skarb.')}if(Math.hypot(P.x-chest.x,P.y-chest.y)<110&&!treasure){treasure=1;coins+=500;xpv+=500;save();return say('💎 SKARB! Wróć do Neli!')}let b=null,d=75;for(const o of O){let q=Math.hypot(P.x-o.x,P.y-o.y);if(q<d){d=q;b=o}}if(!b)return say('Nic w zasięgu.');if(--b.hp>0)return say('Jeszcze jedno uderzenie.');O.splice(O.indexOf(b),1);if(b.t==='tree')wood+=2;else if(b.t==='rock')stone++;else if(b.t==='shell')shells++;else food++;xpv+=10;coins+=2;save()}function goFish(){if(!rod)return say('🎣 Najpierw zrób wędkę.');if(!sea(P.x,P.y)&&!(sea(P.x+80,P.y)||sea(P.x-80,P.y)||sea(P.x,P.y+80)||sea(P.x,P.y-80)))return say('🎣 Podejdź do wody.');if(Math.random()<.7){fish++;food++;xpv+=20;say('🐟 Złowiona ryba!')}else say('🎣 Uciekła.');save()}function craftSpear(){if(wood<6||stone<4)return say('Brakuje 6🪵 4🪨');wood-=6;stone-=4;spear=1;done('⚔️ Włócznia gotowa!')}function craftRod(){if(wood<5||shells<2)return say('Brakuje 5🪵 2🐚');wood-=5;shells-=2;rod=1;done('🎣 Wędka gotowa!')}function craftRaft(){if(wood<12||shells<6)return say('Brakuje 12🪵 6🐚');wood-=12;shells-=6;raft=1;done('🛶 Tratwa gotowa!')}function upgradeBase(l){if(l!==baseLevel+1)return say('Najpierw poprzedni poziom.');let w=[0,12,18,28][l],s=[0,8,12,18][l],c=[0,0,50,100][l];if(wood<w||stone<s||coins<c)return say('Brakuje materiałów lub monet.');wood-=w;stone-=s;coins-=c;baseLevel=l;if(!basePos)basePos={x:P.x+70,y:P.y+20};xpv+=l*100;toggle('basePanel',0);save();say('🏠 Baza L'+l+' gotowa!')}function done(t){toggle('craft',0);xpv+=40;save();say(t)}function zone(){zn.textContent=island2(P.x,P.y)?'Wyspa Skarbu':deep(P.x,P.y)?'Głębokie wody':sea(P.x,P.y)?(raft?'Na tratwie':'Pływanie'):P.x>3050&&P.y<850?'Północna Zatoka':'Wnętrze wyspy'}function toggle(id,v){document.getElementById(id).style.display=v?'block':'none';update()}function update(){hp.textContent=Math.round(health);en.textContent=Math.round(energy);xp.textContent=xpv;co.textContent=coins;wo.textContent=wood;st.textContent=stone;fo.textContent=food;sh.textContent=shells;fi.textContent=fish;bl.textContent=baseLevel;document.getElementById('baseLevel').textContent=baseLevel;bw.textContent=wood;bs.textContent=stone;bf.textContent=food;bsh.textContent=shells;bfi.textContent=fish;bp.textContent=spear?'jest':'brak';br.textContent=rod?'jest':'brak';bra.textContent=raft?'jest':'brak';bt.textContent=treasure?'💎 JEST':'brak';if(!rod){qx.textContent='Zbuduj wędkę.';qp.textContent='5🪵 + 2🐚'}else if(fish<3){qx.textContent='Złów 3 ryby: '+fish+'/3';qp.textContent='🎣 ŁÓW przy wodzie'}else if(!raft){qx.textContent='Zbuduj tratwę.';qp.textContent='12🪵 + 6🐚'}else if(!secondFound){qx.textContent='Znajdź drugą wyspę.';qp.textContent='Płyń na południowy wschód.'}else if(!treasure){qx.textContent='Przeszukaj Wyspę Skarbu.';qp.textContent='Znajdź 🎁.'}else if(!returned){qx.textContent='Wróć do Neli.';qp.textContent='👩‍🦰 Północna Zatoka'}else{qx.textContent='0.9 UKOŃCZONE!';qp.textContent='💎 Skarb zdobyty.'}}function say(t){msg.textContent=t;msg.classList.add('on');setTimeout(()=>msg.classList.remove('on'),2200)}function save(){localStorage.setItem('myIsland09',JSON.stringify({P,wood,stone,food,shells,fish,xpv,coins,health,energy,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos}))}function load(){try{let d=JSON.parse(localStorage.getItem('myIsland09'))||JSON.parse(localStorage.getItem('myIsland08'));if(d){P=d.P||P;wood=d.wood||0;stone=d.stone||0;food=d.food||0;shells=d.shells||0;fish=d.fish||0;xpv=d.xpv||0;coins=d.coins||0;health=d.health??100;energy=d.energy??100;spear=!!d.spear;rod=!!d.rod;raft=!!d.raft;treasure=!!d.treasure;secondFound=!!d.secondFound;returned=!!d.returned;baseLevel=d.baseLevel||0;basePos=d.basePos||null}}catch(e){}}</script></body></html>
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#073d4b">
+<title>My Island 0.10 — Żywa wyspa</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
+canvas{width:100vw;height:100vh;display:block}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
+.hud{position:fixed;z-index:5;top:max(8px,env(safe-area-inset-top));left:2%;width:96%;display:flex;gap:5px;flex-wrap:wrap;justify-content:center;pointer-events:none}
+.p,.q{background:#073a47eb;border:1px solid #ffffff22;box-shadow:0 3px 12px #062b3630;border-radius:13px;padding:6px 9px;font-weight:750;font-size:11px;backdrop-filter:blur(8px)}
+.p b{font-variant-numeric:tabular-nums}
+.q{position:fixed;z-index:6;left:12px;top:58px;max-width:280px;line-height:1.5}
+.q b{color:#ffe087}.q small{color:#c5e5e2}
+.ctrl{position:fixed;z-index:8;bottom:max(14px,env(safe-area-inset-bottom));left:14px;display:grid;grid-template-columns:46px 46px 46px;grid-template-rows:46px 46px;gap:4px}
+.ctrl button,.btn,.side,.act{border:1px solid #ffffff65;box-shadow:0 4px 0 #052c4155,0 5px 14px #04283835;font-weight:850;color:#103943;touch-action:none;user-select:none}
+.ctrl button{border-radius:14px;font-size:20px;background:#f3faf4ed}
+.u{grid-column:2}.l{grid-column:1}.d{grid-column:2}.r{grid-column:3}
+.btn{position:fixed;z-index:9;bottom:18px;width:76px;height:46px;border-radius:14px;font-size:10px;padding:4px}
+.sprint{right:270px;background:#d3efaa}.block{right:186px;background:#b4deeb}.attack{right:102px;background:#ffb09c}
+.act{position:fixed;z-index:8;right:14px;bottom:18px;width:78px;height:78px;border-radius:50%;background:#ffe087;font-size:11px}
+.side{position:fixed;z-index:8;right:14px;width:78px;height:39px;border-radius:12px;font-size:11px;padding:3px}
+.fish{bottom:106px;background:#b4e9e6}.build{bottom:150px;background:#d2edb8}.bag{bottom:194px;background:#b8dded}.base{bottom:238px;background:#eedac1}
+.help{position:fixed;z-index:5;bottom:12px;left:175px;color:#e3f4e4;font-size:10px;text-shadow:0 1px 3px #052e42;pointer-events:none}
+.panel{position:fixed;z-index:20;inset:8% 18%;display:none;overflow:auto;overscroll-behavior:contain;touch-action:pan-y;background:#082f3ff5;border:1px solid #ffffff25;border-radius:24px;padding:24px;box-shadow:0 20px 70px #001e3850;backdrop-filter:blur(12px)}
+.panel h2{margin:0 44px 4px 0;font-size:24px}.panel h3{color:#ffe087;margin:24px 0 10px;font-size:16px}.panel p{line-height:1.6;color:#d7e9e9}.panel .intro{margin-top:6px;color:#a9ccd0;font-size:13px}
+.panel button{border:0;border-radius:10px;padding:10px 14px;background:#ffe087;color:#153b40;font-size:12px;font-weight:800;white-space:nowrap}
+.panel button:disabled{opacity:.4;cursor:default}
+.panel .close{float:right;width:36px;height:36px;padding:0;background:#ffffff18;color:white;font-size:19px}
+.recipe{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#ffffff0b;border:1px solid #ffffff12;border-radius:13px;padding:12px;margin:8px 0;font-size:13px}
+.recipe small{display:block;margin-top:4px;color:#a9ccd0;font-size:11px;line-height:1.4}
+.stock{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.stock span{background:#ffffff0d;border-radius:9px;padding:9px;font-size:12px}
+.msg{position:fixed;z-index:30;left:50%;bottom:174px;transform:translateX(-50%);max-width:90vw;width:max-content;background:#07303eee;border:1px solid #ffffff28;padding:11px 16px;border-radius:14px;opacity:0;pointer-events:none;text-align:center;font-size:13px;transition:opacity .15s}
+.msg.on{opacity:1}
+.hint{position:fixed;z-index:6;left:50%;bottom:80px;transform:translateX(-50%);border-radius:10px;background:#073441cc;color:#e9f4e2;font-size:11px;padding:6px 10px;pointer-events:none;display:none;text-align:center;max-width:45vw}
+.start{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#073a47c9,#073a4766)}
+.card{max-width:calc(100vw - 28px);width:520px;text-align:center;background:linear-gradient(145deg,#073a47f5,#052c3be8);border:1px solid #ffffff30;box-shadow:0 24px 70px #001e3850;padding:30px;border-radius:28px}
+.card .mark{font-size:44px}.card h1{font-size:clamp(28px,8vw,46px);letter-spacing:2px;margin:8px 0}.card .version{color:#ffe087;font-weight:750}.card .desc{color:#bed9db;font-size:13px;line-height:1.7}
+.card button{padding:15px 42px;border:0;border-radius:16px;background:#ffe087;color:#123944;font-weight:900;margin:8px 0}.card .keys{font-size:11px;color:#a9ccd0}
+@media(max-width:700px){
+ .panel{inset:5% 3%;padding:18px}.panel h2{font-size:21px}.recipe{padding:10px;gap:8px;font-size:12px}.recipe button{padding:10px}
+ .q{top:78px;max-width:220px;font-size:10px;padding:6px 9px}.hud{gap:4px}.p{font-size:9px;padding:5px 7px}
+ .btn{bottom:112px;width:66px;height:42px;font-size:10px}.attack{left:158px;right:auto}.block{left:86px;right:auto}.sprint{left:14px;right:auto}
+ .help{display:none}.hint{bottom:170px;left:12px;transform:none;max-width:210px;text-align:left;font-size:10px}.msg{bottom:290px;font-size:12px}
+ .card{padding:24px}.card .keys{display:none}
+}
+@media(max-width:1000px){.help{display:none}}
+@media(max-height:450px) and (min-width:701px){.q{top:48px}.panel{inset:4% 12%;padding:16px}.help{display:none}}
+</style>
+</head>
+<body>
+<div id="start" class="start"><div class="card">
+ <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version">0.10 • Żywa wyspa</p>
+ <p class="desc">Odkrywaj wyspę, rozpal ognisko i poznaj mieszkańców.<br>Twój skarb to dopiero początek przygody.</p>
+ <button onclick="startGame()">GRAJ</button><p class="keys">WASD lub strzałki • E działaj • Shift sprint • spacja atak</p>
+ <p class="desc">ognisko · jedzenie · handel · nowe zadania</p>
+</div></div>
+<div class="hud">
+ <div class="p">❤️ <b id="hp">100</b></div><div class="p">⚡ <b id="en">100</b></div><div class="p">⭐ <b id="xp">0</b></div>
+ <div class="p">🪙 <b id="co">0</b></div><div class="p">🪵 <b id="wo">0</b></div><div class="p">🪨 <b id="st">0</b></div>
+ <div class="p">🥥 <b id="fo">0</b></div><div class="p">🐚 <b id="sh">0</b></div><div class="p">🐟 <b id="fi">0</b></div>
+ <div class="p">🏠 L<b id="bl">0</b></div><div class="p">🧭 <b id="zn">Laguna</b></div>
+</div>
+<div class="q">📜 <b id="qt">Wyprawa 0.10</b><br><span id="qx"></span><br><small id="qp"></small></div>
+<canvas id="game" aria-label="Wyspa, postacie i świat gry"></canvas>
+<div id="msg" class="msg" role="status"></div><div id="hint" class="hint"></div>
+<div class="ctrl"><button class="u" data-k="ArrowUp" aria-label="Idź w górę">▲</button><button class="l" data-k="ArrowLeft" aria-label="Idź w lewo">◀</button><button class="d" data-k="ArrowDown" aria-label="Idź w dół">▼</button><button class="r" data-k="ArrowRight" aria-label="Idź w prawo">▶</button></div>
+<button class="btn sprint">🏃 SPRINT</button><button class="btn block" onclick="block()">🛡️ BLOK</button><button class="btn attack" onclick="attack()">⚔️ ATAK</button>
+<button class="side base" onclick="toggle('basePanel',1)">🏠 BAZA</button><button class="side bag" onclick="toggle('bag',1)">🎒 PLECAK</button><button class="side build" onclick="toggle('craft',1)">🔨 BUDUJ</button><button class="side fish" onclick="goFish()">🎣 ŁÓW</button><button class="act" onclick="interact()">DZIAŁAJ</button>
+<div class="help">WASD / strzałki · E działaj · Shift sprint · spacja atak</div>
+<div id="craft" class="panel" role="dialog" aria-label="Warsztat">
+ <button class="close" aria-label="Zamknij warsztat" onclick="toggle('craft',0)">✕</button><h2>🔨 Warsztat</h2><p class="intro">Narzędzia na wyprawę.</p>
+ <div class="recipe"><span>⚔️ Włócznia<small>6 drewna + 4 kamienie</small></span><button onclick="craftSpear()">Zrób</button></div>
+ <div class="recipe"><span>🎣 Wędka<small>5 drewna + 2 muszelki</small></span><button onclick="craftRod()">Zrób</button></div>
+ <div class="recipe"><span>🛶 Tratwa<small>12 drewna + 6 muszelek</small></span><button onclick="craftRaft()">Zbuduj</button></div>
+</div>
+<div id="basePanel" class="panel" role="dialog" aria-label="Centrum bazy">
+ <button class="close" aria-label="Zamknij bazę" onclick="toggle('basePanel',0)">✕</button><h2>🏠 Centrum bazy</h2><p class="intro">Twoje miejsce odpoczynku.</p><p>Poziom bazy: <b id="baseLevel">0</b>/3</p>
+ <div class="recipe"><span>🏠 Baza L1<small>12 drewna + 8 kamieni</small></span><button onclick="upgradeBase(1)">Buduj</button></div>
+ <div class="recipe"><span>🛖 Baza L2<small>18 drewna + 12 kamieni + 50 monet</small></span><button onclick="upgradeBase(2)">Ulepsz</button></div>
+ <div class="recipe"><span>🏡 Baza L3<small>28 drewna + 18 kamieni + 100 monet</small></span><button onclick="upgradeBase(3)">Ulepsz</button></div>
+ <h3>🔥 Ognisko</h3><p id="fireStatus">Zbuduj bazę L1, potem rozpal ognisko.</p>
+ <div class="recipe"><span>Rozpal ognisko<small>4 drewna + 2 kamienie · przy twojej bazie</small></span><button id="fireBuild" onclick="buildFire()">Rozpal</button></div>
+ <div class="recipe"><span>Upiecz rybę<small>1 surowa ryba + 1 drewno · przy ognisku</small></span><button onclick="cookFish()">Upiecz</button></div>
+ <div class="recipe"><span>Odpoczynek<small>5 sekund · do +40 zdrowia i +70 energii</small></span><button id="restButton" onclick="restAtFire()">Odpocznij</button></div>
+</div>
+<div id="bag" class="panel" role="dialog" aria-label="Plecak">
+ <button class="close" aria-label="Zamknij plecak" onclick="toggle('bag',0)">✕</button><h2>🎒 Plecak</h2><p class="intro">Zjedz coś przed kolejną wyprawą.</p>
+ <div class="stock"><span>🪵 <b id="bw">0</b></span><span>🪨 <b id="bs">0</b></span><span>🐚 <b id="bsh">0</b></span></div>
+ <div class="recipe"><span>🥥 Kokosy: <b id="bf">0</b><small>+20 zdrowia · +15 energii</small></span><button onclick="eat('coconut')">Zjedz kokos</button></div>
+ <div class="recipe"><span>🐟 Surowe ryby: <b id="bfi">0</b><small>Upiecz je przy ognisku lub sprzedaj.</small></span></div>
+ <div class="recipe"><span>🍽️ Pieczone ryby: <b id="bcf">0</b><small>+45 zdrowia · +35 energii</small></span><button onclick="eat('fish')">Zjedz rybę</button></div>
+ <p>Włócznia: <b id="bp">brak</b> · Wędka: <b id="br">brak</b><br>Tratwa: <b id="bra">brak</b> · Skarb: <b id="bt">brak</b></p>
+</div>
+<div id="shop" class="panel" role="dialog" aria-label="Handlarz Leon">
+ <button class="close" aria-label="Zamknij handel" onclick="toggle('shop',0)">✕</button><h2>🧑‍🌾 Leon — handlarz</h2><p class="intro">„Masz nadmiar? Ja mam miejsce na straganie!”</p><p>Twoje monety: <b id="shopCoins">0</b></p>
+ <h3>Kup materiały</h3>
+ <div class="recipe"><span>🪵 5 drewna<small>20 monet</small></span><button onclick="trade('buy','wood')">Kup</button></div>
+ <div class="recipe"><span>🪨 5 kamieni<small>25 monet</small></span><button onclick="trade('buy','stone')">Kup</button></div>
+ <div class="recipe"><span>🥥 2 kokosy<small>16 monet</small></span><button onclick="trade('buy','food')">Kup</button></div>
+ <h3>Sprzedaj zasoby</h3>
+ <div class="recipe"><span>🪵 5 drewna<small>Dostaniesz 10 monet</small></span><button onclick="trade('sell','wood')">Sprzedaj</button></div>
+ <div class="recipe"><span>🐟 1 surowa ryba<small>Dostaniesz 12 monet</small></span><button onclick="trade('sell','fish')">Sprzedaj</button></div>
+ <div class="recipe"><span>🐚 2 muszelki<small>Dostaniesz 8 monet</small></span><button onclick="trade('sell','shells')">Sprzedaj</button></div>
+ <h3>📜 Dostawa dla Leona</h3><div class="recipe"><span>6 drewna + 4 kamienie<small id="supplyQuest">Nagroda: 40 monet + 60 XP</small></span><button id="supplyButton" onclick="deliverQuest('supplies')">Dostarcz</button></div>
+</div>
+<div id="nelaPanel" class="panel" role="dialog" aria-label="Zadania Neli">
+ <button class="close" aria-label="Zamknij zadania" onclick="toggle('nelaPanel',0)">✕</button><h2>👩‍🦰 Nela — zadania</h2><p class="intro">„Na wyspie zawsze przyda się pomocna dłoń.”</p>
+ <div class="recipe"><span>Ryby dla mieszkańców<small id="fishQuest">Dostarcz 3 ryby (surowe lub pieczone). Nagroda: 70 monet + 80 XP</small></span><button id="fishQuestButton" onclick="deliverQuest('fish')">Dostarcz ryby</button></div>
+ <h3>💎 Wyprawa po skarb</h3><p id="treasureQuest">Zbuduj tratwę i znajdź drugą wyspę na południowym wschodzie.</p>
+</div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id), C=$('game'), X=C.getContext('2d');
+const WORLD={w:4600,h:2900}, SAVE_KEY='myIsland09';
+let W=0,H=0,DPR=1,K={},play=0,P={x:1500,y:1100},cam={x:0,y:0};
+let wood=0,stone=0,food=0,shells=0,fish=0,cookedFish=0,totalCaught=0,xpv=0,coins=0,health=100,energy=100;
+let spear=0,rod=0,raft=0,treasure=0,sprint=0,blocking=0,lastAttack=0,secondFound=0,returned=0,baseLevel=0,basePos=null,campfire=0;
+let questsDone={fish:0,supplies:0},activePanel=null,resting=0,face='down',moving=false,walkPhase=0,time=0,lastTime=0,lastAutosave=0,lastUI=0,hitFlash=0,msgTimer=0;
+const O=[],E=[],F=[],nela={x:3370,y:430},leon={x:1630,y:1160};
+const chest={x:4200,y:2450},panels=['craft','basePanel','bag','shop','nelaPanel'];
+let terrain=null,waterGradient=null,seed=710;
+function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
+function rnd(a,b){return a+rand()*(b-a)}
+function ellipseInside(x,y,cx,cy,rx,ry){return ((x-cx)/rx)**2+((y-cy)/ry)**2<1}
+function mainLand(x,y){return ellipseInside(x,y,1750,1300,1540,970)||ellipseInside(x,y,3380,500,520,310)}
+function island2(x,y){return ellipseInside(x,y,4100,2400,390,290)}
+function sea(x,y){return !mainLand(x,y)&&!island2(x,y)}
+function deep(x,y){return sea(x,y)&&x>3500&&y>1150}
+function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function safeZone(x,y){return !!basePos&&baseLevel>0&&Math.hypot(x-basePos.x,y-basePos.y)<160}
+function spawnResources(type,count){
+ for(let i=0;i<count;i++){
+  let x,y;do{x=rnd(350,3400);y=rnd(350,2100)}while(!ellipseInside(x,y,1750,1300,1410,840)||Math.hypot(x-1540,y-1120)<210);
+  O.push({t:type,x,y,hp:type==='tree'||type==='rock'?2:1,phase:rand()*6.28});
+ }
+}
+spawnResources('tree',140);spawnResources('rock',85);spawnResources('food',38);
+for(let i=0;i<40;i++){const a=2*Math.PI*i/40;O.push({t:'shell',x:1750+1490*Math.cos(a),y:1300+915*Math.sin(a),hp:1,phase:0})}
+for(let i=0;i<6;i++){const x=rnd(2150,2850),y=rnd(650,1100);E.push({x,y,sx:x,sy:y,hp:3,hit:0,phase:rand()*6.28})}
+for(let i=0;i<28;i++){let x,y;do{x=rnd(100,4500);y=rnd(100,2800)}while(!sea(x,y));F.push({x,y,phase:rand()*6.28})}
+function ellipse(ctx,x,y,rx,ry,color){ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}
+function rounded(ctx,x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
+function makeTerrain(){
+ const c=document.createElement('canvas');c.width=WORLD.w/2;c.height=WORLD.h/2;const ctx=c.getContext('2d');ctx.scale(.5,.5);
+ const coast=[[1750,1300,1540,970],[3380,500,520,310],[4100,2400,390,290]];
+ for(const [x,y,rx,ry] of coast){
+  ellipse(ctx,x,y,rx+26,ry+26,'#42b9b4');ellipse(ctx,x,y,rx+10,ry+10,'#72d1c0');
+  const sand=ctx.createLinearGradient(x,y-ry,x,y+ry);sand.addColorStop(0,'#f4e5b4');sand.addColorStop(1,'#dcc286');ellipse(ctx,x,y,rx,ry,sand);
+ }
+ const grass=ctx.createLinearGradient(0,300,0,2250);grass.addColorStop(0,'#6ca468');grass.addColorStop(.45,'#85b578');grass.addColorStop(1,'#6aa367');
+ ellipse(ctx,1750,1300,1420,840,grass);ellipse(ctx,3380,500,450,240,'#91b977');ellipse(ctx,4100,2400,325,225,'#75a668');
+ let terrainSeed=23;const r=()=>((terrainSeed=(terrainSeed*1664525+1013904223)>>>0)/4294967296);
+ for(let i=0;i<4800;i++){
+  const x=r()*WORLD.w,y=r()*WORLD.h;
+  if(ellipseInside(x,y,1750,1300,1410,825)||ellipseInside(x,y,3380,500,440,225)||ellipseInside(x,y,4100,2400,310,210)){
+   ellipse(ctx,x,y,6+r()*23,2+r()*8,i%3?'#bad58b18':'#386e4b17');
+   if(i%7===0){ctx.strokeStyle='#edf0ae40';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x-3,y+3);ctx.lineTo(x,y-3);ctx.lineTo(x+4,y+2);ctx.stroke()}
+  }else if(mainLand(x,y)||island2(x,y)){ellipse(ctx,x,y,1+r()*2,1,'#a9916240')}
+ }
+ ctx.strokeStyle='#d5c494';ctx.lineWidth=45;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(1440,1190);ctx.bezierCurveTo(1520,1080,1750,1190,1980,1280);ctx.bezierCurveTo(2420,1510,2790,1440,3200,1320);ctx.stroke();
+ ctx.strokeStyle='#e2d4a4';ctx.lineWidth=28;ctx.stroke();
+ ctx.strokeStyle='#ceb789';ctx.lineWidth=32;ctx.beginPath();ctx.moveTo(1800,1180);ctx.bezierCurveTo(2100,930,2820,920,3220,730);ctx.lineTo(3370,480);ctx.stroke();
+ ctx.strokeStyle='#ddcaa0';ctx.lineWidth=20;ctx.stroke();
+ ellipse(ctx,1570,1160,142,100,'#c9b888');ellipse(ctx,1570,1160,125,85,'#d9c99f');
+ terrain=c;
+}
+makeTerrain();
+function resize(){
+ DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;C.width=Math.round(W*DPR);C.height=Math.round(H*DPR);X.setTransform(DPR,0,0,DPR,0,0);
+ waterGradient=X.createLinearGradient(0,0,W,H);waterGradient.addColorStop(0,'#239cb2');waterGradient.addColorStop(.6,'#168ca7');waterGradient.addColorStop(1,'#10688e');
+}
+addEventListener('resize',resize);resize();
+function visible(x,y,pad=120){return x>cam.x-pad&&x<cam.x+W+pad&&y>cam.y-pad&&y<cam.y+H+pad}
+function label(x,y,text,color='#e9f3dc'){
+ X.font='700 10px system-ui';const w=X.measureText(text).width+16;rounded(X,x-w/2,y-12,w,20,7,'#07333dd9');X.fillStyle=color;X.textAlign='center';X.fillText(text,x,y+1);X.textAlign='left';
+}
+function shadow(x,y,rx=15,ry=6){ellipse(X,x+5,y+3,rx,ry,'#193c3b2d')}
+function drawPalm(o){
+ const shake=o.shakeUntil>Date.now()?Math.sin(time*.1)*3:0;const sway=Math.sin(time*.0012+o.phase)*3;
+ X.save();X.translate(o.x+shake,o.y);shadow(0,0,23,8);
+ X.strokeStyle='#77522f';X.lineWidth=12;X.lineCap='round';X.beginPath();X.moveTo(0,0);X.quadraticCurveTo(-8,-30,7+sway,-67);X.stroke();
+ X.strokeStyle='#bb8b50';X.lineWidth=6;X.beginPath();X.moveTo(-3,-2);X.quadraticCurveTo(-7,-34,6+sway,-66);X.stroke();
+ X.strokeStyle='#6a482d';X.lineWidth=2;for(let i=0;i<5;i++){X.beginPath();X.moveTo(-7+i*.6,-i*11-5);X.lineTo(2+i*.8,-i*11-9);X.stroke()}
+ X.translate(7+sway,-66);
+ for(let i=0;i<7;i++){
+  const a=i*6.28/7+.18;X.save();X.rotate(a);X.fillStyle=i%2?'#2a714d':'#398253';X.beginPath();X.moveTo(0,0);X.bezierCurveTo(8,-18,32,-17,48,1);X.quadraticCurveTo(22,-7,0,0);X.fill();X.strokeStyle='#66a966';X.lineWidth=1.6;X.beginPath();X.moveTo(0,0);X.quadraticCurveTo(25,-12,47,1);X.stroke();X.restore();
+ }
+ ellipse(X,-5,3,5,6,'#855b36');ellipse(X,4,6,5,6,'#a17442');X.restore();
+}
+function drawRock(o){
+ X.save();X.translate(o.x,o.y);shadow(0,0,20,7);X.fillStyle='#71858a';X.beginPath();X.moveTo(-21,-3);X.lineTo(-15,-21);X.lineTo(1,-29);X.lineTo(19,-16);X.lineTo(23,-1);X.lineTo(9,7);X.lineTo(-11,5);X.closePath();X.fill();
+ X.fillStyle='#a9b6ae';X.beginPath();X.moveTo(-15,-21);X.lineTo(1,-29);X.lineTo(10,-14);X.lineTo(-3,-5);X.lineTo(-21,-3);X.closePath();X.fill();
+ X.fillStyle='#8b9c97';X.beginPath();X.moveTo(1,-29);X.lineTo(19,-16);X.lineTo(23,-1);X.lineTo(10,-14);X.fill();X.restore();
+}
+function drawCoconut(o){shadow(o.x,o.y,10,4);ellipse(X,o.x,o.y-8,10,11,'#7a5134');ellipse(X,o.x-2,o.y-10,7,8,'#b89463');ellipse(X,o.x+2,o.y-12,1.3,1.3,'#392e26');ellipse(X,o.x-2,o.y-13,1.3,1.3,'#392e26');ellipse(X,o.x,o.y-9,1.3,1.3,'#392e26')}
+function drawShell(o){
+ X.save();X.translate(o.x,o.y);shadow(0,0,9,3);X.fillStyle='#f5dec5';X.strokeStyle='#b79477';X.lineWidth=1;X.beginPath();X.moveTo(0,1);X.lineTo(-11,-6);X.quadraticCurveTo(-8,-20,0,-16);X.quadraticCurveTo(9,-20,12,-6);X.closePath();X.fill();X.stroke();
+ for(let i=-2;i<=2;i++){X.beginPath();X.moveTo(0,0);X.lineTo(i*4,-13+Math.abs(i)*2);X.stroke()}X.restore();
+}
+function drawFish(f){
+ const x=f.x+Math.sin(time*.001+f.phase)*28,y=f.y+Math.cos(time*.0014+f.phase)*9;
+ if(!sea(x,y)||!visible(x,y,30))return;
+ X.save();X.translate(x,y);X.rotate(Math.sin(time*.001+f.phase)*.25);X.globalAlpha=.55;
+ ellipse(X,0,0,11,4,'#85d9d9');X.fillStyle='#69c4c7';X.beginPath();X.moveTo(-9,0);X.lineTo(-17,-5);X.lineTo(-15,5);X.fill();ellipse(X,7,-1,1,1,'#0b718c');X.restore();
+}
+function drawPerson(x,y,kind='player',direction='down',walk=0,wet=false){
+ const skin=kind==='leon'?'#b9825e':'#e3b185',shirt=kind==='nela'?'#dd876f':kind==='leon'?'#ded1a5':'#4c9cba',hair=kind==='nela'?'#945039':'#463b32';
+ const bob=walk?Math.abs(Math.sin(walk))*1.8:Math.sin(time*.002+kind.length)*.7,step=walk?Math.sin(walk)*5:0;
+ X.save();X.translate(x,y);shadow(0,0,14,5);if(direction==='left')X.scale(-1,1);
+ if(wet){X.strokeStyle='#b5ece0a0';X.lineWidth=2;X.beginPath();X.ellipse(0,0,18+Math.sin(time*.006)*2,5,0,0,6.28);X.stroke();X.translate(0,23)}
+ if(kind==='nela'){ellipse(X,0,-38-bob,13,20,hair)}
+ X.lineCap='round';
+ if(!wet){
+  X.strokeStyle='#334958';X.lineWidth=8;
+  X.beginPath();X.moveTo(-6,-19-bob);X.lineTo(-6-step*.2,-9);X.lineTo(-7+step,0);X.stroke();
+  X.beginPath();X.moveTo(6,-19-bob);X.lineTo(6+step*.2,-9);X.lineTo(7-step,0);X.stroke();
+  X.strokeStyle='#413e35';X.lineWidth=5;X.beginPath();X.moveTo(-8+step,1);X.lineTo(-3+step,1);X.moveTo(5-step,1);X.lineTo(11-step,1);X.stroke();
+ }
+ X.strokeStyle=skin;X.lineWidth=6;
+ X.beginPath();X.moveTo(-11,-33-bob);X.lineTo(-15,-23+step*.6-bob);X.lineTo(-13,-17+step*.8-bob);X.stroke();
+ X.beginPath();X.moveTo(11,-33-bob);X.lineTo(15,-23-step*.6-bob);X.lineTo(13,-17-step*.8-bob);X.stroke();
+ rounded(X,-11,-38-bob,22,23,7,shirt);rounded(X,-10,-21-bob,20,5,2,kind==='leon'?'#9b8060':'#315766');
+ if(kind==='leon'){rounded(X,-8,-36-bob,5,17,1,'#8b8060');rounded(X,3,-36-bob,5,17,1,'#8b8060')}
+ rounded(X,-4,-43-bob,8,8,2,skin);ellipse(X,0,-49-bob,10,12,skin);
+ const back=direction==='up',profile=direction==='right'||direction==='left';
+ X.fillStyle=hair;X.beginPath();X.arc(0,-52-bob,10,Math.PI,Math.PI*2);X.lineTo(10,-49-bob);X.quadraticCurveTo(5,-57-bob,-4,-53-bob);X.lineTo(-10,-46-bob);X.closePath();X.fill();
+ if(back)ellipse(X,0,-50-bob,10,10,hair);
+ else if(profile){ellipse(X,7,-50-bob,1.2,1.6,'#293c3b');ellipse(X,10,-46-bob,2.5,2,skin);X.strokeStyle='#9b6957';X.lineWidth=1;X.beginPath();X.moveTo(7,-42-bob);X.lineTo(10,-42-bob);X.stroke()}
+ else{
+  ellipse(X,-4,-49-bob,1.2,1.5,'#263b3b');ellipse(X,4,-49-bob,1.2,1.5,'#263b3b');X.strokeStyle='#a26d56';X.lineWidth=1.1;X.beginPath();X.moveTo(-2,-42-bob);X.quadraticCurveTo(0,-40-bob,3,-42-bob);X.stroke();
+ }
+ if(kind==='leon'){ellipse(X,0,-59-bob,15,3,'#b49a64');rounded(X,-9,-68-bob,18,10,3,'#d2bc86');X.fillStyle='#c3ae79';X.fillRect(-9,-60-bob,18,2)}
+ if(kind==='nela')ellipse(X,11,-49-bob,5,9,'#b26642');
+ if(kind==='player'&&spear&&!wet){X.strokeStyle='#755738';X.lineWidth=3;X.beginPath();X.moveTo(18,-4);X.lineTo(21,-51);X.stroke();X.fillStyle='#b8c8c6';X.beginPath();X.moveTo(21,-59);X.lineTo(16,-49);X.lineTo(24,-49);X.fill()}
+ if(kind==='player'&&blocking){ellipse(X,-16,-25,11,14,'#768f9a');ellipse(X,-16,-25,7,10,'#aebcb5')}
+ if(kind==='player'&&hitFlash>0){X.strokeStyle='#ffb7a3';X.lineWidth=2;X.beginPath();X.ellipse(0,-29,18,32,0,0,6.28);X.stroke()}
+ X.restore();
+}
+function drawBoar(e){
+ X.save();X.translate(e.x,e.y);shadow(0,0,20,7);const s=Math.sin(time*.008+e.phase)*2;
+ X.strokeStyle='#574d44';X.lineWidth=4;X.lineCap='round';for(let i=-1;i<=1;i+=2){X.beginPath();X.moveTo(i*11,-5);X.lineTo(i*11+s,5);X.moveTo(i*5,-5);X.lineTo(i*5-s,5);X.stroke()}
+ ellipse(X,0,-12,21,12,'#6e6655');ellipse(X,13,-17,9,10,'#7e715b');ellipse(X,21,-11,6,4,'#b39479');ellipse(X,17,-20,1.3,1.3,'#202f2b');ellipse(X,10,-25,3,5,'#554b42');X.restore();
+}
+function drawRaft(x,y){
+ X.save();X.translate(x,y);ellipse(X,2,9,40,17,'#063f6650');
+ for(let i=0;i<5;i++){rounded(X,-34+i*14,-8,12,30,5,i%2?'#b18c53':'#c5a16a');X.strokeStyle='#87623e';X.lineWidth=1;X.beginPath();X.moveTo(-29+i*14,-4);X.lineTo(-29+i*14,18);X.stroke()}
+ X.strokeStyle='#74684b';X.lineWidth=3;X.beginPath();X.moveTo(-34,0);X.lineTo(34,0);X.moveTo(-34,15);X.lineTo(34,15);X.stroke();
+ X.strokeStyle='#b6a77b';X.lineWidth=3;X.beginPath();X.moveTo(25,-12);X.lineTo(49+Math.sin(walkPhase)*4,28);X.stroke();ellipse(X,49+Math.sin(walkPhase)*4,27,5,10,'#b6a77b');X.restore();
+}
+function firePosition(){if(!basePos)return null;for(const [dx,dy] of [[77,38],[-77,38],[0,-50],[0,0]]){const p={x:basePos.x+dx,y:basePos.y+dy};if(!sea(p.x,p.y))return p}return {x:basePos.x,y:basePos.y}}
+function drawFire(x,y){
+ X.save();X.translate(x,y);const glow=X.createRadialGradient(0,-4,1,0,0,68);glow.addColorStop(0,'#ffb94745');glow.addColorStop(1,'#ffb94700');ellipse(X,0,0,68,38,glow);
+ for(let i=0;i<7;i++){const a=i*6.28/7;ellipse(X,Math.cos(a)*18,Math.sin(a)*9,5,4,'#80928b')}
+ X.strokeStyle='#6f5036';X.lineWidth=6;X.lineCap='round';X.beginPath();X.moveTo(-12,5);X.lineTo(11,-4);X.moveTo(-10,-3);X.lineTo(12,5);X.stroke();
+ const f=Math.sin(time*.018)*4;X.fillStyle='#ee7836';X.beginPath();X.moveTo(-11,1);X.quadraticCurveTo(-13,-8,0,-29-f);X.quadraticCurveTo(1,-12,8,-18);X.quadraticCurveTo(14,-6,8,3);X.closePath();X.fill();
+ X.fillStyle='#ffd66a';X.beginPath();X.moveTo(-6,3);X.quadraticCurveTo(-8,-8,1,-19+f*.5);X.quadraticCurveTo(8,-4,5,4);X.fill();
+ for(let i=0;i<3;i++){const p=(time*.025+i*14)%43;ellipse(X,Math.sin(p*.2+i)*8,-10-p,1.4,1.4,'#ffd58c')}
+ X.restore();
+}
+function drawBase(){
+ if(!basePos)return;const {x,y}=basePos;shadow(x,y,48,12);X.save();X.translate(x,y);
+ if(baseLevel===1){
+  X.fillStyle='#dfcf98';X.beginPath();X.moveTo(-38,3);X.lineTo(0,-55);X.lineTo(38,3);X.closePath();X.fill();X.fillStyle='#b4aa7c';X.beginPath();X.moveTo(0,-55);X.lineTo(38,3);X.lineTo(8,3);X.closePath();X.fill();
+  X.fillStyle='#5d7265';X.beginPath();X.moveTo(-14,3);X.lineTo(0,-28);X.lineTo(14,3);X.fill();X.strokeStyle='#827857';X.lineWidth=2;X.beginPath();X.moveTo(-38,3);X.lineTo(-53,9);X.moveTo(38,3);X.lineTo(52,9);X.stroke();
+ }else{
+  rounded(X,-35,-45,70,47,3,baseLevel===2?'#bda16e':'#e3d1a2');X.fillStyle=baseLevel===2?'#527c51':'#b67c56';X.beginPath();X.moveTo(-46,-41);X.lineTo(0,-78);X.lineTo(46,-41);X.closePath();X.fill();
+  rounded(X,-8,-29,18,31,2,'#6a6e50');rounded(X,-26,-31,13,14,2,'#91bdc4');rounded(X,17,-31,13,14,2,'#91bdc4');X.strokeStyle='#f2e0a6';X.lineWidth=2;X.beginPath();X.moveTo(-20,-30);X.lineTo(-20,-17);X.moveTo(23,-30);X.lineTo(23,-17);X.stroke();
+ }X.restore();label(x,y-87,'TWOJA BAZA · L'+baseLevel);
+}
+function drawChest(){shadow(chest.x,chest.y,22,8);rounded(X,chest.x-20,chest.y-25,40,28,4,'#a77a40');rounded(X,chest.x-20,chest.y-33,40,14,4,'#be9455');X.fillStyle='#e2c67b';X.fillRect(chest.x-12,chest.y-32,4,34);X.fillRect(chest.x+8,chest.y-32,4,34);rounded(X,chest.x-4,chest.y-17,8,9,2,'#f6d779')}
+function drawStall(){
+ const x=leon.x+52,y=leon.y+18;shadow(x,y,45,12);X.strokeStyle='#806b48';X.lineWidth=5;X.beginPath();X.moveTo(x-39,y);X.lineTo(x-39,y-66);X.moveTo(x+39,y);X.lineTo(x+39,y-66);X.stroke();
+ rounded(X,x-42,y-30,84,23,4,'#a48755');
+ for(let i=0;i<7;i++){X.fillStyle=i%2?'#ead9ac':'#6dada7';X.beginPath();X.moveTo(x-45+i*13,y-69);X.lineTo(x-32+i*13,y-69);X.lineTo(x-29+i*13,y-48);X.lineTo(x-42+i*13,y-48);X.closePath();X.fill()}
+ ellipse(X,x-19,y-34,6,6,'#bfaa66');ellipse(X,x-4,y-35,6,6,'#c3955f');rounded(X,x+10,y-39,17,9,2,'#6eafa8');
+}
+function draw(){
+ X.fillStyle=waterGradient;X.fillRect(0,0,W,H);X.save();X.translate(-cam.x,-cam.y);
+ X.fillStyle='#0c6b8f70';X.fillRect(3500,1150,1100,1750);
+ X.strokeStyle='#acf0e221';X.lineWidth=1.5;
+ const waveOffset=Math.sin(time*.0005)*14;
+ for(let y=Math.floor(cam.y/95)*95;y<cam.y+H+95;y+=95)for(let x=Math.floor(cam.x/120)*120;x<cam.x+W+120;x+=120){
+  if(!sea(x,y))continue;X.beginPath();X.moveTo(x+waveOffset,y);X.quadraticCurveTo(x+18+waveOffset,y-3-Math.sin(time*.001+x)*2,x+38+waveOffset,y);X.stroke();
+ }
+ for(const f of F)drawFish(f);
+ const tw=Math.min(W,WORLD.w-cam.x),th=Math.min(H,WORLD.h-cam.y);
+ X.drawImage(terrain,cam.x/2,cam.y/2,tw/2,th/2,cam.x,cam.y,tw,th);
+ X.strokeStyle='#fbf4d791';X.lineWidth=2;
+ for(const [x,y,rx,ry] of [[1750,1300,1545,975],[3380,500,525,315],[4100,2400,395,295]]){X.beginPath();X.ellipse(x,y,rx+Math.sin(time*.001)*3,ry+Math.sin(time*.001)*3,0,0,6.28);X.stroke()}
+ if(visible(leon.x,leon.y))drawStall();
+ const things=O.filter(o=>visible(o.x,o.y)).map(o=>({y:o.y,draw:()=>o.t==='tree'?drawPalm(o):o.t==='rock'?drawRock(o):o.t==='shell'?drawShell(o):drawCoconut(o)}));
+ for(const e of E)if(visible(e.x,e.y))things.push({y:e.y,draw:()=>drawBoar(e)});
+ if(basePos&&visible(basePos.x,basePos.y))things.push({y:basePos.y,draw:drawBase});
+ const fire=firePosition();if(campfire&&fire&&visible(fire.x,fire.y))things.push({y:fire.y,draw:()=>drawFire(fire.x,fire.y)});
+ if(!treasure&&visible(chest.x,chest.y))things.push({y:chest.y,draw:drawChest});
+ for(const [person,kind,name] of [[nela,'nela','NELA · ZADANIA'],[leon,'leon','LEON · HANDLARZ']]){
+  if(visible(person.x,person.y))things.push({y:person.y,draw:()=>{drawPerson(person.x,person.y,kind,Math.abs(P.x-person.x)>Math.abs(P.y-person.y)?P.x<person.x?'left':'right':P.y<person.y?'up':'down');label(person.x,person.y-80,name)}});
+ }
+ things.push({y:P.y,draw:()=>{const wet=sea(P.x,P.y);if(wet&&raft)drawRaft(P.x,P.y);drawPerson(P.x,P.y,'player',face,moving?walkPhase:0,wet&&!raft);if(Date.now()-lastAttack<180&&spear){X.strokeStyle='#f6efd3';X.lineWidth=3;X.beginPath();X.arc(P.x,P.y-18,43,walkPhase,walkPhase+1.9);X.stroke()}}});
+ things.sort((a,b)=>a.y-b.y);for(const t of things)t.draw();
+ if(visible(3380,220))label(3380,205,'PÓŁNOCNA ZATOKA','#f5e7ba');
+ if(visible(4100,2120))label(4100,2110,'WYSPA SKARBU','#f5e7ba');
+ for(let i=0;i<4;i++){
+  const bx=1520+Math.sin(time*.00013+i*1.7)*330,by=1010+Math.cos(time*.00016+i*2.2)*210;
+  if(!visible(bx,by,20))continue;const wing=3+Math.sin(time*.011+i)*3;X.strokeStyle='#fff8ddc9';X.lineWidth=2;X.beginPath();X.moveTo(bx-8,by-wing);X.quadraticCurveTo(bx-3,by-2,bx,by);X.quadraticCurveTo(bx+3,by-2,bx+8,by-wing);X.stroke();
+ }X.restore();
+}
+function enemies(step){
+ for(const e of E){
+  const d=distance(P,e),safe=safeZone(P.x,P.y);
+  const target=d<260&&!safe?P:{x:e.sx+Math.sin(time*.0005+e.phase)*32,y:e.sy+Math.cos(time*.0006+e.phase)*23};
+  const a=Math.atan2(target.y-e.y,target.x-e.x),speed=d<260&&!safe?.65:.14;
+  if(distance(e,target)>3){e.x+=Math.cos(a)*speed*step;e.y+=Math.sin(a)*speed*step}
+  if(d<42&&!safe&&Date.now()-e.hit>1500){
+   e.hit=Date.now();health=Math.max(0,health-(blocking?2:6));hitFlash=12;
+   if(health<=0){health=50;P=basePos?{x:basePos.x+70,y:basePos.y}:{x:1500,y:1100};resetInput();save();say('Odrodzenie przy bazie. Zjedz coś lub odpocznij przy ognisku.')}
+  }
+ }
+}
+function loop(timestamp=performance.now()){
+ const step=lastTime?Math.max(.1,Math.min(3,(timestamp-lastTime)/16.667)):1;lastTime=timestamp;time=timestamp;
+ if(play){
+  let dx=0,dy=0;if(!activePanel){if(K.ArrowUp||K.w)dy--;if(K.ArrowDown||K.s)dy++;if(K.ArrowLeft||K.a)dx--;if(K.ArrowRight||K.d)dx++}
+  if(dx&&dy){dx*=Math.SQRT1_2;dy*=Math.SQRT1_2}
+  moving=!!(dx||dy);if(moving){face=Math.abs(dx)>Math.abs(dy)?dx<0?'left':'right':dy<0?'up':'down';walkPhase+=step*.2;if(resting){resting=0;say('Odpoczynek przerwany.')}}
+  const wet=sea(P.x,P.y),fast=sprint&&energy>0&&moving,speed=wet?(raft?6:2):(fast?7:4);
+  if(!activePanel)energy=Math.max(0,Math.min(100,energy+(wet&&!raft?-.2:fast?-.28:.12)*step));
+  let nx=Math.max(60,Math.min(4540,P.x+dx*speed*step)),ny=Math.max(60,Math.min(2840,P.y+dy*speed*step));
+  if(deep(nx,ny)&&!raft){nx=P.x;ny=P.y}P.x=nx;P.y=ny;
+  if(island2(P.x,P.y)&&!secondFound){secondFound=1;xpv+=150;coins+=75;say('Odkryto Wyspę Skarbu!');save()}
+  if(resting>0){const seconds=step/60;health=Math.min(100,health+seconds*8);energy=Math.min(100,energy+seconds*14);resting=Math.max(0,resting-seconds);if(!resting){save();say('Odpoczynek zakończony. Czas na przygodę!')}}
+  if(!activePanel&&mainLand(P.x,P.y))enemies(step);hitFlash=Math.max(0,hitFlash-step);
+  if(timestamp-lastAutosave>5000){save();lastAutosave=timestamp}
+ }
+ cam.x=Math.max(0,Math.min(Math.max(0,WORLD.w-W),P.x-W/2));cam.y=Math.max(0,Math.min(Math.max(0,WORLD.h-H),P.y-H/2));
+ draw();if(play&&timestamp-lastUI>160){update();lastUI=timestamp}requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+function resetInput(){K={};sprint=0}
+addEventListener('keydown',e=>{
+ if(!play)return;if(e.key==='Escape'){if(activePanel)toggle(activePanel,0);return}if(activePanel)return;
+ const k=e.key.length===1?e.key.toLowerCase():e.key;K[k]=1;if(e.key.startsWith('Arrow')||e.key===' ')e.preventDefault();
+ if(e.key===' '&&!e.repeat)attack();if(k==='e'&&!e.repeat)interact();if(e.key==='Shift')sprint=1;
+});
+addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;K[k]=0;if(e.key==='Shift')sprint=0});
+addEventListener('blur',resetInput);document.addEventListener('visibilitychange',()=>{if(document.hidden)resetInput()});
+function holdControl(b,on,off){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);on()};b.onpointerup=b.onpointercancel=b.onlostpointercapture=off}
+document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;holdControl(b,()=>{if(!activePanel)K[k]=1},()=>K[k]=0)});
+holdControl(document.querySelector('.sprint'),()=>{if(!activePanel)sprint=1},()=>sprint=0);
+function startGame(){if(play)return;load();$('start').style.display='none';play=1;lastAutosave=performance.now();update();say('Witaj na żywej wyspie! Leon czeka przy obozowisku.')}
+function block(){if(activePanel)return;blocking=1;setTimeout(()=>blocking=0,1200)}
+function attack(){
+ if(activePanel)return;if(!spear)return say('Potrzebujesz włóczni. Zrobisz ją w warsztacie.');if(Date.now()-lastAttack<650)return;lastAttack=Date.now();
+ let target=null,d=105;for(const e of E){const q=distance(P,e);if(q<d){d=q;target=e}}if(!target)return say('Nic w zasięgu włóczni.');
+ target.hp-=2;if(target.hp<=0){E.splice(E.indexOf(target),1);coins+=20;xpv+=35;save();update();say('Dzik pokonany: +20 monet, +35 XP.')}
+}
+function interact(){
+ if(activePanel)return;
+ if(distance(P,leon)<110)return toggle('shop',1);
+ if(distance(P,nela)<110){
+  if(treasure&&!returned){returned=1;coins+=250;xpv+=300;save();say('Nela: Skarb odnaleziony! +250 monet, +300 XP.')}return toggle('nelaPanel',1);
+ }
+ if(distance(P,chest)<110&&!treasure){treasure=1;coins+=500;xpv+=500;save();update();return say('Skarb zdobyty! Wróć do Neli w Północnej Zatoce.')}
+ const f=firePosition();if(campfire&&f&&distance(P,f)<95)return toggle('basePanel',1);
+ let target=null,d=75;for(const o of O){const q=distance(P,o);if(q<d){d=q;target=o}}
+ if(!target)return say('Podejdź do zasobu, mieszkańca albo ogniska.');
+ if(--target.hp>0){target.shakeUntil=Date.now()+150;return say('Jeszcze jedno uderzenie.')}
+ O.splice(O.indexOf(target),1);
+ let found;if(target.t==='tree'){wood+=2;found='2 drewna'}else if(target.t==='rock'){stone++;found='1 kamień'}else if(target.t==='shell'){shells++;found='1 muszelka'}else{food++;found='1 kokos'}
+ xpv+=10;coins+=2;save();update();say('Zebrano: '+found+'.');
+}
+function goFish(){
+ if(activePanel)return;if(!rod)return say('Najpierw zrób wędkę w warsztacie.');
+ if(!sea(P.x,P.y)&&![[-80,0],[80,0],[0,-80],[0,80]].some(([x,y])=>sea(P.x+x,P.y+y)))return say('Podejdź do brzegu, żeby łowić.');
+ if(rand()<.7){fish++;totalCaught++;xpv+=20;say('Złowiona ryba! Upiecz ją lub sprzedaj Leonowi.')}else say('Ryba uciekła. Spróbuj ponownie.');save();update();
+}
+function craftSpear(){if(spear)return say('Masz już włócznię.');if(wood<6||stone<4)return say('Potrzebujesz 6 drewna i 4 kamieni.');wood-=6;stone-=4;spear=1;done('Włócznia gotowa!')}
+function craftRod(){if(rod)return say('Masz już wędkę.');if(wood<5||shells<2)return say('Potrzebujesz 5 drewna i 2 muszelek.');wood-=5;shells-=2;rod=1;done('Wędka gotowa!')}
+function craftRaft(){if(raft)return say('Masz już tratwę.');if(wood<12||shells<6)return say('Potrzebujesz 12 drewna i 6 muszelek.');wood-=12;shells-=6;raft=1;done('Tratwa gotowa! Możesz przemierzać głębokie wody.')}
+function upgradeBase(level){
+ if(level!==baseLevel+1)return say('Zbuduj kolejno poziomy L1, L2 i L3.');if(level===1&&sea(P.x,P.y))return say('Bazę zbuduj na lądzie.');
+ const w=[0,12,18,28][level],s=[0,8,12,18][level],c=[0,0,50,100][level];
+ if(wood<w||stone<s||coins<c)return say('Brakuje materiałów lub monet.');wood-=w;stone-=s;coins-=c;baseLevel=level;
+ if(!basePos){basePos={x:P.x+70,y:P.y+20};if(sea(basePos.x,basePos.y))basePos={x:P.x,y:P.y}}
+ xpv+=level*100;toggle('basePanel',0);save();update();say('Baza L'+level+' gotowa! W pobliżu jesteś bezpieczny przed dzikami.');
+}
+function nearFire(){const f=firePosition();return campfire&&f&&distance(P,f)<150}
+function buildFire(){
+ if(campfire)return say('Ognisko już płonie.');if(!baseLevel)return say('Najpierw zbuduj bazę L1.');
+ if(distance(P,basePos)>150)return say('Wróć do swojej bazy, żeby rozpalić ognisko.');if(wood<4||stone<2)return say('Potrzebujesz 4 drewna i 2 kamieni.');
+ wood-=4;stone-=2;campfire=1;xpv+=40;save();update();say('Ognisko płonie. Możesz piec ryby i odpoczywać.');
+}
+function cookFish(){
+ if(!nearFire())return say('Podejdź do rozpalonego ogniska przy bazie.');if(fish<1||wood<1)return say('Potrzebujesz surowej ryby i 1 drewna.');
+ fish--;wood--;cookedFish++;xpv+=10;save();update();say('Ryba upieczona! Znajdziesz ją w plecaku.');
+}
+function eat(kind){
+ if(health>=100&&energy>=100)return say('Masz pełne zdrowie i energię. Zachowaj jedzenie na później.');
+ if(kind==='coconut'){if(food<1)return say('Nie masz kokosów.');food--;health=Math.min(100,health+20);energy=Math.min(100,energy+15)}
+ else if(kind==='fish'){if(cookedFish<1)return say('Najpierw upiecz rybę przy ognisku.');cookedFish--;health=Math.min(100,health+45);energy=Math.min(100,energy+35)}
+ else return;save();update();say('Jedzenie dodało ci sił.');
+}
+function restAtFire(){
+ if(resting)return;if(!nearFire())return say('Podejdź do rozpalonego ogniska.');
+ if(health>=100&&energy>=100)return say('Jesteś już wypoczęty.');resetInput();resting=5;update();say('Odpoczywasz przy ognisku…');
+}
+const market={buy:{wood:{qty:5,price:20},stone:{qty:5,price:25},food:{qty:2,price:16}},sell:{wood:{qty:5,price:10},fish:{qty:1,price:12},shells:{qty:2,price:8}}};
+function resource(key,value){if(key==='wood'){if(value!==undefined)wood=value;return wood}if(key==='stone'){if(value!==undefined)stone=value;return stone}if(key==='food'){if(value!==undefined)food=value;return food}if(key==='fish'){if(value!==undefined)fish=value;return fish}if(key==='shells'){if(value!==undefined)shells=value;return shells}return 0}
+function trade(mode,key){
+ if(distance(P,leon)>=110)return say('Podejdź do Leona przy obozowisku.');const offer=market[mode]?.[key];if(!offer)return;
+ if(mode==='buy'){if(coins<offer.price)return say('Za mało monet.');coins-=offer.price;resource(key,resource(key)+offer.qty)}
+ else{if(resource(key)<offer.qty)return say('Za mało zasobów na sprzedaż.');resource(key,resource(key)-offer.qty);coins+=offer.price}
+ save();update();say(mode==='buy'?'Zakup udany.':'Zasoby sprzedane.');
+}
+function deliverQuest(key){
+ if(questsDone[key])return say('To zadanie jest już ukończone.');
+ if(key==='supplies'){
+  if(distance(P,leon)>=110)return say('Dostarcz materiały Leonowi.');if(wood<6||stone<4)return say('Leon potrzebuje 6 drewna i 4 kamieni.');
+  wood-=6;stone-=4;coins+=40;xpv+=60;
+ }else if(key==='fish'){
+  if(distance(P,nela)>=110)return say('Dostarcz ryby Neli w Północnej Zatoce.');if(fish+cookedFish<3)return say('Nela potrzebuje 3 ryb.');
+  const raw=Math.min(fish,3);fish-=raw;cookedFish-=3-raw;coins+=70;xpv+=80;
+ }else return;
+ questsDone[key]=1;save();update();say('Dostawa przyjęta! Otrzymujesz monety i XP.');
+}
+function done(text){toggle('craft',0);xpv+=40;save();update();say(text)}
+function toggle(id,on){if(!panels.includes(id))return;for(const name of panels)$(name).style.display='none';activePanel=on?id:null;if(on)$(id).style.display='block';resetInput();update()}
+function update(){
+ const values={hp:Math.round(health),en:Math.round(energy),xp:xpv,co:coins,wo:wood,st:stone,fo:food,sh:shells,fi:fish+cookedFish,bl:baseLevel,baseLevel,bw:wood,bs:stone,bf:food,bsh:shells,bfi:fish,bcf:cookedFish,bp:spear?'jest':'brak',br:rod?'jest':'brak',bra:raft?'jest':'brak',bt:treasure?'zdobyty':'brak',shopCoins:coins};
+ for(const [id,value] of Object.entries(values))$(id).textContent=value;
+ $('zn').textContent=island2(P.x,P.y)?'Wyspa Skarbu':deep(P.x,P.y)?'Głębokie wody':sea(P.x,P.y)?raft?'Na tratwie':'Pływanie':P.x>3050&&P.y<850?'Północna Zatoka':'Wnętrze wyspy';
+ $('fireBuild').disabled=!!campfire;$('restButton').disabled=resting>0;$('restButton').textContent=resting?'Odpoczynek '+Math.ceil(resting)+' s':'Odpocznij';
+ $('fireStatus').textContent=campfire?'Ognisko płonie. Gotuj i odpoczywaj w jego pobliżu.':'Zbuduj bazę L1, potem rozpal ognisko.';
+ $('supplyButton').disabled=!!questsDone.supplies;$('fishQuestButton').disabled=!!questsDone.fish;
+ $('supplyQuest').textContent=questsDone.supplies?'Dostawa ukończona ✓':'Nagroda: 40 monet + 60 XP';
+ $('fishQuest').textContent=questsDone.fish?'Dostawa ukończona ✓':'Dostarcz 3 ryby (surowe lub pieczone). Nagroda: 70 monet + 80 XP';
+ $('treasureQuest').textContent=returned?'Skarb odnaleziony i oddany Neli. Gratulacje!':treasure?'Skarb masz w plecaku. Porozmawiaj z Nelą.':'Zbuduj tratwę i znajdź drugą wyspę na południowym wschodzie.';
+ let title='Wyprawa po skarb',text,detail;
+ if(!rod){text='Zbuduj wędkę.';detail='5 drewna + 2 muszelki. Muszelek szukaj na plaży.'}
+ else if(totalCaught<3){text='Złów 3 ryby: '+totalCaught+'/3';detail='Podejdź do brzegu i użyj ŁÓW.'}
+ else if(!raft){text='Zbuduj tratwę.';detail='12 drewna + 6 muszelek.'}
+ else if(!secondFound){text='Znajdź drugą wyspę.';detail='Płyń na południowy wschód.'}
+ else if(!treasure){text='Przeszukaj Wyspę Skarbu.';detail='Znajdź skrzynię i użyj DZIAŁAJ.'}
+ else if(!returned){text='Wróć do Neli.';detail='Czeka w Północnej Zatoce.'}
+ else{title='Żywa wyspa';text=questsDone.fish&&questsDone.supplies?'Mieszkańcy dziękują za pomoc!':'Pomóż mieszkańcom.';detail='Nela potrzebuje ryb, Leon materiałów. Rozwijaj bazę.'}
+ $('qt').textContent=title;$('qx').textContent=text;$('qp').textContent=detail;
+ let hint='';if(!activePanel){if(distance(P,leon)<110)hint='Leon: handel i dostawa · DZIAŁAJ';else if(distance(P,nela)<110)hint='Nela: zadania · DZIAŁAJ';else if(nearFire())hint='Ognisko: gotuj i odpoczywaj · DZIAŁAJ';else if(O.some(o=>distance(P,o)<75))hint='Zasób w zasięgu · DZIAŁAJ'}
+ $('hint').textContent=hint;$('hint').style.display=hint?'block':'none';
+}
+function say(text){$('msg').textContent=text;$('msg').classList.add('on');clearTimeout(msgTimer);msgTimer=setTimeout(()=>$('msg').classList.remove('on'),2600)}
+function save(){
+ try{localStorage.setItem(SAVE_KEY,JSON.stringify({version:10,P,wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,health,energy,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone}))}catch(e){}
+}
+function load(){
+ try{
+  const d=JSON.parse(localStorage.getItem(SAVE_KEY))||JSON.parse(localStorage.getItem('myIsland08'));if(!d)return;
+  const n=(key,fallback=0)=>Number.isFinite(d[key])?Math.max(0,d[key]):fallback;
+  if(d.P&&Number.isFinite(d.P.x)&&Number.isFinite(d.P.y))P={x:Math.max(60,Math.min(4540,d.P.x)),y:Math.max(60,Math.min(2840,d.P.y))};
+  wood=n('wood');stone=n('stone');shells=n('shells');fish=n('fish');cookedFish=n('cookedFish');totalCaught=n('totalCaught',fish);
+  food=d.version>=10?n('food'):Math.max(0,n('food')-fish);xpv=n('xpv');coins=n('coins');health=Math.min(100,n('health',100));energy=Math.min(100,n('energy',100));
+  spear=!!d.spear;rod=!!d.rod;raft=!!d.raft;treasure=!!d.treasure;secondFound=!!d.secondFound;returned=!!d.returned;baseLevel=Math.min(3,n('baseLevel'));campfire=!!d.campfire;
+  basePos=d.basePos&&Number.isFinite(d.basePos.x)&&Number.isFinite(d.basePos.y)?{x:d.basePos.x,y:d.basePos.y}:null;
+  if(baseLevel&&!basePos)basePos={x:1500,y:1100};
+  questsDone={fish:!!d.questsDone?.fish,supplies:!!d.questsDone?.supplies};
+ }catch(e){}
+}
+</script>
+</body>
+</html>
