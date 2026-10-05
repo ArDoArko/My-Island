@@ -4,11 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
-<title>My Island 0.13 — Konto My Island</title>
+<title>My Island 0.14 — Pierwsza wyspa 3D</title>
+<script defer src="island3d.bundle.js"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
 canvas{width:100vw;height:100vh;display:block}
+#world3d{position:fixed;inset:0;z-index:1;display:none;touch-action:none}
+.camera-button{pointer-events:auto;border:1px solid #ffffff35;min-width:40px;min-height:32px;color:#e8f5eb;touch-action:none}.camera-button:disabled{opacity:.55}.view-note{font-size:12px;color:#b8d9db;line-height:1.5}
 button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 .hud{position:fixed;z-index:5;top:max(8px,env(safe-area-inset-top));left:2%;width:96%;display:flex;gap:5px;flex-wrap:wrap;justify-content:center;pointer-events:none}
@@ -75,7 +78,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 </head>
 <body>
 <div id="start" class="start"><div class="card">
- <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version">0.13 • Konto My Island</p>
+ <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version">0.14 • Pierwsza wyspa 3D</p>
  <p class="desc">Odkrywaj wyspę sam albo z przyjaciółmi.<br>Do czterech graczy, wspólna baza i wyprawa po skarb.</p>
  <div class="play-choice"><button onclick="startGame()">GRAJ SOLO</button><button class="online-choice" onclick="toggle('roomPanel',1)">GRAJ ONLINE</button></div><p class="keys">WASD lub strzałki • E działaj • Shift sprint • spacja atak</p>
  <button class="cloud-entry" onclick="toggle('accountPanel',1)">☁️ Konto i zapis</button><p id="cloudStartStatus" role="status">Zaloguj się, aby kontynuować na innym urządzeniu.</p>
@@ -83,6 +86,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <p class="desc">wspólna wyspa · kod pokoju · pad i joystick</p>
 </div></div>
 <div class="hud">
+ <button id="viewButton" class="p camera-button" onclick="switchView()" disabled aria-label="Przełącz widok wyspy">Widok 2D</button><button id="cameraLeft" class="p camera-button" onclick="orbitView(-.25)" disabled aria-label="Obróć kamerę w lewo">↶</button><button id="cameraRight" class="p camera-button" onclick="orbitView(.25)" disabled aria-label="Obróć kamerę w prawo">↷</button>
  <div class="p">❤️ <b id="hp">100</b></div><div class="p">⚡ <b id="en">100</b></div><div class="p">⭐ <b id="xp">0</b></div>
  <div class="p">🪙 <b id="co">0</b></div><div class="p">🪵 <b id="wo">0</b></div><div class="p">🪨 <b id="st">0</b></div>
  <div class="p">🥥 <b id="fo">0</b></div><div class="p">🐚 <b id="sh">0</b></div><div class="p">🐟 <b id="fi">0</b></div>
@@ -94,11 +98,12 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 </div>
 <div id="questBox" class="q">📜 <b id="qt">Wyprawa 0.13</b><br><span id="qx"></span><br><small id="qp"></small></div>
 <canvas id="game" aria-label="Wyspa, postacie i świat gry"></canvas>
+<canvas id="world3d" aria-label="Wyspa 3D z kamerą zza pleców postaci"></canvas>
 <div id="msg" class="msg" role="status"></div><div id="hint" class="hint"></div>
 <div class="ctrl"><button class="u" data-k="ArrowUp" aria-label="Idź w górę">▲</button><button class="l" data-k="ArrowLeft" aria-label="Idź w lewo">◀</button><button class="d" data-k="ArrowDown" aria-label="Idź w dół">▼</button><button class="r" data-k="ArrowRight" aria-label="Idź w prawo">▶</button></div>
 <button class="btn sprint">🏃 SPRINT</button><button class="btn block" onclick="block()">🛡️ BLOK</button><button class="btn attack" onclick="attack()">⚔️ ATAK</button>
 <button class="side base" onclick="toggle('basePanel',1)">🏠 BAZA</button><button class="side bag" onclick="toggle('bag',1)">🎒 PLECAK</button><button class="side build" onclick="toggle('craft',1)">🔨 BUDUJ</button><button class="side fish" onclick="goFish()">🎣 ŁÓW</button><button class="act" onclick="interact()">DZIAŁAJ</button>
-<div class="help">WASD / strzałki · E działaj · Shift sprint · spacja atak</div>
+<div class="help" id="viewHelp">WASD / strzałki · E działaj · Shift sprint · spacja atak</div>
 <div id="accountPanel" class="panel" role="dialog" aria-label="Konto gracza i zapis w chmurze">
  <button class="close" aria-label="Zamknij konto gracza" onclick="toggle('accountPanel',0)">✕</button><h2>☁️ Twoja wyspa</h2>
  <p class="intro">Ten sam postęp solo na telefonie i komputerze.</p>
@@ -227,6 +232,8 @@ let padProfiles=Object.create(null),padProfile=null,padDevice=null,inputFocused=
 const pad={index:null,id:'',x:0,y:0,sprinting:false,blocking:false,buttons:[],ready:false,menuDirection:0,nextMenu:0,capture:null,captureUntil:0,lastUI:0};
 try{const stored=JSON.parse(localStorage.getItem(PAD_KEY));if(stored&&typeof stored==='object'&&!Array.isArray(stored))Object.assign(padProfiles,stored)}catch(e){}
 let terrain=null,waterGradient=null,seed=710;
+let islandView=null,viewHeading=null,preferredView='3d';
+try{if(localStorage.getItem('myIslandViewV1')==='2d')preferredView='2d'}catch(e){}
 function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
 function rnd(a,b){return a+rand()*(b-a)}
 function ellipseInside(x,y,cx,cy,rx,ry){return ((x-cx)/rx)**2+((y-cy)/ry)**2<1}
@@ -279,6 +286,7 @@ makeTerrain();
 function resize(){
  DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;C.width=Math.round(W*DPR);C.height=Math.round(H*DPR);X.setTransform(DPR,0,0,DPR,0,0);
  waterGradient=X.createLinearGradient(0,0,W,H);waterGradient.addColorStop(0,'#239cb2');waterGradient.addColorStop(.6,'#168ca7');waterGradient.addColorStop(1,'#10688e');
+ if(islandView)islandView.resize();
 }
 addEventListener('resize',resize);resize();
 if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>{const r=document.querySelector('.hud').getBoundingClientRect();$('questBox').style.top=Math.max(r.bottom+12,r.top+(innerWidth<=700?94:62))+'px'}).observe(document.querySelector('.hud'));
@@ -387,6 +395,7 @@ function drawStall(){
  ellipse(X,x-19,y-34,6,6,'#bfaa66');ellipse(X,x-4,y-35,6,6,'#c3955f');rounded(X,x+10,y-39,17,9,2,'#6eafa8');
 }
 function draw(){
+ if(islandView?.enabled){try{islandView.frame(time);return}catch(error){console.warn('Widok 3D:',error);islandView.setEnabled(false);updateView();say('Widok 3D jest chwilowo niedostępny. Możesz kontynuować w 2D.')}}
  X.fillStyle=waterGradient;X.fillRect(0,0,W,H);X.save();X.translate(-cam.x,-cam.y);
  X.fillStyle='#0c6b8f70';X.fillRect(3500,1150,1100,1750);
  X.strokeStyle='#acf0e221';X.lineWidth=1.5;
@@ -626,6 +635,11 @@ function loop(timestamp=performance.now()){
  if(play&&soloReady()){
   let dx=0,dy=0;if(!activePanel&&onlineReady()){if(K.ArrowUp||K.w)dy--;if(K.ArrowDown||K.s)dy++;if(K.ArrowLeft||K.a)dx--;if(K.ArrowRight||K.d)dx++;
    if(dx&&dy){dx*=Math.SQRT1_2;dy*=Math.SQRT1_2}else if(!dx&&!dy){dx=pad.x;dy=pad.y}
+  }
+  if(islandView?.enabled&&!activePanel&&onlineReady()&&inputFocused&&!document.hidden){
+   islandView.orbit(((K.q?-1:0)+(K.r?1:0))*.03*step);
+   if(pad.ready&&padDevice?.mapping==='standard'&&padProfile.x<2&&padProfile.y<2){const ax=padDevice.axes?.[2]||0,ay=padDevice.axes?.[3]||0;islandView.orbit(Math.abs(ax)>.18?-ax*.035*step:0,Math.abs(ay)>.18?ay*.02*step:0)}
+   ({x:dx,y:dy}=islandView.vector(dx,dy));if(dx||dy)viewHeading=Math.atan2(dx,dy);
   }
   moving=!!(dx||dy);if(moving){face=Math.abs(dx)>Math.abs(dy)?dx<0?'left':'right':dy<0?'up':'down';walkPhase+=step*.2;if(resting){resting=0;say('Odpoczynek przerwany.')}}
   const wet=sea(P.x,P.y),fast=(sprint||pad.sprinting)&&energy>0&&moving,speed=wet?(raft?6:2):(fast?7:4);
@@ -916,6 +930,12 @@ async function restartCloudSoloGame(fresh){
   cloud.revision=data.save.revision;cloud.updatedAt=data.save.updatedAt;cloud.cache={state:data.save.state,revision:cloud.revision,updatedAt:cloud.updatedAt,dirty:false,pending:null};persistCloudCache();applySoloSnapshot(data.save.state);blocking=lastAttack=hitFlash=walkPhase=0;lastTime=0;cloud.error='';$('start').style.display='none';play=1;cloud.resetting=false;toggle('newGamePanel',0);draw();say('Nowa przygoda zapisana na koncie!');
  }catch(error){$('newGameError').textContent=error.message||'Nie udało się rozpocząć nowej gry. Obecny postęp został zachowany.'}finally{cloud.resetting=false;for(const b of $('newGamePanel').querySelectorAll('button'))b.disabled=false;updateCloudUI()}
 }
+function sceneState(){return {P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear,objects:O,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):[]}}
+function updateView(){const active=!!islandView?.enabled;$('world3d').style.display=active?'block':'none';C.style.display=active?'none':'block';$('viewButton').textContent=active?'Widok 3D':'Widok 2D';$('viewButton').setAttribute('aria-pressed',String(active));$('cameraLeft').disabled=$('cameraRight').disabled=!active;$('viewHelp').textContent=active?'WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera':'WASD / strzałki · E działaj · Shift sprint · spacja atak'}
+function switchView(){if(!islandView)return;preferredView=islandView.enabled?'2d':'3d';islandView.setEnabled(preferredView==='3d');viewHeading=null;resetInput();try{localStorage.setItem('myIslandViewV1',preferredView)}catch(e){}updateView()}
+function orbitView(amount){if(islandView?.enabled)islandView.orbit(amount)}
+function boot3D(){if(islandView||!globalThis.MyIsland3D)return;try{islandView=globalThis.MyIsland3D.create({canvas:$('world3d'),terrain,getState:sceneState,onLost:()=>{updateView();resetInput();say('Grafika 3D została przerwana. Kontynuuj w 2D albo włącz 3D ponownie.')}});islandView.setEnabled(preferredView==='3d');$('viewButton').disabled=false;updateView()}catch(error){console.warn('Nie można włączyć 3D:',error);$('viewButton').textContent='Widok 2D';$('viewButton').title='Ta przeglądarka nie udostępnia grafiki 3D.'}}
+addEventListener('load',boot3D);
 cloud.bootstrap=bootCloud();
 </script>
 </body>

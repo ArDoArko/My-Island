@@ -1,0 +1,9 @@
+{
+  "name": "my-island",
+  "version": "0.14.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node scripts/build.mjs" },
+  "dependencies": { "three": "0.180.0" },
+  "devDependencies": { "esbuild": "0.25.12" }
+}
