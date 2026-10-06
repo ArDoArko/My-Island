@@ -3288,20 +3288,54 @@
     "LEON · COMERCIO"
   ],
   [
-    "0.15 • Wyspa w sześciu językach",
-    "0.15 • An island in six languages",
-    "0.15 • Een eiland in zes talen",
-    "0.15 • Eine Insel in sechs Sprachen",
-    "0.15 • Une île en six langues",
-    "0.15 • Una isla en seis idiomas"
+    "0.15.1 • Wyspa w sześciu językach",
+    "0.15.1 • An island in six languages",
+    "0.15.1 • Een eiland in zes talen",
+    "0.15.1 • Eine Insel in sechs Sprachen",
+    "0.15.1 • Une île en six langues",
+    "0.15.1 • Una isla en seis idiomas"
   ],
   [
-    "My Island 0.15 — Twoja wyspa",
-    "My Island 0.15 — Your island",
-    "My Island 0.15 — Jouw eiland",
-    "My Island 0.15 — Deine Insel",
-    "My Island 0.15 — Votre île",
-    "My Island 0.15 — Tu isla"
+    "My Island 0.15.1 — Twoja wyspa",
+    "My Island 0.15.1 — Your island",
+    "My Island 0.15.1 — Jouw eiland",
+    "My Island 0.15.1 — Deine Insel",
+    "My Island 0.15.1 — Votre île",
+    "My Island 0.15.1 — Tu isla"
+  ],
+  [
+    "Schowaj włócznię", "Stow spear", "Speer opbergen", "Speer wegstecken", "Ranger la lance", "Guardar lanza"
+  ],
+  [
+    "Wyciągnij włócznię", "Draw spear", "Speer pakken", "Speer ziehen", "Sortir la lance", "Sacar lanza"
+  ],
+  [
+    "schowana", "stowed", "opgeborgen", "weggesteckt", "rangée", "guardada"
+  ],
+  [
+    "w ręce", "in hand", "in de hand", "in der Hand", "en main", "en la mano"
+  ],
+  [
+    "H: schowaj lub wyciągnij. ATAK wyciąga włócznię.",
+    "H: stow or draw. ATTACK draws the spear.",
+    "H: opbergen of pakken. AANVAL pakt de speer.",
+    "H: wegstecken oder ziehen. ANGRIFF zieht den Speer.",
+    "H : ranger ou sortir. ATTAQUE sort la lance.",
+    "H: guardar o sacar. ATAQUE saca la lanza."
+  ],
+  [
+    "Włócznia schowana. Nadal jest w plecaku.",
+    "Spear stowed. It is still in your backpack.",
+    "Speer opgeborgen. Hij blijft in je rugzak.",
+    "Speer weggesteckt. Er bleibt im Rucksack.",
+    "Lance rangée. Elle reste dans votre sac.",
+    "Lanza guardada. Sigue en tu mochila."
+  ],
+  [
+    "Włócznia w ręce.", "Spear in hand.", "Speer in de hand.", "Speer in der Hand.", "Lance en main.", "Lanza en la mano."
+  ],
+  [
+    "POROZMAWIAJ", "TALK", "PRATEN", "SPRECHEN", "PARLER", "HABLAR"
   ],
   [
     "Kod pokoju skopiowany: ",

@@ -1,4 +1,12 @@
-# My Island 0.15
+# My Island 0.15.1
+
+## Interaction and wildlife patch
+
+The backpack can stow/draw a spear; H does the same during play and attack draws it automatically. Ownership and all cloud-save data stay unchanged. The device-local `myIslandWeaponV1` preference only controls the held pose. Room presence includes an optional `spearStowed` cosmetic flag, so teammates see each player's choice; room protocol 11 stays compatible with older clients.
+
+Near Nela or Leon the action button reads TALK (translated into all six languages). E, the action button and the configured controller interact button open their existing quests/trade. Player-to-player text or voice chat is not implemented.
+
+`wildlife.mjs` is shared byte-for-byte with the room server's `lib/wildlife.mjs`. The solo game loads its local bundle. Boars navigate around rocks and palm trunks with full model clearance; segments are swept for obstacles and shorelines. Grid detours are smoothed, capped in travel distance and rechecked against current resources. Already embedded enemies are moved to free ground without rebuilding resources, resetting saves or changing rewards. The room engine uses the same movement and line-of-sight checks. The renderer faces boars along their movement and stops leg motion when idle. Build and publish the source and generated wildlife bundle together.
 
 ## Build and publish
 

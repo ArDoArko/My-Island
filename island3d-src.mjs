@@ -258,8 +258,8 @@ export function create({canvas,terrain,getState,onLost}) {
     }
   }
   const boars=[];
-  function newBoar(){const root=new T.Group();scene.add(root);ell(root,'#765745',[0,.29,0],[.24,.25,.43]);ell(root,'#765745',[0,.3,.4],[.19,.18,.2]);ell(root,'#ae8b68',[0,.26,.58],[.11,.065,.065]);for(const side of [-1,1]){const ear=mesh(root,new T.ConeGeometry(.08,.17,3),mat('#644937'),[side*.13,.47,.43]);ear.rotation.z=side*.45;}const legs=[];for(const x of [-.17,.17])for(const z of [-.27,.24])legs.push(tube(root,'#5e493b',[x,.105,z],[.037,.2,.037]));return {root,legs};}
-  function updateBoars(list,seconds){while(boars.length<list.length)boars.push(newBoar());for(let i=0;i<boars.length;i++){const b=boars[i],e=list[i];b.root.visible=!!e;if(!e)continue;const x=e.x/SCALE,z=e.y/SCALE;b.root.position.set(x,terrainHeight(x,z),z);b.root.rotation.y=Math.atan2(self.root.position.x-x,self.root.position.z-z);for(let j=0;j<4;j++)b.legs[j].rotation.x=Math.sin(seconds*6+j*Math.PI)*.15;}}
+  function newBoar(){const root=new T.Group();scene.add(root);ell(root,'#765745',[0,.29,0],[.24,.25,.43]);ell(root,'#765745',[0,.3,.4],[.19,.18,.2]);ell(root,'#ae8b68',[0,.26,.58],[.11,.065,.065]);for(const side of [-1,1]){const ear=mesh(root,new T.ConeGeometry(.08,.17,3),mat('#644937'),[side*.13,.47,.43]);ear.rotation.z=side*.45;}const legs=[];for(const x of [-.17,.17])for(const z of [-.27,.24])legs.push(tube(root,'#5e493b',[x,.105,z],[.037,.2,.037]));return {root,legs,lastX:null,lastZ:null};}
+  function updateBoars(list,seconds){while(boars.length<list.length)boars.push(newBoar());for(let i=0;i<boars.length;i++){const b=boars[i],e=list[i];b.root.visible=!!e;if(!e){b.lastX=b.lastZ=null;continue}const x=e.x/SCALE,z=e.y/SCALE,dx=b.lastX===null?0:x-b.lastX,dz=b.lastZ===null?0:z-b.lastZ,walking=Math.hypot(dx,dz)>.0001;b.root.position.set(x,terrainHeight(x,z),z);if(walking)b.root.rotation.y=Math.atan2(dx,dz);for(let j=0;j<4;j++)b.legs[j].rotation.x=walking?Math.sin(seconds*6+j*Math.PI)*.15:0;b.lastX=x;b.lastZ=z;}}
 
   const birds=[];for(let i=0;i<4;i++){
     const g=new T.BufferGeometry().setFromPoints([new T.Vector3(-.3,0,0),new T.Vector3(0,-.08,0),new T.Vector3(.3,0,0)]);
@@ -292,7 +292,7 @@ export function create({canvas,terrain,getState,onLost}) {
       if(!person||person.name!==p.name){if(person)removePerson(person);person=human(s.looks[p.slot]||{},'player',p.name);people.set(p.id,person);}
       const dx=person.lastX===null?0:p.point.x/SCALE-person.lastX,dz=person.lastZ===null?0:p.point.y/SCALE-person.lastZ;
       const heading=p.moving&&Math.hypot(dx,dz)>.002?Math.atan2(dx,dz):facing[p.face]||0;
-      animatePerson(person,p.point,heading,p.moving,seconds,step,3,{...s,blocked:p.blocked});
+      animatePerson(person,p.point,heading,p.moving,seconds,step,3,{...s,spear:s.spearOwned&&!p.spearStowed,blocked:p.blocked});
     }
     for(const [id,p] of people)if(!present.has(id)){removePerson(p);people.delete(id);}
     const me=s.players.find(p=>p.id===s.you),look=me?s.looks[me.slot]||{}:{};
