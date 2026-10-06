@@ -51,6 +51,7 @@ for (const [index, code] of languageCodes.entries()) test(code + ': all screens 
   assert.equal(g.document.documentElement.lang, code);
   assert.equal(g.element('languageButton').textContent, '🌐 ' + code.toUpperCase());
   assert.equal(g.element('languageStart').value, code);
+  assert.equal(g.element('msg').textContent, catalog.get('Witaj na żywej wyspie! Leon czeka przy obozowisku.')[index]);
   assert.equal(g.document.querySelector('[data-language="' + code + '"]').getAttribute('aria-pressed'), 'true');
   assert.equal(g.run('JSON.stringify(soloSnapshot())'), before);
   assert.deepEqual(g.stored(), { ...stored, myIslandLanguageV1: code });

@@ -949,7 +949,7 @@ function orbitView(amount){if(islandView?.enabled)islandView.orbit(amount)}
 function boot3D(){if(islandView||!globalThis.MyIsland3D)return;try{islandView=globalThis.MyIsland3D.create({canvas:$('world3d'),terrain,getState:sceneState,onLost:()=>{updateView();resetInput();say(tr('Grafika 3D została przerwana. Kontynuuj w 2D albo włącz 3D ponownie.'))}});islandView.setEnabled(preferredView==='3d');$('viewButton').disabled=false;updateView()}catch(error){console.warn('Nie można włączyć 3D:',error);$('viewButton').textContent=tr('Widok 2D');$('viewButton').title=tr('Ta przeglądarka nie udostępnia grafiki 3D.')}}
 function refreshTranslations(){
  MyIslandI18n.apply(document);update();updateRoomUI();updatePadUI();updateView();
- for(const id of ['roomStatus','newGameError','newGameDescription','cloudRecoveryStatus'])$(id).textContent=tr($(id).textContent);
+ for(const id of ['roomStatus','newGameError','newGameDescription','cloudRecoveryStatus','msg'])$(id).textContent=tr($(id).textContent);
  if($('viewButton').title)$('viewButton').title=tr($('viewButton').title);
 }
 function setLanguage(code){if(!MyIslandI18n.set(code,document))return;resetInput();refreshTranslations()}
