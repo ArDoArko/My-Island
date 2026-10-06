@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
-<title>My Island 0.14 — Pierwsza wyspa 3D</title>
-<script defer src="island3d.bundle.js"></script>
+<title>My Island 0.15 — Twoja wyspa</title>
+<script defer src="island3d.bundle.js?v=0.15"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -63,6 +63,9 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 .card{max-width:calc(100vw - 28px);width:520px;text-align:center;background:linear-gradient(145deg,#073a47f5,#052c3be8);border:1px solid #ffffff30;box-shadow:0 24px 70px #001e3850;padding:30px;border-radius:28px}
 .card .mark{font-size:44px}.card h1{font-size:clamp(28px,8vw,46px);letter-spacing:2px;margin:8px 0}.card .version{color:#ffe087;font-weight:750}.card .desc{color:#bed9db;font-size:13px;line-height:1.7}
 .card button{padding:15px 42px;border:0;border-radius:16px;background:#ffe087;color:#123944;font-weight:900;margin:8px 0}.card .keys{font-size:11px;color:#a9ccd0}
+.language-picker{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 18px;flex-wrap:wrap;font-size:14px}.language-picker select{font:inherit;font-size:16px;min-height:44px;max-width:100%;padding:9px 13px;border-radius:12px;border:1px solid #ffffff45;background:#103e4b;color:#fff;touch-action:auto}.language-picker select:focus-visible{outline:3px solid #ffe087;outline-offset:3px}.language-picker option{background:#103e4b;color:#fff}
+#languagePanel{z-index:49;inset:auto;top:50%;left:50%;transform:translate(-50%,-50%);width:min(480px,calc(100vw - 28px));max-height:calc(100dvh - 28px)}.language-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}.language-options button{min-height:46px;white-space:normal;background:#ffffff12;color:#fff;border:1px solid #ffffff30}.language-options button[aria-pressed="true"]{background:#ffe087;color:#153b40;border-color:#ffe087}
+.btn,.side,.act{overflow-wrap:anywhere;line-height:1.15}.card .play-choice button{min-width:0;padding:15px 10px;white-space:normal}.panel .recipe button{white-space:normal;flex-shrink:0;max-width:44%}.panel h2{overflow-wrap:anywhere}
  .card .pad-guide{padding:8px 12px;background:#ffffff12;color:#d4ece4;font-size:11px;margin:0}.card .new-solo{margin:8px 4px;color:#ffe087}.card .pad-start{font-size:11px;color:#b9d7d8;line-height:1.5;margin:9px 0}
 @media(max-width:700px){
  .panel{inset:5% 3%;padding:18px}.panel h2{font-size:21px}.recipe{padding:10px;gap:8px;font-size:12px}.recipe button{padding:10px}
@@ -78,138 +81,147 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 </head>
 <body>
 <div id="start" class="start"><div class="card">
- <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version">0.14 • Pierwsza wyspa 3D</p>
- <p class="desc">Odkrywaj wyspę sam albo z przyjaciółmi.<br>Do czterech graczy, wspólna baza i wyprawa po skarb.</p>
- <div class="play-choice"><button onclick="startGame()">GRAJ SOLO</button><button class="online-choice" onclick="toggle('roomPanel',1)">GRAJ ONLINE</button></div><p class="keys">WASD lub strzałki • E działaj • Shift sprint • spacja atak</p>
- <button class="cloud-entry" onclick="toggle('accountPanel',1)">☁️ Konto i zapis</button><p id="cloudStartStatus" role="status">Zaloguj się, aby kontynuować na innym urządzeniu.</p>
- <button id="newSoloStart" class="pad-guide new-solo" onclick="askNewSoloGame()">↻ Nowa gra solo</button><button class="pad-guide" onclick="toggle('controllerPanel',1)">🎮 Sterowanie padem i joystickiem</button><p id="padStartInfo" class="pad-start">Podłącz kontroler i naciśnij na nim przycisk.</p>
- <p class="desc">wspólna wyspa · kod pokoju · pad i joystick</p>
+ <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version"><span data-i18n="0.15 • Wyspa w sześciu językach">0.15 • Wyspa w sześciu językach</span></p>
+ <div class="language-picker"><label for="languageStart"><span data-i18n="🌐 Język">🌐 Język</span></label><select id="languageStart" onchange="setLanguage(this.value)" aria-label="Wybierz język" data-i18n-aria-label="Wybierz język"><option value="pl">Polski</option><option value="en">English</option><option value="nl">Nederlands</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option></select></div>
+ <p class="desc"><span data-i18n="Odkrywaj wyspę sam albo z przyjaciółmi.">Odkrywaj wyspę sam albo z przyjaciółmi.</span><br><span data-i18n="Do czterech graczy, wspólna baza i wyprawa po skarb.">Do czterech graczy, wspólna baza i wyprawa po skarb.</span></p>
+ <div class="play-choice"><button onclick="startGame()"><span data-i18n="GRAJ SOLO">GRAJ SOLO</span></button><button class="online-choice" onclick="toggle('roomPanel',1)"><span data-i18n="GRAJ ONLINE">GRAJ ONLINE</span></button></div><p class="keys"><span data-i18n="WASD lub strzałki • E działaj • Shift sprint • spacja atak">WASD lub strzałki • E działaj • Shift sprint • spacja atak</span></p>
+ <button class="cloud-entry" onclick="toggle('accountPanel',1)"><span data-i18n="☁️ Konto i zapis">☁️ Konto i zapis</span></button><p id="cloudStartStatus" role="status">Zaloguj się, aby kontynuować na innym urządzeniu.</p>
+ <button id="newSoloStart" class="pad-guide new-solo" onclick="askNewSoloGame()"><span data-i18n="↻ Nowa gra solo">↻ Nowa gra solo</span></button><button class="pad-guide" onclick="toggle('controllerPanel',1)"><span data-i18n="🎮 Sterowanie padem i joystickiem">🎮 Sterowanie padem i joystickiem</span></button><p id="padStartInfo" class="pad-start">Podłącz kontroler i naciśnij na nim przycisk.</p>
+ <p class="desc"><span data-i18n="wspólna wyspa · kod pokoju · pad i joystick">wspólna wyspa · kod pokoju · pad i joystick</span></p>
 </div></div>
 <div class="hud">
- <button id="viewButton" class="p camera-button" onclick="switchView()" disabled aria-label="Przełącz widok wyspy">Widok 2D</button><button id="cameraLeft" class="p camera-button" onclick="orbitView(-.25)" disabled aria-label="Obróć kamerę w lewo">↶</button><button id="cameraRight" class="p camera-button" onclick="orbitView(.25)" disabled aria-label="Obróć kamerę w prawo">↷</button>
+ <button id="viewButton" class="p camera-button" onclick="switchView()" disabled aria-label="Przełącz widok wyspy" data-i18n-aria-label="Przełącz widok wyspy">Widok 2D</button><button id="cameraLeft" class="p camera-button" onclick="orbitView(-.25)" disabled aria-label="Obróć kamerę w lewo" data-i18n-aria-label="Obróć kamerę w lewo">↶</button><button id="cameraRight" class="p camera-button" onclick="orbitView(.25)" disabled aria-label="Obróć kamerę w prawo" data-i18n-aria-label="Obróć kamerę w prawo">↷</button>
  <div class="p">❤️ <b id="hp">100</b></div><div class="p">⚡ <b id="en">100</b></div><div class="p">⭐ <b id="xp">0</b></div>
  <div class="p">🪙 <b id="co">0</b></div><div class="p">🪵 <b id="wo">0</b></div><div class="p">🪨 <b id="st">0</b></div>
  <div class="p">🥥 <b id="fo">0</b></div><div class="p">🐚 <b id="sh">0</b></div><div class="p">🐟 <b id="fi">0</b></div>
- <div class="p">🏠 L<b id="bl">0</b></div><div class="p">🧭 <b id="zn">Laguna</b></div>
- <button id="padButton" class="p pad-button" onclick="toggle('controllerPanel',1)" aria-label="Sterowanie padem i joystickiem">🎮 PAD</button>
- <button id="roomButton" class="p pad-button" onclick="toggle('roomPanel',1)" aria-label="Pokój online i gracze">👥 ONLINE</button>
- <button id="accountButton" class="p pad-button" onclick="toggle('accountPanel',1)" aria-label="Konto gracza i zapis w chmurze">☁️ KONTO</button>
- <button id="newSoloButton" class="p pad-button" onclick="askNewSoloGame()" aria-label="Nowa gra solo">↻ NOWA GRA</button>
+ <div class="p"><span data-i18n="🏠 L">🏠 L</span><b id="bl">0</b></div><div class="p">🧭 <b id="zn">Laguna</b></div>
+ <button id="padButton" class="p pad-button" onclick="toggle('controllerPanel',1)" aria-label="Sterowanie padem i joystickiem" data-i18n-aria-label="Sterowanie padem i joystickiem">🎮 PAD</button>
+ <button id="roomButton" class="p pad-button" onclick="toggle('roomPanel',1)" aria-label="Pokój online i gracze" data-i18n-aria-label="Pokój online i gracze">👥 ONLINE</button>
+ <button id="accountButton" class="p pad-button" onclick="toggle('accountPanel',1)" aria-label="Konto gracza i zapis w chmurze" data-i18n-aria-label="Konto gracza i zapis w chmurze">☁️ KONTO</button>
+ <button id="newSoloButton" class="p pad-button" onclick="askNewSoloGame()" aria-label="Nowa gra solo" data-i18n-aria-label="Nowa gra solo"><span data-i18n="↻ NOWA GRA">↻ NOWA GRA</span></button>
+ <button id="languageButton" class="p pad-button" onclick="toggle('languagePanel',1)" aria-label="Język gry" data-i18n-aria-label="Język gry">🌐 PL</button>
 </div>
 <div id="questBox" class="q">📜 <b id="qt">Wyprawa 0.13</b><br><span id="qx"></span><br><small id="qp"></small></div>
-<canvas id="game" aria-label="Wyspa, postacie i świat gry"></canvas>
-<canvas id="world3d" aria-label="Wyspa 3D z kamerą zza pleców postaci"></canvas>
+<canvas id="game" aria-label="Wyspa, postacie i świat gry" data-i18n-aria-label="Wyspa, postacie i świat gry"></canvas>
+<canvas id="world3d" aria-label="Wyspa 3D z kamerą zza pleców postaci" data-i18n-aria-label="Wyspa 3D z kamerą zza pleców postaci"></canvas>
 <div id="msg" class="msg" role="status"></div><div id="hint" class="hint"></div>
-<div class="ctrl"><button class="u" data-k="ArrowUp" aria-label="Idź w górę">▲</button><button class="l" data-k="ArrowLeft" aria-label="Idź w lewo">◀</button><button class="d" data-k="ArrowDown" aria-label="Idź w dół">▼</button><button class="r" data-k="ArrowRight" aria-label="Idź w prawo">▶</button></div>
-<button class="btn sprint">🏃 SPRINT</button><button class="btn block" onclick="block()">🛡️ BLOK</button><button class="btn attack" onclick="attack()">⚔️ ATAK</button>
-<button class="side base" onclick="toggle('basePanel',1)">🏠 BAZA</button><button class="side bag" onclick="toggle('bag',1)">🎒 PLECAK</button><button class="side build" onclick="toggle('craft',1)">🔨 BUDUJ</button><button class="side fish" onclick="goFish()">🎣 ŁÓW</button><button class="act" onclick="interact()">DZIAŁAJ</button>
+<div class="ctrl"><button class="u" data-k="ArrowUp" aria-label="Idź w górę" data-i18n-aria-label="Idź w górę">▲</button><button class="l" data-k="ArrowLeft" aria-label="Idź w lewo" data-i18n-aria-label="Idź w lewo">◀</button><button class="d" data-k="ArrowDown" aria-label="Idź w dół" data-i18n-aria-label="Idź w dół">▼</button><button class="r" data-k="ArrowRight" aria-label="Idź w prawo" data-i18n-aria-label="Idź w prawo">▶</button></div>
+<button class="btn sprint"><span data-i18n="🏃 SPRINT">🏃 SPRINT</span></button><button class="btn block" onclick="block()"><span data-i18n="🛡️ BLOK">🛡️ BLOK</span></button><button class="btn attack" onclick="attack()"><span data-i18n="⚔️ ATAK">⚔️ ATAK</span></button>
+<button class="side base" onclick="toggle('basePanel',1)"><span data-i18n="🏠 BAZA">🏠 BAZA</span></button><button class="side bag" onclick="toggle('bag',1)"><span data-i18n="🎒 PLECAK">🎒 PLECAK</span></button><button class="side build" onclick="toggle('craft',1)"><span data-i18n="🔨 BUDUJ">🔨 BUDUJ</span></button><button class="side fish" onclick="goFish()"><span data-i18n="🎣 ŁÓW">🎣 ŁÓW</span></button><button class="act" onclick="interact()"><span data-i18n="DZIAŁAJ">DZIAŁAJ</span></button>
 <div class="help" id="viewHelp">WASD / strzałki · E działaj · Shift sprint · spacja atak</div>
-<div id="accountPanel" class="panel" role="dialog" aria-label="Konto gracza i zapis w chmurze">
- <button class="close" aria-label="Zamknij konto gracza" onclick="toggle('accountPanel',0)">✕</button><h2>☁️ Twoja wyspa</h2>
- <p class="intro">Ten sam postęp solo na telefonie i komputerze.</p>
+<div id="accountPanel" class="panel" role="dialog" aria-label="Konto gracza i zapis w chmurze" data-i18n-aria-label="Konto gracza i zapis w chmurze">
+ <button class="close" aria-label="Zamknij konto gracza" onclick="toggle('accountPanel',0)" data-i18n-aria-label="Zamknij konto gracza">✕</button><h2><span data-i18n="☁️ Twoja wyspa">☁️ Twoja wyspa</span></h2>
+ <p class="intro"><span data-i18n="Ten sam postęp solo na telefonie i komputerze.">Ten sam postęp solo na telefonie i komputerze.</span></p>
  <div class="cloud-state"><b id="accountLabel">Grasz bez konta</b><p id="cloudStatus" role="status">Twój zapis jest tylko w tej przeglądarce.</p></div>
- <div id="cloudLegacy"><p>Dodaj e-mail i hasło do obecnego konta. Zachowasz tę samą wyspę i wszystkie zasoby.</p><button id="cloudLinkEmail" onclick="showAccountForm('register')">Dodaj e-mail i hasło</button></div>
+ <div id="cloudLegacy"><p><span data-i18n="Dodaj e-mail i hasło do obecnego konta. Zachowasz tę samą wyspę i wszystkie zasoby.">Dodaj e-mail i hasło do obecnego konta. Zachowasz tę samą wyspę i wszystkie zasoby.</span></p><button id="cloudLinkEmail" onclick="showAccountForm('register')"><span data-i18n="Dodaj e-mail i hasło">Dodaj e-mail i hasło</span></button></div>
  <div id="cloudAnonymous">
-  <div id="cloudAuthTabs" class="account-tabs"><button id="cloudLoginTab" aria-pressed="true" onclick="showAccountForm('login')">Zaloguj się</button><button id="cloudRegisterTab" aria-pressed="false" onclick="showAccountForm('register')">Załóż konto</button></div>
+  <div id="cloudAuthTabs" class="account-tabs"><button id="cloudLoginTab" aria-pressed="true" onclick="showAccountForm('login')"><span data-i18n="Zaloguj się">Zaloguj się</span></button><button id="cloudRegisterTab" aria-pressed="false" onclick="showAccountForm('register')"><span data-i18n="Załóż konto">Załóż konto</span></button></div>
   <form id="cloudAuthForm" class="account-form" onsubmit="event.preventDefault();submitAccountForm()">
    <h3 id="cloudFormTitle">Zaloguj się do My Island</h3>
-   <div id="cloudEmailField" class="account-field"><label for="cloudEmail">E-mail</label><input id="cloudEmail" type="email" autocomplete="username" inputmode="email" maxlength="254" spellcheck="false" autocapitalize="none" required></div>
-   <div id="cloudRecoveryField" class="account-field" style="display:none"><label for="cloudRecoveryInput">Kod odzyskiwania</label><input id="cloudRecoveryInput" autocomplete="off" maxlength="100" placeholder="MI-…" spellcheck="false" autocapitalize="characters"></div>
-   <div class="account-field"><label id="cloudPasswordLabel" for="cloudPassword">Hasło</label><input id="cloudPassword" type="password" autocomplete="current-password" minlength="15" maxlength="128" required><small id="cloudPasswordHint">Hasło ma od 15 do 128 znaków. Możesz użyć zdania, które łatwo zapamiętasz.</small></div>
-   <div id="cloudRepeatField" class="account-field" style="display:none"><label for="cloudPasswordRepeat">Powtórz hasło</label><input id="cloudPasswordRepeat" type="password" autocomplete="new-password" minlength="15" maxlength="128"></div>
+   <div id="cloudEmailField" class="account-field"><label for="cloudEmail"><span data-i18n="E-mail">E-mail</span></label><input id="cloudEmail" type="email" autocomplete="username" inputmode="email" maxlength="254" spellcheck="false" autocapitalize="none" required></div>
+   <div id="cloudRecoveryField" class="account-field" style="display:none"><label for="cloudRecoveryInput"><span data-i18n="Kod odzyskiwania">Kod odzyskiwania</span></label><input id="cloudRecoveryInput" autocomplete="off" maxlength="100" placeholder="MI-…" spellcheck="false" autocapitalize="characters"></div>
+   <div class="account-field"><label id="cloudPasswordLabel" for="cloudPassword">Hasło</label><input id="cloudPassword" type="password" autocomplete="current-password" minlength="15" maxlength="128" required><small id="cloudPasswordHint"><span data-i18n="Hasło ma od 15 do 128 znaków. Możesz użyć zdania, które łatwo zapamiętasz.">Hasło ma od 15 do 128 znaków. Możesz użyć zdania, które łatwo zapamiętasz.</span></small></div>
+   <div id="cloudRepeatField" class="account-field" style="display:none"><label for="cloudPasswordRepeat"><span data-i18n="Powtórz hasło">Powtórz hasło</span></label><input id="cloudPasswordRepeat" type="password" autocomplete="new-password" minlength="15" maxlength="128"></div>
    <p id="cloudAuthError" role="alert"></p><button id="cloudLogin" type="submit">Zaloguj się</button>
-   <button id="cloudForgot" type="button" class="account-link" onclick="showAccountForm('recover')">Nie pamiętam hasła</button><button id="cloudAuthCancel" type="button" class="account-link" style="display:none" onclick="hideAccountForm()">Anuluj</button>
+   <button id="cloudForgot" type="button" class="account-link" onclick="showAccountForm('recover')"><span data-i18n="Nie pamiętam hasła">Nie pamiętam hasła</span></button><button id="cloudAuthCancel" type="button" class="account-link" style="display:none" onclick="hideAccountForm()"><span data-i18n="Anuluj">Anuluj</span></button>
    <small id="cloudFormNote">Na innym urządzeniu wpisz ten sam e-mail i hasło, aby wczytać swoją wyspę.</small>
   </form>
-  <p id="cloudImportNote" class="cloud-note">Pierwsze konto przeniesie obecny zapis solo do chmury. Jeśli masz już wyspę na koncie, wczytamy ją, a zapis gościa pozostanie na tym urządzeniu.</p>
+  <p id="cloudImportNote" class="cloud-note"><span data-i18n="Pierwsze konto przeniesie obecny zapis solo do chmury. Jeśli masz już wyspę na koncie, wczytamy ją, a zapis gościa pozostanie na tym urządzeniu.">Pierwsze konto przeniesie obecny zapis solo do chmury. Jeśli masz już wyspę na koncie, wczytamy ją, a zapis gościa pozostanie na tym urządzeniu.</span></p>
  </div>
- <div id="cloudRecovery" class="recovery-box"><h3>Zachowaj kod odzyskiwania</h3><p>Zapisz go poza telefonem, na przykład na kartce lub w menedżerze haseł. Kod pozwala ustawić nowe hasło i odzyskać wyspę. Każdy nowy kod zastępuje poprzedni.</p><label for="cloudRecoveryKey" class="cloud-note">Twój kod — udostępniaj go tylko sobie</label><textarea id="cloudRecoveryKey" rows="2" readonly spellcheck="false" aria-label="Twój kod odzyskiwania konta"></textarea><div class="room-actions"><button onclick="copyRecoveryCode()">Kopiuj kod</button><button class="cloud-fallback" onclick="dismissRecoveryCode()">Kod mam zapisany</button></div><p id="cloudRecoveryStatus" role="status" class="cloud-note"></p></div>
- <div id="cloudSigned"><div class="room-actions"><button id="cloudSaveNow" onclick="saveCloudNow()">Zapisz teraz</button><button id="cloudRetry" class="cloud-fallback" onclick="retryCloud()">Ponów połączenie</button><button id="cloudLogout" class="cloud-fallback" onclick="signOutCloud()">Wyloguj z gry</button></div><p class="cloud-note">Gra zapisuje postęp podczas gry i po zebraniu zasobów. Sprawdź „Zapisano w chmurze” przed zmianą urządzenia. Gdy nie ma sieci, bieżący postęp czeka na tym urządzeniu na ponowne połączenie.</p></div>
- <div id="cloudRotate"><button class="account-link" onclick="showAccountForm('rotate-recovery')">Utwórz nowy kod odzyskiwania</button></div>
- <div id="cloudConflict"><h3>Dwie wersje wyspy</h3><p>Nowszy zapis pochodzi z innego urządzenia. Wybierz, którą wyspę kontynuować. Zasoby z dwóch wersji nie sumują się.</p><div class="room-actions"><button onclick="resolveCloudConflict(false)">Wczytaj nowszy zapis z chmury</button><button class="cloud-fallback" onclick="resolveCloudConflict(true)">Zapisz tę wyspę na koncie</button></div></div>
- <p class="cloud-note">Konto chroni twoją przygodę solo. Pokoje online mają osobny, wspólny postęp i działają przez 24 godziny od ostatniej gry.</p>
+ <div id="cloudRecovery" class="recovery-box"><h3><span data-i18n="Zachowaj kod odzyskiwania">Zachowaj kod odzyskiwania</span></h3><p><span data-i18n="Zapisz go poza telefonem, na przykład na kartce lub w menedżerze haseł. Kod pozwala ustawić nowe hasło i odzyskać wyspę. Każdy nowy kod zastępuje poprzedni.">Zapisz go poza telefonem, na przykład na kartce lub w menedżerze haseł. Kod pozwala ustawić nowe hasło i odzyskać wyspę. Każdy nowy kod zastępuje poprzedni.</span></p><label for="cloudRecoveryKey" class="cloud-note"><span data-i18n="Twój kod — udostępniaj go tylko sobie">Twój kod — udostępniaj go tylko sobie</span></label><textarea id="cloudRecoveryKey" rows="2" readonly spellcheck="false" aria-label="Twój kod odzyskiwania konta" data-i18n-aria-label="Twój kod odzyskiwania konta"></textarea><div class="room-actions"><button onclick="copyRecoveryCode()"><span data-i18n="Kopiuj kod">Kopiuj kod</span></button><button class="cloud-fallback" onclick="dismissRecoveryCode()"><span data-i18n="Kod mam zapisany">Kod mam zapisany</span></button></div><p id="cloudRecoveryStatus" role="status" class="cloud-note"></p></div>
+ <div id="cloudSigned"><div class="room-actions"><button id="cloudSaveNow" onclick="saveCloudNow()"><span data-i18n="Zapisz teraz">Zapisz teraz</span></button><button id="cloudRetry" class="cloud-fallback" onclick="retryCloud()"><span data-i18n="Ponów połączenie">Ponów połączenie</span></button><button id="cloudLogout" class="cloud-fallback" onclick="signOutCloud()"><span data-i18n="Wyloguj z gry">Wyloguj z gry</span></button></div><p class="cloud-note"><span data-i18n="Gra zapisuje postęp podczas gry i po zebraniu zasobów. Sprawdź „Zapisano w chmurze” przed zmianą urządzenia. Gdy nie ma sieci, bieżący postęp czeka na tym urządzeniu na ponowne połączenie.">Gra zapisuje postęp podczas gry i po zebraniu zasobów. Sprawdź „Zapisano w chmurze” przed zmianą urządzenia. Gdy nie ma sieci, bieżący postęp czeka na tym urządzeniu na ponowne połączenie.</span></p></div>
+ <div id="cloudRotate"><button class="account-link" onclick="showAccountForm('rotate-recovery')"><span data-i18n="Utwórz nowy kod odzyskiwania">Utwórz nowy kod odzyskiwania</span></button></div>
+ <div id="cloudConflict"><h3><span data-i18n="Dwie wersje wyspy">Dwie wersje wyspy</span></h3><p><span data-i18n="Nowszy zapis pochodzi z innego urządzenia. Wybierz, którą wyspę kontynuować. Zasoby z dwóch wersji nie sumują się.">Nowszy zapis pochodzi z innego urządzenia. Wybierz, którą wyspę kontynuować. Zasoby z dwóch wersji nie sumują się.</span></p><div class="room-actions"><button onclick="resolveCloudConflict(false)"><span data-i18n="Wczytaj nowszy zapis z chmury">Wczytaj nowszy zapis z chmury</span></button><button class="cloud-fallback" onclick="resolveCloudConflict(true)"><span data-i18n="Zapisz tę wyspę na koncie">Zapisz tę wyspę na koncie</span></button></div></div>
+ <p class="cloud-note"><span data-i18n="Konto chroni twoją przygodę solo. Pokoje online mają osobny, wspólny postęp i działają przez 24 godziny od ostatniej gry.">Konto chroni twoją przygodę solo. Pokoje online mają osobny, wspólny postęp i działają przez 24 godziny od ostatniej gry.</span></p>
 </div>
-<div id="newGamePanel" class="panel" role="dialog" aria-label="Zacznij nową grę solo" aria-describedby="newGameDescription">
- <button class="close" aria-label="Zamknij nową grę" onclick="toggle('newGamePanel',0)">✕</button><h2>🏝️ Nowa gra solo</h2>
+<div id="newGamePanel" class="panel" role="dialog" aria-label="Zacznij nową grę solo" aria-describedby="newGameDescription" data-i18n-aria-label="Zacznij nową grę solo">
+ <button class="close" aria-label="Zamknij nową grę" onclick="toggle('newGamePanel',0)" data-i18n-aria-label="Zamknij nową grę">✕</button><h2><span data-i18n="🏝️ Nowa gra solo">🏝️ Nowa gra solo</span></h2>
  <p id="newGameDescription">Zacząć przygodę od początku? Twój dotychczasowy zapis solo zostanie zastąpiony. Postać, zasoby, narzędzia, baza, monety i zadania wrócą do stanu początkowego.</p>
- <p class="intro">Ustawienia pada i wspólne pokoje online zostają zachowane.</p><p id="newGameError" role="status"></p>
- <div class="room-actions"><button id="newGameCancel" class="cancel-new-game" onclick="toggle('newGamePanel',0)">Anuluj</button><button onclick="restartSoloGame()">Zacznij od nowa</button></div>
+ <p class="intro"><span data-i18n="Ustawienia pada i wspólne pokoje online zostają zachowane.">Ustawienia pada i wspólne pokoje online zostają zachowane.</span></p><p id="newGameError" role="status"></p>
+ <div class="room-actions"><button id="newGameCancel" class="cancel-new-game" onclick="toggle('newGamePanel',0)"><span data-i18n="Anuluj">Anuluj</span></button><button onclick="restartSoloGame()"><span data-i18n="Zacznij od nowa">Zacznij od nowa</span></button></div>
 </div>
-<div id="roomPanel" class="panel" role="dialog" aria-label="Pokój online">
- <button class="close" aria-label="Zamknij pokój online" onclick="toggle('roomPanel',0)">✕</button><h2>👥 Wspólna wyspa</h2>
- <p class="intro">Maksymalnie cztery osoby. Każdy gra na swoim urządzeniu.</p><p id="roomStatus" role="status">Utwórz pokój albo wpisz kod od znajomego.</p>
+<div id="roomPanel" class="panel" role="dialog" aria-label="Pokój online" data-i18n-aria-label="Pokój online">
+ <button class="close" aria-label="Zamknij pokój online" onclick="toggle('roomPanel',0)" data-i18n-aria-label="Zamknij pokój online">✕</button><h2><span data-i18n="👥 Wspólna wyspa">👥 Wspólna wyspa</span></h2>
+ <p class="intro"><span data-i18n="Maksymalnie cztery osoby. Każdy gra na swoim urządzeniu.">Maksymalnie cztery osoby. Każdy gra na swoim urządzeniu.</span></p><p id="roomStatus" role="status">Utwórz pokój albo wpisz kod od znajomego.</p>
  <div id="roomLobby">
-  <div class="room-form"><label for="roomName">Twoje imię w grze</label><input id="roomName" maxlength="16" placeholder="Gracz" autocomplete="nickname"><label for="roomJoinCode">Kod pokoju od znajomego</label><input id="roomJoinCode" maxlength="12" placeholder="8 znaków" autocomplete="off" spellcheck="false"></div>
-  <div class="room-actions"><button id="roomCreate" onclick="connectRoom('create')">Utwórz nowy pokój</button><button id="roomJoin" onclick="connectRoom('join')">Dołącz kodem</button><button id="roomResume" onclick="connectRoom('resume')">Wróć do ostatniego pokoju</button></div>
-  <p class="room-note">W pokoju zaczynacie wspólną przygodę. Zasoby, narzędzia, monety, baza i zadania są wspólne. Każdy ma własne zdrowie i energię. Twój zapis solo pozostaje osobno.</p>
+  <div class="room-form"><label for="roomName"><span data-i18n="Twoje imię w grze">Twoje imię w grze</span></label><input id="roomName" maxlength="16" placeholder="Gracz" autocomplete="nickname" data-i18n-placeholder="Gracz"><label for="roomJoinCode"><span data-i18n="Kod pokoju od znajomego">Kod pokoju od znajomego</span></label><input id="roomJoinCode" maxlength="12" placeholder="8 znaków" autocomplete="off" spellcheck="false" data-i18n-placeholder="8 znaków"></div>
+  <div class="room-actions"><button id="roomCreate" onclick="connectRoom('create')"><span data-i18n="Utwórz nowy pokój">Utwórz nowy pokój</span></button><button id="roomJoin" onclick="connectRoom('join')"><span data-i18n="Dołącz kodem">Dołącz kodem</span></button><button id="roomResume" onclick="connectRoom('resume')"><span data-i18n="Wróć do ostatniego pokoju">Wróć do ostatniego pokoju</span></button></div>
+  <p class="room-note"><span data-i18n="W pokoju zaczynacie wspólną przygodę. Zasoby, narzędzia, monety, baza i zadania są wspólne. Każdy ma własne zdrowie i energię. Twój zapis solo pozostaje osobno.">W pokoju zaczynacie wspólną przygodę. Zasoby, narzędzia, monety, baza i zadania są wspólne. Każdy ma własne zdrowie i energię. Twój zapis solo pozostaje osobno.</span></p>
  </div>
- <div id="roomActive"><h3>Kod dla znajomych</h3><input id="roomCode" class="room-code" readonly aria-label="Kod bieżącego pokoju"><div class="room-actions"><button onclick="copyRoomCode()">Kopiuj kod</button><button onclick="toggle('roomPanel',0)">Wróć na wyspę</button></div><h3>Gracze <span id="roomCount">1/4</span></h3><ul id="roomMembers" class="room-members"></ul><p class="room-note">Pokój i wspólny postęp pozostają dostępne przez 24 godziny od ostatniej gry. Po utracie połączenia wolne miejsce zwalnia się po 45 sekundach.</p><div class="room-actions"><button onclick="leaveRoom()">Opuść pokój i wróć do solo</button></div></div>
+ <div id="roomActive"><h3><span data-i18n="Kod dla znajomych">Kod dla znajomych</span></h3><input id="roomCode" class="room-code" readonly aria-label="Kod bieżącego pokoju" data-i18n-aria-label="Kod bieżącego pokoju"><div class="room-actions"><button onclick="copyRoomCode()"><span data-i18n="Kopiuj kod">Kopiuj kod</span></button><button onclick="toggle('roomPanel',0)"><span data-i18n="Wróć na wyspę">Wróć na wyspę</span></button></div><h3><span data-i18n="Gracze">Gracze</span> <span id="roomCount">1/4</span></h3><ul id="roomMembers" class="room-members"></ul><p class="room-note"><span data-i18n="Pokój i wspólny postęp pozostają dostępne przez 24 godziny od ostatniej gry. Po utracie połączenia wolne miejsce zwalnia się po 45 sekundach.">Pokój i wspólny postęp pozostają dostępne przez 24 godziny od ostatniej gry. Po utracie połączenia wolne miejsce zwalnia się po 45 sekundach.</span></p><div class="room-actions"><button onclick="leaveRoom()"><span data-i18n="Opuść pokój i wróć do solo">Opuść pokój i wróć do solo</span></button></div></div>
 </div>
-<div id="controllerPanel" class="panel" role="dialog" aria-label="Sterowanie padem i joystickiem">
- <button class="close" aria-label="Zamknij sterowanie" onclick="toggle('controllerPanel',0)">✕</button><h2>🎮 Pad i joystick</h2>
- <p class="intro">Podłącz kontroler przez USB lub sparuj go przez Bluetooth z urządzeniem. Wróć do gry i naciśnij przycisk na kontrolerze.</p>
+<div id="controllerPanel" class="panel" role="dialog" aria-label="Sterowanie padem i joystickiem" data-i18n-aria-label="Sterowanie padem i joystickiem">
+ <button class="close" aria-label="Zamknij sterowanie" onclick="toggle('controllerPanel',0)" data-i18n-aria-label="Zamknij sterowanie">✕</button><h2><span data-i18n="🎮 Pad i joystick">🎮 Pad i joystick</span></h2>
+ <p class="intro"><span data-i18n="Podłącz kontroler przez USB lub sparuj go przez Bluetooth z urządzeniem. Wróć do gry i naciśnij przycisk na kontrolerze.">Podłącz kontroler przez USB lub sparuj go przez Bluetooth z urządzeniem. Wróć do gry i naciśnij przycisk na kontrolerze.</span></p>
  <div id="padStatus" class="pad-device" role="status">Czekam na kontroler…</div>
  <div class="pad-live"><div class="stick-test"><span id="stickDot"></span></div><span id="padLive">Tutaj sprawdzisz ruch drążka i przyciski.</span></div>
  <p id="bindPrompt" role="status">Drążek: ruch. W menu wybieraj góra/dół, zatwierdzaj przyciskiem DZIAŁAJ.</p>
- <div class="pad-tools"><button id="padCycle" onclick="cyclePad()">Zmień kontroler</button><button id="padRestore" onclick="restorePadDefaults()">Przywróć przyciski</button><button onclick="toggle('roomPanel',1)">👥 Pokoje online</button><button onclick="toggle('accountPanel',1)">☁️ Konto i zapis</button><button id="newSoloPad" onclick="askNewSoloGame()">↻ Nowa gra solo</button></div>
- <h3>Przyciski</h3><p class="intro">Kliknij „Zmień”, potem naciśnij wybrany przycisk na kontrolerze. Ustawienia zapamiętują się dla tego urządzenia.</p>
- <div class="recipe"><span>DZIAŁAJ / zatwierdź / GRAJ</span><button id="bind-interact" onclick="bindPad('interact')">A / ✕ · Zmień</button></div>
- <div class="recipe"><span>ATAK</span><button id="bind-attack" onclick="bindPad('attack')">X / □ · Zmień</button></div>
- <div class="recipe"><span>PLECAK</span><button id="bind-bag" onclick="bindPad('bag')">Y / △ · Zmień</button></div>
- <div class="recipe"><span>SPRINT (trzymaj)</span><button id="bind-sprint" onclick="bindPad('sprint')">RT / R2 · Zmień</button></div>
- <div class="recipe"><span>BLOK (trzymaj)</span><button id="bind-block" onclick="bindPad('block')">LT / L2 · Zmień</button></div>
- <div class="recipe"><span>ŁÓW</span><button id="bind-fish" onclick="bindPad('fish')">RB / R1 · Zmień</button></div>
- <div class="recipe"><span>BAZA</span><button id="bind-base" onclick="bindPad('base')">LB / L1 · Zmień</button></div>
- <div class="recipe"><span>BUDUJ</span><button id="bind-craft" onclick="bindPad('craft')">View / Share · Zmień</button></div>
- <div class="recipe"><span>Menu sterowania / zamknij</span><button id="bind-menu" onclick="bindPad('menu')">Menu / Options · Zmień</button></div>
- <div class="recipe"><span>Wróć / zamknij</span><button id="bind-back" onclick="bindPad('back')">B / ○ · Zmień</button></div>
- <h3>Drążek</h3>
+ <div class="pad-tools"><button id="padCycle" onclick="cyclePad()"><span data-i18n="Zmień kontroler">Zmień kontroler</span></button><button id="padRestore" onclick="restorePadDefaults()"><span data-i18n="Przywróć przyciski">Przywróć przyciski</span></button><button onclick="toggle('roomPanel',1)"><span data-i18n="👥 Pokoje online">👥 Pokoje online</span></button><button onclick="toggle('accountPanel',1)"><span data-i18n="☁️ Konto i zapis">☁️ Konto i zapis</span></button><button id="newSoloPad" onclick="askNewSoloGame()"><span data-i18n="↻ Nowa gra solo">↻ Nowa gra solo</span></button></div>
+ <h3><span data-i18n="Przyciski">Przyciski</span></h3><p class="intro"><span data-i18n="Kliknij „Zmień”, potem naciśnij wybrany przycisk na kontrolerze. Ustawienia zapamiętują się dla tego urządzenia.">Kliknij „Zmień”, potem naciśnij wybrany przycisk na kontrolerze. Ustawienia zapamiętują się dla tego urządzenia.</span></p>
+ <div class="recipe"><span><span data-i18n="DZIAŁAJ / zatwierdź / GRAJ">DZIAŁAJ / zatwierdź / GRAJ</span></span><button id="bind-interact" onclick="bindPad('interact')">A / ✕ · Zmień</button></div>
+ <div class="recipe"><span><span data-i18n="ATAK">ATAK</span></span><button id="bind-attack" onclick="bindPad('attack')">X / □ · Zmień</button></div>
+ <div class="recipe"><span><span data-i18n="PLECAK">PLECAK</span></span><button id="bind-bag" onclick="bindPad('bag')">Y / △ · Zmień</button></div>
+ <div class="recipe"><span><span data-i18n="SPRINT (trzymaj)">SPRINT (trzymaj)</span></span><button id="bind-sprint" onclick="bindPad('sprint')">RT / R2 · Zmień</button></div>
+ <div class="recipe"><span><span data-i18n="BLOK (trzymaj)">BLOK (trzymaj)</span></span><button id="bind-block" onclick="bindPad('block')">LT / L2 · Zmień</button></div>
+ <div class="recipe"><span><span data-i18n="ŁÓW">ŁÓW</span></span><button id="bind-fish" onclick="bindPad('fish')">RB / R1 · Zmień</button></div>
+ <div class="recipe"><span><span data-i18n="BAZA">BAZA</span></span><button id="bind-base" onclick="bindPad('base')">LB / L1 · Zmień</button></div>
+ <div class="recipe"><span><span data-i18n="BUDUJ">BUDUJ</span></span><button id="bind-craft" onclick="bindPad('craft')">View / Share · Zmień</button></div>
+ <div class="recipe"><span><span data-i18n="Menu sterowania / zamknij">Menu sterowania / zamknij</span></span><button id="bind-menu" onclick="bindPad('menu')">Menu / Options · Zmień</button></div>
+ <div class="recipe"><span><span data-i18n="Wróć / zamknij">Wróć / zamknij</span></span><button id="bind-back" onclick="bindPad('back')">B / ○ · Zmień</button></div>
+ <h3><span data-i18n="Drążek">Drążek</span></h3>
  <div class="pad-tools"><button id="padAxisX" onclick="changePadAxis('x')">Ruch lewo/prawo: oś 1</button><button id="padAxisY" onclick="changePadAxis('y')">Ruch góra/dół: oś 2</button><button id="padInvert" onclick="invertPadY()">Odwróć góra/dół: nie</button><button id="padDeadzone" onclick="changePadDeadzone()">Martwa strefa: 18%</button></div>
- <p class="intro">Jeśli postać rusza sama, zwiększ martwą strefę. Dla innego joysticka możesz zmienić osie i przyciski. Dostępność kontrolera zależy od urządzenia i przeglądarki.</p>
+ <p class="intro"><span data-i18n="Jeśli postać rusza sama, zwiększ martwą strefę. Dla innego joysticka możesz zmienić osie i przyciski. Dostępność kontrolera zależy od urządzenia i przeglądarki.">Jeśli postać rusza sama, zwiększ martwą strefę. Dla innego joysticka możesz zmienić osie i przyciski. Dostępność kontrolera zależy od urządzenia i przeglądarki.</span></p>
 </div>
-<div id="craft" class="panel" role="dialog" aria-label="Warsztat">
- <button class="close" aria-label="Zamknij warsztat" onclick="toggle('craft',0)">✕</button><h2>🔨 Warsztat</h2><p class="intro">Narzędzia na wyprawę.</p>
- <div class="recipe"><span>⚔️ Włócznia<small>6 drewna + 4 kamienie</small></span><button onclick="craftSpear()">Zrób</button></div>
- <div class="recipe"><span>🎣 Wędka<small>5 drewna + 2 muszelki</small></span><button onclick="craftRod()">Zrób</button></div>
- <div class="recipe"><span>🛶 Tratwa<small>12 drewna + 6 muszelek</small></span><button onclick="craftRaft()">Zbuduj</button></div>
+<div id="craft" class="panel" role="dialog" aria-label="Warsztat" data-i18n-aria-label="Warsztat">
+ <button class="close" aria-label="Zamknij warsztat" onclick="toggle('craft',0)" data-i18n-aria-label="Zamknij warsztat">✕</button><h2><span data-i18n="🔨 Warsztat">🔨 Warsztat</span></h2><p class="intro"><span data-i18n="Narzędzia na wyprawę.">Narzędzia na wyprawę.</span></p>
+ <div class="recipe"><span><span data-i18n="⚔️ Włócznia">⚔️ Włócznia</span><small><span data-i18n="6 drewna + 4 kamienie">6 drewna + 4 kamienie</span></small></span><button onclick="craftSpear()"><span data-i18n="Zrób">Zrób</span></button></div>
+ <div class="recipe"><span><span data-i18n="🎣 Wędka">🎣 Wędka</span><small><span data-i18n="5 drewna + 2 muszelki">5 drewna + 2 muszelki</span></small></span><button onclick="craftRod()"><span data-i18n="Zrób">Zrób</span></button></div>
+ <div class="recipe"><span><span data-i18n="🛶 Tratwa">🛶 Tratwa</span><small><span data-i18n="12 drewna + 6 muszelek">12 drewna + 6 muszelek</span></small></span><button onclick="craftRaft()"><span data-i18n="Zbuduj">Zbuduj</span></button></div>
 </div>
-<div id="basePanel" class="panel" role="dialog" aria-label="Centrum bazy">
- <button class="close" aria-label="Zamknij bazę" onclick="toggle('basePanel',0)">✕</button><h2>🏠 Centrum bazy</h2><p id="baseIntro" class="intro">Twoje miejsce odpoczynku.</p><p>Poziom bazy: <b id="baseLevel">0</b>/3</p>
- <div class="recipe"><span>🏠 Baza L1<small>12 drewna + 8 kamieni</small></span><button onclick="upgradeBase(1)">Buduj</button></div>
- <div class="recipe"><span>🛖 Baza L2<small>18 drewna + 12 kamieni + 50 monet</small></span><button onclick="upgradeBase(2)">Ulepsz</button></div>
- <div class="recipe"><span>🏡 Baza L3<small>28 drewna + 18 kamieni + 100 monet</small></span><button onclick="upgradeBase(3)">Ulepsz</button></div>
- <h3>🔥 Ognisko</h3><p id="fireStatus">Zbuduj bazę L1, potem rozpal ognisko.</p>
- <div class="recipe"><span>Rozpal ognisko<small>4 drewna + 2 kamienie · przy twojej bazie</small></span><button id="fireBuild" onclick="buildFire()">Rozpal</button></div>
- <div class="recipe"><span>Upiecz rybę<small>1 surowa ryba + 1 drewno · przy ognisku</small></span><button onclick="cookFish()">Upiecz</button></div>
- <div class="recipe"><span>Odpoczynek<small>5 sekund · do +40 zdrowia i +70 energii</small></span><button id="restButton" onclick="restAtFire()">Odpocznij</button></div>
+<div id="basePanel" class="panel" role="dialog" aria-label="Centrum bazy" data-i18n-aria-label="Centrum bazy">
+ <button class="close" aria-label="Zamknij bazę" onclick="toggle('basePanel',0)" data-i18n-aria-label="Zamknij bazę">✕</button><h2><span data-i18n="🏠 Centrum bazy">🏠 Centrum bazy</span></h2><p id="baseIntro" class="intro">Twoje miejsce odpoczynku.</p><p><span data-i18n="Poziom bazy:">Poziom bazy:</span> <b id="baseLevel">0</b>/3</p>
+ <div class="recipe"><span><span data-i18n="🏠 Baza L1">🏠 Baza L1</span><small><span data-i18n="12 drewna + 8 kamieni">12 drewna + 8 kamieni</span></small></span><button onclick="upgradeBase(1)"><span data-i18n="Buduj">Buduj</span></button></div>
+ <div class="recipe"><span><span data-i18n="🛖 Baza L2">🛖 Baza L2</span><small><span data-i18n="18 drewna + 12 kamieni + 50 monet">18 drewna + 12 kamieni + 50 monet</span></small></span><button onclick="upgradeBase(2)"><span data-i18n="Ulepsz">Ulepsz</span></button></div>
+ <div class="recipe"><span><span data-i18n="🏡 Baza L3">🏡 Baza L3</span><small><span data-i18n="28 drewna + 18 kamieni + 100 monet">28 drewna + 18 kamieni + 100 monet</span></small></span><button onclick="upgradeBase(3)"><span data-i18n="Ulepsz">Ulepsz</span></button></div>
+ <h3><span data-i18n="🔥 Ognisko">🔥 Ognisko</span></h3><p id="fireStatus">Zbuduj bazę L1, potem rozpal ognisko.</p>
+ <div class="recipe"><span><span data-i18n="Rozpal ognisko">Rozpal ognisko</span><small><span data-i18n="4 drewna + 2 kamienie · przy twojej bazie">4 drewna + 2 kamienie · przy twojej bazie</span></small></span><button id="fireBuild" onclick="buildFire()"><span data-i18n="Rozpal">Rozpal</span></button></div>
+ <div class="recipe"><span><span data-i18n="Upiecz rybę">Upiecz rybę</span><small><span data-i18n="1 surowa ryba + 1 drewno · przy ognisku">1 surowa ryba + 1 drewno · przy ognisku</span></small></span><button onclick="cookFish()"><span data-i18n="Upiecz">Upiecz</span></button></div>
+ <div class="recipe"><span><span data-i18n="Odpoczynek">Odpoczynek</span><small><span data-i18n="5 sekund · do +40 zdrowia i +70 energii">5 sekund · do +40 zdrowia i +70 energii</span></small></span><button id="restButton" onclick="restAtFire()">Odpocznij</button></div>
 </div>
-<div id="bag" class="panel" role="dialog" aria-label="Plecak">
- <button class="close" aria-label="Zamknij plecak" onclick="toggle('bag',0)">✕</button><h2>🎒 Plecak</h2><p id="bagIntro" class="intro">Zjedz coś przed kolejną wyprawą.</p>
+<div id="bag" class="panel" role="dialog" aria-label="Plecak" data-i18n-aria-label="Plecak">
+ <button class="close" aria-label="Zamknij plecak" onclick="toggle('bag',0)" data-i18n-aria-label="Zamknij plecak">✕</button><h2><span data-i18n="🎒 Plecak">🎒 Plecak</span></h2><p id="bagIntro" class="intro">Zjedz coś przed kolejną wyprawą.</p>
  <div class="stock"><span>🪵 <b id="bw">0</b></span><span>🪨 <b id="bs">0</b></span><span>🐚 <b id="bsh">0</b></span></div>
- <div class="recipe"><span>🥥 Kokosy: <b id="bf">0</b><small>+20 zdrowia · +15 energii</small></span><button onclick="eat('coconut')">Zjedz kokos</button></div>
- <div class="recipe"><span>🐟 Surowe ryby: <b id="bfi">0</b><small>Upiecz je przy ognisku lub sprzedaj.</small></span></div>
- <div class="recipe"><span>🍽️ Pieczone ryby: <b id="bcf">0</b><small>+45 zdrowia · +35 energii</small></span><button onclick="eat('fish')">Zjedz rybę</button></div>
- <p>Włócznia: <b id="bp">brak</b> · Wędka: <b id="br">brak</b><br>Tratwa: <b id="bra">brak</b> · Skarb: <b id="bt">brak</b></p>
+ <div class="recipe"><span><span data-i18n="🥥 Kokosy:">🥥 Kokosy:</span> <b id="bf">0</b><small><span data-i18n="+20 zdrowia · +15 energii">+20 zdrowia · +15 energii</span></small></span><button onclick="eat('coconut')"><span data-i18n="Zjedz kokos">Zjedz kokos</span></button></div>
+ <div class="recipe"><span><span data-i18n="🐟 Surowe ryby:">🐟 Surowe ryby:</span> <b id="bfi">0</b><small><span data-i18n="Upiecz je przy ognisku lub sprzedaj.">Upiecz je przy ognisku lub sprzedaj.</span></small></span></div>
+ <div class="recipe"><span><span data-i18n="🍽️ Pieczone ryby:">🍽️ Pieczone ryby:</span> <b id="bcf">0</b><small><span data-i18n="+45 zdrowia · +35 energii">+45 zdrowia · +35 energii</span></small></span><button onclick="eat('fish')"><span data-i18n="Zjedz rybę">Zjedz rybę</span></button></div>
+ <p><span data-i18n="Włócznia:">Włócznia:</span> <b id="bp">brak</b> <span data-i18n="· Wędka:">· Wędka:</span> <b id="br">brak</b><br><span data-i18n="Tratwa:">Tratwa:</span> <b id="bra">brak</b> <span data-i18n="· Skarb:">· Skarb:</span> <b id="bt">brak</b></p>
 </div>
-<div id="shop" class="panel" role="dialog" aria-label="Handlarz Leon">
- <button class="close" aria-label="Zamknij handel" onclick="toggle('shop',0)">✕</button><h2>🧑‍🌾 Leon — handlarz</h2><p class="intro">„Masz nadmiar? Ja mam miejsce na straganie!”</p><p>Twoje monety: <b id="shopCoins">0</b></p>
- <h3>Kup materiały</h3>
- <div class="recipe"><span>🪵 5 drewna<small>20 monet</small></span><button onclick="trade('buy','wood')">Kup</button></div>
- <div class="recipe"><span>🪨 5 kamieni<small>25 monet</small></span><button onclick="trade('buy','stone')">Kup</button></div>
- <div class="recipe"><span>🥥 2 kokosy<small>16 monet</small></span><button onclick="trade('buy','food')">Kup</button></div>
- <h3>Sprzedaj zasoby</h3>
- <div class="recipe"><span>🪵 5 drewna<small>Dostaniesz 10 monet</small></span><button onclick="trade('sell','wood')">Sprzedaj</button></div>
- <div class="recipe"><span>🐟 1 surowa ryba<small>Dostaniesz 12 monet</small></span><button onclick="trade('sell','fish')">Sprzedaj</button></div>
- <div class="recipe"><span>🐚 2 muszelki<small>Dostaniesz 8 monet</small></span><button onclick="trade('sell','shells')">Sprzedaj</button></div>
- <h3>📜 Dostawa dla Leona</h3><div class="recipe"><span>6 drewna + 4 kamienie<small id="supplyQuest">Nagroda: 40 monet + 60 XP</small></span><button id="supplyButton" onclick="deliverQuest('supplies')">Dostarcz</button></div>
+<div id="shop" class="panel" role="dialog" aria-label="Handlarz Leon" data-i18n-aria-label="Handlarz Leon">
+ <button class="close" aria-label="Zamknij handel" onclick="toggle('shop',0)" data-i18n-aria-label="Zamknij handel">✕</button><h2><span data-i18n="🧑‍🌾 Leon — handlarz">🧑‍🌾 Leon — handlarz</span></h2><p class="intro"><span data-i18n="„Masz nadmiar? Ja mam miejsce na straganie!”">„Masz nadmiar? Ja mam miejsce na straganie!”</span></p><p><span data-i18n="Twoje monety:">Twoje monety:</span> <b id="shopCoins">0</b></p>
+ <h3><span data-i18n="Kup materiały">Kup materiały</span></h3>
+ <div class="recipe"><span><span data-i18n="🪵 5 drewna">🪵 5 drewna</span><small><span data-i18n="20 monet">20 monet</span></small></span><button onclick="trade('buy','wood')"><span data-i18n="Kup">Kup</span></button></div>
+ <div class="recipe"><span><span data-i18n="🪨 5 kamieni">🪨 5 kamieni</span><small><span data-i18n="25 monet">25 monet</span></small></span><button onclick="trade('buy','stone')"><span data-i18n="Kup">Kup</span></button></div>
+ <div class="recipe"><span><span data-i18n="🥥 2 kokosy">🥥 2 kokosy</span><small><span data-i18n="16 monet">16 monet</span></small></span><button onclick="trade('buy','food')"><span data-i18n="Kup">Kup</span></button></div>
+ <h3><span data-i18n="Sprzedaj zasoby">Sprzedaj zasoby</span></h3>
+ <div class="recipe"><span><span data-i18n="🪵 5 drewna">🪵 5 drewna</span><small><span data-i18n="Dostaniesz 10 monet">Dostaniesz 10 monet</span></small></span><button onclick="trade('sell','wood')"><span data-i18n="Sprzedaj">Sprzedaj</span></button></div>
+ <div class="recipe"><span><span data-i18n="🐟 1 surowa ryba">🐟 1 surowa ryba</span><small><span data-i18n="Dostaniesz 12 monet">Dostaniesz 12 monet</span></small></span><button onclick="trade('sell','fish')"><span data-i18n="Sprzedaj">Sprzedaj</span></button></div>
+ <div class="recipe"><span><span data-i18n="🐚 2 muszelki">🐚 2 muszelki</span><small><span data-i18n="Dostaniesz 8 monet">Dostaniesz 8 monet</span></small></span><button onclick="trade('sell','shells')"><span data-i18n="Sprzedaj">Sprzedaj</span></button></div>
+ <h3><span data-i18n="📜 Dostawa dla Leona">📜 Dostawa dla Leona</span></h3><div class="recipe"><span><span data-i18n="6 drewna + 4 kamienie">6 drewna + 4 kamienie</span><small id="supplyQuest">Nagroda: 40 monet + 60 XP</small></span><button id="supplyButton" onclick="deliverQuest('supplies')"><span data-i18n="Dostarcz">Dostarcz</span></button></div>
 </div>
-<div id="nelaPanel" class="panel" role="dialog" aria-label="Zadania Neli">
- <button class="close" aria-label="Zamknij zadania" onclick="toggle('nelaPanel',0)">✕</button><h2>👩‍🦰 Nela — zadania</h2><p class="intro">„Na wyspie zawsze przyda się pomocna dłoń.”</p>
- <div class="recipe"><span>Ryby dla mieszkańców<small id="fishQuest">Dostarcz 3 ryby (surowe lub pieczone). Nagroda: 70 monet + 80 XP</small></span><button id="fishQuestButton" onclick="deliverQuest('fish')">Dostarcz ryby</button></div>
- <h3>💎 Wyprawa po skarb</h3><p id="treasureQuest">Zbuduj tratwę i znajdź drugą wyspę na południowym wschodzie.</p>
+<div id="nelaPanel" class="panel" role="dialog" aria-label="Zadania Neli" data-i18n-aria-label="Zadania Neli">
+ <button class="close" aria-label="Zamknij zadania" onclick="toggle('nelaPanel',0)" data-i18n-aria-label="Zamknij zadania">✕</button><h2><span data-i18n="👩‍🦰 Nela — zadania">👩‍🦰 Nela — zadania</span></h2><p class="intro"><span data-i18n="„Na wyspie zawsze przyda się pomocna dłoń.”">„Na wyspie zawsze przyda się pomocna dłoń.”</span></p>
+ <div class="recipe"><span><span data-i18n="Ryby dla mieszkańców">Ryby dla mieszkańców</span><small id="fishQuest">Dostarcz 3 ryby (surowe lub pieczone). Nagroda: 70 monet + 80 XP</small></span><button id="fishQuestButton" onclick="deliverQuest('fish')"><span data-i18n="Dostarcz ryby">Dostarcz ryby</span></button></div>
+ <h3><span data-i18n="💎 Wyprawa po skarb">💎 Wyprawa po skarb</span></h3><p id="treasureQuest">Zbuduj tratwę i znajdź drugą wyspę na południowym wschodzie.</p>
 </div>
+<div id="languagePanel" class="panel" role="dialog" aria-label="Język gry" data-i18n-aria-label="Język gry">
+ <button class="close" aria-label="Zamknij wybór języka" onclick="toggle('languagePanel',0)" data-i18n-aria-label="Zamknij wybór języka">✕</button><h2><span data-i18n="🌐 Język">🌐 Język</span></h2>
+ <p class="intro"><span data-i18n="Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.">Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.</span></p>
+ <div class="language-options"><button data-language="pl" onclick="setLanguage('pl')">Polski</button><button data-language="en" onclick="setLanguage('en')">English</button><button data-language="nl" onclick="setLanguage('nl')">Nederlands</button><button data-language="de" onclick="setLanguage('de')">Deutsch</button><button data-language="fr" onclick="setLanguage('fr')">Français</button><button data-language="es" onclick="setLanguage('es')">Español</button></div>
+</div>
+<script src="i18n.bundle.js?v=0.15"></script>
 <script>
 'use strict';
+const tr=(source)=>MyIslandI18n.t(source);
 const $=id=>document.getElementById(id), C=$('game'), X=C.getContext('2d');
 const WORLD={w:4600,h:2900}, SAVE_KEY='myIsland09';
 let W=0,H=0,DPR=1,K={},play=0,P={x:1500,y:1100},cam={x:0,y:0};
@@ -217,7 +229,7 @@ let wood=0,stone=0,food=0,shells=0,fish=0,cookedFish=0,totalCaught=0,xpv=0,coins
 let spear=0,rod=0,raft=0,treasure=0,sprint=0,blocking=0,lastAttack=0,secondFound=0,returned=0,baseLevel=0,basePos=null,campfire=0;
 let questsDone={fish:0,supplies:0},activePanel=null,resting=0,face='down',moving=false,walkPhase=0,time=0,lastTime=0,lastAutosave=0,lastUI=0,hitFlash=0,msgTimer=0;
 const O=[],E=[],F=[],nela={x:3370,y:430},leon={x:1630,y:1160};
-const chest={x:4200,y:2450},panels=['craft','basePanel','bag','shop','nelaPanel','controllerPanel','roomPanel','newGamePanel','accountPanel'];
+const chest={x:4200,y:2450},panels=['craft','basePanel','bag','shop','nelaPanel','controllerPanel','roomPanel','newGamePanel','accountPanel','languagePanel'];
 const ROOM_API='https://my-island-online.arekpoczta734.chatgpt.site/api/rooms',ROOM_KEY='myIslandRoomV1';
 const playerLooks=[{shirt:'#4c9cba',skin:'#e3b185',hair:'#463b32'},{shirt:'#df8168',skin:'#be895f',hair:'#382d29'},{shirt:'#9974c7',skin:'#efc69d',hair:'#725039'},{shirt:'#76b677',skin:'#a67152',hair:'#2f302b'}];
 const net={room:null,token:null,you:null,players:[],worldRev:-1,connected:false,busy:false,joining:false,epoch:0,lastOk:0,actions:[],timer:null,solo:null,reset:0,joinAbort:null};
@@ -385,7 +397,7 @@ function drawBase(){
  }else{
   rounded(X,-35,-45,70,47,3,baseLevel===2?'#bda16e':'#e3d1a2');X.fillStyle=baseLevel===2?'#527c51':'#b67c56';X.beginPath();X.moveTo(-46,-41);X.lineTo(0,-78);X.lineTo(46,-41);X.closePath();X.fill();
   rounded(X,-8,-29,18,31,2,'#6a6e50');rounded(X,-26,-31,13,14,2,'#91bdc4');rounded(X,17,-31,13,14,2,'#91bdc4');X.strokeStyle='#f2e0a6';X.lineWidth=2;X.beginPath();X.moveTo(-20,-30);X.lineTo(-20,-17);X.moveTo(23,-30);X.lineTo(23,-17);X.stroke();
- }X.restore();label(x,y-87,(net.room?'WSPÓLNA BAZA':'TWOJA BAZA')+' · L'+baseLevel);
+ }X.restore();label(x,y-87,(net.room?tr('WSPÓLNA BAZA'):tr('TWOJA BAZA'))+' · L'+baseLevel);
 }
 function drawChest(){shadow(chest.x,chest.y,22,8);rounded(X,chest.x-20,chest.y-25,40,28,4,'#a77a40');rounded(X,chest.x-20,chest.y-33,40,14,4,'#be9455');X.fillStyle='#e2c67b';X.fillRect(chest.x-12,chest.y-32,4,34);X.fillRect(chest.x+8,chest.y-32,4,34);rounded(X,chest.x-4,chest.y-17,8,9,2,'#f6d779')}
 function drawStall(){
@@ -395,7 +407,7 @@ function drawStall(){
  ellipse(X,x-19,y-34,6,6,'#bfaa66');ellipse(X,x-4,y-35,6,6,'#c3955f');rounded(X,x+10,y-39,17,9,2,'#6eafa8');
 }
 function draw(){
- if(islandView?.enabled){try{islandView.frame(time);return}catch(error){console.warn('Widok 3D:',error);islandView.setEnabled(false);updateView();say('Widok 3D jest chwilowo niedostępny. Możesz kontynuować w 2D.')}}
+ if(islandView?.enabled){try{islandView.frame(time);return}catch(error){console.warn('Widok 3D:',error);islandView.setEnabled(false);updateView();say(tr('Widok 3D jest chwilowo niedostępny. Możesz kontynuować w 2D.'))}}
  X.fillStyle=waterGradient;X.fillRect(0,0,W,H);X.save();X.translate(-cam.x,-cam.y);
  X.fillStyle='#0c6b8f70';X.fillRect(3500,1150,1100,1750);
  X.strokeStyle='#acf0e221';X.lineWidth=1.5;
@@ -414,17 +426,17 @@ function draw(){
  if(basePos&&visible(basePos.x,basePos.y))things.push({y:basePos.y,draw:drawBase});
  const fire=firePosition();if(campfire&&fire&&visible(fire.x,fire.y))things.push({y:fire.y,draw:()=>drawFire(fire.x,fire.y)});
  if(!treasure&&visible(chest.x,chest.y))things.push({y:chest.y,draw:drawChest});
- for(const [person,kind,name] of [[nela,'nela','NELA · ZADANIA'],[leon,'leon','LEON · HANDLARZ']]){
+ for(const [person,kind,name] of [[nela,'nela',tr('NELA · ZADANIA')],[leon,'leon',tr('LEON · HANDLARZ')]]){
   if(visible(person.x,person.y))things.push({y:person.y,draw:()=>{drawPerson(person.x,person.y,kind,Math.abs(P.x-person.x)>Math.abs(P.y-person.y)?P.x<person.x?'left':'right':P.y<person.y?'up':'down');label(person.x,P.y>person.y&&distance(P,person)<140?person.y-80:person.y+23,name)}});
  }
  if(net.room)for(const person of net.players){
   if(person.id===net.you)continue;const point=remotePosition(person,time),look=playerLooks[person.slot]||playerLooks[0];
   if(visible(point.x,point.y))things.push({y:point.y,draw:()=>{const wet=sea(point.x,point.y);if(wet&&raft)drawRaft(point.x,point.y);ellipse(X,point.x,point.y+3,17,6,look.shirt+'aa');drawPerson(point.x,point.y,'player',person.face,person.moving?time*.012:0,wet&&!raft,{...look,blocked:person.blocked,remote:true});label(point.x,point.y-80,person.name,look.shirt)}});
  }
- things.push({y:P.y,draw:()=>{const wet=sea(P.x,P.y),me=net.players.find(p=>p.id===net.you),look=net.room?playerLooks[me?.slot||0]:null;if(wet&&raft)drawRaft(P.x,P.y);if(look)ellipse(X,P.x,P.y+3,17,6,look.shirt+'aa');drawPerson(P.x,P.y,'player',face,moving?walkPhase:0,wet&&!raft,look);if(me)label(P.x,P.y-80,me.name+' · TY',look.shirt);if(Date.now()-lastAttack<180&&spear){X.strokeStyle='#f6efd3';X.lineWidth=3;X.beginPath();X.arc(P.x,P.y-18,43,walkPhase,walkPhase+1.9);X.stroke()}}});
+ things.push({y:P.y,draw:()=>{const wet=sea(P.x,P.y),me=net.players.find(p=>p.id===net.you),look=net.room?playerLooks[me?.slot||0]:null;if(wet&&raft)drawRaft(P.x,P.y);if(look)ellipse(X,P.x,P.y+3,17,6,look.shirt+'aa');drawPerson(P.x,P.y,'player',face,moving?walkPhase:0,wet&&!raft,look);if(me)label(P.x,P.y-80,me.name+tr(' · TY'),look.shirt);if(Date.now()-lastAttack<180&&spear){X.strokeStyle='#f6efd3';X.lineWidth=3;X.beginPath();X.arc(P.x,P.y-18,43,walkPhase,walkPhase+1.9);X.stroke()}}});
  things.sort((a,b)=>a.y-b.y);for(const t of things)t.draw();
- if(visible(3380,220))label(3380,205,'PÓŁNOCNA ZATOKA','#f5e7ba');
- if(visible(4100,2120))label(4100,2110,'WYSPA SKARBU','#f5e7ba');
+ if(visible(3380,220))label(3380,205,tr('PÓŁNOCNA ZATOKA'),'#f5e7ba');
+ if(visible(4100,2120))label(4100,2110,tr('WYSPA SKARBU'),'#f5e7ba');
  for(let i=0;i<4;i++){
   const bx=1520+Math.sin(time*.00013+i*1.7)*330,by=1010+Math.cos(time*.00016+i*2.2)*210;
   if(!visible(bx,by,20))continue;const wing=3+Math.sin(time*.011+i)*3;X.strokeStyle='#fff8ddc9';X.lineWidth=2;X.beginPath();X.moveTo(bx-8,by-wing);X.quadraticCurveTo(bx-3,by-2,bx,by);X.quadraticCurveTo(bx+3,by-2,bx+8,by-wing);X.stroke();
@@ -438,7 +450,7 @@ function enemies(step){
   if(distance(e,target)>3){e.x+=Math.cos(a)*speed*step;e.y+=Math.sin(a)*speed*step}
   if(d<42&&!safe&&Date.now()-e.hit>1500){
    e.hit=Date.now();health=Math.max(0,health-(blocking||pad.blocking?2:6));hitFlash=12;
-   if(health<=0){health=50;P=basePos?{x:basePos.x+70,y:basePos.y}:{x:1500,y:1100};resetInput();save();say('Odrodzenie przy bazie. Zjedz coś lub odpocznij przy ognisku.')}
+   if(health<=0){health=50;P=basePos?{x:basePos.x+70,y:basePos.y}:{x:1500,y:1100};resetInput();save();say(tr('Odrodzenie przy bazie. Zjedz coś lub odpocznij przy ognisku.'))}
   }
  }
 }
@@ -456,18 +468,18 @@ function updateRoomUI(){
  $('roomCreate').disabled=$('roomJoin').disabled=$('roomResume').disabled=net.joining;
  $('roomResume').style.display=lastRoom&&!net.room?'inline-block':'none';
  if(!$('roomName').value)$('roomName').value=lastRoom?.name||'';
- $('roomButton').textContent=net.room?net.connected?'👥 '+net.players.length+'/4':'👥 ŁĄCZĘ…':'👥 ONLINE';
+ $('roomButton').textContent=net.room?net.connected?'👥 '+net.players.length+'/4':tr('👥 ŁĄCZĘ…'):tr('👥 ONLINE');
  if(!net.room)return;
  $('roomCode').value=net.room;$('roomCount').textContent=net.players.length+'/4';
- $('roomStatus').textContent=net.ended?'Sesja zakończona. Wróć do solo i dołącz ponownie.':net.connected?'Jesteście na wspólnej wyspie. Podaj znajomym kod pokoju.':'Połączenie przerwane. Ponawiam — postać czeka bezpiecznie.';
- const members=net.players.map(p=>{const li=document.createElement('li'),color=document.createElement('span'),name=document.createElement('span'),hp=document.createElement('span');color.className='member-color';color.style.background=(playerLooks[p.slot]||playerLooks[0]).shirt;name.textContent=p.name+(p.id===net.you?' (ty)':'');hp.className='member-health';hp.textContent='❤️ '+Math.round(p.health);li.append(color,name,hp);return li});
+ $('roomStatus').textContent=net.ended?tr('Sesja zakończona. Wróć do solo i dołącz ponownie.'):net.connected?tr('Jesteście na wspólnej wyspie. Podaj znajomym kod pokoju.'):tr('Połączenie przerwane. Ponawiam — postać czeka bezpiecznie.');
+ const members=net.players.map(p=>{const li=document.createElement('li'),color=document.createElement('span'),name=document.createElement('span'),hp=document.createElement('span');color.className='member-color';color.style.background=(playerLooks[p.slot]||playerLooks[0]).shirt;name.textContent=p.name+(p.id===net.you?tr(' (ty)'):'');hp.className='member-health';hp.textContent='❤️ '+Math.round(p.health);li.append(color,name,hp);return li});
  $('roomMembers').replaceChildren(...members);
 }
 async function roomRequest(payload,signal){
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),8000);if(signal)signal.addEventListener('abort',()=>controller.abort(),{once:true});
  try{const response=await fetch(ROOM_API,{method:'POST',mode:'cors',cache:'no-store',credentials:'omit',headers:{'Content-Type':'application/json'},body:JSON.stringify({version:11,...payload}),signal:controller.signal});
-  let data;try{data=await response.json()}catch(e){throw new Error('Nie mogę teraz odczytać pokoju. Spróbuj ponownie.')}
-  if(!response.ok||data.error)throw Object.assign(new Error(data.error||'Nie mogę teraz połączyć się z pokojem.'),{ended:!!data.ended,status:response.status});return data;
+  let data;try{data=await response.json()}catch(e){throw new Error(tr('Nie mogę teraz odczytać pokoju. Spróbuj ponownie.'))}
+  if(!response.ok||data.error)throw Object.assign(new Error(data.error||tr('Nie mogę teraz połączyć się z pokojem.')),{ended:!!data.ended,status:response.status});return data;
  }finally{clearTimeout(timeout)}
 }
 function applyRoomSnapshot(data,initial=false){
@@ -484,25 +496,25 @@ function cancelRoomJoin(){if(!net.joining)return;net.epoch++;net.joinAbort?.abor
 async function connectRoom(mode){
  if(net.room||net.joining)return;
  if(!soloReady()){toggle('accountPanel',1);return}
- const name=String($('roomName').value||'Gracz').trim().slice(0,16)||'Gracz',code=String($('roomJoinCode').value||'').toUpperCase().replace(/[\s-]/g,'');
- if(mode==='join'&&!/^[A-HJ-NP-Z2-9]{8}$/.test(code)){return $('roomStatus').textContent='Wpisz osiem znaków kodu od znajomego.'}
+ const name=String($('roomName').value||tr('Gracz')).trim().slice(0,16)||tr('Gracz'),code=String($('roomJoinCode').value||'').toUpperCase().replace(/[\s-]/g,'');
+ if(mode==='join'&&!/^[A-HJ-NP-Z2-9]{8}$/.test(code)){return $('roomStatus').textContent=tr('Wpisz osiem znaków kodu od znajomego.')}
  if(mode==='resume'&&!lastRoom)return;
- if(!play)load();save();const solo=captureSolo(),epoch=++net.epoch;net.joining=true;net.joinAbort=new AbortController();updateRoomUI();$('roomStatus').textContent=mode==='create'?'Tworzę wspólną wyspę…':'Dołączam do wyspy…';
+ if(!play)load();save();const solo=captureSolo(),epoch=++net.epoch;net.joining=true;net.joinAbort=new AbortController();updateRoomUI();$('roomStatus').textContent=mode==='create'?tr('Tworzę wspólną wyspę…'):tr('Dołączam do wyspy…');
  try{
   const payload=mode==='create'?{op:'create',name}:mode==='resume'?{op:'join',name,code:lastRoom.code,token:lastRoom.token}:{op:'join',name,code};
   const data=await roomRequest(payload,net.joinAbort.signal);if(epoch!==net.epoch)return;
   net.joining=false;net.solo=solo;net.room=data.code;net.token=data.token||lastRoom?.token;net.actions=[];net.worldRev=-1;net.reset=-1;net.players=[];
-  if(!net.token)throw new Error('Nie udało się rozpocząć sesji. Dołącz ponownie.');
+  if(!net.token)throw new Error(tr('Nie udało się rozpocząć sesji. Dołącz ponownie.'));
   lastRoom={code:net.room,token:net.token,name};try{localStorage.setItem(ROOM_KEY,JSON.stringify(lastRoom))}catch(e){}
-  $('start').style.display='none';play=1;toggle('roomPanel',0);applyRoomSnapshot(data,true);net.timer=setInterval(()=>syncRoom(),180);syncRoom();say('Wspólna wyspa gotowa! Kod: '+net.room);
- }catch(error){if(epoch!==net.epoch)return;if(error.ended&&mode==='resume'){lastRoom=null;try{localStorage.removeItem(ROOM_KEY)}catch(e){}}$('roomStatus').textContent=error.name==='AbortError'?'Połączenie trwa zbyt długo. Spróbuj ponownie.':error.message||'Nie mogę połączyć się z wyspą.';
+  $('start').style.display='none';play=1;toggle('roomPanel',0);applyRoomSnapshot(data,true);net.timer=setInterval(()=>syncRoom(),180);syncRoom();say(tr('Wspólna wyspa gotowa! Kod: ')+net.room);
+ }catch(error){if(epoch!==net.epoch)return;if(error.ended&&mode==='resume'){lastRoom=null;try{localStorage.removeItem(ROOM_KEY)}catch(e){}}$('roomStatus').textContent=error.name==='AbortError'?tr('Połączenie trwa zbyt długo. Spróbuj ponownie.'):tr(error.message||tr('Nie mogę połączyć się z wyspą.'));
   if(net.room){net.room=null;net.token=null;restoreSolo(solo)}
  }finally{if(epoch===net.epoch){net.joining=false;updateRoomUI()}}
 }
 function onlineReady(){return !net.room||(net.connected&&!net.ended&&performance.now()-net.lastOk<2500)}
 function roomAction(action){
- if(!net.room)return false;if(!onlineReady()){say('Czekam na połączenie z wyspą.');return true}
- if(net.actions.length){say('Chwileczkę — kończę poprzednią czynność.');return true}
+ if(!net.room)return false;if(!onlineReady()){say(tr('Czekam na połączenie z wyspą.'));return true}
+ if(net.actions.length){say(tr('Chwileczkę — kończę poprzednią czynność.'));return true}
  const id=typeof crypto!=='undefined'&&typeof crypto.randomUUID==='function'?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
  net.actions.push({...action,id,fromPanel:activePanel});syncRoom();return true;
 }
@@ -519,10 +531,10 @@ async function syncRoom(){
 async function leaveRoom(){
  if(!net.room){cancelRoomJoin();return}
  const session={op:'leave',code:net.room,token:net.token},saved=net.solo;net.epoch++;clearInterval(net.timer);net.timer=null;net.room=null;net.token=null;net.players=[];net.actions=[];net.connected=false;net.busy=false;net.ended=false;net.solo=null;lastRoom=null;
- try{localStorage.removeItem(ROOM_KEY)}catch(e){}restoreSolo(saved);resetInput();toggle('roomPanel',0);save();updateRoomUI();$('roomStatus').textContent='Utwórz pokój albo wpisz kod od znajomego.';say('Wróciłeś do swojego zapisu solo.');
+ try{localStorage.removeItem(ROOM_KEY)}catch(e){}restoreSolo(saved);resetInput();toggle('roomPanel',0);save();updateRoomUI();$('roomStatus').textContent=tr('Utwórz pokój albo wpisz kod od znajomego.');say(tr('Wróciłeś do swojego zapisu solo.'));
  try{await roomRequest(session)}catch(e){}
 }
-async function copyRoomCode(){if(!net.room)return;try{await navigator.clipboard.writeText(net.room);say('Kod pokoju skopiowany: '+net.room)}catch(e){$('roomCode').focus();$('roomCode').select();say('Zaznaczyłem kod. Skopiuj go i podaj znajomym.')}}
+async function copyRoomCode(){if(!net.room)return;try{await navigator.clipboard.writeText(net.room);say(tr('Kod pokoju skopiowany: ')+net.room)}catch(e){$('roomCode').focus();$('roomCode').select();say(tr('Zaznaczyłem kod. Skopiuj go i podaj znajomym.'))}}
 function readPads(){
  if(!padAvailable)return [];try{return Array.from(navigator.getGamepads()||[]).filter(p=>p&&p.connected!==false)}catch(e){padAvailable=false;return []}
 }
@@ -538,32 +550,32 @@ function clearPadInput(){pad.x=pad.y=0;pad.sprinting=pad.blocking=false;pad.read
 function selectPad(device){
  padDevice=device;pad.index=device?.index??null;pad.id=device?.id||'';pad.buttons=[];pad.capture=null;clearPadInput();padProfile=device?loadPadProfile(pad.id):null;
  pad.focusedButton?.classList.remove('pad-selected');pad.focusedButton=null;updatePadUI();
- if(!device){$('stickDot').style.transform='translate(0,0)';$('padLive').textContent='Tutaj sprawdzisz ruch drążka i przyciski.'}
- if(play)say(device?'Kontroler wykryty. Puść przyciski i ustaw drążek na środku.':'Kontroler odłączony. Możesz grać klawiaturą lub dotykiem.');
+ if(!device){$('stickDot').style.transform='translate(0,0)';$('padLive').textContent=tr('Tutaj sprawdzisz ruch drążka i przyciski.')}
+ if(play)say(device?tr('Kontroler wykryty. Puść przyciski i ustaw drążek na środku.'):tr('Kontroler odłączony. Możesz grać klawiaturą lub dotykiem.'));
 }
-function padButtonLabel(key){const n=(padProfile||defaultPadProfile()).buttons[key];return (!padDevice||padDevice.mapping==='standard')&&n===padDefaults[key]?padLabels[key]:'Przycisk '+(n+1)}
+function padButtonLabel(key){const n=(padProfile||defaultPadProfile()).buttons[key];return (!padDevice||padDevice.mapping==='standard')&&n===padDefaults[key]?padLabels[key]:tr('Przycisk ')+(n+1)}
 function updatePadUI(){
  const profile=padProfile||defaultPadProfile(),connected=!!padDevice;
- $('padButton').textContent=connected?'🎮 PAD ✓':'🎮 PAD';$('padButton').classList[connected?'add':'remove']('connected');
- $('padStatus').textContent=!padAvailable?'Ta przeglądarka nie udostępnia kontrolerów. Spróbuj otworzyć grę w innej przeglądarce.':connected?'Podłączony: '+padDevice.id+' · '+(padDevice.mapping==='standard'?'standardowy układ':'własny układ — możesz zmienić przyciski'):'Czekam na kontroler. Podłącz go i naciśnij na nim przycisk.';
- $('padStartInfo').textContent=connected?'Kontroler wykryty. Puść przyciski, potem '+padButtonLabel('interact')+' uruchamia grę.':'Podłącz kontroler i naciśnij na nim przycisk.';
- for(const key of Object.keys(padDefaults)){$('bind-'+key).textContent=padButtonLabel(key)+' · Zmień';$('bind-'+key).disabled=!connected}
+ $('padButton').textContent=connected?tr('🎮 PAD ✓'):tr('🎮 PAD');$('padButton').classList[connected?'add':'remove']('connected');
+ $('padStatus').textContent=!padAvailable?tr('Ta przeglądarka nie udostępnia kontrolerów. Spróbuj otworzyć grę w innej przeglądarce.'):connected?tr('Podłączony: ')+padDevice.id+' · '+(padDevice.mapping==='standard'?tr('standardowy układ'):tr('własny układ — możesz zmienić przyciski')):tr('Czekam na kontroler. Podłącz go i naciśnij na nim przycisk.');
+ $('padStartInfo').textContent=connected?tr('Kontroler wykryty. Puść przyciski, potem ')+padButtonLabel('interact')+tr(' uruchamia grę.'):tr('Podłącz kontroler i naciśnij na nim przycisk.');
+ for(const key of Object.keys(padDefaults)){$('bind-'+key).textContent=padButtonLabel(key)+tr(' · Zmień');$('bind-'+key).disabled=!connected}
  $('padCycle').disabled=readPads().length<2;
  $('padRestore').disabled=!connected;
- $('padAxisX').textContent='Ruch lewo/prawo: oś '+(profile.x+1);$('padAxisY').textContent='Ruch góra/dół: oś '+(profile.y+1);
+ $('padAxisX').textContent=tr('Ruch lewo/prawo: oś ')+(profile.x+1);$('padAxisY').textContent=tr('Ruch góra/dół: oś ')+(profile.y+1);
  $('padAxisX').disabled=$('padAxisY').disabled=!connected||padDevice.axes.length<2;
- $('padInvert').textContent='Odwróć góra/dół: '+(profile.invertY?'tak':'nie');$('padInvert').disabled=!connected;
- $('padDeadzone').textContent='Martwa strefa: '+Math.round(profile.deadzone*100)+'%';$('padDeadzone').disabled=!connected;
- if(!pad.capture)$('bindPrompt').textContent='Drążek: ruch. W menu wybieraj góra/dół, zatwierdzaj przyciskiem DZIAŁAJ.';
+ $('padInvert').textContent=tr('Odwróć góra/dół: ')+(profile.invertY?tr('tak'):tr('nie'));$('padInvert').disabled=!connected;
+ $('padDeadzone').textContent=tr('Martwa strefa: ')+Math.round(profile.deadzone*100)+'%';$('padDeadzone').disabled=!connected;
+ if(!pad.capture)$('bindPrompt').textContent=tr('Drążek: ruch. W menu wybieraj góra/dół, zatwierdzaj przyciskiem DZIAŁAJ.');
 }
 function cyclePad(){const devices=readPads();if(devices.length<2)return;const i=devices.findIndex(p=>p.index===pad.index&&p.id===pad.id);selectPad(devices[(i+1)%devices.length])}
 function bindPad(key){
  if(!padDevice||!Object.prototype.hasOwnProperty.call(padDefaults,key))return;
  pad.capture=key;pad.captureArmed=!pad.buttons.some(Boolean);pad.captureUntil=performance.now()+15000;
- $('bindPrompt').textContent='Puść przyciski, potem naciśnij nowy przycisk: '+padNames[key]+'. Esc anuluje.';
+ $('bindPrompt').textContent=tr('Puść przyciski, potem naciśnij nowy przycisk: ')+tr(padNames[key])+tr('. Esc anuluje.');
 }
 function cancelPadBinding(){pad.capture=null;clearPadInput();updatePadUI()}
-function restorePadDefaults(){if(!padDevice)return;padProfile=defaultPadProfile();pad.capture=null;clearPadInput();savePadProfile();updatePadUI();say('Przywrócono domyślny układ kontrolera.')}
+function restorePadDefaults(){if(!padDevice)return;padProfile=defaultPadProfile();pad.capture=null;clearPadInput();savePadProfile();updatePadUI();say(tr('Przywrócono domyślny układ kontrolera.'))}
 function changePadAxis(key){
  if(!padDevice||!['x','y'].includes(key)||padDevice.axes.length<2)return;
  const other=key==='x'?'y':'x',old=padProfile[key];padProfile[key]=(old+1)%padDevice.axes.length;if(padProfile[key]===padProfile[other])padProfile[other]=old;
@@ -604,15 +616,15 @@ function pollController(now){
  pad.buttons=down;pad.x=pad.y=0;pad.sprinting=pad.blocking=false;
  if(activePanel==='controllerPanel'&&now-pad.lastUI>160){
   $('stickDot').style.transform='translate('+(vector.x*18).toFixed(1)+'px,'+(vector.y*18).toFixed(1)+'px)';
-  $('padLive').textContent='Drążek: '+Math.round(vector.x*100)+'% / '+Math.round(vector.y*100)+'% · '+(down.some(Boolean)?'przycisk '+down.map((v,i)=>v?i+1:null).filter(v=>v!==null).join(', '):'przyciski puszczone');pad.lastUI=now;
+  $('padLive').textContent=tr('Drążek: ')+Math.round(vector.x*100)+'% / '+Math.round(vector.y*100)+'% · '+(down.some(Boolean)?tr('przycisk ')+down.map((v,i)=>v?i+1:null).filter(v=>v!==null).join(', '):tr('przyciski puszczone'));pad.lastUI=now;
  }
  if(!inputFocused||document.hidden){clearPadInput();return}
  if(pad.capture){
-  if(now>pad.captureUntil){cancelPadBinding();say('Zmiana przycisku anulowana.');return}
+  if(now>pad.captureUntil){cancelPadBinding();say(tr('Zmiana przycisku anulowana.'));return}
   if(!pad.captureArmed){if(!down.some(Boolean))pad.captureArmed=true;return}
   const index=down.findIndex((v,i)=>v&&!previous[i]);if(index<0)return;
   const key=pad.capture,old=padProfile.buttons[key],other=Object.keys(padDefaults).find(k=>k!==key&&padProfile.buttons[k]===index);
-  if(other)padProfile.buttons[other]=old;padProfile.buttons[key]=index;pad.capture=null;clearPadInput();savePadProfile();updatePadUI();say('Przypisano przycisk '+(index+1)+'.');return;
+  if(other)padProfile.buttons[other]=old;padProfile.buttons[key]=index;pad.capture=null;clearPadInput();savePadProfile();updatePadUI();say(tr('Przypisano przycisk ')+(index+1)+'.');return;
  }
  if(!pad.ready){if(!down.some(Boolean)&&!vector.x&&!vector.y)pad.ready=true;return}
  const pressed=key=>down[padProfile.buttons[key]]&&!previous[padProfile.buttons[key]];
@@ -641,13 +653,13 @@ function loop(timestamp=performance.now()){
    if(pad.ready&&padDevice?.mapping==='standard'&&padProfile.x<2&&padProfile.y<2){const ax=padDevice.axes?.[2]||0,ay=padDevice.axes?.[3]||0;islandView.orbit(Math.abs(ax)>.18?-ax*.035*step:0,Math.abs(ay)>.18?ay*.02*step:0)}
    ({x:dx,y:dy}=islandView.vector(dx,dy));if(dx||dy)viewHeading=Math.atan2(dx,dy);
   }
-  moving=!!(dx||dy);if(moving){face=Math.abs(dx)>Math.abs(dy)?dx<0?'left':'right':dy<0?'up':'down';walkPhase+=step*.2;if(resting){resting=0;say('Odpoczynek przerwany.')}}
+  moving=!!(dx||dy);if(moving){face=Math.abs(dx)>Math.abs(dy)?dx<0?'left':'right':dy<0?'up':'down';walkPhase+=step*.2;if(resting){resting=0;say(tr('Odpoczynek przerwany.'))}}
   const wet=sea(P.x,P.y),fast=(sprint||pad.sprinting)&&energy>0&&moving,speed=wet?(raft?6:2):(fast?7:4);
   if(!net.room&&!activePanel)energy=Math.max(0,Math.min(100,energy+(wet&&!raft?-.2:fast?-.28:.12)*step));
   let nx=Math.max(60,Math.min(4540,P.x+dx*speed*step)),ny=Math.max(60,Math.min(2840,P.y+dy*speed*step));
   if(deep(nx,ny)&&!raft){nx=P.x;ny=P.y}P.x=nx;P.y=ny;
-  if(!net.room&&island2(P.x,P.y)&&!secondFound){secondFound=1;xpv+=150;coins+=75;say('Odkryto Wyspę Skarbu!');save()}
-  if(!net.room&&resting>0){const seconds=step/60;health=Math.min(100,health+seconds*8);energy=Math.min(100,energy+seconds*14);resting=Math.max(0,resting-seconds);if(!resting){save();say('Odpoczynek zakończony. Czas na przygodę!')}}
+  if(!net.room&&island2(P.x,P.y)&&!secondFound){secondFound=1;xpv+=150;coins+=75;say(tr('Odkryto Wyspę Skarbu!'));save()}
+  if(!net.room&&resting>0){const seconds=step/60;health=Math.min(100,health+seconds*8);energy=Math.min(100,energy+seconds*14);resting=Math.max(0,resting-seconds);if(!resting){save();say(tr('Odpoczynek zakończony. Czas na przygodę!'))}}
   if(!net.room&&!activePanel&&mainLand(P.x,P.y))enemies(step);hitFlash=Math.max(0,hitFlash-step);
   if(timestamp-lastAutosave>5000){save();lastAutosave=timestamp}
  }
@@ -666,130 +678,130 @@ addEventListener('blur',()=>{inputFocused=false;resetInput()});addEventListener(
 function holdControl(b,on,off){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);on()};b.onpointerup=b.onpointercancel=b.onlostpointercapture=off}
 document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;holdControl(b,()=>{if(!activePanel)K[k]=1},()=>K[k]=0)});
 holdControl(document.querySelector('.sprint'),()=>{if(!activePanel)sprint=1},()=>sprint=0);
-function startGame(){if(play)return;if(!soloReady()){toggle('accountPanel',1);return}cancelRoomJoin();load();$('start').style.display='none';play=1;resetInput();lastAutosave=performance.now();update();say(cloud.session?'Witaj z powrotem! Wczytałem twoją wyspę z konta.':'Witaj na żywej wyspie! Leon czeka przy obozowisku.')}
+function startGame(){if(play)return;if(!soloReady()){toggle('accountPanel',1);return}cancelRoomJoin();load();$('start').style.display='none';play=1;resetInput();lastAutosave=performance.now();update();say(cloud.session?tr('Witaj z powrotem! Wczytałem twoją wyspę z konta.'):tr('Witaj na żywej wyspie! Leon czeka przy obozowisku.'))}
 function askNewSoloGame(){
- if(net.room||net.joining)return;if(!soloReady()){toggle('accountPanel',1);return}pad.capture=null;$('newGameError').textContent='';$('newGameDescription').textContent=cloud.session?'Zacząć przygodę od początku? Twój zapis solo na koncie zostanie zastąpiony na wszystkich urządzeniach. Postać, zasoby, narzędzia, baza, monety i zadania wrócą do stanu początkowego.':'Zacząć przygodę od początku? Twój dotychczasowy zapis solo zostanie zastąpiony. Postać, zasoby, narzędzia, baza, monety i zadania wrócą do stanu początkowego.';toggle('newGamePanel',1);if(!padDevice)$('newGameCancel').focus();else focusPadButton($('newGameCancel'));
+ if(net.room||net.joining)return;if(!soloReady()){toggle('accountPanel',1);return}pad.capture=null;$('newGameError').textContent='';$('newGameDescription').textContent=cloud.session?tr('Zacząć przygodę od początku? Twój zapis solo na koncie zostanie zastąpiony na wszystkich urządzeniach. Postać, zasoby, narzędzia, baza, monety i zadania wrócą do stanu początkowego.'):tr('Zacząć przygodę od początku? Twój dotychczasowy zapis solo zostanie zastąpiony. Postać, zasoby, narzędzia, baza, monety i zadania wrócą do stanu początkowego.');toggle('newGamePanel',1);if(!padDevice)$('newGameCancel').focus();else focusPadButton($('newGameCancel'));
 }
 function restartSoloGame(){
  if(activePanel!=='newGamePanel'||net.room||net.joining)return;
  const fresh={version:10,P:{x:1500,y:1100},wood:0,stone:0,food:0,shells:0,fish:0,cookedFish:0,totalCaught:0,xpv:0,coins:0,health:100,energy:100,spear:0,rod:0,raft:0,treasure:0,secondFound:0,returned:0,baseLevel:0,basePos:null,campfire:0,questsDone:{fish:0,supplies:0}};
  if(cloud.session)return restartCloudSoloGame(fresh);
- try{localStorage.setItem(SAVE_KEY,JSON.stringify(fresh))}catch(e){$('newGameError').textContent='Nie udało się zapisać nowej gry. Poprzedni postęp został zachowany. Spróbuj ponownie.';return}
+ try{localStorage.setItem(SAVE_KEY,JSON.stringify(fresh))}catch(e){$('newGameError').textContent=tr('Nie udało się zapisać nowej gry. Poprzedni postęp został zachowany. Spróbuj ponownie.');return}
  try{localStorage.removeItem('myIsland08')}catch(e){}
  applyBank(fresh);P={...fresh.P};health=energy=100;populateSoloWorld();resting=blocking=lastAttack=hitFlash=walkPhase=0;face='down';moving=false;lastTime=0;lastAutosave=performance.now();lastUI=0;
- $('start').style.display='none';play=1;toggle('newGamePanel',0);cam.x=Math.max(0,Math.min(Math.max(0,WORLD.w-W),P.x-W/2));cam.y=Math.max(0,Math.min(Math.max(0,WORLD.h-H),P.y-H/2));draw();say('Nowa przygoda rozpoczęta! Wyspa czeka na ciebie.');
+ $('start').style.display='none';play=1;toggle('newGamePanel',0);cam.x=Math.max(0,Math.min(Math.max(0,WORLD.w-W),P.x-W/2));cam.y=Math.max(0,Math.min(Math.max(0,WORLD.h-H),P.y-H/2));draw();say(tr('Nowa przygoda rozpoczęta! Wyspa czeka na ciebie.'));
 }
 function block(){if(activePanel)return;blocking=1;setTimeout(()=>blocking=0,1200)}
 function attack(){
- if(activePanel)return;if(net.room)return roomAction({kind:'attack'});if(!spear)return say('Potrzebujesz włóczni. Zrobisz ją w warsztacie.');if(Date.now()-lastAttack<650)return;lastAttack=Date.now();
- let target=null,d=105;for(const e of E){const q=distance(P,e);if(q<d){d=q;target=e}}if(!target)return say('Nic w zasięgu włóczni.');
- target.hp-=2;if(target.hp<=0){E.splice(E.indexOf(target),1);coins+=20;xpv+=35;save();update();say('Dzik pokonany: +20 monet, +35 XP.')}
+ if(activePanel)return;if(net.room)return roomAction({kind:'attack'});if(!spear)return say(tr('Potrzebujesz włóczni. Zrobisz ją w warsztacie.'));if(Date.now()-lastAttack<650)return;lastAttack=Date.now();
+ let target=null,d=105;for(const e of E){const q=distance(P,e);if(q<d){d=q;target=e}}if(!target)return say(tr('Nic w zasięgu włóczni.'));
+ target.hp-=2;if(target.hp<=0){E.splice(E.indexOf(target),1);coins+=20;xpv+=35;save();update();say(tr('Dzik pokonany: +20 monet, +35 XP.'))}
 }
 function interact(){
  if(activePanel)return;
  if(net.room){let target=null,d=75;for(const o of O){const q=distance(P,o);if(q<d){d=q;target=o}}return roomAction({kind:'interact',...(target?{target:target.id}:{})})}
  if(distance(P,leon)<110)return toggle('shop',1);
  if(distance(P,nela)<110){
-  if(treasure&&!returned){returned=1;coins+=250;xpv+=300;save();say('Nela: Skarb odnaleziony! +250 monet, +300 XP.')}return toggle('nelaPanel',1);
+  if(treasure&&!returned){returned=1;coins+=250;xpv+=300;save();say(tr('Nela: Skarb odnaleziony! +250 monet, +300 XP.'))}return toggle('nelaPanel',1);
  }
- if(distance(P,chest)<110&&!treasure){treasure=1;coins+=500;xpv+=500;save();update();return say('Skarb zdobyty! Wróć do Neli w Północnej Zatoce.')}
+ if(distance(P,chest)<110&&!treasure){treasure=1;coins+=500;xpv+=500;save();update();return say(tr('Skarb zdobyty! Wróć do Neli w Północnej Zatoce.'))}
  const f=firePosition();if(campfire&&f&&distance(P,f)<95)return toggle('basePanel',1);
  let target=null,d=75;for(const o of O){const q=distance(P,o);if(q<d){d=q;target=o}}
- if(!target)return say('Podejdź do zasobu, mieszkańca albo ogniska.');
- if(--target.hp>0){target.shakeUntil=Date.now()+150;return say('Jeszcze jedno uderzenie.')}
+ if(!target)return say(tr('Podejdź do zasobu, mieszkańca albo ogniska.'));
+ if(--target.hp>0){target.shakeUntil=Date.now()+150;return say(tr('Jeszcze jedno uderzenie.'))}
  O.splice(O.indexOf(target),1);
- let found;if(target.t==='tree'){wood+=2;found='2 drewna'}else if(target.t==='rock'){stone++;found='1 kamień'}else if(target.t==='shell'){shells++;found='1 muszelka'}else{food++;found='1 kokos'}
- xpv+=10;coins+=2;save();update();say('Zebrano: '+found+'.');
+ let found;if(target.t==='tree'){wood+=2;found=tr('2 drewna')}else if(target.t==='rock'){stone++;found=tr('1 kamień')}else if(target.t==='shell'){shells++;found=tr('1 muszelka')}else{food++;found=tr('1 kokos')}
+ xpv+=10;coins+=2;save();update();say(tr('Zebrano: ')+found+'.');
 }
 function goFish(){
- if(activePanel)return;if(net.room)return roomAction({kind:'fish'});if(!rod)return say('Najpierw zrób wędkę w warsztacie.');
- if(!sea(P.x,P.y)&&![[-80,0],[80,0],[0,-80],[0,80]].some(([x,y])=>sea(P.x+x,P.y+y)))return say('Podejdź do brzegu, żeby łowić.');
- if(rand()<.7){fish++;totalCaught++;xpv+=20;say('Złowiona ryba! Upiecz ją lub sprzedaj Leonowi.')}else say('Ryba uciekła. Spróbuj ponownie.');save();update();
+ if(activePanel)return;if(net.room)return roomAction({kind:'fish'});if(!rod)return say(tr('Najpierw zrób wędkę w warsztacie.'));
+ if(!sea(P.x,P.y)&&![[-80,0],[80,0],[0,-80],[0,80]].some(([x,y])=>sea(P.x+x,P.y+y)))return say(tr('Podejdź do brzegu, żeby łowić.'));
+ if(rand()<.7){fish++;totalCaught++;xpv+=20;say(tr('Złowiona ryba! Upiecz ją lub sprzedaj Leonowi.'))}else say(tr('Ryba uciekła. Spróbuj ponownie.'));save();update();
 }
-function craftSpear(){if(net.room)return roomAction({kind:'craft',item:'spear'});if(spear)return say('Masz już włócznię.');if(wood<6||stone<4)return say('Potrzebujesz 6 drewna i 4 kamieni.');wood-=6;stone-=4;spear=1;done('Włócznia gotowa!')}
-function craftRod(){if(net.room)return roomAction({kind:'craft',item:'rod'});if(rod)return say('Masz już wędkę.');if(wood<5||shells<2)return say('Potrzebujesz 5 drewna i 2 muszelek.');wood-=5;shells-=2;rod=1;done('Wędka gotowa!')}
-function craftRaft(){if(net.room)return roomAction({kind:'craft',item:'raft'});if(raft)return say('Masz już tratwę.');if(wood<12||shells<6)return say('Potrzebujesz 12 drewna i 6 muszelek.');wood-=12;shells-=6;raft=1;done('Tratwa gotowa! Możesz przemierzać głębokie wody.')}
+function craftSpear(){if(net.room)return roomAction({kind:'craft',item:'spear'});if(spear)return say(tr('Masz już włócznię.'));if(wood<6||stone<4)return say(tr('Potrzebujesz 6 drewna i 4 kamieni.'));wood-=6;stone-=4;spear=1;done(tr('Włócznia gotowa!'))}
+function craftRod(){if(net.room)return roomAction({kind:'craft',item:'rod'});if(rod)return say(tr('Masz już wędkę.'));if(wood<5||shells<2)return say(tr('Potrzebujesz 5 drewna i 2 muszelek.'));wood-=5;shells-=2;rod=1;done(tr('Wędka gotowa!'))}
+function craftRaft(){if(net.room)return roomAction({kind:'craft',item:'raft'});if(raft)return say(tr('Masz już tratwę.'));if(wood<12||shells<6)return say(tr('Potrzebujesz 12 drewna i 6 muszelek.'));wood-=12;shells-=6;raft=1;done(tr('Tratwa gotowa! Możesz przemierzać głębokie wody.'))}
 function upgradeBase(level){
  if(net.room)return roomAction({kind:'base',level});
- if(level!==baseLevel+1)return say('Zbuduj kolejno poziomy L1, L2 i L3.');if(level===1&&sea(P.x,P.y))return say('Bazę zbuduj na lądzie.');
+ if(level!==baseLevel+1)return say(tr('Zbuduj kolejno poziomy L1, L2 i L3.'));if(level===1&&sea(P.x,P.y))return say(tr('Bazę zbuduj na lądzie.'));
  const w=[0,12,18,28][level],s=[0,8,12,18][level],c=[0,0,50,100][level];
- if(wood<w||stone<s||coins<c)return say('Brakuje materiałów lub monet.');wood-=w;stone-=s;coins-=c;baseLevel=level;
+ if(wood<w||stone<s||coins<c)return say(tr('Brakuje materiałów lub monet.'));wood-=w;stone-=s;coins-=c;baseLevel=level;
  if(!basePos){basePos={x:P.x+70,y:P.y+20};if(sea(basePos.x,basePos.y))basePos={x:P.x,y:P.y}}
- xpv+=level*100;toggle('basePanel',0);save();update();say('Baza L'+level+' gotowa! W pobliżu jesteś bezpieczny przed dzikami.');
+ xpv+=level*100;toggle('basePanel',0);save();update();say(tr('Baza L')+level+tr(' gotowa! W pobliżu jesteś bezpieczny przed dzikami.'));
 }
 function nearFire(){const f=firePosition();return campfire&&f&&distance(P,f)<150}
 function buildFire(){
  if(net.room)return roomAction({kind:'fire'});
- if(campfire)return say('Ognisko już płonie.');if(!baseLevel)return say('Najpierw zbuduj bazę L1.');
- if(distance(P,basePos)>150)return say('Wróć do swojej bazy, żeby rozpalić ognisko.');if(wood<4||stone<2)return say('Potrzebujesz 4 drewna i 2 kamieni.');
- wood-=4;stone-=2;campfire=1;xpv+=40;save();update();say('Ognisko płonie. Możesz piec ryby i odpoczywać.');
+ if(campfire)return say(tr('Ognisko już płonie.'));if(!baseLevel)return say(tr('Najpierw zbuduj bazę L1.'));
+ if(distance(P,basePos)>150)return say(tr('Wróć do swojej bazy, żeby rozpalić ognisko.'));if(wood<4||stone<2)return say(tr('Potrzebujesz 4 drewna i 2 kamieni.'));
+ wood-=4;stone-=2;campfire=1;xpv+=40;save();update();say(tr('Ognisko płonie. Możesz piec ryby i odpoczywać.'));
 }
 function cookFish(){
  if(net.room)return roomAction({kind:'cook'});
- if(!nearFire())return say('Podejdź do rozpalonego ogniska przy bazie.');if(fish<1||wood<1)return say('Potrzebujesz surowej ryby i 1 drewna.');
- fish--;wood--;cookedFish++;xpv+=10;save();update();say('Ryba upieczona! Znajdziesz ją w plecaku.');
+ if(!nearFire())return say(tr('Podejdź do rozpalonego ogniska przy bazie.'));if(fish<1||wood<1)return say(tr('Potrzebujesz surowej ryby i 1 drewna.'));
+ fish--;wood--;cookedFish++;xpv+=10;save();update();say(tr('Ryba upieczona! Znajdziesz ją w plecaku.'));
 }
 function eat(kind){
  if(net.room)return roomAction({kind:'eat',item:kind});
- if(health>=100&&energy>=100)return say('Masz pełne zdrowie i energię. Zachowaj jedzenie na później.');
- if(kind==='coconut'){if(food<1)return say('Nie masz kokosów.');food--;health=Math.min(100,health+20);energy=Math.min(100,energy+15)}
- else if(kind==='fish'){if(cookedFish<1)return say('Najpierw upiecz rybę przy ognisku.');cookedFish--;health=Math.min(100,health+45);energy=Math.min(100,energy+35)}
- else return;save();update();say('Jedzenie dodało ci sił.');
+ if(health>=100&&energy>=100)return say(tr('Masz pełne zdrowie i energię. Zachowaj jedzenie na później.'));
+ if(kind==='coconut'){if(food<1)return say(tr('Nie masz kokosów.'));food--;health=Math.min(100,health+20);energy=Math.min(100,energy+15)}
+ else if(kind==='fish'){if(cookedFish<1)return say(tr('Najpierw upiecz rybę przy ognisku.'));cookedFish--;health=Math.min(100,health+45);energy=Math.min(100,energy+35)}
+ else return;save();update();say(tr('Jedzenie dodało ci sił.'));
 }
 function restAtFire(){
  if(net.room){resetInput();return roomAction({kind:'rest'})}
- if(resting)return;if(!nearFire())return say('Podejdź do rozpalonego ogniska.');
- if(health>=100&&energy>=100)return say('Jesteś już wypoczęty.');resetInput();resting=5;update();say('Odpoczywasz przy ognisku…');
+ if(resting)return;if(!nearFire())return say(tr('Podejdź do rozpalonego ogniska.'));
+ if(health>=100&&energy>=100)return say(tr('Jesteś już wypoczęty.'));resetInput();resting=5;update();say(tr('Odpoczywasz przy ognisku…'));
 }
 const market={buy:{wood:{qty:5,price:20},stone:{qty:5,price:25},food:{qty:2,price:16}},sell:{wood:{qty:5,price:10},fish:{qty:1,price:12},shells:{qty:2,price:8}}};
 function resource(key,value){if(key==='wood'){if(value!==undefined)wood=value;return wood}if(key==='stone'){if(value!==undefined)stone=value;return stone}if(key==='food'){if(value!==undefined)food=value;return food}if(key==='fish'){if(value!==undefined)fish=value;return fish}if(key==='shells'){if(value!==undefined)shells=value;return shells}return 0}
 function trade(mode,key){
  if(net.room)return roomAction({kind:'trade',mode,item:key});
- if(distance(P,leon)>=110)return say('Podejdź do Leona przy obozowisku.');const offer=market[mode]?.[key];if(!offer)return;
- if(mode==='buy'){if(coins<offer.price)return say('Za mało monet.');coins-=offer.price;resource(key,resource(key)+offer.qty)}
- else{if(resource(key)<offer.qty)return say('Za mało zasobów na sprzedaż.');resource(key,resource(key)-offer.qty);coins+=offer.price}
- save();update();say(mode==='buy'?'Zakup udany.':'Zasoby sprzedane.');
+ if(distance(P,leon)>=110)return say(tr('Podejdź do Leona przy obozowisku.'));const offer=market[mode]?.[key];if(!offer)return;
+ if(mode==='buy'){if(coins<offer.price)return say(tr('Za mało monet.'));coins-=offer.price;resource(key,resource(key)+offer.qty)}
+ else{if(resource(key)<offer.qty)return say(tr('Za mało zasobów na sprzedaż.'));resource(key,resource(key)-offer.qty);coins+=offer.price}
+ save();update();say(mode==='buy'?tr('Zakup udany.'):tr('Zasoby sprzedane.'));
 }
 function deliverQuest(key){
  if(net.room)return roomAction({kind:'quest',item:key});
- if(questsDone[key])return say('To zadanie jest już ukończone.');
+ if(questsDone[key])return say(tr('To zadanie jest już ukończone.'));
  if(key==='supplies'){
-  if(distance(P,leon)>=110)return say('Dostarcz materiały Leonowi.');if(wood<6||stone<4)return say('Leon potrzebuje 6 drewna i 4 kamieni.');
+  if(distance(P,leon)>=110)return say(tr('Dostarcz materiały Leonowi.'));if(wood<6||stone<4)return say(tr('Leon potrzebuje 6 drewna i 4 kamieni.'));
   wood-=6;stone-=4;coins+=40;xpv+=60;
  }else if(key==='fish'){
-  if(distance(P,nela)>=110)return say('Dostarcz ryby Neli w Północnej Zatoce.');if(fish+cookedFish<3)return say('Nela potrzebuje 3 ryb.');
+  if(distance(P,nela)>=110)return say(tr('Dostarcz ryby Neli w Północnej Zatoce.'));if(fish+cookedFish<3)return say(tr('Nela potrzebuje 3 ryb.'));
   const raw=Math.min(fish,3);fish-=raw;cookedFish-=3-raw;coins+=70;xpv+=80;
  }else return;
- questsDone[key]=1;save();update();say('Dostawa przyjęta! Otrzymujesz monety i XP.');
+ questsDone[key]=1;save();update();say(tr('Dostawa przyjęta! Otrzymujesz monety i XP.'));
 }
 function done(text){toggle('craft',0);xpv+=40;save();update();say(text)}
 function toggle(id,on){if(!panels.includes(id)||cloud.resetting)return;if(net.joining&&!net.room&&(id!=='roomPanel'||!on))cancelRoomJoin();for(const name of panels)$(name).style.display='none';activePanel=on?id:null;if(on)$(id).style.display='block';pad.capture=null;focusPadButton(null);resetInput();if(id==='controllerPanel')updatePadUI();if(id==='roomPanel')updateRoomUI();if(on&&padDevice)focusPadMenu();update()}
 function update(){
  updateCloudUI();
  for(const id of ['newSoloStart','newSoloButton','newSoloPad'])$(id).style.display=net.room?'none':'';
- $('bagIntro').textContent=net.room?'Wspólne zasoby drużyny. Jedzenie leczy osobę, która je zjada.':'Zjedz coś przed kolejną wyprawą.';$('baseIntro').textContent=net.room?'Wspólna baza i ognisko całej drużyny.':'Twoje miejsce odpoczynku.';
- const values={hp:Math.round(health),en:Math.round(energy),xp:xpv,co:coins,wo:wood,st:stone,fo:food,sh:shells,fi:fish+cookedFish,bl:baseLevel,baseLevel,bw:wood,bs:stone,bf:food,bsh:shells,bfi:fish,bcf:cookedFish,bp:spear?'jest':'brak',br:rod?'jest':'brak',bra:raft?'jest':'brak',bt:treasure?'zdobyty':'brak',shopCoins:coins};
+ $('bagIntro').textContent=net.room?tr('Wspólne zasoby drużyny. Jedzenie leczy osobę, która je zjada.'):tr('Zjedz coś przed kolejną wyprawą.');$('baseIntro').textContent=net.room?tr('Wspólna baza i ognisko całej drużyny.'):tr('Twoje miejsce odpoczynku.');
+ const values={hp:Math.round(health),en:Math.round(energy),xp:xpv,co:coins,wo:wood,st:stone,fo:food,sh:shells,fi:fish+cookedFish,bl:baseLevel,baseLevel,bw:wood,bs:stone,bf:food,bsh:shells,bfi:fish,bcf:cookedFish,bp:spear?tr('jest'):tr('brak'),br:rod?tr('jest'):tr('brak'),bra:raft?tr('jest'):tr('brak'),bt:treasure?tr('zdobyty'):tr('brak'),shopCoins:coins};
  for(const [id,value] of Object.entries(values))$(id).textContent=value;
- $('zn').textContent=island2(P.x,P.y)?'Wyspa Skarbu':deep(P.x,P.y)?'Głębokie wody':sea(P.x,P.y)?raft?'Na tratwie':'Pływanie':P.x>3050&&P.y<850?'Północna Zatoka':'Wnętrze wyspy';
- $('fireBuild').disabled=!!campfire;$('restButton').disabled=resting>0;$('restButton').textContent=resting?'Odpoczynek '+Math.ceil(resting)+' s':'Odpocznij';
- $('fireStatus').textContent=campfire?'Ognisko płonie. Gotuj i odpoczywaj w jego pobliżu.':'Zbuduj bazę L1, potem rozpal ognisko.';
+ $('zn').textContent=island2(P.x,P.y)?tr('Wyspa Skarbu'):deep(P.x,P.y)?tr('Głębokie wody'):sea(P.x,P.y)?raft?tr('Na tratwie'):tr('Pływanie'):P.x>3050&&P.y<850?tr('Północna Zatoka'):tr('Wnętrze wyspy');
+ $('fireBuild').disabled=!!campfire;$('restButton').disabled=resting>0;$('restButton').textContent=resting?tr('Odpoczynek ')+Math.ceil(resting)+' s':tr('Odpocznij');
+ $('fireStatus').textContent=campfire?tr('Ognisko płonie. Gotuj i odpoczywaj w jego pobliżu.'):tr('Zbuduj bazę L1, potem rozpal ognisko.');
  $('supplyButton').disabled=!!questsDone.supplies;$('fishQuestButton').disabled=!!questsDone.fish;
- $('supplyQuest').textContent=questsDone.supplies?'Dostawa ukończona ✓':'Nagroda: 40 monet + 60 XP';
- $('fishQuest').textContent=questsDone.fish?'Dostawa ukończona ✓':'Dostarcz 3 ryby (surowe lub pieczone). Nagroda: 70 monet + 80 XP';
- $('treasureQuest').textContent=returned?'Skarb odnaleziony i oddany Neli. Gratulacje!':treasure?'Skarb masz w plecaku. Porozmawiaj z Nelą.':'Zbuduj tratwę i znajdź drugą wyspę na południowym wschodzie.';
- let title='Wyprawa po skarb',text,detail;
- if(!rod){text='Zbuduj wędkę.';detail='5 drewna + 2 muszelki. Muszelek szukaj na plaży.'}
- else if(totalCaught<3){text='Złów 3 ryby: '+totalCaught+'/3';detail='Podejdź do brzegu i użyj ŁÓW.'}
- else if(!raft){text='Zbuduj tratwę.';detail='12 drewna + 6 muszelek.'}
- else if(!secondFound){text='Znajdź drugą wyspę.';detail='Płyń na południowy wschód.'}
- else if(!treasure){text='Przeszukaj Wyspę Skarbu.';detail='Znajdź skrzynię i użyj DZIAŁAJ.'}
- else if(!returned){text='Wróć do Neli.';detail='Czeka w Północnej Zatoce.'}
- else{title='Żywa wyspa';text=questsDone.fish&&questsDone.supplies?'Mieszkańcy dziękują za pomoc!':'Pomóż mieszkańcom.';detail='Nela potrzebuje ryb, Leon materiałów. Rozwijaj bazę.'}
+ $('supplyQuest').textContent=questsDone.supplies?tr('Dostawa ukończona ✓'):tr('Nagroda: 40 monet + 60 XP');
+ $('fishQuest').textContent=questsDone.fish?tr('Dostawa ukończona ✓'):tr('Dostarcz 3 ryby (surowe lub pieczone). Nagroda: 70 monet + 80 XP');
+ $('treasureQuest').textContent=returned?tr('Skarb odnaleziony i oddany Neli. Gratulacje!'):treasure?tr('Skarb masz w plecaku. Porozmawiaj z Nelą.'):tr('Zbuduj tratwę i znajdź drugą wyspę na południowym wschodzie.');
+ let title=tr('Wyprawa po skarb'),text,detail;
+ if(!rod){text=tr('Zbuduj wędkę.');detail=tr('5 drewna + 2 muszelki. Muszelek szukaj na plaży.')}
+ else if(totalCaught<3){text=tr('Złów 3 ryby: ')+totalCaught+'/3';detail=tr('Podejdź do brzegu i użyj ŁÓW.')}
+ else if(!raft){text=tr('Zbuduj tratwę.');detail=tr('12 drewna + 6 muszelek.')}
+ else if(!secondFound){text=tr('Znajdź drugą wyspę.');detail=tr('Płyń na południowy wschód.')}
+ else if(!treasure){text=tr('Przeszukaj Wyspę Skarbu.');detail=tr('Znajdź skrzynię i użyj DZIAŁAJ.')}
+ else if(!returned){text=tr('Wróć do Neli.');detail=tr('Czeka w Północnej Zatoce.')}
+ else{title=tr('Żywa wyspa');text=questsDone.fish&&questsDone.supplies?tr('Mieszkańcy dziękują za pomoc!'):tr('Pomóż mieszkańcom.');detail=tr('Nela potrzebuje ryb, Leon materiałów. Rozwijaj bazę.')}
  $('qt').textContent=title;$('qx').textContent=text;$('qp').textContent=detail;
- let hint='';if(!activePanel){if(distance(P,leon)<110)hint='Leon: handel i dostawa · DZIAŁAJ';else if(distance(P,nela)<110)hint='Nela: zadania · DZIAŁAJ';else if(nearFire())hint='Ognisko: gotuj i odpoczywaj · DZIAŁAJ';else if(O.some(o=>distance(P,o)<75))hint='Zasób w zasięgu · DZIAŁAJ'}
+ let hint='';if(!activePanel){if(distance(P,leon)<110)hint=tr('Leon: handel i dostawa · DZIAŁAJ');else if(distance(P,nela)<110)hint=tr('Nela: zadania · DZIAŁAJ');else if(nearFire())hint=tr('Ognisko: gotuj i odpoczywaj · DZIAŁAJ');else if(O.some(o=>distance(P,o)<75))hint=tr('Zasób w zasięgu · DZIAŁAJ')}
  $('hint').textContent=hint;$('hint').style.display=hint?'block':'none';
 }
-function say(text){$('msg').textContent=text;$('msg').classList.add('on');clearTimeout(msgTimer);msgTimer=setTimeout(()=>$('msg').classList.remove('on'),2600)}
+function say(text){$('msg').textContent=tr(text);$('msg').classList.add('on');clearTimeout(msgTimer);msgTimer=setTimeout(()=>$('msg').classList.remove('on'),2600)}
 function save(){
  if(net.room||!soloReady())return;const state=soloSnapshot();if(cloud.session){if(!cloud.cache)return;if(JSON.stringify(state)!==JSON.stringify(cloud.cache.state)){cloud.cache.state=state;cloud.cache.dirty=true;persistCloudCache()}flushCloud();updateCloudUI();return}try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(e){}
 }
@@ -817,34 +829,34 @@ function load(){
 }
 function soloReady(){return !!net.room||!cloud.authBusy&&(!cloud.session||cloud.ready&&!cloud.loading&&!cloud.conflict&&!cloud.resetting)}
 function cloudID(){return typeof crypto.randomUUID==='function'?crypto.randomUUID():Array.from(crypto.getRandomValues(new Uint8Array(20)),n=>n.toString(16).padStart(2,'0')).join('')}
-function persistCloudCache(){if(!cloud.session||!cloud.cache)return;try{localStorage.setItem(CLOUD_CACHE_PREFIX+cloud.session.id,JSON.stringify(cloud.cache))}catch(e){cloud.error='Nie mogę zapisać kopii na tym urządzeniu. Sprawdź zapis w chmurze przed zamknięciem gry.'}}
+function persistCloudCache(){if(!cloud.session||!cloud.cache)return;try{localStorage.setItem(CLOUD_CACHE_PREFIX+cloud.session.id,JSON.stringify(cloud.cache))}catch(e){cloud.error=tr('Nie mogę zapisać kopii na tym urządzeniu. Sprawdź zapis w chmurze przed zamknięciem gry.')}}
 function updateCloudUI(){
- const s=cloud.session;let status=s?'Wczytuję twoją wyspę…':'Zapis tylko na tym urządzeniu. Zaloguj się, aby go zabezpieczyć.';
- if(s){status=cloud.conflict?'Nowszy zapis czeka w chmurze. Wybierz wersję wyspy poniżej.':cloud.loading?'Wczytuję twoją wyspę…':cloud.needsLogin?cloud.error:cloud.busy?'Zapisuję w chmurze…':cloud.cache?.dirty?(cloud.error||'Zapis na urządzeniu czeka na wysłanie do chmury.'):cloud.error||'Zapisano w chmurze'+(cloud.updatedAt?' · '+new Date(cloud.updatedAt).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'')}
+ const s=cloud.session;let status=s?tr('Wczytuję twoją wyspę…'):tr('Zapis tylko na tym urządzeniu. Zaloguj się, aby go zabezpieczyć.');
+ if(s){status=cloud.conflict?tr('Nowszy zapis czeka w chmurze. Wybierz wersję wyspy poniżej.'):cloud.loading?tr('Wczytuję twoją wyspę…'):cloud.needsLogin?cloud.error:cloud.busy?tr('Zapisuję w chmurze…'):cloud.cache?.dirty?(cloud.error||tr('Zapis na urządzeniu czeka na wysłanie do chmury.')):cloud.error||tr('Zapisano w chmurze')+(cloud.updatedAt?' · '+new Date(cloud.updatedAt).toLocaleTimeString(MyIslandI18n.locale(),{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'')}
  else if(cloud.error)status=cloud.error;
- $('accountLabel').textContent=s?s.label:'Grasz bez konta';$('cloudStatus').textContent=status;$('cloudStatus').classList.toggle('warning',!!cloud.error||!!cloud.conflict);$('cloudStartStatus').textContent=status;
- $('accountButton').textContent=!s?'☁️ KONTO':cloud.conflict||cloud.needsLogin?'☁️ SPRAWDŹ ZAPIS':cloud.loading?'☁️ WCZYTUJĘ…':cloud.busy?'☁️ ZAPISUJĘ…':cloud.cache?.dirty?'☁️ CZEKA NA SIEĆ':'☁️ ZAPISANO';
+ $('accountLabel').textContent=s?s.label:tr('Grasz bez konta');$('cloudStatus').textContent=tr(status);$('cloudStatus').classList.toggle('warning',!!cloud.error||!!cloud.conflict);$('cloudStartStatus').textContent=tr(status);
+ $('accountButton').textContent=!s?tr('☁️ KONTO'):cloud.conflict||cloud.needsLogin?tr('☁️ SPRAWDŹ ZAPIS'):cloud.loading?tr('☁️ WCZYTUJĘ…'):cloud.busy?tr('☁️ ZAPISUJĘ…'):cloud.cache?.dirty?tr('☁️ CZEKA NA SIEĆ'):tr('☁️ ZAPISANO');
  const legacy=s&&s.authMode==='legacy'&&!cloud.needsLogin,linking=legacy&&cloud.form==='register',rotating=s&&!cloud.needsLogin&&cloud.form==='rotate-recovery';
  $('cloudAnonymous').style.display=!s||cloud.needsLogin||linking||rotating?'block':'none';$('cloudLegacy').style.display=legacy&&!linking?'block':'none';$('cloudSigned').style.display=s&&!cloud.needsLogin?'block':'none';$('cloudConflict').style.display=cloud.conflict?'block':'none';$('cloudRotate').style.display=s?.authMode==='email'&&!cloud.needsLogin&&!rotating&&!cloud.recovery?'block':'none';
  const disabled=!!net.room||net.joining||cloud.loading||cloud.busy||cloud.resetting||cloud.authBusy;
  const mode=cloud.form,creating=mode==='register',recovering=mode==='recover';
- $('cloudFormTitle').textContent=rotating?'Nowy kod odzyskiwania':recovering?'Odzyskaj swoją wyspę':creating?(linking?'Dodaj e-mail do obecnej wyspy':'Załóż konto My Island'):'Zaloguj się do My Island';
- $('cloudLogin').textContent=cloud.authBusy?'Chwileczkę…':rotating?'Utwórz nowy kod':recovering?'Ustaw nowe hasło':creating?'Załóż konto i zachowaj wyspę':'Zaloguj się';$('cloudLogin').disabled=disabled;
+ $('cloudFormTitle').textContent=rotating?tr('Nowy kod odzyskiwania'):recovering?tr('Odzyskaj swoją wyspę'):creating?(linking?tr('Dodaj e-mail do obecnej wyspy'):tr('Załóż konto My Island')):tr('Zaloguj się do My Island');
+ $('cloudLogin').textContent=cloud.authBusy?tr('Chwileczkę…'):rotating?tr('Utwórz nowy kod'):recovering?tr('Ustaw nowe hasło'):creating?tr('Załóż konto i zachowaj wyspę'):tr('Zaloguj się');$('cloudLogin').disabled=disabled;
  for(const id of ['cloudEmail','cloudPassword','cloudPasswordRepeat','cloudRecoveryInput','cloudLoginTab','cloudRegisterTab','cloudForgot','cloudAuthCancel','cloudLinkEmail'])$(id).disabled=disabled;
  $('cloudLoginTab').setAttribute('aria-pressed',String(mode==='login'));$('cloudRegisterTab').setAttribute('aria-pressed',String(creating));$('cloudAuthTabs').style.display=linking||rotating?'none':'flex';
- $('cloudEmailField').style.display=rotating?'none':'grid';$('cloudEmail').required=!rotating;$('cloudPassword').autocomplete=creating||recovering?'new-password':'current-password';$('cloudPasswordLabel').textContent=recovering?'Nowe hasło':'Hasło';
+ $('cloudEmailField').style.display=rotating?'none':'grid';$('cloudEmail').required=!rotating;$('cloudPassword').autocomplete=creating||recovering?'new-password':'current-password';$('cloudPasswordLabel').textContent=recovering?tr('Nowe hasło'):tr('Hasło');
  $('cloudRepeatField').style.display=creating||recovering?'grid':'none';$('cloudPasswordRepeat').required=creating||recovering;$('cloudRecoveryField').style.display=recovering?'grid':'none';$('cloudRecoveryInput').required=recovering;
- $('cloudForgot').style.display=mode==='login'?'block':'none';$('cloudAuthCancel').style.display=linking||rotating||recovering?'block':'none';$('cloudAuthError').textContent=cloud.authError;
- $('cloudFormNote').textContent=rotating?'Potwierdź obecnym hasłem. Zapisz nowy kod poza telefonem. Poprzedni kod przestanie działać.':recovering?'Wpisz kod zachowany przy zakładaniu konta. Po zmianie hasła otrzymasz nowy kod odzyskiwania.':creating?'Po założeniu konta otrzymasz kod odzyskiwania. Zapisz go poza telefonem, aby móc odzyskać konto po zapomnieniu hasła.':'Na innym urządzeniu wpisz ten sam e-mail i hasło, aby wczytać swoją wyspę.';
+ $('cloudForgot').style.display=mode==='login'?'block':'none';$('cloudAuthCancel').style.display=linking||rotating||recovering?'block':'none';$('cloudAuthError').textContent=tr(cloud.authError);
+ $('cloudFormNote').textContent=rotating?tr('Potwierdź obecnym hasłem. Zapisz nowy kod poza telefonem. Poprzedni kod przestanie działać.'):recovering?tr('Wpisz kod zachowany przy zakładaniu konta. Po zmianie hasła otrzymasz nowy kod odzyskiwania.'):creating?tr('Po założeniu konta otrzymasz kod odzyskiwania. Zapisz go poza telefonem, aby móc odzyskać konto po zapomnieniu hasła.'):tr('Na innym urządzeniu wpisz ten sam e-mail i hasło, aby wczytać swoją wyspę.');
  $('cloudImportNote').style.display=!s&&!recovering?'block':'none';$('cloudRecovery').style.display=cloud.recovery?'block':'none';
  $('cloudSaveNow').disabled=disabled||!cloud.ready||!!cloud.conflict;$('cloudLogout').disabled=disabled||!!cloud.conflict;
  $('cloudRetry').style.display=s&&(cloud.error||cloud.cache?.dirty)&&!cloud.needsLogin&&!cloud.conflict?'inline-block':'none';$('cloudRetry').disabled=cloud.loading||cloud.busy;
 }
 async function accountRequest(payload,keepalive=false){
  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),10000);
- try{const response=await fetch(ACCOUNT_API,{method:'POST',mode:'cors',credentials:'omit',cache:'no-store',keepalive,headers:{'Content-Type':'application/json'},body:JSON.stringify({version:12,...payload}),signal:controller.signal});let data;try{data=await response.json()}catch(e){throw new Error('Nie mogę odczytać zapisu w chmurze.')}
-  if(!response.ok||data.error)throw Object.assign(new Error(data.error||'Nie mogę połączyć się z chmurą.'),{status:response.status,data});return data;
- }catch(error){if(error.name==='AbortError')throw new Error('Zapis w chmurze nie odpowiada. Postęp czeka na tym urządzeniu.');throw error}finally{clearTimeout(timeout)}
+ try{const response=await fetch(ACCOUNT_API,{method:'POST',mode:'cors',credentials:'omit',cache:'no-store',keepalive,headers:{'Content-Type':'application/json'},body:JSON.stringify({version:12,...payload}),signal:controller.signal});let data;try{data=await response.json()}catch(e){throw new Error(tr('Nie mogę odczytać zapisu w chmurze.'))}
+  if(!response.ok||data.error)throw Object.assign(new Error(data.error||tr('Nie mogę połączyć się z chmurą.')),{status:response.status,data});return data;
+ }catch(error){if(error.name==='AbortError')throw new Error(tr('Zapis w chmurze nie odpowiada. Postęp czeka na tym urządzeniu.'));throw error}finally{clearTimeout(timeout)}
 }
 function showAccountForm(mode){
  if(cloud.authBusy)return;cloud.form=mode;cloud.authError='';$('cloudPassword').value='';$('cloudPasswordRepeat').value='';$('cloudRecoveryInput').value='';
@@ -853,29 +865,29 @@ function showAccountForm(mode){
 }
 function hideAccountForm(){if(cloud.authBusy)return;showAccountForm('login')}
 async function submitAccountForm(){
- if(net.room||net.joining)return say('Wróć do solo przed zalogowaniem.');if(cloud.loading||cloud.busy||cloud.resetting||cloud.authBusy)return;
+ if(net.room||net.joining)return say(tr('Wróć do solo przed zalogowaniem.'));if(cloud.loading||cloud.busy||cloud.resetting||cloud.authBusy)return;
  const op=cloud.form,email=$('cloudEmail').value.trim().toLowerCase(),password=$('cloudPassword').value.normalize('NFC');
- cloud.authError='';if(op!=='rotate-recovery'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))cloud.authError='Wpisz prawidłowy adres e-mail.';
- else if(Array.from(password).length<15||Array.from(password).length>128)cloud.authError='Hasło musi mieć od 15 do 128 znaków.';
- else if(['register','recover'].includes(op)&&password!==$('cloudPasswordRepeat').value.normalize('NFC'))cloud.authError='Oba hasła muszą być takie same.';
- else if(op==='recover'&&!$('cloudRecoveryInput').value.trim())cloud.authError='Wpisz zachowany kod odzyskiwania.';
+ cloud.authError='';if(op!=='rotate-recovery'&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))cloud.authError=tr('Wpisz prawidłowy adres e-mail.');
+ else if(Array.from(password).length<15||Array.from(password).length>128)cloud.authError=tr('Hasło musi mieć od 15 do 128 znaków.');
+ else if(['register','recover'].includes(op)&&password!==$('cloudPasswordRepeat').value.normalize('NFC'))cloud.authError=tr('Oba hasła muszą być takie same.');
+ else if(op==='recover'&&!$('cloudRecoveryInput').value.trim())cloud.authError=tr('Wpisz zachowany kod odzyskiwania.');
  if(cloud.authError){updateCloudUI();return}
  if(!cloud.session&&!play)load();save();const guestState=!cloud.session?soloSnapshot():null;cloud.authBusy=true;updateCloudUI();resetInput();
  try{
   const linking=op==='register'&&cloud.session&&!cloud.needsLogin&&cloud.session.authMode==='legacy';
-  if(linking&&!await flushCloud(true))throw new Error('Najpierw zapisz obecną wyspę w chmurze, a potem dodaj e-mail i hasło.');
+  if(linking&&!await flushCloud(true))throw new Error(tr('Najpierw zapisz obecną wyspę w chmurze, a potem dodaj e-mail i hasło.'));
   if(op==='rotate-recovery')await flushCloud(true);
   const data=await accountRequest({op,email,password,...(op==='recover'?{recoveryCode:$('cloudRecoveryInput').value}:{}),...(linking||op==='rotate-recovery'?{token:cloud.session.token}:{})});
   if(op!=='rotate-recovery'){cloud.epoch++;cloud.nextTry=0;await acceptCloudAccount(data,data.token,guestState)}
   $('cloudPassword').value='';$('cloudPasswordRepeat').value='';$('cloudRecoveryInput').value='';cloud.form='login';cloud.authError='';
-  if(data.recoveryCode){cloud.recovery=data.recoveryCode;$('cloudRecoveryKey').value=data.recoveryCode;$('cloudRecoveryStatus').textContent='Kod jest wyświetlany teraz. Zachowaj go przed zamknięciem strony.'}
+  if(data.recoveryCode){cloud.recovery=data.recoveryCode;$('cloudRecoveryKey').value=data.recoveryCode;$('cloudRecoveryStatus').textContent=tr('Kod jest wyświetlany teraz. Zachowaj go przed zamknięciem strony.')}
   else dismissRecoveryCode();
-  say(op==='recover'?'Hasło zmienione. Twoja wyspa jest zachowana.':op==='rotate-recovery'?'Nowy kod gotowy — zapisz go.':'Konto połączone. Sprawdź stan zapisu w chmurze.');
- }catch(error){cloud.authError=error.message||'Nie udało się połączyć z kontem. Spróbuj ponownie.';if(error.status===401&&cloud.session&&op==='rotate-recovery')cloud.authError='Sprawdź hasło lub zaloguj się ponownie.'}
+  say(op==='recover'?tr('Hasło zmienione. Twoja wyspa jest zachowana.'):op==='rotate-recovery'?tr('Nowy kod gotowy — zapisz go.'):tr('Konto połączone. Sprawdź stan zapisu w chmurze.'));
+ }catch(error){cloud.authError=error.message||tr('Nie udało się połączyć z kontem. Spróbuj ponownie.');if(error.status===401&&cloud.session&&op==='rotate-recovery')cloud.authError=tr('Sprawdź hasło lub zaloguj się ponownie.')}
  finally{cloud.authBusy=false;updateCloudUI()}
 }
 async function copyRecoveryCode(){
- if(!cloud.recovery)return;try{if(!navigator.clipboard?.writeText)throw new Error();await navigator.clipboard.writeText(cloud.recovery);$('cloudRecoveryStatus').textContent='Kod skopiowany. Zachowaj go poza telefonem.'}catch{$('cloudRecoveryKey').focus();$('cloudRecoveryKey').select();$('cloudRecoveryStatus').textContent='Zaznaczyłem kod. Skopiuj go lub zapisz na kartce.'}
+ if(!cloud.recovery)return;try{if(!navigator.clipboard?.writeText)throw new Error();await navigator.clipboard.writeText(cloud.recovery);$('cloudRecoveryStatus').textContent=tr('Kod skopiowany. Zachowaj go poza telefonem.')}catch{$('cloudRecoveryKey').focus();$('cloudRecoveryKey').select();$('cloudRecoveryStatus').textContent=tr('Zaznaczyłem kod. Skopiuj go lub zapisz na kartce.')}
 }
 function dismissRecoveryCode(){cloud.recovery=null;$('cloudRecoveryKey').value='';$('cloudRecoveryStatus').textContent='';updateCloudUI()}
 function cacheForAccount(id){try{const c=JSON.parse(localStorage.getItem(CLOUD_CACHE_PREFIX+id));if(c&&c.state?.version===10&&Number.isInteger(c.revision))return c}catch(e){}return null}
@@ -888,10 +900,10 @@ async function acceptCloudAccount(data,token,guestState=null){
  cloud.ready=true;cloud.loading=false;persistCloudCache();updateCloudUI();if(cloud.cache.dirty)await flushCloud(true);
 }
 async function bootCloud(){
- let callback=null;try{if(typeof location!=='undefined'){const fragment=new URLSearchParams(location.hash.slice(1));if(fragment.has('island-login')){const code=fragment.get('island-login'),state=fragment.get('state');history.replaceState(null,'',location.pathname+location.search);const pending=JSON.parse(sessionStorage.getItem(CLOUD_LOGIN_KEY));sessionStorage.removeItem(CLOUD_LOGIN_KEY);if(!pending||pending.state!==state||Date.now()-pending.startedAt>600000||!/^[a-f0-9]{64}$/.test(code||''))throw new Error('Logowanie nie zostało potwierdzone w tej przeglądarce. Spróbuj ponownie.');callback={op:'exchange',code,verifier:pending.verifier}}}}catch(e){cloud.error=e.message;updateCloudUI();toggle('accountPanel',1);return}
+ let callback=null;try{if(typeof location!=='undefined'){const fragment=new URLSearchParams(location.hash.slice(1));if(fragment.has('island-login')){const code=fragment.get('island-login'),state=fragment.get('state');history.replaceState(null,'',location.pathname+location.search);const pending=JSON.parse(sessionStorage.getItem(CLOUD_LOGIN_KEY));sessionStorage.removeItem(CLOUD_LOGIN_KEY);if(!pending||pending.state!==state||Date.now()-pending.startedAt>600000||!/^[a-f0-9]{64}$/.test(code||''))throw new Error(tr('Logowanie nie zostało potwierdzone w tej przeglądarce. Spróbuj ponownie.'));callback={op:'exchange',code,verifier:pending.verifier}}}}catch(e){cloud.error=e.message;updateCloudUI();toggle('accountPanel',1);return}
  if(!callback&&!cloud.session){updateCloudUI();return}
  cloud.loading=true;cloud.ready=false;updateCloudUI();
- try{const data=await accountRequest(callback||{op:'load',token:cloud.session.token});await acceptCloudAccount(data,data.token);if(callback){toggle('accountPanel',1);say(cloud.cache?.dirty?'Konto połączone. Sprawdź stan zapisu przed zmianą urządzenia.':'Konto połączone. Twoja wyspa ma zapis w chmurze.')}}
+ try{const data=await accountRequest(callback||{op:'load',token:cloud.session.token});await acceptCloudAccount(data,data.token);if(callback){toggle('accountPanel',1);say(cloud.cache?.dirty?tr('Konto połączone. Sprawdź stan zapisu przed zmianą urządzenia.'):tr('Konto połączone. Twoja wyspa ma zapis w chmurze.'))}}
  catch(error){cloud.loading=false;cloud.error=error.message;cloud.needsLogin=error.status===401;const cache=cloud.session&&cacheForAccount(cloud.session.id);if(cache&&!cloud.needsLogin){cloud.cache=cache;cloud.revision=cache.revision;cloud.updatedAt=cache.updatedAt||0;cloud.ready=true;applySoloSnapshot(cache.state)}else cloud.ready=!cloud.session;updateCloudUI();toggle('accountPanel',1)}
 }
 async function flushCloud(force=false){
@@ -902,40 +914,47 @@ async function flushCloud(force=false){
    const data=await accountRequest({op:'save',token:cloud.session.token,...pending},force);if(epoch!==cloud.epoch)return false;
    const stillSame=JSON.stringify(cloud.cache.state)===JSON.stringify(pending.state);cloud.revision=data.save.revision;cloud.updatedAt=data.save.updatedAt;cloud.cache.revision=cloud.revision;cloud.cache.updatedAt=cloud.updatedAt;cloud.cache.pending=null;cloud.cache.dirty=!stillSame;if(stillSame)cloud.cache.state=data.save.state;if(pending.reset){applySoloSnapshot(data.save.state);cloud.ready=true}cloud.error='';cloud.nextTry=0;persistCloudCache();
   }return !cloud.cache.dirty;
-  }catch(error){if(epoch!==cloud.epoch)return false;cloud.error=error.message||'Brak sieci — postęp czeka na tym urządzeniu.';cloud.nextTry=Date.now()+5000;if(error.data?.conflict){cloud.conflict=error.data.save;resetInput();toggle('accountPanel',1)}if(error.status===401){cloud.needsLogin=true;cloud.ready=false;resetInput();toggle('accountPanel',1)}persistCloudCache();return false;
+  }catch(error){if(epoch!==cloud.epoch)return false;cloud.error=error.message||tr('Brak sieci — postęp czeka na tym urządzeniu.');cloud.nextTry=Date.now()+5000;if(error.data?.conflict){cloud.conflict=error.data.save;resetInput();toggle('accountPanel',1)}if(error.status===401){cloud.needsLogin=true;cloud.ready=false;resetInput();toggle('accountPanel',1)}persistCloudCache();return false;
   }finally{if(epoch===cloud.epoch){cloud.busy=false;cloud.promise=null;updateCloudUI()}}
  })();return cloud.promise;
 }
-async function saveCloudNow(){if(!cloud.session||net.room)return;save();const ok=await flushCloud(true);say(ok?'Zapisano twoją wyspę w chmurze.':'Sprawdź stan zapisu w oknie konta.');updateCloudUI()}
+async function saveCloudNow(){if(!cloud.session||net.room)return;save();const ok=await flushCloud(true);say(ok?tr('Zapisano twoją wyspę w chmurze.'):tr('Sprawdź stan zapisu w oknie konta.'));updateCloudUI()}
 async function retryCloud(){if(!cloud.session)return;cloud.nextTry=0;if(!cloud.ready||!cloud.cache)return bootCloud();return flushCloud(true)}
 async function resolveCloudConflict(useCurrent){
- if(!cloud.conflict||cloud.busy)return;const latest=cloud.conflict;try{localStorage.setItem(CLOUD_CACHE_PREFIX+cloud.session.id+':backup:'+Date.now(),JSON.stringify(cloud.cache))}catch(e){cloud.error='Nie mogę zachować kopii bieżącej wyspy. Spróbuj ponownie po zwolnieniu miejsca w przeglądarce.';updateCloudUI();return}
+ if(!cloud.conflict||cloud.busy)return;const latest=cloud.conflict;try{localStorage.setItem(CLOUD_CACHE_PREFIX+cloud.session.id+':backup:'+Date.now(),JSON.stringify(cloud.cache))}catch(e){cloud.error=tr('Nie mogę zachować kopii bieżącej wyspy. Spróbuj ponownie po zwolnieniu miejsca w przeglądarce.');updateCloudUI();return}
  cloud.conflict=null;cloud.error='';cloud.revision=latest?.revision||0;cloud.updatedAt=latest?.updatedAt||0;cloud.ready=true;
  if(useCurrent){cloud.cache.revision=cloud.revision;cloud.cache.pending=null;cloud.cache.dirty=true;persistCloudCache();await flushCloud(true)}
  else if(latest){cloud.cache={state:latest.state,revision:cloud.revision,updatedAt:cloud.updatedAt,dirty:false,pending:null};applySoloSnapshot(latest.state);persistCloudCache()}
  updateCloudUI();
 }
 async function signOutCloud(){
- if(!cloud.session||net.room||cloud.loading||cloud.busy||cloud.conflict)return;save();if(!await flushCloud(true)){cloud.error='Najpierw zapisz postęp w chmurze. Twój zapis na urządzeniu jest zachowany.';updateCloudUI();return}
- try{await accountRequest({op:'logout',token:cloud.session.token});cloud.epoch++;try{localStorage.removeItem(CLOUD_AUTH_KEY)}catch(e){}cloud.session=cloud.cache=cloud.conflict=null;cloud.ready=true;cloud.needsLogin=false;cloud.revision=cloud.updatedAt=0;cloud.error='';cloud.form='login';dismissRecoveryCode();populateSoloWorld();loadSoloState({version:10,P:{x:1500,y:1100},questsDone:{}});load();updateCloudUI();say('Wylogowano z gry. Zapis pozostaje na koncie.')}catch(error){cloud.error=error.message;updateCloudUI()}
+ if(!cloud.session||net.room||cloud.loading||cloud.busy||cloud.conflict)return;save();if(!await flushCloud(true)){cloud.error=tr('Najpierw zapisz postęp w chmurze. Twój zapis na urządzeniu jest zachowany.');updateCloudUI();return}
+ try{await accountRequest({op:'logout',token:cloud.session.token});cloud.epoch++;try{localStorage.removeItem(CLOUD_AUTH_KEY)}catch(e){}cloud.session=cloud.cache=cloud.conflict=null;cloud.ready=true;cloud.needsLogin=false;cloud.revision=cloud.updatedAt=0;cloud.error='';cloud.form='login';dismissRecoveryCode();populateSoloWorld();loadSoloState({version:10,P:{x:1500,y:1100},questsDone:{}});load();updateCloudUI();say(tr('Wylogowano z gry. Zapis pozostaje na koncie.'))}catch(error){cloud.error=error.message;updateCloudUI()}
 }
 async function restartCloudSoloGame(fresh){
- if(!soloReady())return;cloud.resetting=true;$('newGameError').textContent='Zapisuję nową przygodę w chmurze…';for(const b of $('newGamePanel').querySelectorAll('button'))b.disabled=true;
- try{if(cloud.cache.dirty&&!await flushCloud(true))throw new Error('Najpierw połącz się z chmurą. Obecna przygoda pozostaje zachowana.');
+ if(!soloReady())return;cloud.resetting=true;$('newGameError').textContent=tr('Zapisuję nową przygodę w chmurze…');for(const b of $('newGamePanel').querySelectorAll('button'))b.disabled=true;
+ try{if(cloud.cache.dirty&&!await flushCloud(true))throw new Error(tr('Najpierw połącz się z chmurą. Obecna przygoda pozostaje zachowana.'));
   const old=captureSolo(),decor=copyState(F);populateSoloWorld();const world={resources:copyState(O),enemies:copyState(E).map(e=>({...e,hit:0})),seed,face:'down'};restoreSolo(old);F.splice(0,F.length,...decor);
   const pending={state:{...fresh,world},revision:cloud.revision,writeId:cloudID(),reset:true};
   // Persist the exact reset request so an interrupted response can be safely retried after reload.
   const previous=copyState(cloud.cache);cloud.cache={state:pending.state,revision:cloud.revision,updatedAt:cloud.updatedAt,dirty:true,pending};persistCloudCache();
-  let data;try{data=await accountRequest({op:'save',token:cloud.session.token,...pending})}catch(error){if(error.status===409||error.status===400){cloud.cache=previous;if(error.data?.conflict){cloud.conflict=error.data.save;cloud.error=error.message}}else{cloud.error='Czekam na potwierdzenie nowej gry. Naciśnij Ponów połączenie w oknie konta.';cloud.ready=false;if(error.status===401)cloud.needsLogin=true}persistCloudCache();throw error}
-  cloud.revision=data.save.revision;cloud.updatedAt=data.save.updatedAt;cloud.cache={state:data.save.state,revision:cloud.revision,updatedAt:cloud.updatedAt,dirty:false,pending:null};persistCloudCache();applySoloSnapshot(data.save.state);blocking=lastAttack=hitFlash=walkPhase=0;lastTime=0;cloud.error='';$('start').style.display='none';play=1;cloud.resetting=false;toggle('newGamePanel',0);draw();say('Nowa przygoda zapisana na koncie!');
- }catch(error){$('newGameError').textContent=error.message||'Nie udało się rozpocząć nowej gry. Obecny postęp został zachowany.'}finally{cloud.resetting=false;for(const b of $('newGamePanel').querySelectorAll('button'))b.disabled=false;updateCloudUI()}
+  let data;try{data=await accountRequest({op:'save',token:cloud.session.token,...pending})}catch(error){if(error.status===409||error.status===400){cloud.cache=previous;if(error.data?.conflict){cloud.conflict=error.data.save;cloud.error=error.message}}else{cloud.error=tr('Czekam na potwierdzenie nowej gry. Naciśnij Ponów połączenie w oknie konta.');cloud.ready=false;if(error.status===401)cloud.needsLogin=true}persistCloudCache();throw error}
+  cloud.revision=data.save.revision;cloud.updatedAt=data.save.updatedAt;cloud.cache={state:data.save.state,revision:cloud.revision,updatedAt:cloud.updatedAt,dirty:false,pending:null};persistCloudCache();applySoloSnapshot(data.save.state);blocking=lastAttack=hitFlash=walkPhase=0;lastTime=0;cloud.error='';$('start').style.display='none';play=1;cloud.resetting=false;toggle('newGamePanel',0);draw();say(tr('Nowa przygoda zapisana na koncie!'));
+ }catch(error){$('newGameError').textContent=tr(error.message||tr('Nie udało się rozpocząć nowej gry. Obecny postęp został zachowany.'))}finally{cloud.resetting=false;for(const b of $('newGamePanel').querySelectorAll('button'))b.disabled=false;updateCloudUI()}
 }
-function sceneState(){return {P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear,objects:O,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):[]}}
-function updateView(){const active=!!islandView?.enabled;$('world3d').style.display=active?'block':'none';C.style.display=active?'none':'block';$('viewButton').textContent=active?'Widok 3D':'Widok 2D';$('viewButton').setAttribute('aria-pressed',String(active));$('cameraLeft').disabled=$('cameraRight').disabled=!active;$('viewHelp').textContent=active?'WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera':'WASD / strzałki · E działaj · Shift sprint · spacja atak'}
+function sceneState(){return {labels:{leon:tr('LEON · HANDEL'),nela:tr('NELA · ZADANIA')},P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear,objects:O,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):[]}}
+function updateView(){const active=!!islandView?.enabled;$('world3d').style.display=active?'block':'none';C.style.display=active?'none':'block';$('viewButton').textContent=active?tr('Widok 3D'):tr('Widok 2D');$('viewButton').setAttribute('aria-pressed',String(active));$('cameraLeft').disabled=$('cameraRight').disabled=!active;$('viewHelp').textContent=active?tr('WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera'):tr('WASD / strzałki · E działaj · Shift sprint · spacja atak')}
 function switchView(){if(!islandView)return;preferredView=islandView.enabled?'2d':'3d';islandView.setEnabled(preferredView==='3d');viewHeading=null;resetInput();try{localStorage.setItem('myIslandViewV1',preferredView)}catch(e){}updateView()}
 function orbitView(amount){if(islandView?.enabled)islandView.orbit(amount)}
-function boot3D(){if(islandView||!globalThis.MyIsland3D)return;try{islandView=globalThis.MyIsland3D.create({canvas:$('world3d'),terrain,getState:sceneState,onLost:()=>{updateView();resetInput();say('Grafika 3D została przerwana. Kontynuuj w 2D albo włącz 3D ponownie.')}});islandView.setEnabled(preferredView==='3d');$('viewButton').disabled=false;updateView()}catch(error){console.warn('Nie można włączyć 3D:',error);$('viewButton').textContent='Widok 2D';$('viewButton').title='Ta przeglądarka nie udostępnia grafiki 3D.'}}
+function boot3D(){if(islandView||!globalThis.MyIsland3D)return;try{islandView=globalThis.MyIsland3D.create({canvas:$('world3d'),terrain,getState:sceneState,onLost:()=>{updateView();resetInput();say(tr('Grafika 3D została przerwana. Kontynuuj w 2D albo włącz 3D ponownie.'))}});islandView.setEnabled(preferredView==='3d');$('viewButton').disabled=false;updateView()}catch(error){console.warn('Nie można włączyć 3D:',error);$('viewButton').textContent=tr('Widok 2D');$('viewButton').title=tr('Ta przeglądarka nie udostępnia grafiki 3D.')}}
+function refreshTranslations(){
+ MyIslandI18n.apply(document);update();updateRoomUI();updatePadUI();updateView();
+ for(const id of ['roomStatus','newGameError','newGameDescription','cloudRecoveryStatus'])$(id).textContent=tr($(id).textContent);
+ if($('viewButton').title)$('viewButton').title=tr($('viewButton').title);
+}
+function setLanguage(code){if(!MyIslandI18n.set(code,document))return;resetInput();refreshTranslations()}
 addEventListener('load',boot3D);
+refreshTranslations();
 cloud.bootstrap=bootCloud();
 </script>
 </body>

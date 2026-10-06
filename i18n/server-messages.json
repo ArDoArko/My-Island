@@ -1,0 +1,682 @@
+[
+  [
+    "Ta strona nie może korzystać z konta gracza.",
+    "This page cannot access the player account.",
+    "Deze pagina heeft geen toegang tot het spelersaccount.",
+    "Diese Seite kann nicht auf das Spielerkonto zugreifen.",
+    "Cette page ne peut pas accéder au compte du joueur.",
+    "Esta página no puede acceder a la cuenta del jugador."
+  ],
+  [
+    "Zapis jest zbyt duży.",
+    "The save is too large.",
+    "De opgeslagen gegevens zijn te groot.",
+    "Der Spielstand ist zu groß.",
+    "La sauvegarde est trop volumineuse.",
+    "La partida guardada es demasiado grande."
+  ],
+  [
+    "Nieprawidłowe dane.",
+    "Invalid data.",
+    "Ongeldige gegevens.",
+    "Ungültige Daten.",
+    "Données incorrectes.",
+    "Datos no válidos."
+  ],
+  [
+    "Odśwież grę, aby korzystać z zapisu w chmurze.",
+    "Refresh the game to use cloud saves.",
+    "Vernieuw het spel om in de cloud op te slaan.",
+    "Lade das Spiel neu, um Cloud-Spielstände zu nutzen.",
+    "Actualise le jeu pour utiliser la sauvegarde en ligne.",
+    "Actualiza el juego para guardar en la nube."
+  ],
+  [
+    "Dane konta są zbyt długie.",
+    "The account details are too long.",
+    "De accountgegevens zijn te lang.",
+    "Die Kontodaten sind zu lang.",
+    "Les données du compte sont trop longues.",
+    "Los datos de la cuenta son demasiado largos."
+  ],
+  [
+    "Zaloguj się ponownie, aby zmienić kod odzyskiwania.",
+    "Sign in again to change your recovery code.",
+    "Meld je opnieuw aan om je herstelcode te wijzigen.",
+    "Melde dich erneut an, um deinen Wiederherstellungscode zu ändern.",
+    "Reconnecte-toi pour changer ton code de récupération.",
+    "Vuelve a iniciar sesión para cambiar tu código de recuperación."
+  ],
+  [
+    "Nieprawidłowy e-mail lub hasło.",
+    "Incorrect email or password.",
+    "Onjuist e-mailadres of wachtwoord.",
+    "E-Mail oder Passwort falsch.",
+    "E-mail ou mot de passe incorrect.",
+    "Correo o contraseña incorrectos."
+  ],
+  [
+    "Podaj prawidłowy e-mail i hasło od 15 do 128 znaków.",
+    "Enter a valid email and a password of 15 to 128 characters.",
+    "Voer een geldig e-mailadres en een wachtwoord van 15 tot 128 tekens in.",
+    "Gib eine gültige E-Mail und ein Passwort mit 15 bis 128 Zeichen ein.",
+    "Saisis un e-mail valide et un mot de passe de 15 à 128 caractères.",
+    "Introduce un correo válido y una contraseña de 15 a 128 caracteres."
+  ],
+  [
+    "Zbyt wiele prób. Spróbuj ponownie później.",
+    "Too many attempts. Try again later.",
+    "Te veel pogingen. Probeer het later opnieuw.",
+    "Zu viele Versuche. Versuche es später erneut.",
+    "Trop de tentatives. Réessaie plus tard.",
+    "Demasiados intentos. Inténtalo más tarde."
+  ],
+  [
+    "Sesja dotychczasowego konta wygasła. Najpierw odzyskaj dostęp do niego.",
+    "Your previous account session has expired. Recover access to it first.",
+    "De sessie van je bestaande account is verlopen. Herstel eerst de toegang.",
+    "Die Sitzung deines bisherigen Kontos ist abgelaufen. Stelle zuerst den Zugriff wieder her.",
+    "La session de ton ancien compte a expiré. Récupère d’abord l’accès à ce compte.",
+    "La sesión de tu cuenta anterior ha caducado. Recupera primero el acceso."
+  ],
+  [
+    "To konto ma już e-mail i hasło. Użyj zakładki Zaloguj się.",
+    "This account already has an email and password. Use the Sign in tab.",
+    "Dit account heeft al een e-mailadres en wachtwoord. Gebruik het tabblad Aanmelden.",
+    "Dieses Konto hat bereits eine E-Mail und ein Passwort. Nutze den Reiter Anmelden.",
+    "Ce compte a déjà un e-mail et un mot de passe. Utilise l’onglet Se connecter.",
+    "Esta cuenta ya tiene correo y contraseña. Usa la pestaña Iniciar sesión."
+  ],
+  [
+    "Ten e-mail ma już konto. Zaloguj się lub użyj kodu odzyskiwania.",
+    "An account already uses this email. Sign in or use your recovery code.",
+    "Er bestaat al een account met dit e-mailadres. Meld je aan of gebruik je herstelcode.",
+    "Für diese E-Mail gibt es bereits ein Konto. Melde dich an oder nutze deinen Wiederherstellungscode.",
+    "Un compte utilise déjà cet e-mail. Connecte-toi ou utilise ton code de récupération.",
+    "Ya existe una cuenta con este correo. Inicia sesión o usa tu código de recuperación."
+  ],
+  [
+    "Konto jest już utworzone. Zaloguj się swoim e-mailem i hasłem.",
+    "Your account already exists. Sign in with your email and password.",
+    "Je account bestaat al. Meld je aan met je e-mailadres en wachtwoord.",
+    "Dein Konto besteht bereits. Melde dich mit deiner E-Mail und deinem Passwort an.",
+    "Ton compte existe déjà. Connecte-toi avec ton e-mail et ton mot de passe.",
+    "Tu cuenta ya existe. Inicia sesión con tu correo y contraseña."
+  ],
+  [
+    "Hasło zostało zmienione. Zaloguj się nowym hasłem.",
+    "Your password has been changed. Sign in with the new password.",
+    "Je wachtwoord is gewijzigd. Meld je aan met het nieuwe wachtwoord.",
+    "Dein Passwort wurde geändert. Melde dich mit dem neuen Passwort an.",
+    "Ton mot de passe a été changé. Connecte-toi avec le nouveau mot de passe.",
+    "Tu contraseña ha cambiado. Inicia sesión con la nueva contraseña."
+  ],
+  [
+    "Nieprawidłowe hasło.",
+    "Incorrect password.",
+    "Onjuist wachtwoord.",
+    "Falsches Passwort.",
+    "Mot de passe incorrect.",
+    "Contraseña incorrecta."
+  ],
+  [
+    "Dane konta zostały zmienione. Zaloguj się ponownie.",
+    "Your account details have changed. Sign in again.",
+    "Je accountgegevens zijn gewijzigd. Meld je opnieuw aan.",
+    "Deine Kontodaten wurden geändert. Melde dich erneut an.",
+    "Les données de ton compte ont changé. Reconnecte-toi.",
+    "Los datos de tu cuenta han cambiado. Vuelve a iniciar sesión."
+  ],
+  [
+    "Nieprawidłowy e-mail lub kod odzyskiwania.",
+    "Incorrect email or recovery code.",
+    "Onjuist e-mailadres of herstelcode.",
+    "E-Mail oder Wiederherstellungscode falsch.",
+    "E-mail ou code de récupération incorrect.",
+    "Correo o código de recuperación incorrectos."
+  ],
+  [
+    "Ten kod został już wykorzystany. Użyj nowego kodu lub zaloguj się nowym hasłem.",
+    "This code has already been used. Use the new code or sign in with your new password.",
+    "Deze code is al gebruikt. Gebruik de nieuwe code of meld je aan met je nieuwe wachtwoord.",
+    "Dieser Code wurde bereits verwendet. Nutze den neuen Code oder melde dich mit deinem neuen Passwort an.",
+    "Ce code a déjà été utilisé. Utilise le nouveau code ou connecte-toi avec ton nouveau mot de passe.",
+    "Este código ya se ha utilizado. Usa el nuevo código o inicia sesión con tu nueva contraseña."
+  ],
+  [
+    "Logowanie wygasło. Zaloguj się ponownie.",
+    "Your login has expired. Sign in again.",
+    "Je aanmelding is verlopen. Meld je opnieuw aan.",
+    "Deine Anmeldung ist abgelaufen. Melde dich erneut an.",
+    "Ta connexion a expiré. Reconnecte-toi.",
+    "Tu sesión ha caducado. Vuelve a iniciar sesión."
+  ],
+  [
+    "Zaloguj się, aby otworzyć swój zapis.",
+    "Sign in to open your save.",
+    "Meld je aan om je opgeslagen spel te openen.",
+    "Melde dich an, um deinen Spielstand zu öffnen.",
+    "Connecte-toi pour ouvrir ta sauvegarde.",
+    "Inicia sesión para abrir tu partida guardada."
+  ],
+  [
+    "Sesja wygasła. Zaloguj się ponownie. Twój postęp pozostaje na koncie.",
+    "Your session has expired. Sign in again. Your progress is still saved to your account.",
+    "Je sessie is verlopen. Meld je opnieuw aan. Je voortgang blijft bewaard in je account.",
+    "Deine Sitzung ist abgelaufen. Melde dich erneut an. Dein Fortschritt bleibt im Konto gespeichert.",
+    "Ta session a expiré. Reconnecte-toi. Ta progression reste enregistrée sur ton compte.",
+    "Tu sesión ha caducado. Vuelve a iniciar sesión. Tu progreso sigue guardado en tu cuenta."
+  ],
+  [
+    "Nieprawidłowa wersja zapisu.",
+    "Unsupported save version.",
+    "Ongeldige versie van het opgeslagen spel.",
+    "Ungültige Spielstandversion.",
+    "Version de sauvegarde incorrecte.",
+    "Versión de partida guardada no válida."
+  ],
+  [
+    "Nieprawidłowy zapis.",
+    "Invalid save.",
+    "Ongeldig opgeslagen spel.",
+    "Ungültiger Spielstand.",
+    "Sauvegarde incorrecte.",
+    "Partida guardada no válida."
+  ],
+  [
+    "Ten zapis został już wysłany z innymi danymi.",
+    "This save has already been sent with different data.",
+    "Dit opgeslagen spel is al met andere gegevens verstuurd.",
+    "Dieser Spielstand wurde bereits mit anderen Daten gesendet.",
+    "Cette sauvegarde a déjà été envoyée avec d’autres données.",
+    "Esta partida guardada ya se ha enviado con otros datos."
+  ],
+  [
+    "Na innym urządzeniu jest nowszy postęp. Twój bieżący zapis został zachowany na tym urządzeniu.",
+    "Another device has newer progress. Your current save has been kept on this device.",
+    "Een ander apparaat heeft nieuwere voortgang. Je huidige opgeslagen spel blijft op dit apparaat bewaard.",
+    "Auf einem anderen Gerät gibt es neueren Fortschritt. Dein aktueller Spielstand bleibt auf diesem Gerät erhalten.",
+    "Un autre appareil a une progression plus récente. Ta sauvegarde actuelle reste conservée sur cet appareil.",
+    "Otro dispositivo tiene un progreso más reciente. Tu partida actual se conserva en este dispositivo."
+  ],
+  [
+    "Nie udało się połączyć z kontem w chmurze. Postęp na tym urządzeniu pozostaje zachowany.",
+    "Could not connect to your cloud account. Your progress on this device is safe.",
+    "Geen verbinding met je cloudaccount. Je voortgang op dit apparaat blijft bewaard.",
+    "Keine Verbindung zum Cloud-Konto. Dein Fortschritt auf diesem Gerät bleibt erhalten.",
+    "Impossible de se connecter à ton compte en ligne. Ta progression sur cet appareil reste conservée.",
+    "No se pudo conectar con tu cuenta en la nube. Tu progreso en este dispositivo se conserva."
+  ],
+  [
+    "Ta strona nie może dołączać do wyspy.",
+    "This page cannot join the island.",
+    "Deze pagina kan niet deelnemen aan het eiland.",
+    "Diese Seite kann der Insel nicht beitreten.",
+    "Cette page ne peut pas rejoindre l’île.",
+    "Esta página no puede unirse a la isla."
+  ],
+  [
+    "Za duże żądanie.",
+    "The request is too large.",
+    "Het verzoek is te groot.",
+    "Die Anfrage ist zu groß.",
+    "La requête est trop volumineuse.",
+    "La solicitud es demasiado grande."
+  ],
+  [
+    "Odśwież grę, żeby używać aktualnego trybu online.",
+    "Refresh the game to use the current online mode.",
+    "Vernieuw het spel om de nieuwste onlinemodus te gebruiken.",
+    "Lade das Spiel neu, um den aktuellen Online-Modus zu nutzen.",
+    "Actualise le jeu pour utiliser le mode en ligne actuel.",
+    "Actualiza el juego para usar el modo online actual."
+  ],
+  [
+    "Wszystkie wyspy są zajęte. Spróbuj później.",
+    "All islands are busy. Try again later.",
+    "Alle eilanden zijn bezet. Probeer het later opnieuw.",
+    "Alle Inseln sind belegt. Versuche es später erneut.",
+    "Toutes les îles sont occupées. Réessaie plus tard.",
+    "Todas las islas están ocupadas. Inténtalo más tarde."
+  ],
+  [
+    "Nie udało się utworzyć postaci.",
+    "Could not create your character.",
+    "Je personage kon niet worden gemaakt.",
+    "Deine Spielfigur konnte nicht erstellt werden.",
+    "Impossible de créer ton personnage.",
+    "No se pudo crear tu personaje."
+  ],
+  [
+    "Nie udało się znaleźć wolnego kodu. Spróbuj ponownie.",
+    "Could not find an available room code. Try again.",
+    "Er is geen vrije kamercode gevonden. Probeer het opnieuw.",
+    "Kein freier Raumcode gefunden. Versuche es erneut.",
+    "Impossible de trouver un code de salon disponible. Réessaie.",
+    "No se encontró un código de sala disponible. Inténtalo de nuevo."
+  ],
+  [
+    "Wpisz osiem znaków kodu pokoju.",
+    "Enter the eight-character room code.",
+    "Voer de kamercode van acht tekens in.",
+    "Gib den achtstelligen Raumcode ein.",
+    "Saisis les huit caractères du code du salon.",
+    "Introduce los ocho caracteres del código de sala."
+  ],
+  [
+    "Nieznane żądanie.",
+    "Unknown request.",
+    "Onbekend verzoek.",
+    "Unbekannte Anfrage.",
+    "Requête inconnue.",
+    "Solicitud desconocida."
+  ],
+  [
+    "Dołącz ponownie do pokoju.",
+    "Rejoin the room.",
+    "Neem opnieuw deel aan de kamer.",
+    "Tritt dem Raum erneut bei.",
+    "Rejoins à nouveau le salon.",
+    "Vuelve a unirte a la sala."
+  ],
+  [
+    "Nie ma takiego pokoju lub wygasł. Sprawdź kod.",
+    "This room does not exist or has expired. Check the code.",
+    "Deze kamer bestaat niet of is verlopen. Controleer de code.",
+    "Dieser Raum besteht nicht oder ist abgelaufen. Prüfe den Code.",
+    "Ce salon n’existe pas ou a expiré. Vérifie le code.",
+    "Esta sala no existe o ha caducado. Comprueba el código."
+  ],
+  [
+    "Sesja wygasła. Dołącz kodem pokoju.",
+    "Your session has expired. Join using the room code.",
+    "Je sessie is verlopen. Neem deel met de kamercode.",
+    "Deine Sitzung ist abgelaufen. Tritt mit dem Raumcode bei.",
+    "Ta session a expiré. Rejoins le salon avec son code.",
+    "Tu sesión ha caducado. Únete con el código de sala."
+  ],
+  [
+    "Pokój jest pełny — maksymalnie czterech graczy.",
+    "The room is full — maximum four players.",
+    "De kamer is vol — maximaal vier spelers.",
+    "Der Raum ist voll — höchstens vier Spieler.",
+    "Le salon est complet — quatre joueurs maximum.",
+    "La sala está llena — máximo cuatro jugadores."
+  ],
+  [
+    "Twoja sesja wygasła. Dołącz ponownie.",
+    "Your session has expired. Rejoin the room.",
+    "Je sessie is verlopen. Neem opnieuw deel.",
+    "Deine Sitzung ist abgelaufen. Tritt erneut bei.",
+    "Ta session a expiré. Rejoins à nouveau le salon.",
+    "Tu sesión ha caducado. Vuelve a unirte."
+  ],
+  [
+    "Pokój został zapełniony. Dołącz później.",
+    "The room has filled up. Join later.",
+    "De kamer is nu vol. Neem later deel.",
+    "Der Raum ist inzwischen voll. Tritt später bei.",
+    "Le salon s’est rempli. Rejoins-le plus tard.",
+    "La sala se ha llenado. Únete más tarde."
+  ],
+  [
+    "Wyspa jest zajęta. Ponawiam połączenie.",
+    "The island is busy. Reconnecting.",
+    "Het eiland is bezet. De verbinding wordt opnieuw gemaakt.",
+    "Die Insel ist beschäftigt. Die Verbindung wird erneut hergestellt.",
+    "L’île est occupée. Reconnexion en cours.",
+    "La isla está ocupada. Reconectando."
+  ],
+  [
+    "Nie mogę teraz połączyć się z wyspą. Spróbuj ponownie.",
+    "Cannot connect to the island right now. Try again.",
+    "Op dit moment geen verbinding met het eiland. Probeer het opnieuw.",
+    "Die Verbindung zur Insel ist gerade nicht möglich. Versuche es erneut.",
+    "Impossible de se connecter à l’île maintenant. Réessaie.",
+    "No se puede conectar con la isla ahora. Inténtalo de nuevo."
+  ],
+  [
+    "Nieprawidłowy zapis gry.",
+    "Invalid game save.",
+    "Ongeldig opgeslagen spel.",
+    "Ungültiger Spielstand.",
+    "Sauvegarde du jeu incorrecte.",
+    "Partida guardada no válida."
+  ],
+  [
+    "Nieprawidłowy świat gry.",
+    "Invalid game world.",
+    "Ongeldige spelwereld.",
+    "Ungültige Spielwelt.",
+    "Monde du jeu incorrect.",
+    "Mundo del juego no válido."
+  ],
+  [
+    "Rozpocznij logowanie ponownie.",
+    "Start signing in again.",
+    "Start het aanmelden opnieuw.",
+    "Starte die Anmeldung erneut.",
+    "Recommence la connexion.",
+    "Vuelve a iniciar el proceso de acceso."
+  ],
+  [
+    "Nela: Skarb odnaleziony! Nagroda dla całej drużyny.",
+    "Nela: Treasure found! A reward for the whole team.",
+    "Nela: Schat gevonden! Een beloning voor het hele team.",
+    "Nela: Schatz gefunden! Eine Belohnung für das ganze Team.",
+    "Nela : Trésor trouvé ! Une récompense pour toute l’équipe.",
+    "Nela: ¡Tesoro encontrado! Una recompensa para todo el equipo."
+  ],
+  [
+    "Drużyna zdobyła skarb! Wróćcie do Neli.",
+    "The team found the treasure! Return to Nela.",
+    "Het team heeft de schat gevonden! Ga terug naar Nela.",
+    "Das Team hat den Schatz gefunden! Kehrt zu Nela zurück.",
+    "L’équipe a trouvé le trésor ! Retournez voir Nela.",
+    "¡El equipo ha encontrado el tesoro! Volved con Nela."
+  ],
+  [
+    "Zasób jest już zebrany albo poza zasięgiem.",
+    "This resource has already been collected or is out of reach.",
+    "Deze grondstof is al verzameld of buiten bereik.",
+    "Diese Ressource wurde bereits gesammelt oder ist außer Reichweite.",
+    "Cette ressource a déjà été récoltée ou est hors de portée.",
+    "Este recurso ya se ha recogido o está fuera de alcance."
+  ],
+  [
+    "Nieznany przepis.",
+    "Unknown recipe.",
+    "Onbekend recept.",
+    "Unbekanntes Rezept.",
+    "Recette inconnue.",
+    "Receta desconocida."
+  ],
+  [
+    "Drużyna już ma ten przedmiot.",
+    "The team already has this item.",
+    "Het team heeft dit voorwerp al.",
+    "Das Team hat diesen Gegenstand bereits.",
+    "L’équipe possède déjà cet objet.",
+    "El equipo ya tiene este objeto."
+  ],
+  [
+    "Brakuje materiałów we wspólnym plecaku.",
+    "Not enough materials in the shared backpack.",
+    "Niet genoeg materialen in de gezamenlijke rugzak.",
+    "Nicht genug Materialien im gemeinsamen Rucksack.",
+    "Il manque des matériaux dans le sac à dos commun.",
+    "Faltan materiales en la mochila compartida."
+  ],
+  [
+    "Budujcie kolejno poziomy L1, L2 i L3.",
+    "Build levels L1, L2 and L3 in order.",
+    "Bouw achtereenvolgens niveau L1, L2 en L3.",
+    "Baut die Stufen L1, L2 und L3 der Reihe nach.",
+    "Construisez les niveaux L1, L2 et L3 dans l’ordre.",
+    "Construid los niveles L1, L2 y L3 en orden."
+  ],
+  [
+    "Najpierw zbudujcie bazę L1.",
+    "Build a level L1 base first.",
+    "Bouw eerst een basis van niveau L1.",
+    "Baut zuerst eine Basis der Stufe L1.",
+    "Construisez d’abord une base de niveau L1.",
+    "Construid primero una base de nivel L1."
+  ],
+  [
+    "Podejdź do wspólnej bazy.",
+    "Go to the shared base.",
+    "Ga naar de gezamenlijke basis.",
+    "Gehe zur gemeinsamen Basis.",
+    "Approche-toi de la base commune.",
+    "Acércate a la base compartida."
+  ],
+  [
+    "Potrzebujecie 4 drewna i 2 kamieni.",
+    "You need 4 wood and 2 stone.",
+    "Jullie hebben 4 hout en 2 stenen nodig.",
+    "Ihr braucht 4 Holz und 2 Steine.",
+    "Il vous faut 4 bois et 2 pierres.",
+    "Necesitáis 4 de madera y 2 piedras."
+  ],
+  [
+    "Wspólne ognisko płonie.",
+    "The shared campfire is burning.",
+    "Het gezamenlijke kampvuur brandt.",
+    "Das gemeinsame Lagerfeuer brennt.",
+    "Le feu de camp commun est allumé.",
+    "La hoguera compartida está encendida."
+  ],
+  [
+    "Ryba upieczona! Jest we wspólnym plecaku.",
+    "Fish cooked! It is in the shared backpack.",
+    "Vis gebakken! Hij zit in de gezamenlijke rugzak.",
+    "Fisch gebraten! Er ist im gemeinsamen Rucksack.",
+    "Poisson cuit ! Il est dans le sac à dos commun.",
+    "¡Pescado cocinado! Está en la mochila compartida."
+  ],
+  [
+    "Masz pełne zdrowie i energię.",
+    "Your health and energy are full.",
+    "Je gezondheid en energie zijn volledig aangevuld.",
+    "Deine Gesundheit und Energie sind voll.",
+    "Ta santé et ton énergie sont au maximum.",
+    "Tu salud y energía están al máximo."
+  ],
+  [
+    "Nie ma kokosów we wspólnym plecaku.",
+    "There are no coconuts in the shared backpack.",
+    "Er zitten geen kokosnoten in de gezamenlijke rugzak.",
+    "Im gemeinsamen Rucksack sind keine Kokosnüsse.",
+    "Il n’y a pas de noix de coco dans le sac à dos commun.",
+    "No hay cocos en la mochila compartida."
+  ],
+  [
+    "Najpierw upieczcie rybę.",
+    "Cook a fish first.",
+    "Bak eerst een vis.",
+    "Bratet zuerst einen Fisch.",
+    "Faites d’abord cuire un poisson.",
+    "Cocinad primero un pescado."
+  ],
+  [
+    "Nieznane jedzenie.",
+    "Unknown food.",
+    "Onbekend voedsel.",
+    "Unbekanntes Essen.",
+    "Nourriture inconnue.",
+    "Alimento desconocido."
+  ],
+  [
+    "Najpierw zróbcie wędkę.",
+    "Craft a fishing rod first.",
+    "Maak eerst een hengel.",
+    "Stellt zuerst eine Angel her.",
+    "Fabriquez d’abord une canne à pêche.",
+    "Fabricad primero una caña de pescar."
+  ],
+  [
+    "Złowiona ryba! Trafiła do wspólnego plecaka.",
+    "Fish caught! It is in the shared backpack.",
+    "Vis gevangen! Hij zit in de gezamenlijke rugzak.",
+    "Fisch gefangen! Er ist im gemeinsamen Rucksack.",
+    "Poisson attrapé ! Il est dans le sac à dos commun.",
+    "¡Pez capturado! Está en la mochila compartida."
+  ],
+  [
+    "Najpierw zróbcie włócznię.",
+    "Craft a spear first.",
+    "Maak eerst een speer.",
+    "Stellt zuerst einen Speer her.",
+    "Fabriquez d’abord une lance.",
+    "Fabricad primero una lanza."
+  ],
+  [
+    "Dzik pokonany! +20 monet i +35 XP dla drużyny.",
+    "Boar defeated! +20 coins and +35 XP for the team.",
+    "Everzwijn verslagen! +20 munten en +35 XP voor het team.",
+    "Wildschwein besiegt! +20 Münzen und +35 EP für das Team.",
+    "Sanglier vaincu ! +20 pièces et +35 XP pour l’équipe.",
+    "¡Jabalí derrotado! +20 monedas y +35 XP para el equipo."
+  ],
+  [
+    "Podejdź do Leona.",
+    "Go to Leon.",
+    "Ga naar Leon.",
+    "Gehe zu Leon.",
+    "Approche-toi de Leon.",
+    "Acércate a Leon."
+  ],
+  [
+    "Nieznana oferta.",
+    "Unknown offer.",
+    "Onbekend aanbod.",
+    "Unbekanntes Angebot.",
+    "Offre inconnue.",
+    "Oferta desconocida."
+  ],
+  [
+    "Za mało zasobów.",
+    "Not enough resources.",
+    "Niet genoeg grondstoffen.",
+    "Nicht genug Ressourcen.",
+    "Pas assez de ressources.",
+    "No hay suficientes recursos."
+  ],
+  [
+    "Nieznane zadanie.",
+    "Unknown quest.",
+    "Onbekende opdracht.",
+    "Unbekannte Aufgabe.",
+    "Quête inconnue.",
+    "Misión desconocida."
+  ],
+  [
+    "Drużyna już ukończyła to zadanie.",
+    "The team has already completed this quest.",
+    "Het team heeft deze opdracht al voltooid.",
+    "Das Team hat diese Aufgabe bereits erledigt.",
+    "L’équipe a déjà terminé cette quête.",
+    "El equipo ya ha completado esta misión."
+  ],
+  [
+    "Podejdź do Neli.",
+    "Go to Nela.",
+    "Ga naar Nela.",
+    "Gehe zu Nela.",
+    "Approche-toi de Nela.",
+    "Acércate a Nela."
+  ],
+  [
+    "Dostawa przyjęta! Nagroda dla całej drużyny.",
+    "Delivery accepted! A reward for the whole team.",
+    "Levering ontvangen! Een beloning voor het hele team.",
+    "Lieferung angenommen! Eine Belohnung für das ganze Team.",
+    "Livraison acceptée ! Une récompense pour toute l’équipe.",
+    "¡Entrega aceptada! Una recompensa para todo el equipo."
+  ],
+  [
+    "Nieznana czynność.",
+    "Unknown action.",
+    "Onbekende actie.",
+    "Unbekannte Aktion.",
+    "Action inconnue.",
+    "Acción desconocida."
+  ],
+  [
+    "Nieprawidłowa czynność.",
+    "Invalid action.",
+    "Ongeldige actie.",
+    "Ungültige Aktion.",
+    "Action incorrecte.",
+    "Acción no válida."
+  ],
+  [
+    "Chwileczkę — spróbuj ponownie.",
+    "Just a moment — try again.",
+    "Even geduld — probeer het opnieuw.",
+    "Einen Moment — versuche es erneut.",
+    "Un instant — réessaie.",
+    "Un momento — inténtalo de nuevo."
+  ],
+  [
+    "Włócznia gotowa dla całej drużyny!",
+    "Spear ready for the whole team!",
+    "Speer klaar voor het hele team!",
+    "Speer für das ganze Team fertig!",
+    "Lance prête pour toute l’équipe !",
+    "¡Lanza lista para todo el equipo!"
+  ],
+  [
+    "Wędka gotowa dla całej drużyny!",
+    "Fishing rod ready for the whole team!",
+    "Hengel klaar voor het hele team!",
+    "Angel für das ganze Team fertig!",
+    "Canne à pêche prête pour toute l’équipe !",
+    "¡Caña de pescar lista para todo el equipo!"
+  ],
+  [
+    "Tratwa gotowa dla całej drużyny!",
+    "Raft ready for the whole team!",
+    "Vlot klaar voor het hele team!",
+    "Floß für das ganze Team fertig!",
+    "Radeau prêt pour toute l’équipe !",
+    "¡Balsa lista para todo el equipo!"
+  ],
+  [
+    "Wspólna baza L1 gotowa!",
+    "Shared base L1 ready!",
+    "Gezamenlijke basis L1 klaar!",
+    "Gemeinsame Basis L1 fertig!",
+    "Base commune L1 prête !",
+    "¡Base compartida L1 lista!"
+  ],
+  [
+    "Wspólna baza L2 gotowa!",
+    "Shared base L2 ready!",
+    "Gezamenlijke basis L2 klaar!",
+    "Gemeinsame Basis L2 fertig!",
+    "Base commune L2 prête !",
+    "¡Base compartida L2 lista!"
+  ],
+  [
+    "Wspólna baza L3 gotowa!",
+    "Shared base L3 ready!",
+    "Gezamenlijke basis L3 klaar!",
+    "Gemeinsame Basis L3 fertig!",
+    "Base commune L3 prête !",
+    "¡Base compartida L3 lista!"
+  ],
+  [
+    "Zebrano dla drużyny: 2 drewna.",
+    "Collected for the team: 2 wood.",
+    "Verzameld voor het team: 2 hout.",
+    "Für das Team gesammelt: 2 Holz.",
+    "Récolté pour l’équipe : 2 bois.",
+    "Recogido para el equipo: 2 de madera."
+  ],
+  [
+    "Zebrano dla drużyny: 1 kamień.",
+    "Collected for the team: 1 stone.",
+    "Verzameld voor het team: 1 steen.",
+    "Für das Team gesammelt: 1 Stein.",
+    "Récolté pour l’équipe : 1 pierre.",
+    "Recogido para el equipo: 1 piedra."
+  ],
+  [
+    "Zebrano dla drużyny: 1 muszelka.",
+    "Collected for the team: 1 shell.",
+    "Verzameld voor het team: 1 schelp.",
+    "Für das Team gesammelt: 1 Muschel.",
+    "Récolté pour l’équipe : 1 coquillage.",
+    "Recogido para el equipo: 1 concha."
+  ],
+  [
+    "Zebrano dla drużyny: 1 kokos.",
+    "Collected for the team: 1 coconut.",
+    "Verzameld voor het team: 1 kokosnoot.",
+    "Für das Team gesammelt: 1 Kokosnuss.",
+    "Récolté pour l’équipe : 1 noix de coco.",
+    "Recogido para el equipo: 1 coco."
+  ]
+]

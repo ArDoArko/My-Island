@@ -1,8 +1,18 @@
-# My Island 0.14
+# My Island 0.15
 
 ## Build and publish
 
-Run `npm ci` and `npm run build` after editing `island3d-src.mjs`. Commit the source, package lock and generated `island3d.bundle.js` together. GitHub Pages serves `index.html` and the bundle from the main branch root. The bundle includes Three.js 0.180.0, so the game makes no runtime requests for a graphics library, models or textures. See `THIRD_PARTY_NOTICES.txt` for its MIT license.
+Run `npm ci` and `npm run verify` after editing the renderer or translations. Commit sources, catalogs, package lock and both generated bundles together. GitHub Pages serves `index.html`, `island3d.bundle.js` and `i18n.bundle.js` from the main branch root. The graphics bundle includes Three.js 0.180.0, so the game makes no runtime requests for a graphics library, models or textures. See `THIRD_PARTY_NOTICES.txt` for its MIT license. The translation bundle loads synchronously before the existing game script and contains every language; changing language needs no network request.
+
+## Six languages
+
+The start-screen selector and the in-game globe button support Polish, English, Dutch (Nederlands), German, French and Spanish. Dutch covers both the Netherlands and Belgium; there is no separate "Holland" language option. Native language names remain visible in the picker. A supported browser language is used initially; a saved selection takes priority. Locale `nl-BE` and `fr-BE` are used for Dutch and French time formatting.
+
+Presentation strings live in `i18n/messages.json` and `i18n/server-messages.json` as rows in the order PL, EN, NL, DE, FR, ES. Server responses are translated in the client without changing the deployed account or room server. Resource costs, rewards, user-provided names, emails and room/recovery codes remain unchanged. NPC labels update in the 3D scene without recreating the world or renderer. Long button labels can wrap.
+
+Language preference uses only `myIslandLanguageV1`, separate from the existing solo, account, controller, room and view storage keys. Switching applies immediately without reloading, leaves open form fields intact and does not create an account, send an account request or rewrite a save. The language panel pauses gameplay like the other menus. A device that blocks local storage can still change language for the current session.
+
+`npm test` runs the real game script against a local DOM with mocked rendering and network, plus camera/ground-contact checks. It checks all six interfaces, Dutch browser detection, reload persistence, blocked storage, old-save migration, solo resources and world contents, anonymous account forms and errors, pending cloud-save conflicts, four-player names and shared inventory, gamepad remapping and camera controls, and unchanged account/room protocol versions. Test inputs are local fixtures and never reach the live server. Actual 3D rendering and anonymous forms must also be checked on public Pages after a completed deployment. Do not claim publication complete from a commit, successful build or queued run alone.
 
 ## First 3D stage
 
@@ -14,7 +24,7 @@ Account protocol remains version 12 and save format version 10. Existing account
 
 ## Agreed stages
 
-1. **0.14: first playable 3D island.** Third-person view, ground contact, movement, resources and compatibility with saves and co-op. Verify actual rendering on the published site before calling this stage complete.
+1. **0.14: first playable 3D island; 0.15: six languages.** Third-person view, ground contact, movement, resources and compatibility with saves and co-op. The language release preserves that first stage. Verify actual rendering and language selection on the published site before calling these releases complete.
 2. **Character identity and animation.** More detailed humanoid models, clothes and hair choices, fishing/gathering animations, emotes.
 3. **Co-op adventures.** Shared missions, puzzles and treasure expeditions designed for up to four players.
 4. **Creative shared base.** More building pieces, decorations and collaborative construction.

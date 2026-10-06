@@ -1,0 +1,3602 @@
+[
+  [
+    "My Island 0.14 — Pierwsza wyspa 3D",
+    "My Island 0.14 — Your first 3D island",
+    "My Island 0.14 — Je eerste 3D-eiland",
+    "My Island 0.14 — Deine erste 3D-Insel",
+    "My Island 0.14 — Votre première île en 3D",
+    "My Island 0.14 — Tu primera isla en 3D"
+  ],
+  [
+    "0.14 • Pierwsza wyspa 3D",
+    "0.14 • Your first 3D island",
+    "0.14 • Je eerste 3D-eiland",
+    "0.14 • Deine erste 3D-Insel",
+    "0.14 • Votre première île en 3D",
+    "0.14 • Tu primera isla en 3D"
+  ],
+  [
+    "Odkrywaj wyspę sam albo z przyjaciółmi.",
+    "Explore the island on your own or with friends.",
+    "Verken het eiland alleen of met vrienden.",
+    "Erkunde die Insel allein oder mit Freunden.",
+    "Explorez l’île en solo ou avec vos amis.",
+    "Explora la isla a solas o con amigos."
+  ],
+  [
+    "Do czterech graczy, wspólna baza i wyprawa po skarb.",
+    "Up to four players, a shared base and a treasure adventure.",
+    "Tot vier spelers, een gezamenlijke basis en een schattenjacht.",
+    "Bis zu vier Spieler, eine gemeinsame Basis und eine Schatzsuche.",
+    "Jusqu’à quatre joueurs, une base commune et une chasse au trésor.",
+    "Hasta cuatro jugadores, una base compartida y una búsqueda del tesoro."
+  ],
+  [
+    "GRAJ SOLO",
+    "PLAY SOLO",
+    "SPEEL SOLO",
+    "SOLO SPIELEN",
+    "JOUER EN SOLO",
+    "JUGAR EN SOLITARIO"
+  ],
+  [
+    "GRAJ ONLINE",
+    "PLAY ONLINE",
+    "SPEEL ONLINE",
+    "ONLINE SPIELEN",
+    "JOUER EN LIGNE",
+    "JUGAR EN LÍNEA"
+  ],
+  [
+    "WASD lub strzałki • E działaj • Shift sprint • spacja atak",
+    "WASD or arrows • E interact • Shift sprint • space attack",
+    "WASD of pijltjes • E actie • Shift sprint • spatie aanval",
+    "WASD oder Pfeile • E Aktion • Umschalt sprinten • Leertaste angreifen",
+    "WASD ou flèches • E agir • Maj sprinter • espace attaquer",
+    "WASD o flechas • E actuar • Mayús correr • espacio atacar"
+  ],
+  [
+    "☁️ Konto i zapis",
+    "☁️ Account and save",
+    "☁️ Account en opslag",
+    "☁️ Konto und Spielstand",
+    "☁️ Compte et sauvegarde",
+    "☁️ Cuenta y guardado"
+  ],
+  [
+    "Zaloguj się, aby kontynuować na innym urządzeniu.",
+    "Sign in to continue on another device.",
+    "Log in om op een ander apparaat verder te spelen.",
+    "Melde dich an, um auf einem anderen Gerät weiterzuspielen.",
+    "Connectez-vous pour continuer sur un autre appareil.",
+    "Inicia sesión para continuar en otro dispositivo."
+  ],
+  [
+    "↻ Nowa gra solo",
+    "↻ New solo game",
+    "↻ Nieuw solospel",
+    "↻ Neues Solospiel",
+    "↻ Nouvelle partie solo",
+    "↻ Nueva partida en solitario"
+  ],
+  [
+    "🎮 Sterowanie padem i joystickiem",
+    "🎮 Gamepad and joystick controls",
+    "🎮 Gamepad en joystick instellen",
+    "🎮 Gamepad und Joystick",
+    "🎮 Commandes manette et joystick",
+    "🎮 Controles de mando y joystick"
+  ],
+  [
+    "Podłącz kontroler i naciśnij na nim przycisk.",
+    "Connect a controller and press a button on it.",
+    "Sluit een controller aan en druk op een knop.",
+    "Verbinde einen Controller und drücke eine Taste darauf.",
+    "Connectez une manette et appuyez sur un bouton.",
+    "Conecta un mando y pulsa uno de sus botones."
+  ],
+  [
+    "wspólna wyspa · kod pokoju · pad i joystick",
+    "shared island · room code · gamepad and joystick",
+    "gezamenlijk eiland · kamercode · gamepad en joystick",
+    "gemeinsame Insel · Raumcode · Gamepad und Joystick",
+    "île commune · code du salon · manette et joystick",
+    "isla compartida · código de sala · mando y joystick"
+  ],
+  [
+    "Przełącz widok wyspy",
+    "Switch island view",
+    "Eilandweergave wisselen",
+    "Inselansicht wechseln",
+    "Changer la vue de l’île",
+    "Cambiar la vista de la isla"
+  ],
+  [
+    "Widok 2D",
+    "2D view",
+    "2D-weergave",
+    "2D-Ansicht",
+    "Vue 2D",
+    "Vista 2D"
+  ],
+  [
+    "Obróć kamerę w lewo",
+    "Rotate camera left",
+    "Camera naar links draaien",
+    "Kamera nach links drehen",
+    "Tourner la caméra à gauche",
+    "Girar la cámara a la izquierda"
+  ],
+  [
+    "Obróć kamerę w prawo",
+    "Rotate camera right",
+    "Camera naar rechts draaien",
+    "Kamera nach rechts drehen",
+    "Tourner la caméra à droite",
+    "Girar la cámara a la derecha"
+  ],
+  [
+    "🏠 L",
+    "🏠 L",
+    "🏠 L",
+    "🏠 L",
+    "🏠 N",
+    "🏠 N"
+  ],
+  [
+    "Laguna",
+    "Lagoon",
+    "Lagune",
+    "Lagune",
+    "Lagune",
+    "Laguna"
+  ],
+  [
+    "Sterowanie padem i joystickiem",
+    "Gamepad and joystick controls",
+    "Gamepad en joystick instellen",
+    "Gamepad- und Joysticksteuerung",
+    "Commandes manette et joystick",
+    "Controles de mando y joystick"
+  ],
+  [
+    "🎮 PAD",
+    "🎮 PAD",
+    "🎮 PAD",
+    "🎮 PAD",
+    "🎮 MANETTE",
+    "🎮 MANDO"
+  ],
+  [
+    "Pokój online i gracze",
+    "Online room and players",
+    "Onlinekamer en spelers",
+    "Online-Raum und Spieler",
+    "Salon en ligne et joueurs",
+    "Sala en línea y jugadores"
+  ],
+  [
+    "👥 ONLINE",
+    "👥 ONLINE",
+    "👥 ONLINE",
+    "👥 ONLINE",
+    "👥 EN LIGNE",
+    "👥 EN LÍNEA"
+  ],
+  [
+    "Konto gracza i zapis w chmurze",
+    "Player account and cloud save",
+    "Spelersaccount en cloudopslag",
+    "Spielerkonto und Cloud-Spielstand",
+    "Compte joueur et sauvegarde cloud",
+    "Cuenta del jugador y guardado en la nube"
+  ],
+  [
+    "☁️ KONTO",
+    "☁️ ACCOUNT",
+    "☁️ ACCOUNT",
+    "☁️ KONTO",
+    "☁️ COMPTE",
+    "☁️ CUENTA"
+  ],
+  [
+    "Nowa gra solo",
+    "New solo game",
+    "Nieuw solospel",
+    "Neues Solospiel",
+    "Nouvelle partie solo",
+    "Nueva partida en solitario"
+  ],
+  [
+    "↻ NOWA GRA",
+    "↻ NEW GAME",
+    "↻ NIEUW SPEL",
+    "↻ NEUES SPIEL",
+    "↻ NOUVELLE PARTIE",
+    "↻ NUEVA PARTIDA"
+  ],
+  [
+    "Wyprawa 0.13",
+    "Adventure 0.13",
+    "Avontuur 0.13",
+    "Abenteuer 0.13",
+    "Aventure 0.13",
+    "Aventura 0.13"
+  ],
+  [
+    "Wyspa, postacie i świat gry",
+    "Island, characters and game world",
+    "Eiland, personages en spelwereld",
+    "Insel, Figuren und Spielwelt",
+    "Île, personnages et monde du jeu",
+    "Isla, personajes y mundo del juego"
+  ],
+  [
+    "Wyspa 3D z kamerą zza pleców postaci",
+    "3D island with a camera behind the character",
+    "3D-eiland met de camera achter het personage",
+    "3D-Insel mit Kamera hinter der Figur",
+    "Île en 3D avec caméra derrière le personnage",
+    "Isla en 3D con cámara detrás del personaje"
+  ],
+  [
+    "Idź w górę",
+    "Move up",
+    "Omhoog bewegen",
+    "Nach oben bewegen",
+    "Aller vers le haut",
+    "Mover arriba"
+  ],
+  [
+    "Idź w lewo",
+    "Move left",
+    "Naar links bewegen",
+    "Nach links bewegen",
+    "Aller à gauche",
+    "Mover a la izquierda"
+  ],
+  [
+    "Idź w dół",
+    "Move down",
+    "Omlaag bewegen",
+    "Nach unten bewegen",
+    "Aller vers le bas",
+    "Mover abajo"
+  ],
+  [
+    "Idź w prawo",
+    "Move right",
+    "Naar rechts bewegen",
+    "Nach rechts bewegen",
+    "Aller à droite",
+    "Mover a la derecha"
+  ],
+  [
+    "🏃 SPRINT",
+    "🏃 SPRINT",
+    "🏃 SPRINT",
+    "🏃 SPRINT",
+    "🏃 SPRINT",
+    "🏃 CORRER"
+  ],
+  [
+    "🛡️ BLOK",
+    "🛡️ BLOCK",
+    "🛡️ BLOK",
+    "🛡️ BLOCK",
+    "🛡️ PARER",
+    "🛡️ BLOQUEAR"
+  ],
+  [
+    "⚔️ ATAK",
+    "⚔️ ATTACK",
+    "⚔️ AANVAL",
+    "⚔️ ANGRIFF",
+    "⚔️ ATTAQUER",
+    "⚔️ ATACAR"
+  ],
+  [
+    "🏠 BAZA",
+    "🏠 BASE",
+    "🏠 BASIS",
+    "🏠 BASIS",
+    "🏠 BASE",
+    "🏠 BASE"
+  ],
+  [
+    "🎒 PLECAK",
+    "🎒 BAG",
+    "🎒 RUGZAK",
+    "🎒 RUCKSACK",
+    "🎒 SAC",
+    "🎒 MOCHILA"
+  ],
+  [
+    "🔨 BUDUJ",
+    "🔨 BUILD",
+    "🔨 BOUW",
+    "🔨 BAUEN",
+    "🔨 BÂTIR",
+    "🔨 CONSTRUIR"
+  ],
+  [
+    "🎣 ŁÓW",
+    "🎣 FISH",
+    "🎣 VIS",
+    "🎣 ANGELN",
+    "🎣 PÊCHER",
+    "🎣 PESCAR"
+  ],
+  [
+    "DZIAŁAJ",
+    "INTERACT",
+    "ACTIE",
+    "AKTION",
+    "AGIR",
+    "ACTUAR"
+  ],
+  [
+    "WASD / strzałki · E działaj · Shift sprint · spacja atak",
+    "WASD / arrows · E interact · Shift sprint · space attack",
+    "WASD / pijltjes · E actie · Shift sprint · spatie aanval",
+    "WASD / Pfeile · E Aktion · Umschalt sprinten · Leertaste angreifen",
+    "WASD / flèches · E agir · Maj sprinter · espace attaquer",
+    "WASD / flechas · E actuar · Mayús correr · espacio atacar"
+  ],
+  [
+    "Zamknij konto gracza",
+    "Close player account",
+    "Spelersaccount sluiten",
+    "Spielerkonto schließen",
+    "Fermer le compte joueur",
+    "Cerrar la cuenta del jugador"
+  ],
+  [
+    "☁️ Twoja wyspa",
+    "☁️ Your island",
+    "☁️ Jouw eiland",
+    "☁️ Deine Insel",
+    "☁️ Votre île",
+    "☁️ Tu isla"
+  ],
+  [
+    "Ten sam postęp solo na telefonie i komputerze.",
+    "The same solo progress on your phone and computer.",
+    "Dezelfde solovoortgang op je telefoon en computer.",
+    "Derselbe Solo-Fortschritt auf Handy und Computer.",
+    "La même progression solo sur téléphone et ordinateur.",
+    "El mismo progreso en solitario en el móvil y el ordenador."
+  ],
+  [
+    "Grasz bez konta",
+    "Playing without an account",
+    "Je speelt zonder account",
+    "Du spielst ohne Konto",
+    "Vous jouez sans compte",
+    "Juegas sin cuenta"
+  ],
+  [
+    "Twój zapis jest tylko w tej przeglądarce.",
+    "Your save is only in this browser.",
+    "Je spel is alleen in deze browser opgeslagen.",
+    "Dein Spielstand ist nur in diesem Browser gespeichert.",
+    "Votre sauvegarde est uniquement dans ce navigateur.",
+    "Tu partida solo está guardada en este navegador."
+  ],
+  [
+    "Dodaj e-mail i hasło do obecnego konta. Zachowasz tę samą wyspę i wszystkie zasoby.",
+    "Add an email and password to your current account. Keep the same island and all your resources.",
+    "Voeg een e-mailadres en wachtwoord toe aan je huidige account. Je behoudt hetzelfde eiland en al je grondstoffen.",
+    "Füge deinem bisherigen Konto E-Mail und Passwort hinzu. Deine Insel und alle Ressourcen bleiben erhalten.",
+    "Ajoutez un e-mail et un mot de passe à votre compte actuel. Vous garderez la même île et toutes vos ressources.",
+    "Añade un correo y una contraseña a tu cuenta actual. Conservarás la misma isla y todos tus recursos."
+  ],
+  [
+    "Dodaj e-mail i hasło",
+    "Add email and password",
+    "E-mail en wachtwoord toevoegen",
+    "E-Mail und Passwort hinzufügen",
+    "Ajouter e-mail et mot de passe",
+    "Añadir correo y contraseña"
+  ],
+  [
+    "Zaloguj się",
+    "Sign in",
+    "Inloggen",
+    "Anmelden",
+    "Se connecter",
+    "Iniciar sesión"
+  ],
+  [
+    "Załóż konto",
+    "Create account",
+    "Account aanmaken",
+    "Konto erstellen",
+    "Créer un compte",
+    "Crear cuenta"
+  ],
+  [
+    "Zaloguj się do My Island",
+    "Sign in to My Island",
+    "Inloggen bij My Island",
+    "Bei My Island anmelden",
+    "Se connecter à My Island",
+    "Iniciar sesión en My Island"
+  ],
+  [
+    "E-mail",
+    "Email",
+    "E-mail",
+    "E-Mail",
+    "E-mail",
+    "Correo electrónico"
+  ],
+  [
+    "Kod odzyskiwania",
+    "Recovery code",
+    "Herstelcode",
+    "Wiederherstellungscode",
+    "Code de récupération",
+    "Código de recuperación"
+  ],
+  [
+    "Hasło",
+    "Password",
+    "Wachtwoord",
+    "Passwort",
+    "Mot de passe",
+    "Contraseña"
+  ],
+  [
+    "Hasło ma od 15 do 128 znaków. Możesz użyć zdania, które łatwo zapamiętasz.",
+    "Use 15 to 128 characters. A sentence you can remember works well.",
+    "Gebruik 15 tot 128 tekens. Een zin die je goed kunt onthouden is ook geschikt.",
+    "Verwende 15 bis 128 Zeichen. Du kannst einen Satz nutzen, den du dir gut merken kannst.",
+    "Utilisez 15 à 128 caractères. Vous pouvez choisir une phrase facile à retenir.",
+    "Usa entre 15 y 128 caracteres. Puedes elegir una frase fácil de recordar."
+  ],
+  [
+    "Powtórz hasło",
+    "Repeat password",
+    "Wachtwoord herhalen",
+    "Passwort wiederholen",
+    "Répéter le mot de passe",
+    "Repetir contraseña"
+  ],
+  [
+    "Nie pamiętam hasła",
+    "Forgot password",
+    "Wachtwoord vergeten",
+    "Passwort vergessen",
+    "Mot de passe oublié",
+    "Olvidé mi contraseña"
+  ],
+  [
+    "Anuluj",
+    "Cancel",
+    "Annuleren",
+    "Abbrechen",
+    "Annuler",
+    "Cancelar"
+  ],
+  [
+    "Na innym urządzeniu wpisz ten sam e-mail i hasło, aby wczytać swoją wyspę.",
+    "On another device, use the same email and password to load your island.",
+    "Gebruik op een ander apparaat hetzelfde e-mailadres en wachtwoord om je eiland te laden.",
+    "Nutze auf einem anderen Gerät dieselbe E-Mail und dasselbe Passwort, um deine Insel zu laden.",
+    "Sur un autre appareil, utilisez le même e-mail et mot de passe pour retrouver votre île.",
+    "En otro dispositivo, usa el mismo correo y contraseña para cargar tu isla."
+  ],
+  [
+    "Pierwsze konto przeniesie obecny zapis solo do chmury. Jeśli masz już wyspę na koncie, wczytamy ją, a zapis gościa pozostanie na tym urządzeniu.",
+    "Your first account moves your current solo save to the cloud. If your account already has an island, we load it and keep the guest save on this device.",
+    "Je eerste account zet je huidige solospel in de cloud. Staat er al een eiland op je account, dan laden we dat en blijft het gastspel op dit apparaat.",
+    "Dein erstes Konto überträgt deinen aktuellen Solo-Spielstand in die Cloud. Hat dein Konto bereits eine Insel, wird sie geladen. Der Gast-Spielstand bleibt auf diesem Gerät.",
+    "Votre premier compte transfère votre partie solo actuelle dans le cloud. Si votre compte possède déjà une île, nous la chargeons et gardons la partie invitée sur cet appareil.",
+    "Tu primera cuenta lleva tu partida actual en solitario a la nube. Si tu cuenta ya tiene una isla, la cargamos y la partida de invitado queda en este dispositivo."
+  ],
+  [
+    "Zachowaj kod odzyskiwania",
+    "Keep your recovery code",
+    "Bewaar je herstelcode",
+    "Bewahre deinen Wiederherstellungscode auf",
+    "Conservez votre code de récupération",
+    "Guarda tu código de recuperación"
+  ],
+  [
+    "Zapisz go poza telefonem, na przykład na kartce lub w menedżerze haseł. Kod pozwala ustawić nowe hasło i odzyskać wyspę. Każdy nowy kod zastępuje poprzedni.",
+    "Keep it outside your phone, on paper or in a password manager. It lets you set a new password and recover your island. Each new code replaces the previous one.",
+    "Bewaar de code buiten je telefoon, op papier of in een wachtwoordmanager. Hiermee stel je een nieuw wachtwoord in en krijg je je eiland terug. Elke nieuwe code vervangt de vorige.",
+    "Bewahre ihn außerhalb deines Handys auf, etwa auf Papier oder in einem Passwortmanager. Damit kannst du ein neues Passwort setzen und deine Insel wiederherstellen. Jeder neue Code ersetzt den vorherigen.",
+    "Gardez-le ailleurs que sur votre téléphone, sur papier ou dans un gestionnaire de mots de passe. Il permet de définir un nouveau mot de passe et de retrouver votre île. Chaque nouveau code remplace le précédent.",
+    "Guárdalo fuera del móvil, en papel o en un gestor de contraseñas. Permite crear una nueva contraseña y recuperar tu isla. Cada código nuevo sustituye al anterior."
+  ],
+  [
+    "Twój kod — udostępniaj go tylko sobie",
+    "Your code — keep it private",
+    "Jouw code — houd hem voor jezelf",
+    "Dein Code — behalte ihn für dich",
+    "Votre code — gardez-le pour vous",
+    "Tu código — no lo compartas"
+  ],
+  [
+    "Twój kod odzyskiwania konta",
+    "Your account recovery code",
+    "Herstelcode van je account",
+    "Dein Konto-Wiederherstellungscode",
+    "Votre code de récupération du compte",
+    "Tu código de recuperación de cuenta"
+  ],
+  [
+    "Kopiuj kod",
+    "Copy code",
+    "Code kopiëren",
+    "Code kopieren",
+    "Copier le code",
+    "Copiar código"
+  ],
+  [
+    "Kod mam zapisany",
+    "I have saved the code",
+    "Ik heb de code bewaard",
+    "Ich habe den Code gespeichert",
+    "J’ai conservé le code",
+    "Ya he guardado el código"
+  ],
+  [
+    "Zapisz teraz",
+    "Save now",
+    "Nu opslaan",
+    "Jetzt speichern",
+    "Sauvegarder maintenant",
+    "Guardar ahora"
+  ],
+  [
+    "Ponów połączenie",
+    "Reconnect",
+    "Opnieuw verbinden",
+    "Erneut verbinden",
+    "Se reconnecter",
+    "Volver a conectar"
+  ],
+  [
+    "Wyloguj z gry",
+    "Sign out of the game",
+    "Uitloggen uit het spel",
+    "Vom Spiel abmelden",
+    "Se déconnecter du jeu",
+    "Cerrar sesión en el juego"
+  ],
+  [
+    "Gra zapisuje postęp podczas gry i po zebraniu zasobów. Sprawdź „Zapisano w chmurze” przed zmianą urządzenia. Gdy nie ma sieci, bieżący postęp czeka na tym urządzeniu na ponowne połączenie.",
+    "Progress is saved while you play and collect resources. Check for Saved to cloud before changing devices. Offline progress stays on this device until you reconnect.",
+    "Je voortgang wordt opgeslagen tijdens het spelen en verzamelen. Controleer Opgeslagen in de cloud voordat je van apparaat wisselt. Zonder internet blijft je voortgang op dit apparaat tot je weer verbinding hebt.",
+    "Der Fortschritt wird beim Spielen und Sammeln gespeichert. Prüfe vor dem Gerätewechsel, ob In der Cloud gespeichert angezeigt wird. Ohne Netz bleibt der Fortschritt auf diesem Gerät, bis die Verbindung wiederhergestellt ist.",
+    "La progression est sauvegardée pendant le jeu et la collecte de ressources. Vérifiez Sauvegardé dans le cloud avant de changer d’appareil. Sans réseau, votre progression reste sur cet appareil jusqu’à la reconnexion.",
+    "El progreso se guarda mientras juegas y recoges recursos. Comprueba Guardado en la nube antes de cambiar de dispositivo. Sin conexión, el progreso queda en este dispositivo hasta que vuelvas a conectarte."
+  ],
+  [
+    "Utwórz nowy kod odzyskiwania",
+    "Create a new recovery code",
+    "Nieuwe herstelcode maken",
+    "Neuen Wiederherstellungscode erstellen",
+    "Créer un nouveau code de récupération",
+    "Crear un nuevo código de recuperación"
+  ],
+  [
+    "Dwie wersje wyspy",
+    "Two versions of your island",
+    "Twee versies van je eiland",
+    "Zwei Versionen deiner Insel",
+    "Deux versions de votre île",
+    "Dos versiones de tu isla"
+  ],
+  [
+    "Nowszy zapis pochodzi z innego urządzenia. Wybierz, którą wyspę kontynuować. Zasoby z dwóch wersji nie sumują się.",
+    "A newer save comes from another device. Choose which island to continue. Resources from the two versions cannot be combined.",
+    "Er is een nieuwere opslag van een ander apparaat. Kies met welk eiland je verder speelt. Grondstoffen uit beide versies worden niet opgeteld.",
+    "Ein neuerer Spielstand stammt von einem anderen Gerät. Wähle, welche Insel du fortsetzen möchtest. Ressourcen aus beiden Versionen werden nicht addiert.",
+    "Une sauvegarde plus récente vient d’un autre appareil. Choisissez l’île à continuer. Les ressources des deux versions ne s’additionnent pas.",
+    "Hay un guardado más reciente de otro dispositivo. Elige qué isla quieres continuar. Los recursos de ambas versiones no se suman."
+  ],
+  [
+    "Wczytaj nowszy zapis z chmury",
+    "Load the newer cloud save",
+    "Nieuwere cloudopslag laden",
+    "Neueren Cloud-Spielstand laden",
+    "Charger la sauvegarde cloud récente",
+    "Cargar el guardado más reciente de la nube"
+  ],
+  [
+    "Zapisz tę wyspę na koncie",
+    "Save this island to your account",
+    "Dit eiland op je account opslaan",
+    "Diese Insel im Konto speichern",
+    "Sauvegarder cette île sur votre compte",
+    "Guardar esta isla en tu cuenta"
+  ],
+  [
+    "Konto chroni twoją przygodę solo. Pokoje online mają osobny, wspólny postęp i działają przez 24 godziny od ostatniej gry.",
+    "Your account protects your solo adventure. Online rooms have separate shared progress and last for 24 hours after the last play session.",
+    "Je account beschermt je soloavontuur. Onlinekamers hebben hun eigen gezamenlijke voortgang en blijven 24 uur na het laatste spel beschikbaar.",
+    "Dein Konto schützt dein Solo-Abenteuer. Online-Räume haben einen eigenen gemeinsamen Fortschritt und bleiben nach dem letzten Spielen 24 Stunden verfügbar.",
+    "Votre compte protège votre aventure solo. Les salons en ligne ont une progression commune distincte et restent disponibles 24 heures après la dernière partie.",
+    "Tu cuenta protege tu aventura en solitario. Las salas en línea tienen un progreso compartido independiente y duran 24 horas desde la última partida."
+  ],
+  [
+    "Zacznij nową grę solo",
+    "Start a new solo game",
+    "Nieuw solospel beginnen",
+    "Neues Solospiel starten",
+    "Commencer une nouvelle partie solo",
+    "Empezar una nueva partida en solitario"
+  ],
+  [
+    "Zamknij nową grę",
+    "Close new game",
+    "Nieuw spel sluiten",
+    "Neues Spiel schließen",
+    "Fermer la nouvelle partie",
+    "Cerrar nueva partida"
+  ],
+  [
+    "🏝️ Nowa gra solo",
+    "🏝️ New solo game",
+    "🏝️ Nieuw solospel",
+    "🏝️ Neues Solospiel",
+    "🏝️ Nouvelle partie solo",
+    "🏝️ Nueva partida en solitario"
+  ],
+  [
+    "Zacząć przygodę od początku? Twój dotychczasowy zapis solo zostanie zastąpiony. Postać, zasoby, narzędzia, baza, monety i zadania wrócą do stanu początkowego.",
+    "Start over? Your current solo save will be replaced. Your character, resources, tools, base, coins and quests will return to their starting state.",
+    "Opnieuw beginnen? Je huidige solospel wordt vervangen. Je personage, grondstoffen, gereedschap, basis, munten en opdrachten keren terug naar de beginstand.",
+    "Von vorne beginnen? Dein bisheriger Solo-Spielstand wird ersetzt. Figur, Ressourcen, Werkzeuge, Basis, Münzen und Aufgaben kehren zum Anfangszustand zurück.",
+    "Recommencer ? Votre sauvegarde solo actuelle sera remplacée. Le personnage, les ressources, les outils, la base, les pièces et les quêtes reviendront à leur état initial.",
+    "¿Empezar de nuevo? Se sustituirá tu guardado actual en solitario. El personaje, los recursos, las herramientas, la base, las monedas y las misiones volverán al estado inicial."
+  ],
+  [
+    "Ustawienia pada i wspólne pokoje online zostają zachowane.",
+    "Controller settings and shared online rooms are kept.",
+    "Controllerinstellingen en gezamenlijke onlinekamers blijven behouden.",
+    "Controller-Einstellungen und gemeinsame Online-Räume bleiben erhalten.",
+    "Les réglages de la manette et les salons en ligne sont conservés.",
+    "Se conservan los ajustes del mando y las salas en línea compartidas."
+  ],
+  [
+    "Zacznij od nowa",
+    "Start over",
+    "Opnieuw beginnen",
+    "Neu beginnen",
+    "Recommencer",
+    "Empezar de nuevo"
+  ],
+  [
+    "Pokój online",
+    "Online room",
+    "Onlinekamer",
+    "Online-Raum",
+    "Salon en ligne",
+    "Sala en línea"
+  ],
+  [
+    "Zamknij pokój online",
+    "Close online room",
+    "Onlinekamer sluiten",
+    "Online-Raum schließen",
+    "Fermer le salon en ligne",
+    "Cerrar sala en línea"
+  ],
+  [
+    "👥 Wspólna wyspa",
+    "👥 Shared island",
+    "👥 Gezamenlijk eiland",
+    "👥 Gemeinsame Insel",
+    "👥 Île commune",
+    "👥 Isla compartida"
+  ],
+  [
+    "Maksymalnie cztery osoby. Każdy gra na swoim urządzeniu.",
+    "Up to four people. Each plays on their own device.",
+    "Maximaal vier personen. Iedereen speelt op een eigen apparaat.",
+    "Bis zu vier Personen. Jeder spielt auf seinem eigenen Gerät.",
+    "Jusqu’à quatre personnes. Chacun joue sur son appareil.",
+    "Hasta cuatro personas. Cada una juega en su propio dispositivo."
+  ],
+  [
+    "Utwórz pokój albo wpisz kod od znajomego.",
+    "Create a room or enter a friend’s code.",
+    "Maak een kamer of voer de code van een vriend in.",
+    "Erstelle einen Raum oder gib den Code eines Freundes ein.",
+    "Créez un salon ou entrez le code d’un ami.",
+    "Crea una sala o introduce el código de un amigo."
+  ],
+  [
+    "Twoje imię w grze",
+    "Your name in the game",
+    "Je naam in het spel",
+    "Dein Name im Spiel",
+    "Votre nom dans le jeu",
+    "Tu nombre en el juego"
+  ],
+  [
+    "Gracz",
+    "Player",
+    "Speler",
+    "Spieler",
+    "Joueur",
+    "Jugador"
+  ],
+  [
+    "Kod pokoju od znajomego",
+    "Room code from a friend",
+    "Kamercode van een vriend",
+    "Raumcode von einem Freund",
+    "Code du salon d’un ami",
+    "Código de sala de un amigo"
+  ],
+  [
+    "8 znaków",
+    "8 characters",
+    "8 tekens",
+    "8 Zeichen",
+    "8 caractères",
+    "8 caracteres"
+  ],
+  [
+    "Utwórz nowy pokój",
+    "Create a new room",
+    "Nieuwe kamer maken",
+    "Neuen Raum erstellen",
+    "Créer un nouveau salon",
+    "Crear una sala nueva"
+  ],
+  [
+    "Dołącz kodem",
+    "Join with code",
+    "Deelnemen met code",
+    "Mit Code beitreten",
+    "Rejoindre avec un code",
+    "Unirse con código"
+  ],
+  [
+    "Wróć do ostatniego pokoju",
+    "Return to your last room",
+    "Terug naar je laatste kamer",
+    "Zum letzten Raum zurück",
+    "Revenir au dernier salon",
+    "Volver a tu última sala"
+  ],
+  [
+    "W pokoju zaczynacie wspólną przygodę. Zasoby, narzędzia, monety, baza i zadania są wspólne. Każdy ma własne zdrowie i energię. Twój zapis solo pozostaje osobno.",
+    "Start an adventure together. Resources, tools, coins, the base and quests are shared. Each player has their own health and energy. Your solo save stays separate.",
+    "Begin samen een avontuur. Grondstoffen, gereedschap, munten, basis en opdrachten zijn gezamenlijk. Iedereen heeft eigen gezondheid en energie. Je solospel blijft apart.",
+    "Startet gemeinsam ein Abenteuer. Ressourcen, Werkzeuge, Münzen, Basis und Aufgaben werden geteilt. Jeder hat eigene Gesundheit und Energie. Dein Solo-Spielstand bleibt getrennt.",
+    "Commencez une aventure ensemble. Les ressources, outils, pièces, base et quêtes sont partagés. Chacun a sa santé et son énergie. Votre sauvegarde solo reste séparée.",
+    "Empezad una aventura juntos. Los recursos, herramientas, monedas, base y misiones son compartidos. Cada jugador tiene su propia salud y energía. Tu guardado en solitario queda aparte."
+  ],
+  [
+    "Kod dla znajomych",
+    "Code for your friends",
+    "Code voor je vrienden",
+    "Code für deine Freunde",
+    "Code pour vos amis",
+    "Código para tus amigos"
+  ],
+  [
+    "Kod bieżącego pokoju",
+    "Current room code",
+    "Code van de huidige kamer",
+    "Aktueller Raumcode",
+    "Code du salon actuel",
+    "Código de la sala actual"
+  ],
+  [
+    "Wróć na wyspę",
+    "Return to the island",
+    "Terug naar het eiland",
+    "Zurück zur Insel",
+    "Revenir sur l’île",
+    "Volver a la isla"
+  ],
+  [
+    "Gracze",
+    "Players",
+    "Spelers",
+    "Spieler",
+    "Joueurs",
+    "Jugadores"
+  ],
+  [
+    "Pokój i wspólny postęp pozostają dostępne przez 24 godziny od ostatniej gry. Po utracie połączenia wolne miejsce zwalnia się po 45 sekundach.",
+    "The room and shared progress stay available for 24 hours after the last play session. A disconnected player’s slot is released after 45 seconds.",
+    "De kamer en gezamenlijke voortgang blijven 24 uur na het laatste spel beschikbaar. Bij verbindingsverlies komt de plek na 45 seconden vrij.",
+    "Raum und gemeinsamer Fortschritt bleiben nach dem letzten Spielen 24 Stunden verfügbar. Nach einem Verbindungsabbruch wird der Platz nach 45 Sekunden freigegeben.",
+    "Le salon et la progression commune restent disponibles 24 heures après la dernière partie. Après une déconnexion, la place est libérée au bout de 45 secondes.",
+    "La sala y el progreso compartido quedan disponibles durante 24 horas desde la última partida. Si se pierde la conexión, la plaza se libera tras 45 segundos."
+  ],
+  [
+    "Opuść pokój i wróć do solo",
+    "Leave the room and return to solo",
+    "Kamer verlaten en terug naar solo",
+    "Raum verlassen und solo weiterspielen",
+    "Quitter le salon et revenir en solo",
+    "Salir de la sala y volver a jugar en solitario"
+  ],
+  [
+    "Zamknij sterowanie",
+    "Close controls",
+    "Bediening sluiten",
+    "Steuerung schließen",
+    "Fermer les commandes",
+    "Cerrar controles"
+  ],
+  [
+    "🎮 Pad i joystick",
+    "🎮 Gamepad and joystick",
+    "🎮 Gamepad en joystick",
+    "🎮 Gamepad und Joystick",
+    "🎮 Manette et joystick",
+    "🎮 Mando y joystick"
+  ],
+  [
+    "Podłącz kontroler przez USB lub sparuj go przez Bluetooth z urządzeniem. Wróć do gry i naciśnij przycisk na kontrolerze.",
+    "Connect your controller by USB or pair it with your device using Bluetooth. Return to the game and press a controller button.",
+    "Sluit je controller aan via USB of koppel hem via Bluetooth. Ga terug naar het spel en druk op een knop op de controller.",
+    "Verbinde den Controller über USB oder kopple ihn per Bluetooth. Kehre zum Spiel zurück und drücke eine Controller-Taste.",
+    "Branchez votre manette en USB ou associez-la en Bluetooth. Revenez dans le jeu et appuyez sur un bouton de la manette.",
+    "Conecta el mando por USB o empareja el dispositivo por Bluetooth. Vuelve al juego y pulsa un botón del mando."
+  ],
+  [
+    "Czekam na kontroler…",
+    "Waiting for a controller…",
+    "Wachten op een controller…",
+    "Warte auf Controller…",
+    "En attente d’une manette…",
+    "Esperando un mando…"
+  ],
+  [
+    "Tutaj sprawdzisz ruch drążka i przyciski.",
+    "Check stick movement and buttons here.",
+    "Test hier de beweging van de stick en de knoppen.",
+    "Hier kannst du Stick und Tasten testen.",
+    "Testez ici le stick et les boutons.",
+    "Comprueba aquí el movimiento del stick y los botones."
+  ],
+  [
+    "Drążek: ruch. W menu wybieraj góra/dół, zatwierdzaj przyciskiem DZIAŁAJ.",
+    "Stick: move. In menus, select up/down and confirm with INTERACT.",
+    "Stick: bewegen. Kies in menu’s omhoog/omlaag en bevestig met ACTIE.",
+    "Stick: bewegen. Im Menü oben/unten auswählen und mit AKTION bestätigen.",
+    "Stick : déplacement. Dans les menus, choisissez haut/bas et validez avec AGIR.",
+    "Stick: mover. En los menús, elige arriba/abajo y confirma con ACTUAR."
+  ],
+  [
+    "Zmień kontroler",
+    "Switch controller",
+    "Andere controller",
+    "Controller wechseln",
+    "Changer de manette",
+    "Cambiar mando"
+  ],
+  [
+    "Przywróć przyciski",
+    "Restore buttons",
+    "Knoppen herstellen",
+    "Tasten zurücksetzen",
+    "Rétablir les boutons",
+    "Restablecer botones"
+  ],
+  [
+    "👥 Pokoje online",
+    "👥 Online rooms",
+    "👥 Onlinekamers",
+    "👥 Online-Räume",
+    "👥 Salons en ligne",
+    "👥 Salas en línea"
+  ],
+  [
+    "Przyciski",
+    "Buttons",
+    "Knoppen",
+    "Tasten",
+    "Boutons",
+    "Botones"
+  ],
+  [
+    "Kliknij „Zmień”, potem naciśnij wybrany przycisk na kontrolerze. Ustawienia zapamiętują się dla tego urządzenia.",
+    "Select Change, then press the controller button you want to use. Settings are saved for this device.",
+    "Kies Wijzigen en druk op de gewenste controllerknop. De instellingen worden voor dit apparaat opgeslagen.",
+    "Wähle Ändern und drücke die gewünschte Controller-Taste. Die Einstellungen werden für dieses Gerät gespeichert.",
+    "Choisissez Modifier, puis appuyez sur le bouton souhaité. Les réglages sont conservés pour cet appareil.",
+    "Elige Cambiar y pulsa el botón que quieras usar. Los ajustes se guardan para este dispositivo."
+  ],
+  [
+    "DZIAŁAJ / zatwierdź / GRAJ",
+    "INTERACT / confirm / PLAY",
+    "ACTIE / bevestigen / SPEEL",
+    "AKTION / bestätigen / SPIELEN",
+    "AGIR / valider / JOUER",
+    "ACTUAR / confirmar / JUGAR"
+  ],
+  [
+    "A / ✕ · Zmień",
+    "A / ✕ · Change",
+    "A / ✕ · Wijzigen",
+    "A / ✕ · Ändern",
+    "A / ✕ · Modifier",
+    "A / ✕ · Cambiar"
+  ],
+  [
+    "ATAK",
+    "ATTACK",
+    "AANVAL",
+    "ANGRIFF",
+    "ATTAQUER",
+    "ATACAR"
+  ],
+  [
+    "X / □ · Zmień",
+    "X / □ · Change",
+    "X / □ · Wijzigen",
+    "X / □ · Ändern",
+    "X / □ · Modifier",
+    "X / □ · Cambiar"
+  ],
+  [
+    "PLECAK",
+    "BAG",
+    "RUGZAK",
+    "RUCKSACK",
+    "SAC",
+    "MOCHILA"
+  ],
+  [
+    "Y / △ · Zmień",
+    "Y / △ · Change",
+    "Y / △ · Wijzigen",
+    "Y / △ · Ändern",
+    "Y / △ · Modifier",
+    "Y / △ · Cambiar"
+  ],
+  [
+    "SPRINT (trzymaj)",
+    "SPRINT (hold)",
+    "SPRINT (vasthouden)",
+    "SPRINT (halten)",
+    "SPRINT (maintenir)",
+    "CORRER (mantener)"
+  ],
+  [
+    "RT / R2 · Zmień",
+    "RT / R2 · Change",
+    "RT / R2 · Wijzigen",
+    "RT / R2 · Ändern",
+    "RT / R2 · Modifier",
+    "RT / R2 · Cambiar"
+  ],
+  [
+    "BLOK (trzymaj)",
+    "BLOCK (hold)",
+    "BLOK (vasthouden)",
+    "BLOCK (halten)",
+    "PARER (maintenir)",
+    "BLOQUEAR (mantener)"
+  ],
+  [
+    "LT / L2 · Zmień",
+    "LT / L2 · Change",
+    "LT / L2 · Wijzigen",
+    "LT / L2 · Ändern",
+    "LT / L2 · Modifier",
+    "LT / L2 · Cambiar"
+  ],
+  [
+    "ŁÓW",
+    "FISH",
+    "VIS",
+    "ANGELN",
+    "PÊCHER",
+    "PESCAR"
+  ],
+  [
+    "RB / R1 · Zmień",
+    "RB / R1 · Change",
+    "RB / R1 · Wijzigen",
+    "RB / R1 · Ändern",
+    "RB / R1 · Modifier",
+    "RB / R1 · Cambiar"
+  ],
+  [
+    "BAZA",
+    "BASE",
+    "BASIS",
+    "BASIS",
+    "BASE",
+    "BASE"
+  ],
+  [
+    "LB / L1 · Zmień",
+    "LB / L1 · Change",
+    "LB / L1 · Wijzigen",
+    "LB / L1 · Ändern",
+    "LB / L1 · Modifier",
+    "LB / L1 · Cambiar"
+  ],
+  [
+    "BUDUJ",
+    "BUILD",
+    "BOUW",
+    "BAUEN",
+    "BÂTIR",
+    "CONSTRUIR"
+  ],
+  [
+    "View / Share · Zmień",
+    "View / Share · Change",
+    "View / Share · Wijzigen",
+    "View / Share · Ändern",
+    "View / Share · Modifier",
+    "View / Share · Cambiar"
+  ],
+  [
+    "Menu sterowania / zamknij",
+    "Controls menu / close",
+    "Bedieningsmenu / sluiten",
+    "Steuerungsmenü / schließen",
+    "Menu des commandes / fermer",
+    "Menú de controles / cerrar"
+  ],
+  [
+    "Menu / Options · Zmień",
+    "Menu / Options · Change",
+    "Menu / Options · Wijzigen",
+    "Menu / Options · Ändern",
+    "Menu / Options · Modifier",
+    "Menu / Options · Cambiar"
+  ],
+  [
+    "Wróć / zamknij",
+    "Back / close",
+    "Terug / sluiten",
+    "Zurück / schließen",
+    "Retour / fermer",
+    "Volver / cerrar"
+  ],
+  [
+    "B / ○ · Zmień",
+    "B / ○ · Change",
+    "B / ○ · Wijzigen",
+    "B / ○ · Ändern",
+    "B / ○ · Modifier",
+    "B / ○ · Cambiar"
+  ],
+  [
+    "Drążek",
+    "Stick",
+    "Stick",
+    "Stick",
+    "Stick",
+    "Stick"
+  ],
+  [
+    "Ruch lewo/prawo: oś 1",
+    "Move left/right: axis 1",
+    "Links/rechts bewegen: as 1",
+    "Links/rechts bewegen: Achse 1",
+    "Gauche/droite : axe 1",
+    "Mover izquierda/derecha: eje 1"
+  ],
+  [
+    "Ruch góra/dół: oś 2",
+    "Move up/down: axis 2",
+    "Omhoog/omlaag bewegen: as 2",
+    "Oben/unten bewegen: Achse 2",
+    "Haut/bas : axe 2",
+    "Mover arriba/abajo: eje 2"
+  ],
+  [
+    "Odwróć góra/dół: nie",
+    "Invert up/down: no",
+    "Omhoog/omlaag omkeren: nee",
+    "Oben/unten umkehren: nein",
+    "Inverser haut/bas : non",
+    "Invertir arriba/abajo: no"
+  ],
+  [
+    "Martwa strefa: 18%",
+    "Deadzone: 18%",
+    "Dode zone: 18%",
+    "Totzone: 18%",
+    "Zone morte : 18%",
+    "Zona muerta: 18%"
+  ],
+  [
+    "Jeśli postać rusza sama, zwiększ martwą strefę. Dla innego joysticka możesz zmienić osie i przyciski. Dostępność kontrolera zależy od urządzenia i przeglądarki.",
+    "If your character moves on its own, increase the deadzone. For a different joystick, you can change axes and buttons. Controller support depends on your device and browser.",
+    "Vergroot de dode zone als je personage vanzelf beweegt. Bij een andere joystick kun je de assen en knoppen aanpassen. Ondersteuning hangt af van je apparaat en browser.",
+    "Erhöhe die Totzone, wenn sich die Figur von selbst bewegt. Bei einem anderen Joystick kannst du Achsen und Tasten ändern. Die Unterstützung hängt von Gerät und Browser ab.",
+    "Si votre personnage bouge tout seul, augmentez la zone morte. Vous pouvez changer les axes et boutons d’un autre joystick. La compatibilité dépend de l’appareil et du navigateur.",
+    "Si el personaje se mueve solo, aumenta la zona muerta. Puedes cambiar los ejes y botones de otro joystick. La compatibilidad depende del dispositivo y del navegador."
+  ],
+  [
+    "Warsztat",
+    "Workshop",
+    "Werkplaats",
+    "Werkstatt",
+    "Atelier",
+    "Taller"
+  ],
+  [
+    "Zamknij warsztat",
+    "Close workshop",
+    "Werkplaats sluiten",
+    "Werkstatt schließen",
+    "Fermer l’atelier",
+    "Cerrar taller"
+  ],
+  [
+    "🔨 Warsztat",
+    "🔨 Workshop",
+    "🔨 Werkplaats",
+    "🔨 Werkstatt",
+    "🔨 Atelier",
+    "🔨 Taller"
+  ],
+  [
+    "Narzędzia na wyprawę.",
+    "Tools for your adventure.",
+    "Gereedschap voor je avontuur.",
+    "Werkzeuge für dein Abenteuer.",
+    "Des outils pour votre aventure.",
+    "Herramientas para tu aventura."
+  ],
+  [
+    "⚔️ Włócznia",
+    "⚔️ Spear",
+    "⚔️ Speer",
+    "⚔️ Speer",
+    "⚔️ Lance",
+    "⚔️ Lanza"
+  ],
+  [
+    "6 drewna + 4 kamienie",
+    "6 wood + 4 stones",
+    "6 hout + 4 stenen",
+    "6 Holz + 4 Steine",
+    "6 bois + 4 pierres",
+    "6 de madera + 4 piedras"
+  ],
+  [
+    "Zrób",
+    "Craft",
+    "Maak",
+    "Herstellen",
+    "Fabriquer",
+    "Fabricar"
+  ],
+  [
+    "🎣 Wędka",
+    "🎣 Fishing rod",
+    "🎣 Hengel",
+    "🎣 Angel",
+    "🎣 Canne à pêche",
+    "🎣 Caña de pescar"
+  ],
+  [
+    "5 drewna + 2 muszelki",
+    "5 wood + 2 shells",
+    "5 hout + 2 schelpen",
+    "5 Holz + 2 Muscheln",
+    "5 bois + 2 coquillages",
+    "5 de madera + 2 conchas"
+  ],
+  [
+    "🛶 Tratwa",
+    "🛶 Raft",
+    "🛶 Vlot",
+    "🛶 Floß",
+    "🛶 Radeau",
+    "🛶 Balsa"
+  ],
+  [
+    "12 drewna + 6 muszelek",
+    "12 wood + 6 shells",
+    "12 hout + 6 schelpen",
+    "12 Holz + 6 Muscheln",
+    "12 bois + 6 coquillages",
+    "12 de madera + 6 conchas"
+  ],
+  [
+    "Zbuduj",
+    "Build",
+    "Bouw",
+    "Bauen",
+    "Construire",
+    "Construir"
+  ],
+  [
+    "Centrum bazy",
+    "Base camp",
+    "Basiskamp",
+    "Basislager",
+    "Camp de base",
+    "Campamento base"
+  ],
+  [
+    "Zamknij bazę",
+    "Close base",
+    "Basis sluiten",
+    "Basis schließen",
+    "Fermer la base",
+    "Cerrar base"
+  ],
+  [
+    "🏠 Centrum bazy",
+    "🏠 Base camp",
+    "🏠 Basiskamp",
+    "🏠 Basislager",
+    "🏠 Camp de base",
+    "🏠 Campamento base"
+  ],
+  [
+    "Twoje miejsce odpoczynku.",
+    "Your place to rest.",
+    "Jouw plek om uit te rusten.",
+    "Dein Ort zum Ausruhen.",
+    "Votre lieu de repos.",
+    "Tu lugar para descansar."
+  ],
+  [
+    "Poziom bazy:",
+    "Base level:",
+    "Basisniveau:",
+    "Basisstufe:",
+    "Niveau de la base :",
+    "Nivel de la base:"
+  ],
+  [
+    "🏠 Baza L1",
+    "🏠 Base L1",
+    "🏠 Basis L1",
+    "🏠 Basis L1",
+    "🏠 Base N1",
+    "🏠 Base N1"
+  ],
+  [
+    "12 drewna + 8 kamieni",
+    "12 wood + 8 stones",
+    "12 hout + 8 stenen",
+    "12 Holz + 8 Steine",
+    "12 bois + 8 pierres",
+    "12 de madera + 8 piedras"
+  ],
+  [
+    "Buduj",
+    "Build",
+    "Bouw",
+    "Bauen",
+    "Construire",
+    "Construir"
+  ],
+  [
+    "🛖 Baza L2",
+    "🛖 Base L2",
+    "🛖 Basis L2",
+    "🛖 Basis L2",
+    "🛖 Base N2",
+    "🛖 Base N2"
+  ],
+  [
+    "18 drewna + 12 kamieni + 50 monet",
+    "18 wood + 12 stones + 50 coins",
+    "18 hout + 12 stenen + 50 munten",
+    "18 Holz + 12 Steine + 50 Münzen",
+    "18 bois + 12 pierres + 50 pièces",
+    "18 de madera + 12 piedras + 50 monedas"
+  ],
+  [
+    "Ulepsz",
+    "Upgrade",
+    "Verbeter",
+    "Ausbauen",
+    "Améliorer",
+    "Mejorar"
+  ],
+  [
+    "🏡 Baza L3",
+    "🏡 Base L3",
+    "🏡 Basis L3",
+    "🏡 Basis L3",
+    "🏡 Base N3",
+    "🏡 Base N3"
+  ],
+  [
+    "28 drewna + 18 kamieni + 100 monet",
+    "28 wood + 18 stones + 100 coins",
+    "28 hout + 18 stenen + 100 munten",
+    "28 Holz + 18 Steine + 100 Münzen",
+    "28 bois + 18 pierres + 100 pièces",
+    "28 de madera + 18 piedras + 100 monedas"
+  ],
+  [
+    "🔥 Ognisko",
+    "🔥 Campfire",
+    "🔥 Kampvuur",
+    "🔥 Lagerfeuer",
+    "🔥 Feu de camp",
+    "🔥 Hoguera"
+  ],
+  [
+    "Zbuduj bazę L1, potem rozpal ognisko.",
+    "Build base L1, then light a campfire.",
+    "Bouw basis L1 en maak daarna een kampvuur.",
+    "Baue Basis L1 und entzünde dann ein Lagerfeuer.",
+    "Construisez la base N1, puis allumez un feu de camp.",
+    "Construye la base N1 y después enciende una hoguera."
+  ],
+  [
+    "Rozpal ognisko",
+    "Light a campfire",
+    "Kampvuur maken",
+    "Lagerfeuer entzünden",
+    "Allumer un feu",
+    "Encender una hoguera"
+  ],
+  [
+    "4 drewna + 2 kamienie · przy twojej bazie",
+    "4 wood + 2 stones · at your base",
+    "4 hout + 2 stenen · bij je basis",
+    "4 Holz + 2 Steine · bei deiner Basis",
+    "4 bois + 2 pierres · à votre base",
+    "4 de madera + 2 piedras · en tu base"
+  ],
+  [
+    "Rozpal",
+    "Light",
+    "Steek aan",
+    "Entzünden",
+    "Allumer",
+    "Encender"
+  ],
+  [
+    "Upiecz rybę",
+    "Cook a fish",
+    "Vis bakken",
+    "Fisch braten",
+    "Cuire un poisson",
+    "Cocinar un pescado"
+  ],
+  [
+    "1 surowa ryba + 1 drewno · przy ognisku",
+    "1 raw fish + 1 wood · at the campfire",
+    "1 rauwe vis + 1 hout · bij het kampvuur",
+    "1 roher Fisch + 1 Holz · am Lagerfeuer",
+    "1 poisson cru + 1 bois · au feu de camp",
+    "1 pescado crudo + 1 de madera · en la hoguera"
+  ],
+  [
+    "Upiecz",
+    "Cook",
+    "Bak",
+    "Braten",
+    "Cuire",
+    "Cocinar"
+  ],
+  [
+    "Odpoczynek",
+    "Rest",
+    "Rust",
+    "Ruhe",
+    "Repos",
+    "Descanso"
+  ],
+  [
+    "5 sekund · do +40 zdrowia i +70 energii",
+    "5 seconds · up to +40 health and +70 energy",
+    "5 seconden · tot +40 gezondheid en +70 energie",
+    "5 Sekunden · bis zu +40 Gesundheit und +70 Energie",
+    "5 secondes · jusqu’à +40 santé et +70 énergie",
+    "5 segundos · hasta +40 salud y +70 energía"
+  ],
+  [
+    "Odpocznij",
+    "Rest",
+    "Rust uit",
+    "Ausruhen",
+    "Se reposer",
+    "Descansar"
+  ],
+  [
+    "Plecak",
+    "Bag",
+    "Rugzak",
+    "Rucksack",
+    "Sac",
+    "Mochila"
+  ],
+  [
+    "Zamknij plecak",
+    "Close bag",
+    "Rugzak sluiten",
+    "Rucksack schließen",
+    "Fermer le sac",
+    "Cerrar mochila"
+  ],
+  [
+    "🎒 Plecak",
+    "🎒 Bag",
+    "🎒 Rugzak",
+    "🎒 Rucksack",
+    "🎒 Sac",
+    "🎒 Mochila"
+  ],
+  [
+    "Zjedz coś przed kolejną wyprawą.",
+    "Eat before your next adventure.",
+    "Eet iets voor je volgende avontuur.",
+    "Iss etwas vor deinem nächsten Abenteuer.",
+    "Mangez avant votre prochaine aventure.",
+    "Come algo antes de tu próxima aventura."
+  ],
+  [
+    "🥥 Kokosy:",
+    "🥥 Coconuts:",
+    "🥥 Kokosnoten:",
+    "🥥 Kokosnüsse:",
+    "🥥 Noix de coco :",
+    "🥥 Cocos:"
+  ],
+  [
+    "+20 zdrowia · +15 energii",
+    "+20 health · +15 energy",
+    "+20 gezondheid · +15 energie",
+    "+20 Gesundheit · +15 Energie",
+    "+20 santé · +15 énergie",
+    "+20 salud · +15 energía"
+  ],
+  [
+    "Zjedz kokos",
+    "Eat coconut",
+    "Eet kokosnoot",
+    "Kokosnuss essen",
+    "Manger une noix de coco",
+    "Comer coco"
+  ],
+  [
+    "🐟 Surowe ryby:",
+    "🐟 Raw fish:",
+    "🐟 Rauwe vissen:",
+    "🐟 Rohe Fische:",
+    "🐟 Poissons crus :",
+    "🐟 Pescados crudos:"
+  ],
+  [
+    "Upiecz je przy ognisku lub sprzedaj.",
+    "Cook them at the campfire or sell them.",
+    "Bak ze bij het kampvuur of verkoop ze.",
+    "Brate sie am Lagerfeuer oder verkaufe sie.",
+    "Cuisez-les au feu de camp ou vendez-les.",
+    "Cocínalos en la hoguera o véndelos."
+  ],
+  [
+    "🍽️ Pieczone ryby:",
+    "🍽️ Cooked fish:",
+    "🍽️ Gebakken vissen:",
+    "🍽️ Gebratene Fische:",
+    "🍽️ Poissons cuits :",
+    "🍽️ Pescados cocinados:"
+  ],
+  [
+    "+45 zdrowia · +35 energii",
+    "+45 health · +35 energy",
+    "+45 gezondheid · +35 energie",
+    "+45 Gesundheit · +35 Energie",
+    "+45 santé · +35 énergie",
+    "+45 salud · +35 energía"
+  ],
+  [
+    "Zjedz rybę",
+    "Eat fish",
+    "Eet vis",
+    "Fisch essen",
+    "Manger du poisson",
+    "Comer pescado"
+  ],
+  [
+    "Włócznia:",
+    "Spear:",
+    "Speer:",
+    "Speer:",
+    "Lance :",
+    "Lanza:"
+  ],
+  [
+    "brak",
+    "none",
+    "geen",
+    "keine",
+    "aucun",
+    "ninguno"
+  ],
+  [
+    "· Wędka:",
+    "· Fishing rod:",
+    "· Hengel:",
+    "· Angel:",
+    "· Canne à pêche :",
+    "· Caña de pescar:"
+  ],
+  [
+    "Tratwa:",
+    "Raft:",
+    "Vlot:",
+    "Floß:",
+    "Radeau :",
+    "Balsa:"
+  ],
+  [
+    "· Skarb:",
+    "· Treasure:",
+    "· Schat:",
+    "· Schatz:",
+    "· Trésor :",
+    "· Tesoro:"
+  ],
+  [
+    "Handlarz Leon",
+    "Merchant Leon",
+    "Handelaar Leon",
+    "Händler Leon",
+    "Marchand Leon",
+    "Comerciante Leon"
+  ],
+  [
+    "Zamknij handel",
+    "Close trading",
+    "Handel sluiten",
+    "Handel schließen",
+    "Fermer le commerce",
+    "Cerrar comercio"
+  ],
+  [
+    "🧑‍🌾 Leon — handlarz",
+    "🧑‍🌾 Leon — merchant",
+    "🧑‍🌾 Leon — handelaar",
+    "🧑‍🌾 Leon — Händler",
+    "🧑‍🌾 Leon — marchand",
+    "🧑‍🌾 Leon — comerciante"
+  ],
+  [
+    "„Masz nadmiar? Ja mam miejsce na straganie!”",
+    "Got a surplus? I have room on my stall!",
+    "Iets over? Ik heb plaats op mijn kraam!",
+    "Hast du etwas übrig? Mein Stand hat noch Platz!",
+    "Du surplus ? J’ai de la place sur mon étal !",
+    "¿Te sobra algo? ¡Tengo sitio en mi puesto!"
+  ],
+  [
+    "Twoje monety:",
+    "Your coins:",
+    "Je munten:",
+    "Deine Münzen:",
+    "Vos pièces :",
+    "Tus monedas:"
+  ],
+  [
+    "Kup materiały",
+    "Buy materials",
+    "Materialen kopen",
+    "Material kaufen",
+    "Acheter des matériaux",
+    "Comprar materiales"
+  ],
+  [
+    "🪵 5 drewna",
+    "🪵 5 wood",
+    "🪵 5 hout",
+    "🪵 5 Holz",
+    "🪵 5 bois",
+    "🪵 5 de madera"
+  ],
+  [
+    "20 monet",
+    "20 coins",
+    "20 munten",
+    "20 Münzen",
+    "20 pièces",
+    "20 monedas"
+  ],
+  [
+    "Kup",
+    "Buy",
+    "Koop",
+    "Kaufen",
+    "Acheter",
+    "Comprar"
+  ],
+  [
+    "🪨 5 kamieni",
+    "🪨 5 stones",
+    "🪨 5 stenen",
+    "🪨 5 Steine",
+    "🪨 5 pierres",
+    "🪨 5 piedras"
+  ],
+  [
+    "25 monet",
+    "25 coins",
+    "25 munten",
+    "25 Münzen",
+    "25 pièces",
+    "25 monedas"
+  ],
+  [
+    "🥥 2 kokosy",
+    "🥥 2 coconuts",
+    "🥥 2 kokosnoten",
+    "🥥 2 Kokosnüsse",
+    "🥥 2 noix de coco",
+    "🥥 2 cocos"
+  ],
+  [
+    "16 monet",
+    "16 coins",
+    "16 munten",
+    "16 Münzen",
+    "16 pièces",
+    "16 monedas"
+  ],
+  [
+    "Sprzedaj zasoby",
+    "Sell resources",
+    "Grondstoffen verkopen",
+    "Ressourcen verkaufen",
+    "Vendre des ressources",
+    "Vender recursos"
+  ],
+  [
+    "Dostaniesz 10 monet",
+    "Receive 10 coins",
+    "Je krijgt 10 munten",
+    "Du erhältst 10 Münzen",
+    "Vous recevez 10 pièces",
+    "Recibes 10 monedas"
+  ],
+  [
+    "Sprzedaj",
+    "Sell",
+    "Verkoop",
+    "Verkaufen",
+    "Vendre",
+    "Vender"
+  ],
+  [
+    "🐟 1 surowa ryba",
+    "🐟 1 raw fish",
+    "🐟 1 rauwe vis",
+    "🐟 1 roher Fisch",
+    "🐟 1 poisson cru",
+    "🐟 1 pescado crudo"
+  ],
+  [
+    "Dostaniesz 12 monet",
+    "Receive 12 coins",
+    "Je krijgt 12 munten",
+    "Du erhältst 12 Münzen",
+    "Vous recevez 12 pièces",
+    "Recibes 12 monedas"
+  ],
+  [
+    "🐚 2 muszelki",
+    "🐚 2 shells",
+    "🐚 2 schelpen",
+    "🐚 2 Muscheln",
+    "🐚 2 coquillages",
+    "🐚 2 conchas"
+  ],
+  [
+    "Dostaniesz 8 monet",
+    "Receive 8 coins",
+    "Je krijgt 8 munten",
+    "Du erhältst 8 Münzen",
+    "Vous recevez 8 pièces",
+    "Recibes 8 monedas"
+  ],
+  [
+    "📜 Dostawa dla Leona",
+    "📜 Delivery for Leon",
+    "📜 Levering voor Leon",
+    "📜 Lieferung für Leon",
+    "📜 Livraison pour Leon",
+    "📜 Entrega para Leon"
+  ],
+  [
+    "Nagroda: 40 monet + 60 XP",
+    "Reward: 40 coins + 60 XP",
+    "Beloning: 40 munten + 60 XP",
+    "Belohnung: 40 Münzen + 60 XP",
+    "Récompense : 40 pièces + 60 XP",
+    "Recompensa: 40 monedas + 60 XP"
+  ],
+  [
+    "Dostarcz",
+    "Deliver",
+    "Lever",
+    "Liefern",
+    "Livrer",
+    "Entregar"
+  ],
+  [
+    "Zadania Neli",
+    "Nela’s quests",
+    "Opdrachten van Nela",
+    "Nelas Aufgaben",
+    "Quêtes de Nela",
+    "Misiones de Nela"
+  ],
+  [
+    "Zamknij zadania",
+    "Close quests",
+    "Opdrachten sluiten",
+    "Aufgaben schließen",
+    "Fermer les quêtes",
+    "Cerrar misiones"
+  ],
+  [
+    "👩‍🦰 Nela — zadania",
+    "👩‍🦰 Nela — quests",
+    "👩‍🦰 Nela — opdrachten",
+    "👩‍🦰 Nela — Aufgaben",
+    "👩‍🦰 Nela — quêtes",
+    "👩‍🦰 Nela — misiones"
+  ],
+  [
+    "„Na wyspie zawsze przyda się pomocna dłoń.”",
+    "A helping hand is always welcome on the island.",
+    "Een helpende hand is altijd welkom op het eiland.",
+    "Auf der Insel ist eine helfende Hand immer willkommen.",
+    "Une main secourable est toujours bienvenue sur l’île.",
+    "Una mano amiga siempre es bienvenida en la isla."
+  ],
+  [
+    "Ryby dla mieszkańców",
+    "Fish for the residents",
+    "Vis voor de bewoners",
+    "Fische für die Bewohner",
+    "Poissons pour les habitants",
+    "Pescado para los habitantes"
+  ],
+  [
+    "Dostarcz 3 ryby (surowe lub pieczone). Nagroda: 70 monet + 80 XP",
+    "Deliver 3 fish, raw or cooked. Reward: 70 coins + 80 XP",
+    "Lever 3 rauwe of gebakken vissen. Beloning: 70 munten + 80 XP",
+    "Liefere 3 rohe oder gebratene Fische. Belohnung: 70 Münzen + 80 XP",
+    "Livrez 3 poissons crus ou cuits. Récompense : 70 pièces + 80 XP",
+    "Entrega 3 pescados crudos o cocinados. Recompensa: 70 monedas + 80 XP"
+  ],
+  [
+    "Dostarcz ryby",
+    "Deliver fish",
+    "Lever vissen",
+    "Fische liefern",
+    "Livrer les poissons",
+    "Entregar pescado"
+  ],
+  [
+    "💎 Wyprawa po skarb",
+    "💎 Treasure adventure",
+    "💎 Schattenjacht",
+    "💎 Schatzsuche",
+    "💎 Chasse au trésor",
+    "💎 Búsqueda del tesoro"
+  ],
+  [
+    "Zbuduj tratwę i znajdź drugą wyspę na południowym wschodzie.",
+    "Build a raft and find the second island to the southeast.",
+    "Bouw een vlot en vind het tweede eiland in het zuidoosten.",
+    "Baue ein Floß und finde die zweite Insel im Südosten.",
+    "Construisez un radeau et trouvez la deuxième île au sud-est.",
+    "Construye una balsa y encuentra la segunda isla al sureste."
+  ],
+  [
+    "WRÓĆ",
+    "BACK",
+    "TERUG",
+    "ZURÜCK",
+    "RETOUR",
+    "VOLVER"
+  ],
+  [
+    "BLOK",
+    "BLOCK",
+    "BLOK",
+    "BLOCK",
+    "PARER",
+    "BLOQUEAR"
+  ],
+  [
+    "SPRINT",
+    "SPRINT",
+    "SPRINT",
+    "SPRINT",
+    "SPRINT",
+    "CORRER"
+  ],
+  [
+    "MENU",
+    "MENU",
+    "MENU",
+    "MENÜ",
+    "MENU",
+    "MENÚ"
+  ],
+  [
+    "WSPÓLNA BAZA",
+    "SHARED BASE",
+    "GEZAMENLIJKE BASIS",
+    "GEMEINSAME BASIS",
+    "BASE COMMUNE",
+    "BASE COMPARTIDA"
+  ],
+  [
+    "TWOJA BAZA",
+    "YOUR BASE",
+    "JOUW BASIS",
+    "DEINE BASIS",
+    "VOTRE BASE",
+    "TU BASE"
+  ],
+  [
+    "Widok 3D jest chwilowo niedostępny. Możesz kontynuować w 2D.",
+    "3D view is temporarily unavailable. You can continue in 2D.",
+    "3D is tijdelijk niet beschikbaar. Je kunt verder spelen in 2D.",
+    "Die 3D-Ansicht ist vorübergehend nicht verfügbar. Du kannst in 2D weiterspielen.",
+    "La vue 3D est temporairement indisponible. Vous pouvez continuer en 2D.",
+    "La vista 3D no está disponible temporalmente. Puedes continuar en 2D."
+  ],
+  [
+    "NELA · ZADANIA",
+    "NELA · QUESTS",
+    "NELA · OPDRACHTEN",
+    "NELA · AUFGABEN",
+    "NELA · QUÊTES",
+    "NELA · MISIONES"
+  ],
+  [
+    "LEON · HANDLARZ",
+    "LEON · MERCHANT",
+    "LEON · HANDELAAR",
+    "LEON · HÄNDLER",
+    "LEON · MARCHAND",
+    "LEON · COMERCIANTE"
+  ],
+  [
+    " · TY",
+    " · YOU",
+    " · JIJ",
+    " · DU",
+    " · VOUS",
+    " · TÚ"
+  ],
+  [
+    "PÓŁNOCNA ZATOKA",
+    "NORTHERN BAY",
+    "NOORDELIJKE BAAI",
+    "NORDBUCHT",
+    "BAIE DU NORD",
+    "BAHÍA NORTE"
+  ],
+  [
+    "WYSPA SKARBU",
+    "TREASURE ISLAND",
+    "SCHATEILAND",
+    "SCHATZINSEL",
+    "ÎLE AU TRÉSOR",
+    "ISLA DEL TESORO"
+  ],
+  [
+    "Odrodzenie przy bazie. Zjedz coś lub odpocznij przy ognisku.",
+    "Respawned at the base. Eat or rest at the campfire.",
+    "Opnieuw verschenen bij de basis. Eet iets of rust bij het kampvuur.",
+    "An der Basis wiedergeboren. Iss etwas oder ruhe dich am Lagerfeuer aus.",
+    "Vous réapparaissez à la base. Mangez ou reposez-vous au feu de camp.",
+    "Has reaparecido en la base. Come algo o descansa en la hoguera."
+  ],
+  [
+    "👥 ŁĄCZĘ…",
+    "👥 CONNECTING…",
+    "👥 VERBINDEN…",
+    "👥 VERBINDE…",
+    "👥 CONNEXION…",
+    "👥 CONECTANDO…"
+  ],
+  [
+    "Sesja zakończona. Wróć do solo i dołącz ponownie.",
+    "Session ended. Return to solo and join again.",
+    "De sessie is afgelopen. Ga terug naar solo en neem opnieuw deel.",
+    "Sitzung beendet. Kehre zu Solo zurück und tritt erneut bei.",
+    "Session terminée. Revenez en solo et rejoignez le salon à nouveau.",
+    "La sesión ha terminado. Vuelve al modo en solitario y únete otra vez."
+  ],
+  [
+    "Jesteście na wspólnej wyspie. Podaj znajomym kod pokoju.",
+    "You are on a shared island. Give your friends the room code.",
+    "Jullie zijn op een gezamenlijk eiland. Geef je vrienden de kamercode.",
+    "Ihr seid auf einer gemeinsamen Insel. Gib deinen Freunden den Raumcode.",
+    "Vous êtes sur une île commune. Donnez le code du salon à vos amis.",
+    "Estáis en una isla compartida. Da el código de sala a tus amigos."
+  ],
+  [
+    "Połączenie przerwane. Ponawiam — postać czeka bezpiecznie.",
+    "Connection lost. Retrying — your character waits safely.",
+    "Verbinding verloren. We proberen het opnieuw — je personage wacht veilig.",
+    "Verbindung unterbrochen. Neuer Versuch — deine Figur wartet sicher.",
+    "Connexion interrompue. Nouvelle tentative — votre personnage attend en sécurité.",
+    "Conexión perdida. Reintentando — tu personaje espera a salvo."
+  ],
+  [
+    " (ty)",
+    " (you)",
+    " (jij)",
+    " (du)",
+    " (vous)",
+    " (tú)"
+  ],
+  [
+    "Nie mogę teraz odczytać pokoju. Spróbuj ponownie.",
+    "Cannot read the room right now. Please try again.",
+    "De kamer kan nu niet worden geladen. Probeer het opnieuw.",
+    "Der Raum kann gerade nicht gelesen werden. Versuche es erneut.",
+    "Impossible de lire le salon pour le moment. Réessayez.",
+    "No se puede leer la sala ahora. Inténtalo de nuevo."
+  ],
+  [
+    "Nie mogę teraz połączyć się z pokojem.",
+    "Cannot connect to the room right now.",
+    "De kamer is nu niet bereikbaar.",
+    "Der Raum ist gerade nicht erreichbar.",
+    "Impossible de se connecter au salon pour le moment.",
+    "No se puede conectar con la sala ahora."
+  ],
+  [
+    "Wpisz osiem znaków kodu od znajomego.",
+    "Enter the eight-character code from your friend.",
+    "Voer de acht tekens van de code van je vriend in.",
+    "Gib den achtstelligen Code deines Freundes ein.",
+    "Entrez le code de huit caractères de votre ami.",
+    "Introduce el código de ocho caracteres de tu amigo."
+  ],
+  [
+    "Tworzę wspólną wyspę…",
+    "Creating a shared island…",
+    "Gezamenlijk eiland maken…",
+    "Gemeinsame Insel wird erstellt…",
+    "Création de l’île commune…",
+    "Creando una isla compartida…"
+  ],
+  [
+    "Dołączam do wyspy…",
+    "Joining the island…",
+    "Deelnemen aan het eiland…",
+    "Insel wird betreten…",
+    "Connexion à l’île…",
+    "Uniéndose a la isla…"
+  ],
+  [
+    "Nie udało się rozpocząć sesji. Dołącz ponownie.",
+    "Could not start the session. Join again.",
+    "De sessie kon niet worden gestart. Neem opnieuw deel.",
+    "Die Sitzung konnte nicht gestartet werden. Tritt erneut bei.",
+    "Impossible de démarrer la session. Rejoignez-la à nouveau.",
+    "No se pudo iniciar la sesión. Únete otra vez."
+  ],
+  [
+    "Wspólna wyspa gotowa! Kod: ",
+    "Shared island ready! Code: ",
+    "Gezamenlijk eiland klaar! Code: ",
+    "Gemeinsame Insel bereit! Code: ",
+    "Île commune prête ! Code : ",
+    "¡Isla compartida lista! Código: "
+  ],
+  [
+    "Połączenie trwa zbyt długo. Spróbuj ponownie.",
+    "The connection is taking too long. Try again.",
+    "De verbinding duurt te lang. Probeer het opnieuw.",
+    "Die Verbindung dauert zu lange. Versuche es erneut.",
+    "La connexion prend trop de temps. Réessayez.",
+    "La conexión tarda demasiado. Inténtalo de nuevo."
+  ],
+  [
+    "Nie mogę połączyć się z wyspą.",
+    "Cannot connect to the island.",
+    "Het eiland is niet bereikbaar.",
+    "Die Insel ist nicht erreichbar.",
+    "Impossible de se connecter à l’île.",
+    "No se puede conectar con la isla."
+  ],
+  [
+    "Czekam na połączenie z wyspą.",
+    "Waiting for the island connection.",
+    "Wachten op verbinding met het eiland.",
+    "Warte auf Verbindung zur Insel.",
+    "En attente de connexion à l’île.",
+    "Esperando la conexión con la isla."
+  ],
+  [
+    "Chwileczkę — kończę poprzednią czynność.",
+    "One moment — finishing the previous action.",
+    "Even wachten — de vorige actie wordt afgerond.",
+    "Einen Moment — die vorige Aktion wird abgeschlossen.",
+    "Un instant — l’action précédente se termine.",
+    "Un momento — terminando la acción anterior."
+  ],
+  [
+    "Wróciłeś do swojego zapisu solo.",
+    "Back to your solo save.",
+    "Terug naar je solospel.",
+    "Zurück zu deinem Solo-Spielstand.",
+    "Retour à votre sauvegarde solo.",
+    "Has vuelto a tu partida en solitario."
+  ],
+  [
+    "Zaznaczyłem kod. Skopiuj go i podaj znajomym.",
+    "Code selected. Copy it and send it to your friends.",
+    "Code geselecteerd. Kopieer hem en stuur hem naar je vrienden.",
+    "Code ausgewählt. Kopiere ihn und gib ihn deinen Freunden.",
+    "Code sélectionné. Copiez-le et donnez-le à vos amis.",
+    "Código seleccionado. Cópialo y dáselo a tus amigos."
+  ],
+  [
+    "Kontroler wykryty. Puść przyciski i ustaw drążek na środku.",
+    "Controller detected. Release the buttons and centre the stick.",
+    "Controller gevonden. Laat de knoppen los en zet de stick in het midden.",
+    "Controller erkannt. Lass die Tasten los und zentriere den Stick.",
+    "Manette détectée. Relâchez les boutons et centrez le stick.",
+    "Mando detectado. Suelta los botones y centra el stick."
+  ],
+  [
+    "Kontroler odłączony. Możesz grać klawiaturą lub dotykiem.",
+    "Controller disconnected. Use the keyboard or touch controls.",
+    "Controller losgekoppeld. Speel met het toetsenbord of via aanraking.",
+    "Controller getrennt. Du kannst mit Tastatur oder Touch spielen.",
+    "Manette déconnectée. Utilisez le clavier ou les commandes tactiles.",
+    "Mando desconectado. Puedes usar el teclado o los controles táctiles."
+  ],
+  [
+    "🎮 PAD ✓",
+    "🎮 PAD ✓",
+    "🎮 PAD ✓",
+    "🎮 PAD ✓",
+    "🎮 MANETTE ✓",
+    "🎮 MANDO ✓"
+  ],
+  [
+    "Ta przeglądarka nie udostępnia kontrolerów. Spróbuj otworzyć grę w innej przeglądarce.",
+    "This browser does not support controllers. Try another browser.",
+    "Deze browser ondersteunt geen controllers. Probeer een andere browser.",
+    "Dieser Browser unterstützt keine Controller. Versuche einen anderen Browser.",
+    "Ce navigateur ne prend pas en charge les manettes. Essayez un autre navigateur.",
+    "Este navegador no admite mandos. Prueba otro navegador."
+  ],
+  [
+    "Podłączony: ",
+    "Connected: ",
+    "Verbonden: ",
+    "Verbunden: ",
+    "Connecté : ",
+    "Conectado: "
+  ],
+  [
+    "standardowy układ",
+    "standard layout",
+    "standaardindeling",
+    "Standardbelegung",
+    "disposition standard",
+    "distribución estándar"
+  ],
+  [
+    "własny układ — możesz zmienić przyciski",
+    "custom layout — you can change the buttons",
+    "eigen indeling — je kunt de knoppen wijzigen",
+    "eigene Belegung — Tasten können geändert werden",
+    "disposition personnalisée — boutons modifiables",
+    "distribución personalizada — puedes cambiar los botones"
+  ],
+  [
+    "Czekam na kontroler. Podłącz go i naciśnij na nim przycisk.",
+    "Waiting for a controller. Connect it and press a button.",
+    "Wachten op een controller. Sluit hem aan en druk op een knop.",
+    "Warte auf Controller. Verbinde ihn und drücke eine Taste.",
+    "En attente d’une manette. Connectez-la et appuyez sur un bouton.",
+    "Esperando un mando. Conéctalo y pulsa un botón."
+  ],
+  [
+    "Kontroler wykryty. Puść przyciski, potem ",
+    "Controller detected. Release the buttons, then ",
+    "Controller gevonden. Laat de knoppen los; ",
+    "Controller erkannt. Lass die Tasten los; ",
+    "Manette détectée. Relâchez les boutons, puis ",
+    "Mando detectado. Suelta los botones, después "
+  ],
+  [
+    " uruchamia grę.",
+    " starts the game.",
+    " start het spel.",
+    " startet das Spiel.",
+    " démarre le jeu.",
+    " inicia el juego."
+  ],
+  [
+    " · Zmień",
+    " · Change",
+    " · Wijzigen",
+    " · Ändern",
+    " · Modifier",
+    " · Cambiar"
+  ],
+  [
+    "Ruch lewo/prawo: oś ",
+    "Move left/right: axis ",
+    "Links/rechts bewegen: as ",
+    "Links/rechts bewegen: Achse ",
+    "Gauche/droite : axe ",
+    "Mover izquierda/derecha: eje "
+  ],
+  [
+    "Ruch góra/dół: oś ",
+    "Move up/down: axis ",
+    "Omhoog/omlaag bewegen: as ",
+    "Oben/unten bewegen: Achse ",
+    "Haut/bas : axe ",
+    "Mover arriba/abajo: eje "
+  ],
+  [
+    "Odwróć góra/dół: ",
+    "Invert up/down: ",
+    "Omhoog/omlaag omkeren: ",
+    "Oben/unten umkehren: ",
+    "Inverser haut/bas : ",
+    "Invertir arriba/abajo: "
+  ],
+  [
+    "tak",
+    "yes",
+    "ja",
+    "ja",
+    "oui",
+    "sí"
+  ],
+  [
+    "nie",
+    "no",
+    "nee",
+    "nein",
+    "non",
+    "no"
+  ],
+  [
+    "Puść przyciski, potem naciśnij nowy przycisk: ",
+    "Release the buttons, then press a new button for: ",
+    "Laat de knoppen los en druk op een nieuwe knop voor: ",
+    "Lass die Tasten los und drücke eine neue Taste für: ",
+    "Relâchez les boutons, puis choisissez un nouveau bouton pour : ",
+    "Suelta los botones y pulsa un nuevo botón para: "
+  ],
+  [
+    "Przywrócono domyślny układ kontrolera.",
+    "Default controller layout restored.",
+    "Standaardindeling van de controller hersteld.",
+    "Standardbelegung des Controllers wiederhergestellt.",
+    "Disposition par défaut de la manette rétablie.",
+    "Distribución predeterminada del mando restablecida."
+  ],
+  [
+    "Drążek: ",
+    "Stick: ",
+    "Stick: ",
+    "Stick: ",
+    "Stick : ",
+    "Stick: "
+  ],
+  [
+    "Odkryto Wyspę Skarbu!",
+    "Treasure Island discovered!",
+    "Schateiland ontdekt!",
+    "Schatzinsel entdeckt!",
+    "Île au trésor découverte !",
+    "¡Isla del Tesoro descubierta!"
+  ],
+  [
+    "Odpoczynek zakończony. Czas na przygodę!",
+    "Rest finished. Time for an adventure!",
+    "Uitgerust. Tijd voor avontuur!",
+    "Ausgeruht. Zeit für ein Abenteuer!",
+    "Repos terminé. Place à l’aventure !",
+    "Descanso terminado. ¡Hora de la aventura!"
+  ],
+  [
+    "Witaj z powrotem! Wczytałem twoją wyspę z konta.",
+    "Welcome back! Your island was loaded from your account.",
+    "Welkom terug! Je eiland is geladen vanuit je account.",
+    "Willkommen zurück! Deine Insel wurde aus deinem Konto geladen.",
+    "Bon retour ! Votre île a été chargée depuis votre compte.",
+    "¡Bienvenido de nuevo! Tu isla se ha cargado desde tu cuenta."
+  ],
+  [
+    "Witaj na żywej wyspie! Leon czeka przy obozowisku.",
+    "Welcome to the living island! Leon is waiting at the camp.",
+    "Welkom op het levendige eiland! Leon wacht bij het kamp.",
+    "Willkommen auf der lebendigen Insel! Leon wartet am Lager.",
+    "Bienvenue sur l’île vivante ! Leon vous attend au camp.",
+    "¡Bienvenido a la isla viva! Leon te espera en el campamento."
+  ],
+  [
+    "Zacząć przygodę od początku? Twój zapis solo na koncie zostanie zastąpiony na wszystkich urządzeniach. Postać, zasoby, narzędzia, baza, monety i zadania wrócą do stanu początkowego.",
+    "Start over? Your account’s solo save will be replaced on all devices. Your character, resources, tools, base, coins and quests will return to their starting state.",
+    "Opnieuw beginnen? Het solospel op je account wordt op alle apparaten vervangen. Je personage, grondstoffen, gereedschap, basis, munten en opdrachten keren terug naar de beginstand.",
+    "Von vorne beginnen? Der Solo-Spielstand deines Kontos wird auf allen Geräten ersetzt. Figur, Ressourcen, Werkzeuge, Basis, Münzen und Aufgaben kehren zum Anfangszustand zurück.",
+    "Recommencer ? La sauvegarde solo de votre compte sera remplacée sur tous les appareils. Le personnage, les ressources, les outils, la base, les pièces et les quêtes reviendront à leur état initial.",
+    "¿Empezar de nuevo? Se sustituirá el guardado en solitario de tu cuenta en todos los dispositivos. El personaje, los recursos, las herramientas, la base, las monedas y las misiones volverán al estado inicial."
+  ],
+  [
+    "Nie udało się zapisać nowej gry. Poprzedni postęp został zachowany. Spróbuj ponownie.",
+    "Could not save a new game. Your previous progress is kept. Try again.",
+    "Het nieuwe spel kon niet worden opgeslagen. Je vorige voortgang blijft bewaard. Probeer het opnieuw.",
+    "Neues Spiel konnte nicht gespeichert werden. Dein bisheriger Fortschritt bleibt erhalten. Versuche es erneut.",
+    "Impossible de sauvegarder la nouvelle partie. Votre progression précédente est conservée. Réessayez.",
+    "No se pudo guardar la nueva partida. Tu progreso anterior se conserva. Inténtalo de nuevo."
+  ],
+  [
+    "Nowa przygoda rozpoczęta! Wyspa czeka na ciebie.",
+    "New adventure started! Your island awaits.",
+    "Nieuw avontuur begonnen! Het eiland wacht op je.",
+    "Neues Abenteuer gestartet! Die Insel wartet auf dich.",
+    "Nouvelle aventure lancée ! L’île vous attend.",
+    "¡Nueva aventura iniciada! La isla te espera."
+  ],
+  [
+    "Potrzebujesz włóczni. Zrobisz ją w warsztacie.",
+    "You need a spear. Craft one in the workshop.",
+    "Je hebt een speer nodig. Maak er een in de werkplaats.",
+    "Du brauchst einen Speer. Stelle ihn in der Werkstatt her.",
+    "Il vous faut une lance. Fabriquez-la à l’atelier.",
+    "Necesitas una lanza. Fabrícala en el taller."
+  ],
+  [
+    "Nic w zasięgu włóczni.",
+    "Nothing within spear range.",
+    "Niets binnen het bereik van je speer.",
+    "Nichts in Speerreichweite.",
+    "Rien à portée de la lance.",
+    "No hay nada al alcance de la lanza."
+  ],
+  [
+    "Skarb zdobyty! Wróć do Neli w Północnej Zatoce.",
+    "Treasure collected! Return to Nela in Northern Bay.",
+    "Schat gevonden! Ga terug naar Nela in de Noordelijke Baai.",
+    "Schatz erhalten! Kehre zu Nela in der Nordbucht zurück.",
+    "Trésor récupéré ! Retrouvez Nela dans la baie du Nord.",
+    "¡Tesoro conseguido! Vuelve a Nela en la Bahía Norte."
+  ],
+  [
+    "Podejdź do zasobu, mieszkańca albo ogniska.",
+    "Move close to a resource, resident or campfire.",
+    "Ga naar een grondstof, bewoner of kampvuur.",
+    "Gehe zu einer Ressource, einem Bewohner oder Lagerfeuer.",
+    "Approchez une ressource, un habitant ou un feu de camp.",
+    "Acércate a un recurso, habitante u hoguera."
+  ],
+  [
+    "1 kamień",
+    "1 stone",
+    "1 steen",
+    "1 Stein",
+    "1 pierre",
+    "1 piedra"
+  ],
+  [
+    "1 kokos",
+    "1 coconut",
+    "1 kokosnoot",
+    "1 Kokosnuss",
+    "1 noix de coco",
+    "1 coco"
+  ],
+  [
+    "Najpierw zrób wędkę w warsztacie.",
+    "First craft a fishing rod in the workshop.",
+    "Maak eerst een hengel in de werkplaats.",
+    "Stelle zuerst eine Angel in der Werkstatt her.",
+    "Fabriquez d’abord une canne à pêche à l’atelier.",
+    "Primero fabrica una caña de pescar en el taller."
+  ],
+  [
+    "Podejdź do brzegu, żeby łowić.",
+    "Move to the shore to fish.",
+    "Ga naar de oever om te vissen.",
+    "Gehe zum Ufer, um zu angeln.",
+    "Approchez du rivage pour pêcher.",
+    "Acércate a la orilla para pescar."
+  ],
+  [
+    "Złowiona ryba! Upiecz ją lub sprzedaj Leonowi.",
+    "Fish caught! Cook it or sell it to Leon.",
+    "Vis gevangen! Bak hem of verkoop hem aan Leon.",
+    "Fisch gefangen! Brate ihn oder verkaufe ihn an Leon.",
+    "Poisson attrapé ! Cuisez-le ou vendez-le à Leon.",
+    "¡Pescado capturado! Cocínalo o véndeselo a Leon."
+  ],
+  [
+    "Ryba uciekła. Spróbuj ponownie.",
+    "The fish escaped. Try again.",
+    "De vis is ontsnapt. Probeer het opnieuw.",
+    "Der Fisch ist entkommen. Versuche es erneut.",
+    "Le poisson s’est échappé. Réessayez.",
+    "El pez se ha escapado. Inténtalo de nuevo."
+  ],
+  [
+    "Masz już włócznię.",
+    "You already have a spear.",
+    "Je hebt al een speer.",
+    "Du hast bereits einen Speer.",
+    "Vous avez déjà une lance.",
+    "Ya tienes una lanza."
+  ],
+  [
+    "Włócznia gotowa!",
+    "Spear ready!",
+    "Speer klaar!",
+    "Speer fertig!",
+    "Lance prête !",
+    "¡Lanza lista!"
+  ],
+  [
+    "Masz już wędkę.",
+    "You already have a fishing rod.",
+    "Je hebt al een hengel.",
+    "Du hast bereits eine Angel.",
+    "Vous avez déjà une canne à pêche.",
+    "Ya tienes una caña de pescar."
+  ],
+  [
+    "Wędka gotowa!",
+    "Fishing rod ready!",
+    "Hengel klaar!",
+    "Angel fertig!",
+    "Canne à pêche prête !",
+    "¡Caña de pescar lista!"
+  ],
+  [
+    "Masz już tratwę.",
+    "You already have a raft.",
+    "Je hebt al een vlot.",
+    "Du hast bereits ein Floß.",
+    "Vous avez déjà un radeau.",
+    "Ya tienes una balsa."
+  ],
+  [
+    "Tratwa gotowa! Możesz przemierzać głębokie wody.",
+    "Raft ready! You can cross deep water.",
+    "Vlot klaar! Je kunt diep water oversteken.",
+    "Floß fertig! Du kannst tiefes Wasser überqueren.",
+    "Radeau prêt ! Vous pouvez traverser les eaux profondes.",
+    "¡Balsa lista! Puedes cruzar aguas profundas."
+  ],
+  [
+    "Bazę zbuduj na lądzie.",
+    "Build your base on land.",
+    "Bouw je basis op het land.",
+    "Baue die Basis an Land.",
+    "Construisez votre base sur terre.",
+    "Construye tu base en tierra."
+  ],
+  [
+    "Brakuje materiałów lub monet.",
+    "Not enough materials or coins.",
+    "Niet genoeg materialen of munten.",
+    "Nicht genug Material oder Münzen.",
+    "Pas assez de matériaux ou de pièces.",
+    "No hay suficientes materiales o monedas."
+  ],
+  [
+    " gotowa! W pobliżu jesteś bezpieczny przed dzikami.",
+    " ready! You are safe from boars nearby.",
+    " is klaar! In de buurt ben je veilig voor wilde zwijnen.",
+    " fertig! In der Nähe bist du vor Wildschweinen sicher.",
+    " prête ! Vous êtes à l’abri des sangliers à proximité.",
+    " lista. Estás a salvo de los jabalíes cerca de ella."
+  ],
+  [
+    "Ognisko już płonie.",
+    "The campfire is already lit.",
+    "Het kampvuur brandt al.",
+    "Das Lagerfeuer brennt bereits.",
+    "Le feu de camp est déjà allumé.",
+    "La hoguera ya está encendida."
+  ],
+  [
+    "Najpierw zbuduj bazę L1.",
+    "Build base L1 first.",
+    "Bouw eerst basis L1.",
+    "Baue zuerst Basis L1.",
+    "Construisez d’abord la base N1.",
+    "Construye primero la base N1."
+  ],
+  [
+    "Wróć do swojej bazy, żeby rozpalić ognisko.",
+    "Return to your base to light a campfire.",
+    "Ga terug naar je basis om een kampvuur te maken.",
+    "Kehre zur Basis zurück, um ein Lagerfeuer zu entzünden.",
+    "Revenez à votre base pour allumer un feu.",
+    "Vuelve a tu base para encender una hoguera."
+  ],
+  [
+    "Ognisko płonie. Możesz piec ryby i odpoczywać.",
+    "Campfire lit. You can cook fish and rest.",
+    "Het kampvuur brandt. Je kunt vis bakken en uitrusten.",
+    "Das Lagerfeuer brennt. Du kannst Fische braten und ausruhen.",
+    "Feu allumé. Vous pouvez cuire des poissons et vous reposer.",
+    "Hoguera encendida. Puedes cocinar pescado y descansar."
+  ],
+  [
+    "Podejdź do rozpalonego ogniska przy bazie.",
+    "Move to the lit campfire at your base.",
+    "Ga naar het brandende kampvuur bij je basis.",
+    "Gehe zum brennenden Lagerfeuer an deiner Basis.",
+    "Approchez du feu allumé à votre base.",
+    "Acércate a la hoguera encendida de tu base."
+  ],
+  [
+    "Ryba upieczona! Znajdziesz ją w plecaku.",
+    "Fish cooked! It is in your bag.",
+    "Vis gebakken! Je vindt hem in je rugzak.",
+    "Fisch gebraten! Du findest ihn im Rucksack.",
+    "Poisson cuit ! Vous le trouverez dans votre sac.",
+    "¡Pescado cocinado! Lo encontrarás en tu mochila."
+  ],
+  [
+    "Masz pełne zdrowie i energię. Zachowaj jedzenie na później.",
+    "Health and energy are full. Save your food for later.",
+    "Je gezondheid en energie zijn vol. Bewaar je eten voor later.",
+    "Gesundheit und Energie sind voll. Hebe dein Essen für später auf.",
+    "Votre santé et votre énergie sont au maximum. Gardez la nourriture pour plus tard.",
+    "Tu salud y energía están al máximo. Guarda la comida para después."
+  ],
+  [
+    "Nie masz kokosów.",
+    "You have no coconuts.",
+    "Je hebt geen kokosnoten.",
+    "Du hast keine Kokosnüsse.",
+    "Vous n’avez pas de noix de coco.",
+    "No tienes cocos."
+  ],
+  [
+    "Najpierw upiecz rybę przy ognisku.",
+    "First cook a fish at the campfire.",
+    "Bak eerst een vis bij het kampvuur.",
+    "Brate zuerst einen Fisch am Lagerfeuer.",
+    "Cuisez d’abord un poisson au feu.",
+    "Primero cocina un pescado en la hoguera."
+  ],
+  [
+    "Jedzenie dodało ci sił.",
+    "The food gave you strength.",
+    "Het eten gaf je nieuwe kracht.",
+    "Das Essen hat dir Kraft gegeben.",
+    "La nourriture vous a redonné des forces.",
+    "La comida te ha dado fuerzas."
+  ],
+  [
+    "Podejdź do rozpalonego ogniska.",
+    "Move to the lit campfire.",
+    "Ga naar het brandende kampvuur.",
+    "Gehe zum brennenden Lagerfeuer.",
+    "Approchez du feu allumé.",
+    "Acércate a la hoguera encendida."
+  ],
+  [
+    "Jesteś już wypoczęty.",
+    "You are already rested.",
+    "Je bent al uitgerust.",
+    "Du bist bereits ausgeruht.",
+    "Vous êtes déjà reposé.",
+    "Ya has descansado."
+  ],
+  [
+    "Podejdź do Leona przy obozowisku.",
+    "Move close to Leon at the camp.",
+    "Ga naar Leon bij het kamp.",
+    "Gehe zu Leon am Lager.",
+    "Approchez de Leon au camp.",
+    "Acércate a Leon en el campamento."
+  ],
+  [
+    "Za mało monet.",
+    "Not enough coins.",
+    "Niet genoeg munten.",
+    "Nicht genug Münzen.",
+    "Pas assez de pièces.",
+    "No tienes suficientes monedas."
+  ],
+  [
+    "Za mało zasobów na sprzedaż.",
+    "Not enough resources to sell.",
+    "Niet genoeg grondstoffen om te verkopen.",
+    "Nicht genug Ressourcen zum Verkaufen.",
+    "Pas assez de ressources à vendre.",
+    "No tienes suficientes recursos para vender."
+  ],
+  [
+    "Zakup udany.",
+    "Purchase complete.",
+    "Aankoop gelukt.",
+    "Kauf erfolgreich.",
+    "Achat réussi.",
+    "Compra realizada."
+  ],
+  [
+    "Zasoby sprzedane.",
+    "Resources sold.",
+    "Grondstoffen verkocht.",
+    "Ressourcen verkauft.",
+    "Ressources vendues.",
+    "Recursos vendidos."
+  ],
+  [
+    "To zadanie jest już ukończone.",
+    "This quest is already complete.",
+    "Deze opdracht is al voltooid.",
+    "Diese Aufgabe ist bereits abgeschlossen.",
+    "Cette quête est déjà terminée.",
+    "Esta misión ya está completada."
+  ],
+  [
+    "Dostarcz materiały Leonowi.",
+    "Deliver the materials to Leon.",
+    "Lever de materialen aan Leon.",
+    "Liefere die Materialien an Leon.",
+    "Livrez les matériaux à Leon.",
+    "Entrega los materiales a Leon."
+  ],
+  [
+    "Dostarcz ryby Neli w Północnej Zatoce.",
+    "Deliver the fish to Nela in Northern Bay.",
+    "Lever de vissen aan Nela in de Noordelijke Baai.",
+    "Liefere die Fische an Nela in der Nordbucht.",
+    "Livrez les poissons à Nela dans la baie du Nord.",
+    "Entrega los pescados a Nela en la Bahía Norte."
+  ],
+  [
+    "Dostawa przyjęta! Otrzymujesz monety i XP.",
+    "Delivery accepted! You receive coins and XP.",
+    "Levering ontvangen! Je krijgt munten en XP.",
+    "Lieferung angenommen! Du erhältst Münzen und XP.",
+    "Livraison acceptée ! Vous recevez des pièces et de l’XP.",
+    "¡Entrega aceptada! Recibes monedas y XP."
+  ],
+  [
+    "Wspólne zasoby drużyny. Jedzenie leczy osobę, która je zjada.",
+    "Shared team resources. Food heals the player who eats it.",
+    "Gezamenlijke grondstoffen. Eten herstelt de speler die het opeet.",
+    "Gemeinsame Team-Ressourcen. Essen heilt die Person, die es isst.",
+    "Ressources communes. La nourriture soigne le joueur qui la mange.",
+    "Recursos compartidos del equipo. La comida cura al jugador que la come."
+  ],
+  [
+    "Wspólna baza i ognisko całej drużyny.",
+    "A shared base and campfire for the whole team.",
+    "Een gezamenlijke basis en kampvuur voor het hele team.",
+    "Gemeinsame Basis und Lagerfeuer für das gesamte Team.",
+    "Une base et un feu communs pour toute l’équipe.",
+    "Una base y una hoguera compartidas para todo el equipo."
+  ],
+  [
+    "jest",
+    "yes",
+    "aanwezig",
+    "vorhanden",
+    "oui",
+    "sí"
+  ],
+  [
+    "zdobyty",
+    "collected",
+    "gevonden",
+    "gefunden",
+    "récupéré",
+    "conseguido"
+  ],
+  [
+    "Wyspa Skarbu",
+    "Treasure Island",
+    "Schateiland",
+    "Schatzinsel",
+    "Île au trésor",
+    "Isla del Tesoro"
+  ],
+  [
+    "Głębokie wody",
+    "Deep water",
+    "Diep water",
+    "Tiefes Wasser",
+    "Eaux profondes",
+    "Aguas profundas"
+  ],
+  [
+    "Pływanie",
+    "Swimming",
+    "Zwemmen",
+    "Schwimmen",
+    "À la nage",
+    "Nadando"
+  ],
+  [
+    "Północna Zatoka",
+    "Northern Bay",
+    "Noordelijke Baai",
+    "Nordbucht",
+    "Baie du Nord",
+    "Bahía Norte"
+  ],
+  [
+    "Wnętrze wyspy",
+    "Island interior",
+    "Binnenland",
+    "Inselinneres",
+    "Intérieur de l’île",
+    "Interior de la isla"
+  ],
+  [
+    "Ognisko płonie. Gotuj i odpoczywaj w jego pobliżu.",
+    "The campfire is lit. Cook and rest nearby.",
+    "Het kampvuur brandt. Bak eten en rust uit in de buurt.",
+    "Das Lagerfeuer brennt. Koche und ruhe dich in der Nähe aus.",
+    "Le feu est allumé. Cuisinez et reposez-vous à proximité.",
+    "La hoguera está encendida. Cocina y descansa cerca."
+  ],
+  [
+    "Dostawa ukończona ✓",
+    "Delivery complete ✓",
+    "Levering voltooid ✓",
+    "Lieferung abgeschlossen ✓",
+    "Livraison terminée ✓",
+    "Entrega completada ✓"
+  ],
+  [
+    "Skarb masz w plecaku. Porozmawiaj z Nelą.",
+    "The treasure is in your bag. Talk to Nela.",
+    "De schat zit in je rugzak. Praat met Nela.",
+    "Der Schatz ist in deinem Rucksack. Sprich mit Nela.",
+    "Le trésor est dans votre sac. Parlez à Nela.",
+    "El tesoro está en tu mochila. Habla con Nela."
+  ],
+  [
+    "Zbuduj wędkę.",
+    "Build a fishing rod.",
+    "Maak een hengel.",
+    "Stelle eine Angel her.",
+    "Fabriquez une canne à pêche.",
+    "Fabrica una caña de pescar."
+  ],
+  [
+    "5 drewna + 2 muszelki. Muszelek szukaj na plaży.",
+    "5 wood + 2 shells. Look for shells on the beach.",
+    "5 hout + 2 schelpen. Zoek schelpen op het strand.",
+    "5 Holz + 2 Muscheln. Suche Muscheln am Strand.",
+    "5 bois + 2 coquillages. Cherchez les coquillages sur la plage.",
+    "5 de madera + 2 conchas. Busca conchas en la playa."
+  ],
+  [
+    "Złów 3 ryby: ",
+    "Catch 3 fish: ",
+    "Vang 3 vissen: ",
+    "Fange 3 Fische: ",
+    "Attrapez 3 poissons : ",
+    "Captura 3 peces: "
+  ],
+  [
+    "Podejdź do brzegu i użyj ŁÓW.",
+    "Move to the shore and use FISH.",
+    "Ga naar de oever en kies VIS.",
+    "Gehe zum Ufer und nutze ANGELN.",
+    "Approchez du rivage et utilisez PÊCHER.",
+    "Acércate a la orilla y usa PESCAR."
+  ],
+  [
+    "Zbuduj tratwę.",
+    "Build a raft.",
+    "Bouw een vlot.",
+    "Baue ein Floß.",
+    "Construisez un radeau.",
+    "Construye una balsa."
+  ],
+  [
+    "Znajdź drugą wyspę.",
+    "Find the second island.",
+    "Vind het tweede eiland.",
+    "Finde die zweite Insel.",
+    "Trouvez la deuxième île.",
+    "Encuentra la segunda isla."
+  ],
+  [
+    "Płyń na południowy wschód.",
+    "Sail southeast.",
+    "Vaar naar het zuidoosten.",
+    "Fahre nach Südosten.",
+    "Naviguez vers le sud-est.",
+    "Navega hacia el sureste."
+  ],
+  [
+    "Przeszukaj Wyspę Skarbu.",
+    "Search Treasure Island.",
+    "Doorzoek Schateiland.",
+    "Durchsuche die Schatzinsel.",
+    "Fouillez l’île au trésor.",
+    "Explora la Isla del Tesoro."
+  ],
+  [
+    "Znajdź skrzynię i użyj DZIAŁAJ.",
+    "Find the chest and use INTERACT.",
+    "Vind de kist en kies ACTIE.",
+    "Finde die Truhe und nutze AKTION.",
+    "Trouvez le coffre et utilisez AGIR.",
+    "Encuentra el cofre y usa ACTUAR."
+  ],
+  [
+    "Wróć do Neli.",
+    "Return to Nela.",
+    "Ga terug naar Nela.",
+    "Kehre zu Nela zurück.",
+    "Retrouvez Nela.",
+    "Vuelve a Nela."
+  ],
+  [
+    "Czeka w Północnej Zatoce.",
+    "She is waiting in Northern Bay.",
+    "Ze wacht in de Noordelijke Baai.",
+    "Sie wartet in der Nordbucht.",
+    "Elle vous attend dans la baie du Nord.",
+    "Te espera en la Bahía Norte."
+  ],
+  [
+    "Żywa wyspa",
+    "Living island",
+    "Levendig eiland",
+    "Lebendige Insel",
+    "Île vivante",
+    "Isla viva"
+  ],
+  [
+    "Mieszkańcy dziękują za pomoc!",
+    "The residents thank you for helping!",
+    "De bewoners bedanken je voor je hulp!",
+    "Die Bewohner danken dir für deine Hilfe!",
+    "Les habitants vous remercient !",
+    "¡Los habitantes te agradecen tu ayuda!"
+  ],
+  [
+    "Pomóż mieszkańcom.",
+    "Help the residents.",
+    "Help de bewoners.",
+    "Hilf den Bewohnern.",
+    "Aidez les habitants.",
+    "Ayuda a los habitantes."
+  ],
+  [
+    "Nela potrzebuje ryb, Leon materiałów. Rozwijaj bazę.",
+    "Nela needs fish, Leon needs materials. Improve your base.",
+    "Nela heeft vis nodig, Leon materialen. Verbeter je basis.",
+    "Nela braucht Fische, Leon Materialien. Baue deine Basis aus.",
+    "Nela a besoin de poissons, Leon de matériaux. Améliorez votre base.",
+    "Nela necesita pescado y Leon materiales. Mejora tu base."
+  ],
+  [
+    "Leon: handel i dostawa · DZIAŁAJ",
+    "Leon: trade and delivery · INTERACT",
+    "Leon: handel en levering · ACTIE",
+    "Leon: Handel und Lieferung · AKTION",
+    "Leon : commerce et livraison · AGIR",
+    "Leon: comercio y entrega · ACTUAR"
+  ],
+  [
+    "Nela: zadania · DZIAŁAJ",
+    "Nela: quests · INTERACT",
+    "Nela: opdrachten · ACTIE",
+    "Nela: Aufgaben · AKTION",
+    "Nela : quêtes · AGIR",
+    "Nela: misiones · ACTUAR"
+  ],
+  [
+    "Ognisko: gotuj i odpoczywaj · DZIAŁAJ",
+    "Campfire: cook and rest · INTERACT",
+    "Kampvuur: bakken en rusten · ACTIE",
+    "Lagerfeuer: kochen und ausruhen · AKTION",
+    "Feu : cuisiner et se reposer · AGIR",
+    "Hoguera: cocinar y descansar · ACTUAR"
+  ],
+  [
+    "Zasób w zasięgu · DZIAŁAJ",
+    "Resource in range · INTERACT",
+    "Grondstof binnen bereik · ACTIE",
+    "Ressource in Reichweite · AKTION",
+    "Ressource à portée · AGIR",
+    "Recurso al alcance · ACTUAR"
+  ],
+  [
+    "Nie mogę zapisać kopii na tym urządzeniu. Sprawdź zapis w chmurze przed zamknięciem gry.",
+    "Cannot keep a copy on this device. Check your cloud save before closing the game.",
+    "Een kopie op dit apparaat opslaan lukt niet. Controleer je cloudopslag voordat je het spel sluit.",
+    "Eine Kopie auf diesem Gerät kann nicht gespeichert werden. Prüfe den Cloud-Spielstand vor dem Schließen.",
+    "Impossible de conserver une copie sur cet appareil. Vérifiez la sauvegarde cloud avant de fermer le jeu.",
+    "No se puede guardar una copia en este dispositivo. Comprueba el guardado en la nube antes de cerrar el juego."
+  ],
+  [
+    "Wczytuję twoją wyspę…",
+    "Loading your island…",
+    "Je eiland laden…",
+    "Deine Insel wird geladen…",
+    "Chargement de votre île…",
+    "Cargando tu isla…"
+  ],
+  [
+    "Zapis tylko na tym urządzeniu. Zaloguj się, aby go zabezpieczyć.",
+    "Saved only on this device. Sign in to protect it.",
+    "Alleen op dit apparaat opgeslagen. Log in om je spel te beschermen.",
+    "Nur auf diesem Gerät gespeichert. Melde dich an, um den Spielstand zu sichern.",
+    "Sauvegarde uniquement sur cet appareil. Connectez-vous pour la protéger.",
+    "Guardado solo en este dispositivo. Inicia sesión para protegerlo."
+  ],
+  [
+    "Nowszy zapis czeka w chmurze. Wybierz wersję wyspy poniżej.",
+    "A newer save is in the cloud. Choose your island version below.",
+    "Er staat een nieuwere opslag in de cloud. Kies hieronder je eilandversie.",
+    "Ein neuerer Spielstand liegt in der Cloud. Wähle unten deine Inselversion.",
+    "Une sauvegarde plus récente attend dans le cloud. Choisissez la version ci-dessous.",
+    "Hay un guardado más reciente en la nube. Elige abajo la versión de tu isla."
+  ],
+  [
+    "Zapisuję w chmurze…",
+    "Saving to cloud…",
+    "Opslaan in de cloud…",
+    "Wird in der Cloud gespeichert…",
+    "Sauvegarde dans le cloud…",
+    "Guardando en la nube…"
+  ],
+  [
+    "Zapis na urządzeniu czeka na wysłanie do chmury.",
+    "Your device’s save is waiting to upload to the cloud.",
+    "De opslag op je apparaat wacht op verzending naar de cloud.",
+    "Der lokale Spielstand wartet auf das Hochladen in die Cloud.",
+    "La sauvegarde sur cet appareil attend son envoi dans le cloud.",
+    "El guardado del dispositivo está esperando a subirse a la nube."
+  ],
+  [
+    "Zapisano w chmurze",
+    "Saved to cloud",
+    "Opgeslagen in de cloud",
+    "In der Cloud gespeichert",
+    "Sauvegardé dans le cloud",
+    "Guardado en la nube"
+  ],
+  [
+    "☁️ SPRAWDŹ ZAPIS",
+    "☁️ CHECK SAVE",
+    "☁️ CONTROLEER",
+    "☁️ PRÜFEN",
+    "☁️ VÉRIFIER",
+    "☁️ REVISAR"
+  ],
+  [
+    "☁️ WCZYTUJĘ…",
+    "☁️ LOADING…",
+    "☁️ LADEN…",
+    "☁️ LADE…",
+    "☁️ CHARGEMENT…",
+    "☁️ CARGANDO…"
+  ],
+  [
+    "☁️ ZAPISUJĘ…",
+    "☁️ SAVING…",
+    "☁️ OPSLAAN…",
+    "☁️ SPEICHERE…",
+    "☁️ SAUVEGARDE…",
+    "☁️ GUARDANDO…"
+  ],
+  [
+    "☁️ CZEKA NA SIEĆ",
+    "☁️ WAITING FOR NETWORK",
+    "☁️ WACHT OP NETWERK",
+    "☁️ WARTE AUF NETZ",
+    "☁️ ATTENTE RÉSEAU",
+    "☁️ ESPERANDO RED"
+  ],
+  [
+    "☁️ ZAPISANO",
+    "☁️ SAVED",
+    "☁️ OPGESLAGEN",
+    "☁️ GESPEICHERT",
+    "☁️ SAUVEGARDÉ",
+    "☁️ GUARDADO"
+  ],
+  [
+    "Odzyskaj swoją wyspę",
+    "Recover your island",
+    "Je eiland herstellen",
+    "Deine Insel wiederherstellen",
+    "Récupérer votre île",
+    "Recuperar tu isla"
+  ],
+  [
+    "Załóż konto My Island",
+    "Create a My Island account",
+    "My Island-account aanmaken",
+    "My Island-Konto erstellen",
+    "Créer un compte My Island",
+    "Crear una cuenta de My Island"
+  ],
+  [
+    "Chwileczkę…",
+    "One moment…",
+    "Even wachten…",
+    "Einen Moment…",
+    "Un instant…",
+    "Un momento…"
+  ],
+  [
+    "Utwórz nowy kod",
+    "Create new code",
+    "Nieuwe code maken",
+    "Neuen Code erstellen",
+    "Créer un nouveau code",
+    "Crear código nuevo"
+  ],
+  [
+    "Ustaw nowe hasło",
+    "Set new password",
+    "Nieuw wachtwoord instellen",
+    "Neues Passwort festlegen",
+    "Définir un nouveau mot de passe",
+    "Crear nueva contraseña"
+  ],
+  [
+    "Załóż konto i zachowaj wyspę",
+    "Create account and keep island",
+    "Account maken en eiland behouden",
+    "Konto erstellen und Insel behalten",
+    "Créer un compte et garder l’île",
+    "Crear cuenta y conservar la isla"
+  ],
+  [
+    "Nowe hasło",
+    "New password",
+    "Nieuw wachtwoord",
+    "Neues Passwort",
+    "Nouveau mot de passe",
+    "Nueva contraseña"
+  ],
+  [
+    "Potwierdź obecnym hasłem. Zapisz nowy kod poza telefonem. Poprzedni kod przestanie działać.",
+    "Confirm with your current password. Keep the new code outside your phone. The previous code will stop working.",
+    "Bevestig met je huidige wachtwoord. Bewaar de nieuwe code buiten je telefoon. De vorige code werkt daarna niet meer.",
+    "Bestätige mit deinem aktuellen Passwort. Bewahre den neuen Code außerhalb deines Handys auf. Der bisherige Code wird ungültig.",
+    "Confirmez avec votre mot de passe actuel. Gardez le nouveau code ailleurs que sur votre téléphone. L’ancien code ne fonctionnera plus.",
+    "Confirma con tu contraseña actual. Guarda el código nuevo fuera del móvil. El código anterior dejará de funcionar."
+  ],
+  [
+    "Wpisz kod zachowany przy zakładaniu konta. Po zmianie hasła otrzymasz nowy kod odzyskiwania.",
+    "Enter the code you kept when creating your account. Changing your password gives you a new recovery code.",
+    "Voer de code in die je bij het aanmaken van je account hebt bewaard. Na het wijzigen van je wachtwoord krijg je een nieuwe herstelcode.",
+    "Gib den Code ein, den du bei der Kontoerstellung aufbewahrt hast. Nach der Passwortänderung erhältst du einen neuen Wiederherstellungscode.",
+    "Entrez le code conservé à la création du compte. Après le changement de mot de passe, vous recevrez un nouveau code de récupération.",
+    "Introduce el código que guardaste al crear la cuenta. Tras cambiar la contraseña recibirás un código de recuperación nuevo."
+  ],
+  [
+    "Po założeniu konta otrzymasz kod odzyskiwania. Zapisz go poza telefonem, aby móc odzyskać konto po zapomnieniu hasła.",
+    "After creating your account you get a recovery code. Keep it outside your phone so you can recover the account if you forget the password.",
+    "Na het aanmaken van je account krijg je een herstelcode. Bewaar hem buiten je telefoon, zodat je je account kunt herstellen als je het wachtwoord vergeet.",
+    "Nach der Kontoerstellung erhältst du einen Wiederherstellungscode. Bewahre ihn außerhalb deines Handys auf, damit du dein Konto bei vergessenem Passwort wiederherstellen kannst.",
+    "Après la création du compte, vous recevez un code de récupération. Gardez-le ailleurs que sur votre téléphone pour récupérer le compte si vous oubliez le mot de passe.",
+    "Al crear la cuenta recibes un código de recuperación. Guárdalo fuera del móvil para recuperar la cuenta si olvidas la contraseña."
+  ],
+  [
+    "Nie mogę odczytać zapisu w chmurze.",
+    "Cannot read the cloud save.",
+    "De cloudopslag kan niet worden gelezen.",
+    "Cloud-Spielstand kann nicht gelesen werden.",
+    "Impossible de lire la sauvegarde cloud.",
+    "No se puede leer el guardado en la nube."
+  ],
+  [
+    "Nie mogę połączyć się z chmurą.",
+    "Cannot connect to the cloud.",
+    "De cloud is niet bereikbaar.",
+    "Cloud-Verbindung nicht möglich.",
+    "Impossible de se connecter au cloud.",
+    "No se puede conectar con la nube."
+  ],
+  [
+    "Zapis w chmurze nie odpowiada. Postęp czeka na tym urządzeniu.",
+    "Cloud save is not responding. Your progress is kept on this device.",
+    "De cloudopslag reageert niet. Je voortgang blijft op dit apparaat.",
+    "Der Cloud-Spielstand antwortet nicht. Dein Fortschritt bleibt auf diesem Gerät.",
+    "Le cloud ne répond pas. Votre progression est conservée sur cet appareil.",
+    "El guardado en la nube no responde. Tu progreso queda en este dispositivo."
+  ],
+  [
+    "Wróć do solo przed zalogowaniem.",
+    "Return to solo before signing in.",
+    "Ga terug naar solo voordat je inlogt.",
+    "Kehre vor dem Anmelden zu Solo zurück.",
+    "Revenez en solo avant de vous connecter.",
+    "Vuelve al modo en solitario antes de iniciar sesión."
+  ],
+  [
+    "Wpisz prawidłowy adres e-mail.",
+    "Enter a valid email address.",
+    "Voer een geldig e-mailadres in.",
+    "Gib eine gültige E-Mail-Adresse ein.",
+    "Entrez une adresse e-mail valide.",
+    "Introduce un correo electrónico válido."
+  ],
+  [
+    "Hasło musi mieć od 15 do 128 znaków.",
+    "The password must have 15 to 128 characters.",
+    "Het wachtwoord moet 15 tot 128 tekens bevatten.",
+    "Das Passwort muss 15 bis 128 Zeichen enthalten.",
+    "Le mot de passe doit contenir 15 à 128 caractères.",
+    "La contraseña debe tener entre 15 y 128 caracteres."
+  ],
+  [
+    "Oba hasła muszą być takie same.",
+    "Both passwords must match.",
+    "Beide wachtwoorden moeten hetzelfde zijn.",
+    "Beide Passwörter müssen übereinstimmen.",
+    "Les deux mots de passe doivent être identiques.",
+    "Las dos contraseñas deben coincidir."
+  ],
+  [
+    "Najpierw zapisz obecną wyspę w chmurze, a potem dodaj e-mail i hasło.",
+    "Save your current island to the cloud first, then add an email and password.",
+    "Sla eerst je huidige eiland in de cloud op en voeg daarna e-mail en wachtwoord toe.",
+    "Speichere zuerst deine aktuelle Insel in der Cloud und füge dann E-Mail und Passwort hinzu.",
+    "Sauvegardez d’abord votre île actuelle dans le cloud, puis ajoutez un e-mail et un mot de passe.",
+    "Primero guarda tu isla actual en la nube y después añade un correo y una contraseña."
+  ],
+  [
+    "Kod jest wyświetlany teraz. Zachowaj go przed zamknięciem strony.",
+    "The code is shown now. Keep it before closing the page.",
+    "De code is nu zichtbaar. Bewaar hem voordat je de pagina sluit.",
+    "Der Code wird jetzt angezeigt. Bewahre ihn vor dem Schließen der Seite auf.",
+    "Le code est affiché maintenant. Conservez-le avant de fermer la page.",
+    "El código se muestra ahora. Guárdalo antes de cerrar la página."
+  ],
+  [
+    "Hasło zmienione. Twoja wyspa jest zachowana.",
+    "Password changed. Your island is kept.",
+    "Wachtwoord gewijzigd. Je eiland blijft behouden.",
+    "Passwort geändert. Deine Insel bleibt erhalten.",
+    "Mot de passe modifié. Votre île est conservée.",
+    "Contraseña cambiada. Tu isla se conserva."
+  ],
+  [
+    "Konto połączone. Sprawdź stan zapisu w chmurze.",
+    "Account connected. Check your cloud save status.",
+    "Account verbonden. Controleer de status van je cloudopslag.",
+    "Konto verbunden. Prüfe den Cloud-Speicherstatus.",
+    "Compte connecté. Vérifiez l’état de la sauvegarde cloud.",
+    "Cuenta conectada. Comprueba el estado del guardado en la nube."
+  ],
+  [
+    "Nie udało się połączyć z kontem. Spróbuj ponownie.",
+    "Could not connect to your account. Try again.",
+    "Verbinding met je account is niet gelukt. Probeer het opnieuw.",
+    "Verbindung zum Konto fehlgeschlagen. Versuche es erneut.",
+    "Impossible de se connecter au compte. Réessayez.",
+    "No se pudo conectar con tu cuenta. Inténtalo de nuevo."
+  ],
+  [
+    "Sprawdź hasło lub zaloguj się ponownie.",
+    "Check your password or sign in again.",
+    "Controleer je wachtwoord of log opnieuw in.",
+    "Prüfe dein Passwort oder melde dich erneut an.",
+    "Vérifiez votre mot de passe ou reconnectez-vous.",
+    "Comprueba tu contraseña o vuelve a iniciar sesión."
+  ],
+  [
+    "Zaznaczyłem kod. Skopiuj go lub zapisz na kartce.",
+    "Code selected. Copy it or write it on paper.",
+    "Code geselecteerd. Kopieer hem of schrijf hem op papier.",
+    "Code ausgewählt. Kopiere ihn oder schreibe ihn auf Papier.",
+    "Code sélectionné. Copiez-le ou notez-le sur papier.",
+    "Código seleccionado. Cópialo o escríbelo en papel."
+  ],
+  [
+    "Logowanie nie zostało potwierdzone w tej przeglądarce. Spróbuj ponownie.",
+    "Sign-in was not confirmed in this browser. Try again.",
+    "Het inloggen is niet bevestigd in deze browser. Probeer het opnieuw.",
+    "Die Anmeldung wurde in diesem Browser nicht bestätigt. Versuche es erneut.",
+    "La connexion n’a pas été confirmée dans ce navigateur. Réessayez.",
+    "El inicio de sesión no se ha confirmado en este navegador. Inténtalo de nuevo."
+  ],
+  [
+    "Konto połączone. Sprawdź stan zapisu przed zmianą urządzenia.",
+    "Account connected. Check your save before changing devices.",
+    "Account verbonden. Controleer je opslag voordat je van apparaat wisselt.",
+    "Konto verbunden. Prüfe den Spielstand vor einem Gerätewechsel.",
+    "Compte connecté. Vérifiez la sauvegarde avant de changer d’appareil.",
+    "Cuenta conectada. Comprueba el guardado antes de cambiar de dispositivo."
+  ],
+  [
+    "Konto połączone. Twoja wyspa ma zapis w chmurze.",
+    "Account connected. Your island is saved to the cloud.",
+    "Account verbonden. Je eiland is opgeslagen in de cloud.",
+    "Konto verbunden. Deine Insel ist in der Cloud gespeichert.",
+    "Compte connecté. Votre île est sauvegardée dans le cloud.",
+    "Cuenta conectada. Tu isla está guardada en la nube."
+  ],
+  [
+    "Brak sieci — postęp czeka na tym urządzeniu.",
+    "Offline — your progress is kept on this device.",
+    "Geen netwerk — je voortgang blijft op dit apparaat.",
+    "Kein Netz — dein Fortschritt bleibt auf diesem Gerät.",
+    "Hors ligne — votre progression reste sur cet appareil.",
+    "Sin conexión — tu progreso queda en este dispositivo."
+  ],
+  [
+    "Zapisano twoją wyspę w chmurze.",
+    "Your island was saved to the cloud.",
+    "Je eiland is opgeslagen in de cloud.",
+    "Deine Insel wurde in der Cloud gespeichert.",
+    "Votre île a été sauvegardée dans le cloud.",
+    "Tu isla se ha guardado en la nube."
+  ],
+  [
+    "Sprawdź stan zapisu w oknie konta.",
+    "Check the save status in your account window.",
+    "Controleer de opslagstatus in het accountvenster.",
+    "Prüfe den Speicherstatus im Kontofenster.",
+    "Vérifiez l’état de sauvegarde dans la fenêtre du compte.",
+    "Comprueba el estado del guardado en la ventana de cuenta."
+  ],
+  [
+    "Nie mogę zachować kopii bieżącej wyspy. Spróbuj ponownie po zwolnieniu miejsca w przeglądarce.",
+    "Cannot keep a backup of your current island. Free some browser storage and try again.",
+    "Een kopie van je huidige eiland bewaren lukt niet. Maak ruimte vrij in de browser en probeer het opnieuw.",
+    "Eine Sicherung deiner aktuellen Insel kann nicht gespeichert werden. Schaffe im Browser Platz und versuche es erneut.",
+    "Impossible de garder une copie de votre île actuelle. Libérez de l’espace dans le navigateur et réessayez.",
+    "No se puede guardar una copia de tu isla actual. Libera espacio en el navegador e inténtalo de nuevo."
+  ],
+  [
+    "Najpierw zapisz postęp w chmurze. Twój zapis na urządzeniu jest zachowany.",
+    "Save your progress to the cloud first. Your device’s save is kept.",
+    "Sla eerst je voortgang in de cloud op. De opslag op je apparaat blijft behouden.",
+    "Speichere deinen Fortschritt zuerst in der Cloud. Der lokale Spielstand bleibt erhalten.",
+    "Sauvegardez d’abord votre progression dans le cloud. La sauvegarde sur l’appareil est conservée.",
+    "Guarda primero tu progreso en la nube. Se conserva el guardado del dispositivo."
+  ],
+  [
+    "Zapisuję nową przygodę w chmurze…",
+    "Saving a new adventure to the cloud…",
+    "Nieuw avontuur in de cloud opslaan…",
+    "Neues Abenteuer wird in der Cloud gespeichert…",
+    "Sauvegarde de la nouvelle aventure dans le cloud…",
+    "Guardando una nueva aventura en la nube…"
+  ],
+  [
+    "Najpierw połącz się z chmurą. Obecna przygoda pozostaje zachowana.",
+    "Connect to the cloud first. Your current adventure is kept.",
+    "Maak eerst verbinding met de cloud. Je huidige avontuur blijft behouden.",
+    "Verbinde dich zuerst mit der Cloud. Dein bisheriges Abenteuer bleibt erhalten.",
+    "Connectez-vous d’abord au cloud. Votre aventure actuelle est conservée.",
+    "Conéctate primero con la nube. Tu aventura actual se conserva."
+  ],
+  [
+    "Czekam na potwierdzenie nowej gry. Naciśnij Ponów połączenie w oknie konta.",
+    "Waiting for the new game confirmation. Select Reconnect in your account window.",
+    "Wachten op bevestiging van het nieuwe spel. Kies Opnieuw verbinden in het accountvenster.",
+    "Warte auf Bestätigung des neuen Spiels. Wähle Erneut verbinden im Kontofenster.",
+    "En attente de confirmation de la nouvelle partie. Choisissez Se reconnecter dans la fenêtre du compte.",
+    "Esperando confirmación de la nueva partida. Elige Volver a conectar en la ventana de cuenta."
+  ],
+  [
+    "Nie udało się rozpocząć nowej gry. Obecny postęp został zachowany.",
+    "Could not start a new game. Your current progress is kept.",
+    "Een nieuw spel starten is niet gelukt. Je huidige voortgang blijft behouden.",
+    "Neues Spiel konnte nicht gestartet werden. Dein aktueller Fortschritt bleibt erhalten.",
+    "Impossible de commencer une nouvelle partie. Votre progression actuelle est conservée.",
+    "No se pudo empezar una partida nueva. Tu progreso actual se conserva."
+  ],
+  [
+    "Widok 3D",
+    "3D view",
+    "3D-weergave",
+    "3D-Ansicht",
+    "Vue 3D",
+    "Vista 3D"
+  ],
+  [
+    "WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera",
+    "WASD / arrows · E interact · drag screen or Q/R: camera",
+    "WASD / pijltjes · E actie · scherm slepen of Q/R: camera",
+    "WASD / Pfeile · E Aktion · Bildschirm ziehen oder Q/R: Kamera",
+    "WASD / flèches · E agir · glisser l’écran ou Q/R : caméra",
+    "WASD / flechas · E actuar · arrastra la pantalla o Q/R: cámara"
+  ],
+  [
+    "Grafika 3D została przerwana. Kontynuuj w 2D albo włącz 3D ponownie.",
+    "3D graphics were interrupted. Continue in 2D or turn 3D on again.",
+    "De 3D-weergave is onderbroken. Speel verder in 2D of zet 3D opnieuw aan.",
+    "3D-Grafik wurde unterbrochen. Spiele in 2D weiter oder aktiviere 3D erneut.",
+    "La 3D a été interrompue. Continuez en 2D ou réactivez la 3D.",
+    "Los gráficos 3D se han interrumpido. Continúa en 2D o activa la vista 3D otra vez."
+  ],
+  [
+    "Ta przeglądarka nie udostępnia grafiki 3D.",
+    "This browser does not support 3D graphics.",
+    "Deze browser ondersteunt geen 3D-weergave.",
+    "Dieser Browser unterstützt keine 3D-Grafik.",
+    "Ce navigateur ne prend pas en charge la 3D.",
+    "Este navegador no admite gráficos 3D."
+  ],
+  [
+    "🌐 Język",
+    "🌐 Language",
+    "🌐 Taal",
+    "🌐 Sprache",
+    "🌐 Langue",
+    "🌐 Idioma"
+  ],
+  [
+    "Wybierz język",
+    "Choose language",
+    "Taal kiezen",
+    "Sprache wählen",
+    "Choisir la langue",
+    "Elegir idioma"
+  ],
+  [
+    "Język gry",
+    "Game language",
+    "Speltaal",
+    "Spielsprache",
+    "Langue du jeu",
+    "Idioma del juego"
+  ],
+  [
+    "Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.",
+    "Choose the language for this device. Your island and resources are kept.",
+    "Kies de taal voor dit apparaat. Je eiland en grondstoffen blijven behouden.",
+    "Wähle die Sprache für dieses Gerät. Deine Insel und Ressourcen bleiben erhalten.",
+    "Choisissez la langue de cet appareil. Votre île et vos ressources sont conservées.",
+    "Elige el idioma para este dispositivo. Tu isla y tus recursos se conservan."
+  ],
+  [
+    "Zamknij wybór języka",
+    "Close language selection",
+    "Taalkeuze sluiten",
+    "Sprachauswahl schließen",
+    "Fermer le choix de langue",
+    "Cerrar selección de idioma"
+  ],
+  [
+    "LEON · HANDEL",
+    "LEON · TRADE",
+    "LEON · HANDEL",
+    "LEON · HANDEL",
+    "LEON · COMMERCE",
+    "LEON · COMERCIO"
+  ],
+  [
+    "0.15 • Wyspa w sześciu językach",
+    "0.15 • An island in six languages",
+    "0.15 • Een eiland in zes talen",
+    "0.15 • Eine Insel in sechs Sprachen",
+    "0.15 • Une île en six langues",
+    "0.15 • Una isla en seis idiomas"
+  ],
+  [
+    "My Island 0.15 — Twoja wyspa",
+    "My Island 0.15 — Your island",
+    "My Island 0.15 — Jouw eiland",
+    "My Island 0.15 — Deine Insel",
+    "My Island 0.15 — Votre île",
+    "My Island 0.15 — Tu isla"
+  ],
+  [
+    "Kod pokoju skopiowany: ",
+    "Room code copied: ",
+    "Kamercode gekopieerd: ",
+    "Raumcode kopiert: ",
+    "Code du salon copié : ",
+    "Código de sala copiado: "
+  ],
+  [
+    "Przycisk ",
+    "Button ",
+    "Knop ",
+    "Taste ",
+    "Bouton ",
+    "Botón "
+  ],
+  [
+    "Martwa strefa: ",
+    "Deadzone: ",
+    "Dode zone: ",
+    "Totzone: ",
+    "Zone morte : ",
+    "Zona muerta: "
+  ],
+  [
+    ". Esc anuluje.",
+    ". Esc cancels.",
+    ". Esc annuleert.",
+    ". Esc bricht ab.",
+    ". Échap annule.",
+    ". Esc cancela."
+  ],
+  [
+    "przycisk ",
+    "button ",
+    "knop ",
+    "Taste ",
+    "bouton ",
+    "botón "
+  ],
+  [
+    "przyciski puszczone",
+    "buttons released",
+    "knoppen losgelaten",
+    "Tasten losgelassen",
+    "boutons relâchés",
+    "botones sueltos"
+  ],
+  [
+    "Zmiana przycisku anulowana.",
+    "Button change cancelled.",
+    "Knopwijziging geannuleerd.",
+    "Tastenänderung abgebrochen.",
+    "Modification du bouton annulée.",
+    "Cambio de botón cancelado."
+  ],
+  [
+    "Przypisano przycisk ",
+    "Assigned button ",
+    "Toegewezen knop ",
+    "Zugewiesene Taste ",
+    "Bouton attribué : ",
+    "Botón asignado: "
+  ],
+  [
+    "Odpoczynek przerwany.",
+    "Rest interrupted.",
+    "Rust onderbroken.",
+    "Ruhe unterbrochen.",
+    "Repos interrompu.",
+    "Descanso interrumpido."
+  ],
+  [
+    "Dzik pokonany: +20 monet, +35 XP.",
+    "Boar defeated: +20 coins, +35 XP.",
+    "Wild zwijn verslagen: +20 munten, +35 XP.",
+    "Wildschwein besiegt: +20 Münzen, +35 XP.",
+    "Sanglier vaincu : +20 pièces, +35 XP.",
+    "Jabalí derrotado: +20 monedas, +35 XP."
+  ],
+  [
+    "Nela: Skarb odnaleziony! +250 monet, +300 XP.",
+    "Nela: Treasure found! +250 coins, +300 XP.",
+    "Nela: Schat gevonden! +250 munten, +300 XP.",
+    "Nela: Schatz gefunden! +250 Münzen, +300 XP.",
+    "Nela : Trésor trouvé ! +250 pièces, +300 XP.",
+    "Nela: ¡Tesoro encontrado! +250 monedas, +300 XP."
+  ],
+  [
+    "Jeszcze jedno uderzenie.",
+    "One more hit.",
+    "Nog één keer slaan.",
+    "Noch ein Schlag.",
+    "Encore un coup.",
+    "Un golpe más."
+  ],
+  [
+    "2 drewna",
+    "2 wood",
+    "2 hout",
+    "2 Holz",
+    "2 bois",
+    "2 de madera"
+  ],
+  [
+    "1 muszelka",
+    "1 shell",
+    "1 schelp",
+    "1 Muschel",
+    "1 coquillage",
+    "1 concha"
+  ],
+  [
+    "Zebrano: ",
+    "Collected: ",
+    "Verzameld: ",
+    "Gesammelt: ",
+    "Collecté : ",
+    "Recogido: "
+  ],
+  [
+    "Potrzebujesz 6 drewna i 4 kamieni.",
+    "You need 6 wood and 4 stones.",
+    "Je hebt 6 hout en 4 stenen nodig.",
+    "Du brauchst 6 Holz und 4 Steine.",
+    "Il vous faut 6 bois et 4 pierres.",
+    "Necesitas 6 de madera y 4 piedras."
+  ],
+  [
+    "Potrzebujesz 5 drewna i 2 muszelek.",
+    "You need 5 wood and 2 shells.",
+    "Je hebt 5 hout en 2 schelpen nodig.",
+    "Du brauchst 5 Holz und 2 Muscheln.",
+    "Il vous faut 5 bois et 2 coquillages.",
+    "Necesitas 5 de madera y 2 conchas."
+  ],
+  [
+    "Potrzebujesz 12 drewna i 6 muszelek.",
+    "You need 12 wood and 6 shells.",
+    "Je hebt 12 hout en 6 schelpen nodig.",
+    "Du brauchst 12 Holz und 6 Muscheln.",
+    "Il vous faut 12 bois et 6 coquillages.",
+    "Necesitas 12 de madera y 6 conchas."
+  ],
+  [
+    "Zbuduj kolejno poziomy L1, L2 i L3.",
+    "Build levels L1, L2 and L3 in order.",
+    "Bouw achtereenvolgens L1, L2 en L3.",
+    "Baue L1, L2 und L3 der Reihe nach.",
+    "Construisez N1, N2 et N3 dans l’ordre.",
+    "Construye N1, N2 y N3 en orden."
+  ],
+  [
+    "Baza L",
+    "Base L",
+    "Basis L",
+    "Basis L",
+    "Base N",
+    "Base N"
+  ],
+  [
+    "Potrzebujesz 4 drewna i 2 kamieni.",
+    "You need 4 wood and 2 stones.",
+    "Je hebt 4 hout en 2 stenen nodig.",
+    "Du brauchst 4 Holz und 2 Steine.",
+    "Il vous faut 4 bois et 2 pierres.",
+    "Necesitas 4 de madera y 2 piedras."
+  ],
+  [
+    "Potrzebujesz surowej ryby i 1 drewna.",
+    "You need a raw fish and 1 wood.",
+    "Je hebt een rauwe vis en 1 hout nodig.",
+    "Du brauchst einen rohen Fisch und 1 Holz.",
+    "Il vous faut un poisson cru et 1 bois.",
+    "Necesitas un pescado crudo y 1 de madera."
+  ],
+  [
+    "Odpoczywasz przy ognisku…",
+    "Resting at the campfire…",
+    "Uitrusten bij het kampvuur…",
+    "Ruhe am Lagerfeuer…",
+    "Repos au feu de camp…",
+    "Descansando en la hoguera…"
+  ],
+  [
+    "Leon potrzebuje 6 drewna i 4 kamieni.",
+    "Leon needs 6 wood and 4 stones.",
+    "Leon heeft 6 hout en 4 stenen nodig.",
+    "Leon braucht 6 Holz und 4 Steine.",
+    "Leon a besoin de 6 bois et 4 pierres.",
+    "Leon necesita 6 de madera y 4 piedras."
+  ],
+  [
+    "Nela potrzebuje 3 ryb.",
+    "Nela needs 3 fish.",
+    "Nela heeft 3 vissen nodig.",
+    "Nela braucht 3 Fische.",
+    "Nela a besoin de 3 poissons.",
+    "Nela necesita 3 pescados."
+  ],
+  [
+    "Na tratwie",
+    "On the raft",
+    "Op het vlot",
+    "Auf dem Floß",
+    "Sur le radeau",
+    "En la balsa"
+  ],
+  [
+    "Odpoczynek ",
+    "Resting ",
+    "Rusten ",
+    "Ruhe ",
+    "Repos ",
+    "Descanso "
+  ],
+  [
+    "Skarb odnaleziony i oddany Neli. Gratulacje!",
+    "Treasure found and returned to Nela. Congratulations!",
+    "Schat gevonden en aan Nela gegeven. Gefeliciteerd!",
+    "Schatz gefunden und Nela übergeben. Glückwunsch!",
+    "Trésor trouvé et remis à Nela. Félicitations !",
+    "Tesoro encontrado y entregado a Nela. ¡Enhorabuena!"
+  ],
+  [
+    "Wyprawa po skarb",
+    "Treasure adventure",
+    "Schattenjacht",
+    "Schatzsuche",
+    "Chasse au trésor",
+    "Búsqueda del tesoro"
+  ],
+  [
+    "12 drewna + 6 muszelek.",
+    "12 wood + 6 shells.",
+    "12 hout + 6 schelpen.",
+    "12 Holz + 6 Muscheln.",
+    "12 bois + 6 coquillages.",
+    "12 de madera + 6 conchas."
+  ],
+  [
+    "Nowy kod odzyskiwania",
+    "New recovery code",
+    "Nieuwe herstelcode",
+    "Neuer Wiederherstellungscode",
+    "Nouveau code de récupération",
+    "Nuevo código de recuperación"
+  ],
+  [
+    "Dodaj e-mail do obecnej wyspy",
+    "Add email to your current island",
+    "E-mail aan je huidige eiland toevoegen",
+    "E-Mail zur bisherigen Insel hinzufügen",
+    "Ajouter un e-mail à votre île actuelle",
+    "Añadir correo a tu isla actual"
+  ],
+  [
+    "Wpisz zachowany kod odzyskiwania.",
+    "Enter your saved recovery code.",
+    "Voer je bewaarde herstelcode in.",
+    "Gib deinen aufbewahrten Wiederherstellungscode ein.",
+    "Entrez le code de récupération conservé.",
+    "Introduce el código de recuperación que guardaste."
+  ],
+  [
+    "Nowy kod gotowy — zapisz go.",
+    "New code ready — keep it safe.",
+    "Nieuwe code klaar — bewaar hem.",
+    "Neuer Code bereit — bewahre ihn auf.",
+    "Nouveau code prêt — conservez-le.",
+    "Código nuevo listo — guárdalo."
+  ],
+  [
+    "Kod skopiowany. Zachowaj go poza telefonem.",
+    "Code copied. Keep it outside your phone.",
+    "Code gekopieerd. Bewaar hem buiten je telefoon.",
+    "Code kopiert. Bewahre ihn außerhalb deines Handys auf.",
+    "Code copié. Conservez-le ailleurs que sur votre téléphone.",
+    "Código copiado. Guárdalo fuera del móvil."
+  ],
+  [
+    "Wylogowano z gry. Zapis pozostaje na koncie.",
+    "Signed out of the game. Your save stays on your account.",
+    "Uitgelogd uit het spel. Je opslag blijft op je account.",
+    "Vom Spiel abgemeldet. Dein Spielstand bleibt im Konto.",
+    "Déconnecté du jeu. Votre sauvegarde reste sur votre compte.",
+    "Has cerrado sesión. Tu partida queda guardada en tu cuenta."
+  ],
+  [
+    "Nowa przygoda zapisana na koncie!",
+    "New adventure saved to your account!",
+    "Nieuw avontuur opgeslagen op je account!",
+    "Neues Abenteuer im Konto gespeichert!",
+    "Nouvelle aventure sauvegardée sur votre compte !",
+    "¡Nueva aventura guardada en tu cuenta!"
+  ]
+]

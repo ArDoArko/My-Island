@@ -189,6 +189,15 @@ export function create({canvas,terrain,getState,onLost}) {
   const self=human();const people=new Map();
   const merchant=human({skin:'#d1a074',shirt:'#b49966'},'leon','LEON · HANDEL');
   const guide=human({skin:'#edc39a',shirt:'#609991'},'nela','NELA · ZADANIA');
+  function updateName(person,name,color) {
+    if (!name || name === person.name) return;
+    if (person.tag) {
+      person.root.remove(person.tag);
+      person.tag.material.map.dispose();
+      person.tag.material.dispose();
+    }
+    person.name=name;person.tag=textSprite(name,color);person.root.add(person.tag);
+  }
   function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,state) {
     const x=point.x/SCALE,z=point.y/SCALE,wet=state.sea(point.x,point.y);
     const surface=wet?0:terrainHeight(x,z);
@@ -269,6 +278,8 @@ export function create({canvas,terrain,getState,onLost}) {
   function frame(now){
     if(!enabled||lost)return;
     const s=getState(),seconds=now/1000,step=last?clamp((now-last)/1000,0,.06):1/60;last=now;
+    updateName(merchant,s.labels?.leon,'#b49966');
+    updateName(guide,s.labels?.nela,'#609991');
     const x=s.P.x/SCALE,z=s.P.y/SCALE;
     resources(s.objects,seconds);
     const facing={down:0,up:Math.PI,left:-Math.PI/2,right:Math.PI/2};
