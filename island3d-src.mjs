@@ -1,5 +1,6 @@
 import * as T from 'three';
 import { BOARD, baseLayout } from './island-play.mjs';
+import { colors, motionPose, MOTIONS } from './character.mjs';
 
 // Rendering only. Authoritative inventory, save ownership and room state stay in index.html.
 export const SCALE = 80;
@@ -52,6 +53,86 @@ export function buildBase(layout,elevation,helpers={}){
   for(const bed of layout.beds){const dx=bed.x-layout.center.x,dy=bed.y-layout.center.y,x=(dx*layout.fy-dy*layout.fx)/SCALE,z=(dx*layout.fx+dy*layout.fy)/SCALE;
     cube(hut,'#7d654b',[x,.17,z],[.65,.34,1.125]).name='bed';cube(hut,'#cec6a0',[x,.38,z],[.65,.14,1.125]);cube(hut,'#ede3bd',[x,.49,z-.35],[.5,.09,.26]);}
   return hut;
+}
+
+// The same avatar meshes and action poses are exercised by geometry tests.
+function personTool(kind,root,{cube,tube,ell}){
+  if(kind==='gather'){tube(root,'#8c6944',[0,-.12,.15],[.025,.48,.025]);cube(root,'#8e9891',[0,.1,.15],[.27,.1,.075]);}
+  if(kind==='fish'){const rod=tube(root,'#b2915b',[0,.22,.25],[.014,1.25,.014]);rod.rotation.x=-.6;const line=tube(root,'#d0e6df',[0,.37,.75],[.003,.62,.003]);line.rotation.x=.6;}
+  if(kind==='cook'){const stick=tube(root,'#80613d',[0,-.12,.18],[.016,.5,.016]);stick.rotation.x=-.6;ell(root,'#bb9457',[0,-.26,.3],[.07,.04,.14]);}
+}
+export function buildHuman(look={},kind='player',helpers={}){
+  const materials=new Map(),geometries=new Map();
+  const mat=helpers.mat||(color=>{if(!materials.has(color))materials.set(color,new T.MeshStandardMaterial({color}));return materials.get(color)});
+  const geo=helpers.geo||((key,create)=>{if(!geometries.has(key))geometries.set(key,create());return geometries.get(key)});
+  const mesh=helpers.mesh||((parent,g,m,p=[0,0,0],s=[1,1,1])=>{const o=new T.Mesh(g,m);o.position.set(...p);o.scale.set(...s);parent.add(o);return o});
+  const ell=helpers.ell||((parent,color,p,s)=>mesh(parent,geo('ball',()=>new T.SphereGeometry(1,14,10)),mat(color),p,s));
+  const cube=helpers.cube||((parent,color,p,s)=>mesh(parent,geo('box',()=>new T.BoxGeometry(1,1,1)),mat(color),p,s));
+  const tube=helpers.tube||((parent,color,p,s)=>mesh(parent,geo('cyl',()=>new T.CylinderGeometry(1,1,1,10)),mat(color),p,s));
+    const root=new T.Group(),rig=new T.Group();root.add(rig);
+    const skin=look.skin||'#dda879',hair=look.hair||'#43332b',shirt=look.shirt||'#4c9cba';
+    const hips=new T.Group();hips.position.y=.87;rig.add(hips);
+    ell(hips,'#3f4d4f',[0,.05,0],[.22,.17,.13]);
+    ell(hips,shirt,[0,.36,0],[.255,.31,.15]);
+    cube(hips,'#3b4c48',[0,.135,-.01],[.4,.045,.255]);
+    tube(hips,skin,[0,.64,0],[.064,.13,.064]);
+    const head=new T.Group();head.position.y=.79;hips.add(head);
+    ell(head,skin,[0,0,0],[.135,.175,.133]);
+    ell(head,skin,[-.137,-.005,0],[.025,.048,.025]);ell(head,skin,[.137,-.005,0],[.025,.048,.025]);
+    ell(head,skin,[0,-.015,.136],[.026,.033,.036]);
+    for(const side of [-1,1]){
+      ell(head,'#f6f3df',[side*.052,.02,.115],[.030,.017,.014]);
+      ell(head,'#31433e',[side*.053,.02,.128],[.012,.013,.007]);
+      cube(head,hair,[side*.052,.061,.11],[.062,.01,.014]);
+    }
+    cube(head,'#af735b',[0,-.071,.117],[.051,.009,.012]);
+    const hairG=geo('hair',()=>new T.SphereGeometry(1,16,10,0,Math.PI*2,0,Math.PI*.56));
+    mesh(head,hairG,mat(kind==='nela'?'#8d4931':hair),[0,.015,-.015],[.145,.18,.143]);
+    const hairStyles=[new T.Group(),new T.Group(),new T.Group()];hairStyles.forEach(g=>head.add(g));
+    const cap=head.children.find(o=>o.isMesh&&o.geometry===hairG);head.remove(cap);hairStyles[0].add(cap);
+    mesh(hairStyles[1],hairG,mat(hair),[0,.015,-.015],[.145,.18,.143]);
+    ell(hairStyles[1],hair,[0,-.04,-.17],[.072,.14,.08]);
+    for(let i=0;i<12;i++){const a=i*Math.PI*2/12;ell(hairStyles[2],hair,[Math.sin(a)*.1,.10+(i%2)*.018,Math.cos(a)*.1-.015],[.066,.067,.066]);}
+    ell(hairStyles[2],hair,[0,.15,-.015],[.09,.054,.09]);
+    if(kind==='nela')ell(head,'#8d4931',[0,-.045,-.145],[.125,.21,.07]);
+    hairStyles.forEach((g,i)=>g.visible=i===(look.style||0));
+    if(kind==='leon'){
+      tube(head,'#c5a775',[0,.15,0],[.16,.12,.16]);tube(head,'#c5a775',[0,.095,0],[.22,.028,.22]);
+      cube(hips,'#e4cda1',[0,.23,.145],[.33,.42,.025]);
+    }else if(kind==='player'){
+      ell(hips,'#5d735b',[0,.36,-.17],[.18,.22,.09]);
+      for(const side of [-1,1])cube(hips,'#b6caa4',[side*.17,.38,-.04],[.034,.35,.029]);
+    }
+    const arms=[],legs=[];
+    for(const side of [-1,1]){
+      const arm=new T.Group();arm.position.set(side*.27,.54,0);hips.add(arm);
+      tube(arm,shirt,[0,-.095,0],[.087,.19,.087]);tube(arm,skin,[0,-.24,0],[.061,.15,.061]);
+      const forearm=new T.Group();forearm.position.y=-.31;arm.add(forearm);tube(forearm,skin,[0,-.13,0],[.053,.26,.053]);ell(forearm,skin,[0,-.28,0],[.06,.082,.046]);
+      arms.push({arm,forearm,side});
+      const thigh=new T.Group();thigh.position.set(side*.115,0,0);hips.add(thigh);
+      tube(thigh,'#52625f',[0,-.21,0],[.093,.42,.093]);
+      const calf=new T.Group();calf.position.y=-.43;thigh.add(calf);tube(calf,'#52625f',[0,-.18,0],[.069,.36,.069]);
+      const shoe=ell(calf,'#4b3b2e',[0,-.395,.055],[.075,.052,.14]);legs.push({thigh,calf,shoe,side});
+    }
+    const spear=new T.Group();tube(spear,'#8c6944',[0,.56,0],[.018,1.75,.018]);ell(spear,'#dad9c5',[0,1.45,0],[.045,.15,.03]);spear.position.set(.35,.2,.08);rig.add(spear);spear.visible=false;
+    const props={};
+    for(const key of ['gather','fish','cook']){const prop=new T.Group();personTool(key,prop,{cube,tube,ell});prop.position.set(0,-.28,0);arms[1].forearm.add(prop);prop.visible=false;props[key]=prop;}
+    const raft=new T.Group();root.add(raft);for(let i=0;i<5;i++){const log=tube(raft,'#a17d48',[(i-2)*.25,.08,0],[.115,1.7,.115]);log.rotation.x=Math.PI/2;}for(const z of [-.5,.5])cube(raft,'#6e5937',[0,.19,z],[1.24,.05,.1]);raft.visible=false;
+    const shirtParts=[],skinParts=[],hairParts=[];
+    rig.traverse(o=>{if(o.isMesh){if(o.material===mat(shirt))shirtParts.push(o);if(o.material===mat(skin))skinParts.push(o);if(o.material===mat(hair))hairParts.push(o);}});
+    return {root,rig,hips,head,arms,legs,spear,raft,shirtParts,skinParts,hairParts,hairStyles,props,yaw:0,lastX:null,lastZ:null,phase:0};
+}
+
+export function actionPose(person,motion){
+  const pose=motion&&motionPose(motion.kind,motion.phase);person.rig.rotation.x=pose?.bend||0;
+  for(const [kind,prop] of Object.entries(person.props))prop.visible=!!pose&&motion.kind===kind;
+  if(!pose)return;
+  for(const arm of person.arms){arm.arm.rotation.x=arm.side<0?pose.left:pose.right;arm.forearm.rotation.x=-.25;arm.arm.rotation.z=-arm.side*.08+(arm.side>0||motion.kind==='cheer'?pose.wave||0:0);}
+}
+export function fishPose(point,seconds,sea){
+  const phase=point.phase||0,x=point.x+Math.sin(seconds*.65+phase)*14,y=point.y+Math.cos(seconds*.65+phase)*14;
+  if(!sea(x,y))return null;
+  return {x:x/SCALE,z:y/SCALE,y:.055+Math.sin(seconds*3+phase)*.008,yaw:Math.atan2(Math.cos(seconds*.65+phase),-Math.sin(seconds*.65+phase))};
 }
 
 export function create({canvas,terrain,getState,onLost}) {
@@ -172,53 +253,8 @@ export function create({canvas,terrain,getState,onLost}) {
     const sprite=new T.Sprite(new T.SpriteMaterial({map:texture,depthTest:true,transparent:true}));sprite.scale.set(2.45,.46,1);sprite.position.y=2.32;return sprite;
   }
   const shirtColors=['#4c9cba','#df8168','#9974c7','#76b677'];
-  function human(look={},kind='player',name='') {
-    const root=new T.Group(),rig=new T.Group();root.add(rig);scene.add(root);
-    const skin=look.skin||'#dda879',hair=look.hair||'#43332b',shirt=look.shirt||'#4c9cba';
-    const hips=new T.Group();hips.position.y=.87;rig.add(hips);
-    ell(hips,'#3f4d4f',[0,.05,0],[.22,.17,.13]);
-    ell(hips,shirt,[0,.36,0],[.255,.31,.15]);
-    cube(hips,'#3b4c48',[0,.135,-.01],[.4,.045,.255]);
-    tube(hips,skin,[0,.64,0],[.064,.13,.064]);
-    const head=new T.Group();head.position.y=.79;hips.add(head);
-    ell(head,skin,[0,0,0],[.135,.175,.133]);
-    ell(head,skin,[-.137,-.005,0],[.025,.048,.025]);ell(head,skin,[.137,-.005,0],[.025,.048,.025]);
-    ell(head,skin,[0,-.015,.136],[.026,.033,.036]);
-    for(const side of [-1,1]){
-      ell(head,'#f6f3df',[side*.052,.02,.115],[.030,.017,.014]);
-      ell(head,'#31433e',[side*.053,.02,.128],[.012,.013,.007]);
-      cube(head,hair,[side*.052,.061,.11],[.062,.01,.014]);
-    }
-    cube(head,'#af735b',[0,-.071,.117],[.051,.009,.012]);
-    const hairG=geo('hair',()=>new T.SphereGeometry(1,16,10,0,Math.PI*2,0,Math.PI*.56));
-    mesh(head,hairG,mat(kind==='nela'?'#8d4931':hair),[0,.015,-.015],[.145,.18,.143]);
-    if(kind==='nela')ell(head,'#8d4931',[0,-.045,-.145],[.125,.21,.07]);
-    if(kind==='leon'){
-      tube(head,'#c5a775',[0,.15,0],[.16,.12,.16]);tube(head,'#c5a775',[0,.095,0],[.22,.028,.22]);
-      cube(hips,'#e4cda1',[0,.23,.145],[.33,.42,.025]);
-    }else if(kind==='player'){
-      ell(hips,'#5d735b',[0,.36,-.17],[.18,.22,.09]);
-      for(const side of [-1,1])cube(hips,'#b6caa4',[side*.17,.38,-.04],[.034,.35,.029]);
-    }
-    const arms=[],legs=[];
-    for(const side of [-1,1]){
-      const arm=new T.Group();arm.position.set(side*.27,.54,0);hips.add(arm);
-      tube(arm,shirt,[0,-.095,0],[.087,.19,.087]);tube(arm,skin,[0,-.24,0],[.061,.15,.061]);
-      const forearm=new T.Group();forearm.position.y=-.31;arm.add(forearm);tube(forearm,skin,[0,-.13,0],[.053,.26,.053]);ell(forearm,skin,[0,-.28,0],[.06,.082,.046]);
-      arms.push({arm,forearm,side});
-      const thigh=new T.Group();thigh.position.set(side*.115,0,0);hips.add(thigh);
-      tube(thigh,'#52625f',[0,-.21,0],[.093,.42,.093]);
-      const calf=new T.Group();calf.position.y=-.43;thigh.add(calf);tube(calf,'#52625f',[0,-.18,0],[.069,.36,.069]);
-      const shoe=ell(calf,'#4b3b2e',[0,-.395,.055],[.075,.052,.14]);legs.push({thigh,calf,shoe,side});
-    }
-    const spear=new T.Group();tube(spear,'#8c6944',[0,.56,0],[.018,1.75,.018]);ell(spear,'#dad9c5',[0,1.45,0],[.045,.15,.03]);spear.position.set(.35,.2,.08);rig.add(spear);spear.visible=false;
-    const raft=new T.Group();root.add(raft);for(let i=0;i<5;i++){const log=tube(raft,'#a17d48',[(i-2)*.25,.08,0],[.115,1.7,.115]);log.rotation.x=Math.PI/2;}for(const z of [-.5,.5])cube(raft,'#6e5937',[0,.19,z],[1.24,.05,.1]);raft.visible=false;
-    let tag=null;if(name){tag=textSprite(name,shirt);root.add(tag);}
-    const shirtParts=[],skinParts=[],hairParts=[];
-    rig.traverse(o=>{if(o.isMesh){if(o.material===mat(shirt))shirtParts.push(o);if(o.material===mat(skin))skinParts.push(o);if(o.material===mat(hair))hairParts.push(o);}});
-    return {root,rig,hips,head,arms,legs,spear,raft,tag,name,shirtParts,skinParts,hairParts,yaw:0,lastX:null,lastZ:null,phase:0};
-  }
-  const self=human();const people=new Map();
+  function human(look={},kind='player',name=''){const person=buildHuman(look,kind,{ell,cube,tube,mesh,mat,geo});scene.add(person.root);person.name=name;person.tag=null;if(name){person.tag=textSprite(name,look.shirt);person.root.add(person.tag);}return person;}
+  const self=human(colors());const people=new Map();
   const merchant=human({skin:'#d1a074',shirt:'#b49966'},'leon','LEON · HANDEL');
   const guide=human({skin:'#edc39a',shirt:'#609991'},'nela','NELA · ZADANIA');
   function updateName(person,name,color) {
@@ -229,6 +265,11 @@ export function create({canvas,terrain,getState,onLost}) {
       person.tag.material.dispose();
     }
     person.name=name;person.tag=textSprite(name,color);person.root.add(person.tag);
+  }
+  function updateLook(person,look){
+    if(person.lookKey===JSON.stringify(look))return;person.lookKey=JSON.stringify(look);
+    for(const p of person.shirtParts)p.material=mat(look.shirt||'#4c9cba');for(const p of person.skinParts)p.material=mat(look.skin||'#dda879');for(const p of person.hairParts)p.material=mat(look.hair||'#43332b');
+    person.hairStyles.forEach((g,i)=>g.visible=i===(look.style||0));
   }
   let frameBase=null,frameElevation=0;
   function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,state) {
@@ -252,7 +293,8 @@ export function create({canvas,terrain,getState,onLost}) {
       arm.arm.rotation.z=-arm.side*.07;arm.forearm.rotation.x=active?-.22:-.08;
       if(wet&&!state.raft){arm.arm.rotation.x=-Math.PI/2+Math.sin(phase+arm.side)*.35;arm.forearm.rotation.x=-.28;}
     }
-    person.raft.visible=!!(wet&&state.raft);person.raft.rotation.y=person.yaw;person.spear.visible=!!state.spear&&!wet;
+    actionPose(person,state.motion);
+    person.raft.visible=!!(wet&&state.raft);person.raft.rotation.y=person.yaw;person.spear.visible=!!state.spear&&!wet&&!state.motion;
     if(state.blocked){person.arms[0].arm.rotation.x=-1;person.arms[0].forearm.rotation.x=-1;}
     if(person.tag)person.tag.visible=Math.hypot(x-self.root.position.x,z-self.root.position.z)<13;
     person.lastX=x;person.lastZ=z;
@@ -300,6 +342,26 @@ export function create({canvas,terrain,getState,onLost}) {
   function newBoar(){const root=new T.Group();scene.add(root);ell(root,'#765745',[0,.29,0],[.24,.25,.43]);ell(root,'#765745',[0,.3,.4],[.19,.18,.2]);ell(root,'#ae8b68',[0,.26,.58],[.11,.065,.065]);for(const side of [-1,1]){const ear=mesh(root,new T.ConeGeometry(.08,.17,3),mat('#644937'),[side*.13,.47,.43]);ear.rotation.z=side*.45;}const legs=[];for(const x of [-.17,.17])for(const z of [-.27,.24])legs.push(tube(root,'#5e493b',[x,.105,z],[.037,.2,.037]));return {root,legs,lastX:null,lastZ:null};}
   function updateBoars(list,seconds){while(boars.length<list.length)boars.push(newBoar());for(let i=0;i<boars.length;i++){const b=boars[i],e=list[i];b.root.visible=!!e;if(!e){b.lastX=b.lastZ=null;continue}const x=e.x/SCALE,z=e.y/SCALE,dx=b.lastX===null?0:x-b.lastX,dz=b.lastZ===null?0:z-b.lastZ,walking=Math.hypot(dx,dz)>.0001;b.root.position.set(x,terrainHeight(x,z),z);if(walking)b.root.rotation.y=Math.atan2(dx,dz);for(let j=0;j<4;j++)b.legs[j].rotation.x=walking?Math.sin(seconds*6+j*Math.PI)*.15:0;b.lastX=x;b.lastZ=z;}}
 
+  const fishBatches=[new T.InstancedMesh(ball(),mat('#adddd0',{roughness:.4}),96),new T.InstancedMesh(new T.ConeGeometry(1,1,3),mat('#668e93'),96),new T.InstancedMesh(new T.ConeGeometry(1,1,3),mat('#779da0'),96)];
+  for(const b of fishBatches){b.count=0;b.frustumCulled=false;scene.add(b);}
+  function updateFish(list,seconds,sea){let count=0;for(const f of list||[]){const p=fishPose(f,seconds,sea);if(!p||count>=96)continue;
+    const local=(x,y,z,s,rx=0)=>{dummy.position.set(p.x+Math.sin(p.yaw)*z+Math.cos(p.yaw)*x,p.y+y,p.z+Math.cos(p.yaw)*z-Math.sin(p.yaw)*x);dummy.rotation.set(rx,p.yaw,0);dummy.scale.set(...s);dummy.updateMatrix();};
+    local(0,0,0,[.09,.045,.22]);fishBatches[0].setMatrixAt(count,dummy.matrix);local(0,0,-.25,[.095,.12,.025],Math.PI/2);fishBatches[1].setMatrixAt(count,dummy.matrix);local(0,.045,-.02,[.04,.10,.11]);fishBatches[2].setMatrixAt(count,dummy.matrix);count++;
+  }for(const b of fishBatches){b.count=count;b.instanceMatrix.needsUpdate=true;}}
+  let chapterKey='',chapterRoots=[];
+  function updateChapters(list,seconds){
+    const key=JSON.stringify(list);if(key!==chapterKey){chapterKey=key;for(const root of chapterRoots){scene.remove(root);root.traverse(o=>{if(o.isSprite){o.material.map.dispose();o.material.dispose();}if(o.userData.privateGeometry)o.geometry.dispose();});}chapterRoots=[];
+      for(const point of list||[]){if(point.type==='return')continue;const root=new T.Group();root.position.set(point.x/SCALE,terrainHeight(point.x/SCALE,point.y/SCALE),point.y/SCALE);scene.add(root);chapterRoots.push(root);
+        const ring=new T.Mesh(new T.RingGeometry(.4,.46,28),mat(point.done?'#6d9c89':'#8cebd5',{side:T.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=.03;ring.userData.privateGeometry=true;root.add(ring);
+        if(point.type==='fragment'){cube(root,'#e1c587',[0,.38,0],[.37,.45,.06]);cube(root,'#a68752',[0,.18,-.035],[.035,.42,.035]);cube(root,'#826b4d',[0,.4,.035],[.19,.022,.02]);}
+        if(point.type==='rune'){ell(root,'#87998a',[0,.26,0],[.27,.3,.21]);const sign=textSprite(point.symbol,'#ffe29b');sign.position.y=.8;sign.scale.set(.65,.32,1);root.add(sign);}
+        if(point.type==='chest'){cube(root,'#795a39',[0,.2,0],[.65,.4,.44]);cube(root,'#bb9251',[0,.42,0],[.69,.06,.46]);for(const x of [-.21,.21])cube(root,'#f1d584',[x,.23,.235],[.05,.36,.025]);}
+        if(point.type==='signal'){for(const side of [-1,1]){const pole=tube(root,'#8a6d49',[side*.22,.55,0],[.04,1.1,.04]);pole.rotation.z=side*.22;}cube(root,'#927652',[0,1.1,0],[.7,.16,.45]);if(point.done){const light=ell(root,'#ffe28d',[0,1.34,0],[.16,.21,.16]);light.material=mat('#ffe28d',{emissive:'#ffa842',emissiveIntensity:1});}else cube(root,'#344f57',[0,1.3,0],[.3,.18,.24]);}
+        const tag=textSprite(point.label,point.done?'#b5d1c5':'#ffe9b5');tag.position.y=point.type==='signal'?1.95:1.35;root.add(tag);root.userData.done=point.done;
+      }
+    }
+    for(const root of chapterRoots)root.children[0].scale.setScalar(root.userData.done?1:1+Math.sin(seconds*2.8)*.05);
+  }
   const birds=[];for(let i=0;i<4;i++){
     const g=new T.BufferGeometry().setFromPoints([new T.Vector3(-.3,0,0),new T.Vector3(0,-.08,0),new T.Vector3(.3,0,0)]);
     const b=new T.Line(g,new T.LineBasicMaterial({color:'#fff7de'}));scene.add(b);birds.push(b);
@@ -319,26 +381,27 @@ export function create({canvas,terrain,getState,onLost}) {
     const s=getState(),seconds=now/1000,step=last?clamp((now-last)/1000,0,.06):1/60;last=now;
     frameBase=baseLayout(s.basePos,s.baseLevel);frameElevation=baseElevation(frameBase);
     updateName(boardPerson,s.labels?.board,'#ffe087');if(boardPerson.tag){boardPerson.tag.position.y=1.65;boardPerson.tag.scale.set(1.4,.36,1)}
-    trailRoot.visible=!!s.trail;if(s.trail){trailRoot.position.set(s.trail.x/SCALE,terrainHeight(s.trail.x/SCALE,s.trail.y/SCALE),s.trail.y/SCALE);trailBeam.material.opacity=.35+.13*Math.sin(seconds*3);if(trailNumber!==s.trailNumber||trailTag?.userData.text!==(s.trailNumber===4?s.labels?.finish||'4':String(s.trailNumber))){if(trailTag){trailRoot.remove(trailTag);trailTag.material.map.dispose();trailTag.material.dispose()}trailNumber=s.trailNumber;trailTag=textSprite(trailNumber===4?s.labels?.finish||'4':String(trailNumber),'#54e4ef');trailTag.userData.text=trailNumber===4?s.labels?.finish||'4':String(trailNumber);trailTag.position.y=1.5;trailTag.scale.set(1,.4,1);trailRoot.add(trailTag)}}
+    trailRoot.visible=!!s.trail;if(s.trail){trailRoot.position.set(s.trail.x/SCALE,terrainHeight(s.trail.x/SCALE,s.trail.y/SCALE),s.trail.y/SCALE);trailBeam.material.opacity=.35+.13*Math.sin(seconds*3);if(trailNumber!==s.trailNumber||trailTag?.userData.text!==(s.trailNumber===4?s.labels?.finish||'4':s.trailNumber?String(s.trailNumber):s.trail.label)){if(trailTag){trailRoot.remove(trailTag);trailTag.material.map.dispose();trailTag.material.dispose()}trailNumber=s.trailNumber;trailTag=textSprite(trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label,'#54e4ef');trailTag.userData.text=trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label;trailTag.position.y=1.5;trailTag.scale.set(s.trailNumber?1:2.45,.4,1);trailRoot.add(trailTag)}}
     updateName(merchant,s.labels?.leon,'#b49966');
     updateName(guide,s.labels?.nela,'#609991');
     const x=s.P.x/SCALE,z=s.P.y/SCALE;
-    resources(s.objects,seconds);
+    resources(s.objects,seconds);updateFish(s.fishes,seconds,s.sea);updateChapters(s.chapterMarkers,seconds);
     const facing={down:0,up:Math.PI,left:-Math.PI/2,right:Math.PI/2};
     animatePerson(self,s.P,Number.isFinite(s.heading)?s.heading:facing[s.face]||0,s.moving,seconds,step,s.fast?5.25:3,s);
     merchant.root.visible=guide.root.visible=true;
-    for(const [p,point] of [[merchant,s.leon],[guide,s.nela]])animatePerson(p,point,Math.atan2(x-point.x/SCALE,z-point.y/SCALE),false,seconds,step,0,{...s,raft:false,spear:false,blocked:false});
+    for(const [p,point] of [[merchant,s.leon],[guide,s.nela]])animatePerson(p,point,Math.atan2(x-point.x/SCALE,z-point.y/SCALE),false,seconds,step,0,{...s,raft:false,spear:false,blocked:false,motion:null});
     const present=new Set();
     for(const p of s.players){
       if(p.id===s.you)continue;present.add(p.id);let person=people.get(p.id);
-      if(!person||person.name!==p.name){if(person)removePerson(person);person=human(s.looks[p.slot]||{},'player',p.name);people.set(p.id,person);}
+      const look=p.appearance?colors(p.appearance):s.looks[p.slot]||{};
+      if(!person||person.name!==p.name){if(person)removePerson(person);person=human(look,'player',p.name);people.set(p.id,person);}
+      updateLook(person,look);
       const dx=person.lastX===null?0:p.point.x/SCALE-person.lastX,dz=person.lastZ===null?0:p.point.y/SCALE-person.lastZ;
       const heading=p.moving&&Math.hypot(dx,dz)>.002?Math.atan2(dx,dz):facing[p.face]||0;
-      animatePerson(person,p.point,heading,p.moving,seconds,step,3,{...s,spear:s.spearOwned&&!p.spearStowed,blocked:p.blocked});
+      animatePerson(person,p.point,heading,p.moving,seconds,step,3,{...s,spear:s.spearOwned&&!p.spearStowed,blocked:p.blocked,motion:p.motion&&p.motion.remaining-(now-p.received)>0?{kind:p.motion.kind,phase:1-(p.motion.remaining-(now-p.received))/(MOTIONS[p.motion.kind]||1000)}:null});
     }
     for(const [id,p] of people)if(!present.has(id)){removePerson(p);people.delete(id);}
-    const me=s.players.find(p=>p.id===s.you),look=me?s.looks[me.slot]||{}:{};
-    for(const p of self.shirtParts)p.material=mat(look.shirt||'#4c9cba');for(const p of self.skinParts)p.material=mat(look.skin||'#dda879');for(const p of self.hairParts)p.material=mat(look.hair||'#43332b');
+    updateLook(self,s.appearance||colors());
     stall.position.set(s.leon.x/SCALE+.9,terrainHeight(s.leon.x/SCALE+.9,s.leon.y/SCALE+.15),s.leon.y/SCALE+.15);
     chestRoot.position.set(s.chest.x/SCALE,terrainHeight(s.chest.x/SCALE,s.chest.y/SCALE),s.chest.y/SCALE);chestRoot.visible=!s.treasure;
     updateBuildings(s);updateBoars(s.enemies,seconds);
@@ -362,6 +425,6 @@ export function create({canvas,terrain,getState,onLost}) {
   }
   function removePerson(person){scene.remove(person.root);if(person.tag){person.tag.material.map.dispose();person.tag.material.dispose();}}
   function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;return enabled;}
-  function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();waterGeo.dispose();waterMat.dispose();skyGeo.dispose();sky.material.dispose();map.dispose();for(const b of Object.values(batches)){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
+  function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();waterGeo.dispose();waterMat.dispose();skyGeo.dispose();sky.material.dispose();map.dispose();for(const b of [...Object.values(batches),...fishBatches]){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
   return {frame,resize,orbit,setEnabled,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3})};
 }

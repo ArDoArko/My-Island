@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
-<title>My Island 0.16 — Twoja wyspa</title>
-<script defer src="island3d.bundle.js?v=0.16"></script>
+<title>My Island 0.17 — Twoja wyspa</title>
+<script defer src="island3d.bundle.js?v=0.17"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -78,11 +78,12 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 @media(max-width:1000px){.help{display:none}}
 @media(max-height:600px){.start{align-items:flex-start}}
 @media(max-height:450px) and (min-width:701px){.panel{inset:4% 12%;padding:16px}.help{display:none}}
+.chapter-card{background:#174655;border:1px solid #49757d;border-radius:14px;padding:18px;margin:12px 0}.chapter-card p{line-height:1.5}.chapter-card .reward{color:#ffdc85}.chapter-goal{background:#113d48;border-left:4px solid #5ce5d3;padding:14px;border-radius:8px;margin-bottom:16px}.chapter-goal p{margin:8px 0}.look-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:12px;background:#174655;border-radius:12px}.look-swatch{display:inline-block;width:26px;height:26px;border:2px solid #fff5;border-radius:50%;vertical-align:middle;margin-right:10px}.look-row button{min-width:110px}.look-preview{display:flex;justify-content:center;gap:16px;padding:12px}.look-preview span{width:38px;height:38px;border-radius:50%;border:2px solid #fff6}.chapter-objective{font-weight:700;color:#c5ffed}.chapter-list{line-height:1.65}.chapter-card button:disabled{opacity:.65}.panel button{white-space:normal}.panel button:focus-visible{outline:3px solid #7effdf;outline-offset:3px}
 </style>
 </head>
 <body>
 <div id="start" class="start"><div class="card">
- <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version"><span data-i18n="0.16 • Praca i przygody">0.16 • Praca i przygody</span></p>
+ <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version"><span data-i18n="0.17 • Postać i wyprawy">0.17 • Postać i wyprawy</span></p>
  <div class="language-picker"><label for="languageStart"><span data-i18n="🌐 Język">🌐 Język</span></label><select id="languageStart" onchange="setLanguage(this.value)" aria-label="Wybierz język" data-i18n-aria-label="Wybierz język"><option value="pl">Polski</option><option value="en">English</option><option value="nl">Nederlands</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option></select></div>
  <p class="desc"><span data-i18n="Odkrywaj wyspę sam albo z przyjaciółmi.">Odkrywaj wyspę sam albo z przyjaciółmi.</span><br><span data-i18n="Do czterech graczy, wspólna baza i wyprawa po skarb.">Do czterech graczy, wspólna baza i wyprawa po skarb.</span></p>
  <div class="play-choice"><button onclick="startGame()"><span data-i18n="GRAJ SOLO">GRAJ SOLO</span></button><button class="online-choice" onclick="toggle('roomPanel',1)"><span data-i18n="GRAJ ONLINE">GRAJ ONLINE</span></button></div><p class="keys"><span data-i18n="WASD lub strzałki • E działaj • Shift sprint • spacja atak">WASD lub strzałki • E działaj • Shift sprint • spacja atak</span></p>
@@ -102,6 +103,8 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <button id="newSoloButton" class="p pad-button" onclick="askNewSoloGame()" aria-label="Nowa gra solo" data-i18n-aria-label="Nowa gra solo"><span data-i18n="↻ NOWA GRA">↻ NOWA GRA</span></button>
  <button id="languageButton" class="p pad-button" onclick="toggle('languagePanel',1)" aria-label="Język gry" data-i18n-aria-label="Język gry">🌐 PL</button>
  <button id="workButton" class="p pad-button" onclick="toggle('workPanel',1)"><span data-i18n="📋 PRACA I ZABAWA">📋 PRACA I ZABAWA</span></button>
+ <button id="adventureButton" class="p pad-button" onclick="toggle('adventurePanel',1)" data-i18n="🧭 PRZYGODY">🧭 PRZYGODY</button>
+ <button id="characterButton" class="p pad-button" onclick="toggle('characterPanel',1)" data-i18n="👤 POSTAĆ">👤 POSTAĆ</button>
 </div>
 <div id="questBox" class="q">📜 <b id="qt">Wyprawa 0.13</b><br><span id="qx"></span><br><small id="qp"></small></div>
 <canvas id="game" aria-label="Wyspa, postacie i świat gry" data-i18n-aria-label="Wyspa, postacie i świat gry"></canvas>
@@ -189,7 +192,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <div class="recipe"><span><span data-i18n="Rozpal ognisko">Rozpal ognisko</span><small><span data-i18n="4 drewna + 2 kamienie · przy twojej bazie">4 drewna + 2 kamienie · przy twojej bazie</span></small></span><button id="fireBuild" onclick="buildFire()"><span data-i18n="Rozpal">Rozpal</span></button></div>
  <div class="recipe"><span><span data-i18n="Upiecz rybę">Upiecz rybę</span><small><span data-i18n="1 surowa ryba + 1 drewno · przy ognisku">1 surowa ryba + 1 drewno · przy ognisku</span></small></span><button onclick="cookFish()"><span data-i18n="Upiecz">Upiecz</span></button></div>
  <div class="recipe"><span><span data-i18n="Odpoczynek">Odpoczynek</span><small><span data-i18n="5 sekund · do +40 zdrowia i +70 energii">5 sekund · do +40 zdrowia i +70 energii</span></small></span><button id="restButton" onclick="restAtFire()">Odpocznij</button></div>
- <button onclick="toggle('workPanel',1)" data-i18n="📋 Praca i przygody">📋 Praca i przygody</button>
+ <button onclick="toggle('workPanel',1)" data-i18n="📋 Praca i przygody">📋 Praca i przygody</button><button onclick="toggle('adventurePanel',1)" data-i18n="🧭 PRZYGODY">🧭 PRZYGODY</button>
 </div>
 <div id="bag" class="panel" role="dialog" aria-label="Plecak" data-i18n-aria-label="Plecak">
  <button class="close" aria-label="Zamknij plecak" onclick="toggle('bag',0)" data-i18n-aria-label="Zamknij plecak">✕</button><h2><span data-i18n="🎒 Plecak">🎒 Plecak</span></h2><p id="bagIntro" class="intro">Zjedz coś przed kolejną wyprawą.</p>
@@ -211,13 +214,13 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <div class="recipe"><span><span data-i18n="🐟 1 surowa ryba">🐟 1 surowa ryba</span><small><span data-i18n="Dostaniesz 12 monet">Dostaniesz 12 monet</span></small></span><button onclick="trade('sell','fish')"><span data-i18n="Sprzedaj">Sprzedaj</span></button></div>
  <div class="recipe"><span><span data-i18n="🐚 2 muszelki">🐚 2 muszelki</span><small><span data-i18n="Dostaniesz 8 monet">Dostaniesz 8 monet</span></small></span><button onclick="trade('sell','shells')"><span data-i18n="Sprzedaj">Sprzedaj</span></button></div>
  <h3><span data-i18n="📜 Dostawa dla Leona">📜 Dostawa dla Leona</span></h3><div class="recipe"><span><span data-i18n="6 drewna + 4 kamienie">6 drewna + 4 kamienie</span><small id="supplyQuest">Nagroda: 40 monet + 60 XP</small></span><button id="supplyButton" onclick="deliverQuest('supplies')"><span data-i18n="Dostarcz">Dostarcz</span></button></div>
- <button onclick="toggle('workPanel',1)" data-i18n="📋 Praca i przygody">📋 Praca i przygody</button>
+ <button onclick="toggle('workPanel',1)" data-i18n="📋 Praca i przygody">📋 Praca i przygody</button><button onclick="toggle('adventurePanel',1)" data-i18n="🧭 PRZYGODY">🧭 PRZYGODY</button>
 </div>
 <div id="nelaPanel" class="panel" role="dialog" aria-label="Zadania Neli" data-i18n-aria-label="Zadania Neli">
  <button class="close" aria-label="Zamknij zadania" onclick="toggle('nelaPanel',0)" data-i18n-aria-label="Zamknij zadania">✕</button><h2><span data-i18n="👩‍🦰 Nela — zadania">👩‍🦰 Nela — zadania</span></h2><p class="intro"><span data-i18n="„Na wyspie zawsze przyda się pomocna dłoń.”">„Na wyspie zawsze przyda się pomocna dłoń.”</span></p>
  <div class="recipe"><span><span data-i18n="Ryby dla mieszkańców">Ryby dla mieszkańców</span><small id="fishQuest">Dostarcz 3 ryby (surowe lub pieczone). Nagroda: 70 monet + 80 XP</small></span><button id="fishQuestButton" onclick="deliverQuest('fish')"><span data-i18n="Dostarcz ryby">Dostarcz ryby</span></button></div>
  <h3><span data-i18n="💎 Wyprawa po skarb">💎 Wyprawa po skarb</span></h3><p id="treasureQuest">Zbuduj tratwę i znajdź drugą wyspę na południowym wschodzie.</p>
- <button onclick="toggle('workPanel',1)" data-i18n="📋 Praca i przygody">📋 Praca i przygody</button>
+ <button onclick="toggle('workPanel',1)" data-i18n="📋 Praca i przygody">📋 Praca i przygody</button><button onclick="toggle('adventurePanel',1)" data-i18n="🧭 PRZYGODY">🧭 PRZYGODY</button>
 </div>
 <div id="workPanel" class="panel" role="dialog" aria-label="Praca i przygody" data-i18n-aria-label="Praca i przygody">
  <button class="close" onclick="toggle('workPanel',0)" aria-label="Zamknij tablicę zleceń" data-i18n-aria-label="Zamknij tablicę zleceń">✕</button><h2 data-i18n="📋 Praca i przygody">📋 Praca i przygody</h2>
@@ -228,21 +231,43 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
   <div class="recipe work-card"><span><b data-i18n="🍳 Kucharz wyspy">🍳 Kucharz wyspy</b><small data-i18n="Upiecz 2 ryby przy ognisku. Dostarcz je Neli.">Upiecz 2 ryby przy ognisku. Dostarcz je Neli.</small><small>🪙 60 · ⭐ 90</small></span><button onclick="workAction('accept','cook')" data-i18n="Podejmij pracę">Podejmij pracę</button></div>
   <div class="recipe work-card"><span><b data-i18n="🐚 Opiekun plaży">🐚 Opiekun plaży</b><small data-i18n="Zbierz 4 muszelki i 2 kokosy. Dostarcz je Leonowi.">Zbierz 4 muszelki i 2 kokosy. Dostarcz je Leonowi.</small><small>🪙 35 · ⭐ 55</small></span><button onclick="workAction('accept','beach')" data-i18n="Podejmij pracę">Podejmij pracę</button></div>
  </div>
+ <button onclick="toggle('adventurePanel',1)" data-i18n="🧭 PRZYGODY">🧭 PRZYGODY</button><button onclick="toggle('characterPanel',1)" data-i18n="👤 POSTAĆ">👤 POSTAĆ</button>
  <h3 data-i18n="🏡 Rozwój obozu">🏡 Rozwój obozu</h3><p id="campRank"></p><div class="camp-unlocks"><span id="unlockLamp"></span><span id="unlockGarden"></span><span id="unlockFlag"></span></div><p class="intro" data-i18n="Ogródek daje 2 kokosy po każdej kolejnej ukończonej pracy. Ulepszenia pojawią się przy twojej bazie.">Ogródek daje 2 kokosy po każdej kolejnej ukończonej pracy. Ulepszenia pojawią się przy twojej bazie.</p><button id="gardenHarvest" onclick="collectGarden()" data-i18n="Zbierz plony ogródka">Zbierz plony ogródka</button>
  <h3 data-i18n="🏁 Bieg po wyspie">🏁 Bieg po wyspie</h3><p class="intro" data-i18n="Start przy tablicy obok obozu Leona. Odwiedź 3 oznaczone punkty po kolei i wróć na start. Pierwsze ukończenie: 90 monet i 120 XP. Potem ścigasz swój rekord.">Start przy tablicy obok obozu Leona. Odwiedź 3 oznaczone punkty po kolei i wróć na start. Pierwsze ukończenie: 90 monet i 120 XP. Potem ścigasz swój rekord.</p><p id="raceStatus" role="status"></p><p id="raceRecord"></p><div class="work-actions"><button id="raceStart" onclick="startRace()" data-i18n="Rozpocznij bieg">Rozpocznij bieg</button><button id="raceCancel" onclick="cancelRace()" data-i18n="Przerwij bieg">Przerwij bieg</button></div>
+</div>
+<div id="adventurePanel" class="panel" role="dialog" aria-label="Wyprawy" data-i18n-aria-label="Wyprawy">
+ <button class="close" onclick="toggle('adventurePanel',0)" aria-label="Zamknij wyprawy" data-i18n-aria-label="Zamknij wyprawy">✕</button><h2 data-i18n="🧭 Wyprawy">🧭 Wyprawy</h2>
+ <p class="intro" data-i18n="Dwa rozdziały do przejścia solo lub razem. Online każdy pomaga, a nagrodę otrzymuje wspólna wyspa.">Dwa rozdziały do przejścia solo lub razem. Online każdy pomaga, a nagrodę otrzymuje wspólna wyspa.</p>
+ <div class="chapter-goal"><b id="adventureTitle"></b><p id="adventureObjective" class="chapter-objective"></p><p id="adventureProgress" role="status"></p><p id="adventureDirection"></p><button id="adventureInteract" onclick="chapterInteract()" data-i18n="DZIAŁAJ przy celu">DZIAŁAJ przy celu</button></div>
+ <div class="chapter-card"><h3 data-i18n="1. Zaginiony kompas">1. Zaginiony kompas</h3><p data-i18n="Znajdź trzy fragmenty mapy, rozwiąż zagadkę znaków i przynieś Neli kompas.">Znajdź trzy fragmenty mapy, rozwiąż zagadkę znaków i przynieś Neli kompas.</p><p class="reward">🪙 160 · ⭐ 220</p><p id="compassState"></p><button id="compassStart" onclick="startChapter('compass')" data-i18n="Wyrusz po kompas">Wyrusz po kompas</button></div>
+ <div class="chapter-card"><h3 data-i18n="2. Światła dla rozbitków">2. Światła dla rozbitków</h3><p data-i18n="Po oddaniu kompasu napraw trzy sygnały na wybrzeżu. Każdy wymaga 4 drewna i 2 kamieni. Wróć do Leona po zapłatę.">Po oddaniu kompasu napraw trzy sygnały na wybrzeżu. Każdy wymaga 4 drewna i 2 kamieni. Wróć do Leona po zapłatę.</p><p class="reward">🪙 200 · ⭐ 260</p><p id="beaconsState"></p><button id="beaconsStart" onclick="startChapter('beacons')" data-i18n="Pomóż rozbitkom">Pomóż rozbitkom</button></div>
+ <p id="adventureFinish" role="status"></p><button onclick="toggle('workPanel',1)" data-i18n="📋 Praca i przygody">📋 Praca i przygody</button><button onclick="toggle('adventurePanel',0)" data-i18n="Wróć na wyspę">Wróć na wyspę</button>
+</div>
+<div id="characterPanel" class="panel" role="dialog" aria-label="Wygląd postaci" data-i18n-aria-label="Wygląd postaci">
+ <button class="close" onclick="toggle('characterPanel',0)" aria-label="Zamknij wygląd postaci" data-i18n-aria-label="Zamknij wygląd postaci">✕</button><h2 data-i18n="👤 Twoja postać">👤 Twoja postać</h2>
+ <p class="intro" data-i18n="Wybierz swój wygląd. Zmiany są bezpłatne i widoczne dla znajomych online.">Wybierz swój wygląd. Zmiany są bezpłatne i widoczne dla znajomych online.</p>
+ <div class="look-preview" aria-hidden="true"><span id="shirtPreview"></span><span id="skinPreview"></span><span id="hairPreview"></span></div>
+ <div class="look-row"><span><i id="shirtSwatch" class="look-swatch"></i><b data-i18n="Koszulka">Koszulka</b> <small id="shirtValue"></small></span><button onclick="cycleLook('shirt')" data-i18n="Zmień kolor">Zmień kolor</button></div>
+ <div class="look-row"><span><i id="skinSwatch" class="look-swatch"></i><b data-i18n="Odcień skóry">Odcień skóry</b> <small id="skinValue"></small></span><button onclick="cycleLook('skin')" data-i18n="Zmień odcień">Zmień odcień</button></div>
+ <div class="look-row"><span><i id="hairSwatch" class="look-swatch"></i><b data-i18n="Kolor włosów">Kolor włosów</b> <small id="hairValue"></small></span><button onclick="cycleLook('hair')" data-i18n="Zmień kolor">Zmień kolor</button></div>
+ <div class="look-row"><b id="hairStyle"></b><button onclick="cycleLook('style')" data-i18n="Zmień fryzurę">Zmień fryzurę</button></div>
+ <h3 data-i18n="Gesty dla znajomych">Gesty dla znajomych</h3><div class="work-actions"><button onclick="emote('wave')" data-i18n="👋 Pomachaj">👋 Pomachaj</button><button onclick="emote('cheer')" data-i18n="🙌 Radość">🙌 Radość</button></div>
+ <p id="appearanceStatus" role="status"></p><button onclick="toggle('characterPanel',0)" data-i18n="Wróć na wyspę">Wróć na wyspę</button>
 </div>
 <div id="languagePanel" class="panel" role="dialog" aria-label="Język gry" data-i18n-aria-label="Język gry">
  <button class="close" aria-label="Zamknij wybór języka" onclick="toggle('languagePanel',0)" data-i18n-aria-label="Zamknij wybór języka">✕</button><h2><span data-i18n="🌐 Język">🌐 Język</span></h2>
  <p class="intro"><span data-i18n="Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.">Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.</span></p>
  <div class="language-options"><button data-language="pl" onclick="setLanguage('pl')">Polski</button><button data-language="en" onclick="setLanguage('en')">English</button><button data-language="nl" onclick="setLanguage('nl')">Nederlands</button><button data-language="de" onclick="setLanguage('de')">Deutsch</button><button data-language="fr" onclick="setLanguage('fr')">Français</button><button data-language="es" onclick="setLanguage('es')">Español</button></div>
 </div>
-<script src="i18n.bundle.js?v=0.16"></script>
-<script src="wildlife.bundle.js?v=0.16"></script>
-<script src="island-play.bundle.js?v=0.16"></script>
+<script src="i18n.bundle.js?v=0.17"></script>
+<script src="wildlife.bundle.js?v=0.17"></script>
+<script src="island-play.bundle.js?v=0.17"></script>
+<script src="expeditions.bundle.js?v=0.17"></script>
+<script src="character.bundle.js?v=0.17"></script>
 <script>
 'use strict';
 const tr=(source)=>MyIslandI18n.t(source);
-const activityRules=MyIslandPlay;
+const activityRules=MyIslandPlay,chapterRules=MyIslandExpeditions,characterRules=MyIslandCharacter;
 const $=id=>document.getElementById(id), C=$('game'), X=C.getContext('2d');
 const WORLD={w:4600,h:2900}, SAVE_KEY='myIsland09';
 let W=0,H=0,DPR=1,K={},play=0,P={x:1500,y:1100},cam={x:0,y:0};
@@ -252,8 +277,10 @@ let spearStowed=false;
 try{spearStowed=localStorage.getItem('myIslandWeaponV1')==='stowed'}catch(e){}
 let questsDone={fish:0,supplies:0},activePanel=null,resting=0,face='down',moving=false,walkPhase=0,time=0,lastTime=0,lastAutosave=0,lastUI=0,hitFlash=0,msgTimer=0;
 let campActivities=activityRules.freshActivities(),raceRun=null;
+let chapterState=chapterRules.freshAdventures(),myAppearance=characterRules.appearance(),appearancePreference=null,ownMotion=null;
+try{const saved=JSON.parse(localStorage.getItem('myIslandAppearanceV1'));if(saved&&typeof saved==='object'){appearancePreference=characterRules.appearance(saved);myAppearance={...appearancePreference};}}catch(e){}
 const O=[],E=[],F=[],nela={x:3370,y:430},leon={x:1630,y:1160};
-const chest={x:4200,y:2450},panels=['craft','basePanel','bag','shop','nelaPanel','controllerPanel','roomPanel','newGamePanel','accountPanel','languagePanel','workPanel'];
+const chest={x:4200,y:2450},panels=['craft','basePanel','bag','shop','nelaPanel','controllerPanel','roomPanel','newGamePanel','accountPanel','languagePanel','workPanel','adventurePanel','characterPanel'];
 const ROOM_API='https://my-island-online.arekpoczta734.chatgpt.site/api/rooms',ROOM_KEY='myIslandRoomV1';
 const playerLooks=[{shirt:'#4c9cba',skin:'#e3b185',hair:'#463b32'},{shirt:'#df8168',skin:'#be895f',hair:'#382d29'},{shirt:'#9974c7',skin:'#efc69d',hair:'#725039'},{shirt:'#76b677',skin:'#a67152',hair:'#2f302b'}];
 const net={room:null,token:null,you:null,players:[],worldRev:-1,connected:false,busy:false,joining:false,epoch:0,lastOk:0,actions:[],timer:null,solo:null,reset:0,joinAbort:null};
@@ -289,6 +316,7 @@ function populateSoloWorld(){
  seed=710;O.length=E.length=F.length=0;spawnResources('tree',140);spawnResources('rock',85);spawnResources('food',38);
  for(let i=0;i<40;i++){const a=2*Math.PI*i/40;O.push({t:'shell',x:1750+1490*Math.cos(a),y:1300+915*Math.sin(a),hp:1,phase:0})}
  for(let i=0;i<6;i++){const x=rnd(2150,2850),y=rnd(650,1100);E.push({x,y,sx:x,sy:y,hp:3,hit:0,phase:rand()*6.28})}
+ for(let i=0;i<36;i++){const a=i*Math.PI*2/36,x=1750+1580*Math.cos(a),y=1300+1005*Math.sin(a);if(sea(x,y))F.push({x,y,phase:i*.91});}
  for(let i=0;i<28;i++){let x,y;do{x=rnd(100,4500);y=rnd(100,2800)}while(!sea(x,y));F.push({x,y,phase:rand()*6.28})}
 }
 populateSoloWorld();
@@ -360,6 +388,8 @@ function drawFish(f){
  ellipse(X,0,0,11,4,'#85d9d9');X.fillStyle='#69c4c7';X.beginPath();X.moveTo(-9,0);X.lineTo(-17,-5);X.lineTo(-15,5);X.fill();ellipse(X,7,-1,1,1,'#0b718c');X.restore();
 }
 function drawPerson(x,y,kind='player',direction='down',walk=0,wet=false,look=null,weaponVisible=hasEquippedSpear()){
+ if(kind==='player'&&!look)look=characterRules.colors(myAppearance);
+ const motion=kind==='player'?look?.motion||(look?.remote?null:currentMotion()):null,pose=motion?characterRules.motionPose(motion.kind,motion.phase):null;
  const skin=look?.skin||(kind==='leon'?'#b9825e':'#e3b185'),shirt=look?.shirt||(kind==='nela'?'#dd876f':kind==='leon'?'#ded1a5':'#4c9cba'),hair=look?.hair||(kind==='nela'?'#945039':'#463b32');
  const bob=walk?Math.abs(Math.sin(walk))*1.8:Math.sin(time*.002+kind.length)*.7,step=walk?Math.sin(walk)*5:0;
  X.save();X.translate(x,y);shadow(0,0,14,5);if(direction==='left')X.scale(-1,1);
@@ -373,13 +403,14 @@ function drawPerson(x,y,kind='player',direction='down',walk=0,wet=false,look=nul
   X.strokeStyle='#413e35';X.lineWidth=5;X.beginPath();X.moveTo(-8+step,1);X.lineTo(-3+step,1);X.moveTo(5-step,1);X.lineTo(11-step,1);X.stroke();
  }
  X.strokeStyle=skin;X.lineWidth=6;
- X.beginPath();X.moveTo(-11,-33-bob);X.lineTo(-15,-23+step*.6-bob);X.lineTo(-13,-17+step*.8-bob);X.stroke();
- X.beginPath();X.moveTo(11,-33-bob);X.lineTo(15,-23-step*.6-bob);X.lineTo(13,-17-step*.8-bob);X.stroke();
+ X.beginPath();X.moveTo(-11,-33-bob);X.lineTo(-15,-23+step*.6-bob);X.lineTo(-13,-17+step*.8-bob+(pose?Math.sin(pose.left)*22:0));X.stroke();
+ X.beginPath();X.moveTo(11,-33-bob);X.lineTo(15,-23-step*.6-bob);X.lineTo(13,-17-step*.8-bob+(pose?Math.sin(pose.right)*22:0));X.stroke();
  rounded(X,-11,-38-bob,22,23,7,shirt);rounded(X,-10,-21-bob,20,5,2,kind==='leon'?'#9b8060':'#315766');
  if(kind==='leon'){rounded(X,-8,-36-bob,5,17,1,'#8b8060');rounded(X,3,-36-bob,5,17,1,'#8b8060')}
  rounded(X,-4,-43-bob,8,8,2,skin);ellipse(X,0,-49-bob,10,12,skin);
  const back=direction==='up',profile=direction==='right'||direction==='left';
  X.fillStyle=hair;X.beginPath();X.arc(0,-52-bob,10,Math.PI,Math.PI*2);X.lineTo(10,-49-bob);X.quadraticCurveTo(5,-57-bob,-4,-53-bob);X.lineTo(-10,-46-bob);X.closePath();X.fill();
+ if(look?.style===1)ellipse(X,profile?-10:0,-42-bob,6,15,hair);if(look?.style===2)for(let i=-2;i<=2;i++)ellipse(X,i*4,-58-bob,4,5,hair);
  if(back)ellipse(X,0,-50-bob,10,10,hair);
  else if(profile){ellipse(X,7,-50-bob,1.2,1.6,'#293c3b');ellipse(X,10,-46-bob,2.5,2,skin);X.strokeStyle='#9b6957';X.lineWidth=1;X.beginPath();X.moveTo(7,-42-bob);X.lineTo(10,-42-bob);X.stroke()}
  else{
@@ -429,6 +460,9 @@ function drawActivities(){
  const g=activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y));if(g&&campActivities.completed>=3){rounded(X,g.x-52,g.y-38,104,76,7,'#785b3a');for(let i=0;i<6;i++){const x=g.x-32+(i%3)*32,y=g.y-18+Math.floor(i/3)*36;ellipse(X,x,y,10,12,'#619a47');if(campActivities.gardenClaimed<campActivities.completed)ellipse(X,x+4,y-2,5,5,'#dcc873')}label(g.x,g.y-52,tr('OGRÓDEK'))}
  if(raceRun){const target=activityRules.COURSE[raceRun.next];X.strokeStyle='#30c6e3';X.lineWidth=4;X.beginPath();X.arc(target.x,target.y,80,0,Math.PI*2);X.stroke();label(target.x,target.y-95,raceRun.next===3?tr('META'):String(raceRun.next+1))}
 }
+function drawChapters(){
+ for(const p of chapterMarkers()){if(p.type==='return'||!visible(p.x,p.y,100))continue;X.strokeStyle=p.done?'#829d99':'#72ffe1';X.lineWidth=3;X.beginPath();X.arc(p.x,p.y,36+Math.sin(time*.004)*3,0,Math.PI*2);X.stroke();X.font='26px system-ui';X.textAlign='center';X.fillStyle=p.done?'#8aa8a0':'#fff2be';X.fillText(p.type==='rune'?p.symbol:p.type==='chest'?'🧭':p.type==='signal'?(p.done?'🔥':'🔧'):'📜',p.x,p.y-8);label(p.x,p.y-58,tr(p.label));}
+}
 function drawChest(){shadow(chest.x,chest.y,22,8);rounded(X,chest.x-20,chest.y-25,40,28,4,'#a77a40');rounded(X,chest.x-20,chest.y-33,40,14,4,'#be9455');X.fillStyle='#e2c67b';X.fillRect(chest.x-12,chest.y-32,4,34);X.fillRect(chest.x+8,chest.y-32,4,34);rounded(X,chest.x-4,chest.y-17,8,9,2,'#f6d779')}
 function drawStall(){
  const x=leon.x+52,y=leon.y+18;shadow(x,y,45,12);X.strokeStyle='#806b48';X.lineWidth=5;X.beginPath();X.moveTo(x-39,y);X.lineTo(x-39,y-66);X.moveTo(x+39,y);X.lineTo(x+39,y-66);X.stroke();
@@ -451,7 +485,7 @@ function draw(){
  X.strokeStyle='#fbf4d791';X.lineWidth=2;
  for(const [x,y,rx,ry] of [[1750,1300,1545,975],[3380,500,525,315],[4100,2400,395,295]]){X.beginPath();X.ellipse(x,y,rx+Math.sin(time*.001)*3,ry+Math.sin(time*.001)*3,0,0,6.28);X.stroke()}
  if(visible(leon.x,leon.y))drawStall();
- drawBase();drawActivities();
+ drawBase();drawActivities();drawChapters();
  const things=O.filter(o=>visible(o.x,o.y)).map(o=>({y:o.y,draw:()=>o.t==='tree'?drawPalm(o):o.t==='rock'?drawRock(o):o.t==='shell'?drawShell(o):drawCoconut(o)}));
  for(const e of E)if(visible(e.x,e.y))things.push({y:e.y,draw:()=>drawBoar(e)});
  const fire=firePosition();if(campfire&&fire&&visible(fire.x,fire.y))things.push({y:fire.y,draw:()=>drawFire(fire.x,fire.y)});
@@ -460,10 +494,10 @@ function draw(){
   if(visible(person.x,person.y))things.push({y:person.y,draw:()=>{drawPerson(person.x,person.y,kind,Math.abs(P.x-person.x)>Math.abs(P.y-person.y)?P.x<person.x?'left':'right':P.y<person.y?'up':'down');label(person.x,P.y>person.y&&distance(P,person)<140?person.y-80:person.y+23,name)}});
  }
  if(net.room)for(const person of net.players){
-  if(person.id===net.you)continue;const point=remotePosition(person,time),look=playerLooks[person.slot]||playerLooks[0];
-  if(visible(point.x,point.y))things.push({y:point.y,draw:()=>{const wet=sea(point.x,point.y);if(wet&&raft)drawRaft(point.x,point.y);ellipse(X,point.x,point.y+3,17,6,look.shirt+'aa');drawPerson(point.x,point.y,'player',person.face,person.moving?time*.012:0,wet&&!raft,{...look,blocked:person.blocked,remote:true},!!spear&&!person.spearStowed);label(point.x,point.y-80,person.name,look.shirt)}});
+  if(person.id===net.you)continue;const point=remotePosition(person,time),look=playerLook(person);
+  if(visible(point.x,point.y))things.push({y:point.y,draw:()=>{const wet=sea(point.x,point.y);if(wet&&raft)drawRaft(point.x,point.y);ellipse(X,point.x,point.y+3,17,6,look.shirt+'aa');drawPerson(point.x,point.y,'player',person.face,person.moving?time*.012:0,wet&&!raft,{...look,blocked:person.blocked,remote:true,motion:remoteMotion(person)},!!spear&&!person.spearStowed);label(point.x,point.y-80,person.name,look.shirt)}});
  }
- things.push({y:P.y,draw:()=>{const wet=sea(P.x,P.y),me=net.players.find(p=>p.id===net.you),look=net.room?playerLooks[me?.slot||0]:null;if(wet&&raft)drawRaft(P.x,P.y);if(look)ellipse(X,P.x,P.y+3,17,6,look.shirt+'aa');drawPerson(P.x,P.y,'player',face,moving?walkPhase:0,wet&&!raft,look);if(me)label(P.x,P.y-80,me.name+tr(' · TY'),look.shirt);if(Date.now()-lastAttack<180&&spear){X.strokeStyle='#f6efd3';X.lineWidth=3;X.beginPath();X.arc(P.x,P.y-18,43,walkPhase,walkPhase+1.9);X.stroke()}}});
+ things.push({y:P.y,draw:()=>{const wet=sea(P.x,P.y),me=net.players.find(p=>p.id===net.you),look=characterRules.colors(myAppearance);if(wet&&raft)drawRaft(P.x,P.y);if(look)ellipse(X,P.x,P.y+3,17,6,look.shirt+'aa');drawPerson(P.x,P.y,'player',face,moving?walkPhase:0,wet&&!raft,look);if(me)label(P.x,P.y-80,me.name+tr(' · TY'),look.shirt);if(Date.now()-lastAttack<180&&spear){X.strokeStyle='#f6efd3';X.lineWidth=3;X.beginPath();X.arc(P.x,P.y-18,43,walkPhase,walkPhase+1.9);X.stroke()}}});
  things.sort((a,b)=>a.y-b.y);for(const t of things)t.draw();
  if(visible(3380,220))label(3380,205,tr('PÓŁNOCNA ZATOKA'),'#f5e7ba');
  if(visible(4100,2120))label(4100,2110,tr('WYSPA SKARBU'),'#f5e7ba');
@@ -485,10 +519,10 @@ function enemies(step){
   }
  }
 }
-function gameState(){return {version:10,P,wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,health,energy,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone,activities:campActivities}}
+function gameState(){return {version:10,P,wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,health,energy,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone,activities:campActivities,adventures:chapterState,appearance:myAppearance}}
 function soloSnapshot(){return {...copyState(gameState()),world:{resources:O.map(o=>({t:o.t,x:o.x,y:o.y,hp:o.hp,phase:o.phase})),enemies:E.map(e=>({x:e.x,y:e.y,sx:e.sx,sy:e.sy,hp:e.hp,hit:0,phase:e.phase})),seed,face}}}
 function copyState(value){return JSON.parse(JSON.stringify(value))}
-function applyBank(b){({wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone}=b);campActivities=activityRules.activities(b.activities)}
+function applyBank(b){({wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone}=b);campActivities=activityRules.activities(b.activities);chapterState=chapterRules.adventures(b.adventures)}
 function captureSolo(){return {state:copyState(gameState()),resources:copyState(O),enemies:copyState(E),seed,face,walkPhase,race:copyState(raceRun)}}
 function restoreSolo(saved){
  if(!saved)return;const s=saved.state;applyBank(s);P={...s.P};health=s.health;energy=s.energy;O.splice(0,O.length,...saved.resources);E.splice(0,E.length,...saved.enemies);seed=saved.seed;face=saved.face;walkPhase=saved.walkPhase;raceRun=saved.race||null;resting=0;moving=false;
@@ -503,7 +537,7 @@ function updateRoomUI(){
  if(!net.room)return;
  $('roomCode').value=net.room;$('roomCount').textContent=net.players.length+'/4';
  $('roomStatus').textContent=net.ended?tr('Sesja zakończona. Wróć do solo i dołącz ponownie.'):net.connected?tr('Jesteście na wspólnej wyspie. Podaj znajomym kod pokoju.'):tr('Połączenie przerwane. Ponawiam — postać czeka bezpiecznie.');
- const members=net.players.map(p=>{const li=document.createElement('li'),color=document.createElement('span'),name=document.createElement('span'),hp=document.createElement('span');color.className='member-color';color.style.background=(playerLooks[p.slot]||playerLooks[0]).shirt;name.textContent=p.name+(p.id===net.you?tr(' (ty)'):'');hp.className='member-health';hp.textContent='❤️ '+Math.round(p.health);li.append(color,name,hp);return li});
+ const members=net.players.map(p=>{const li=document.createElement('li'),color=document.createElement('span'),name=document.createElement('span'),hp=document.createElement('span');color.className='member-color';color.style.background=playerLook(p).shirt;name.textContent=p.name+(p.id===net.you?tr(' (ty)'):'');hp.className='member-health';hp.textContent='❤️ '+Math.round(p.health);li.append(color,name,hp);return li});
  $('roomMembers').replaceChildren(...members);
 }
 async function roomRequest(payload,signal){
@@ -553,10 +587,10 @@ function roomAction(action){
 async function syncRoom(){
  if(!net.room||net.busy||net.ended)return;const epoch=net.epoch,action=net.actions[0];net.busy=true;
  try{
-  const input={x:P.x,y:P.y,face,moving:!activePanel&&inputFocused&&moving,sprint:!!(sprint||pad.sprinting),blocked:!!(blocking||pad.blocking),spearStowed,paused:!!activePanel||!inputFocused||document.hidden};
+  const input={x:P.x,y:P.y,face,moving:!activePanel&&inputFocused&&moving,sprint:!!(sprint||pad.sprinting),blocked:!!(blocking||pad.blocking),spearStowed,appearance:myAppearance,paused:!!activePanel||!inputFocused||document.hidden};
   const data=await roomRequest({op:'sync',code:net.room,token:net.token,worldRev:net.worldRev,input,...(action?{action}: {})});if(epoch!==net.epoch||!net.room)return;
   applyRoomSnapshot(data);
-  if(action&&data.actionId===action.id){net.actions.shift();const result=data.result;if(result){if(result.message)say(result.message);if(result.panel&&!activePanel)toggle(result.panel,1);if(result.closePanel&&activePanel===action.fromPanel)toggle(activePanel,0);if(action.kind==='attack'&&result.ok)lastAttack=Date.now()}}
+  if(action&&data.actionId===action.id){net.actions.shift();const result=data.result;if(result){if(result.message)say(result.message);if(result.panel&&!activePanel)toggle(result.panel,1);if(result.closePanel&&activePanel===action.fromPanel)toggle(activePanel,0);if(result.ok){if(action.kind==='attack')lastAttack=Date.now();if(['interact','fish','cook','emote','adventure'].includes(action.kind))animateAction(action.kind==='emote'?action.mode:['interact','adventure'].includes(action.kind)?'gather':action.kind)}}}
  }catch(error){if(epoch!==net.epoch||!net.room)return;net.connected=false;resetInput();if(error.ended){net.ended=true;clearInterval(net.timer);lastRoom=null;try{localStorage.removeItem(ROOM_KEY)}catch(e){}}updateRoomUI();
  }finally{if(epoch===net.epoch)net.busy=false}
 }
@@ -717,7 +751,7 @@ function askNewSoloGame(){
 }
 function restartSoloGame(){
  if(activePanel!=='newGamePanel'||net.room||net.joining)return;
- const fresh={version:10,P:{x:1500,y:1100},wood:0,stone:0,food:0,shells:0,fish:0,cookedFish:0,totalCaught:0,xpv:0,coins:0,health:100,energy:100,spear:0,rod:0,raft:0,treasure:0,secondFound:0,returned:0,baseLevel:0,basePos:null,campfire:0,questsDone:{fish:0,supplies:0},activities:activityRules.freshActivities()};
+ const fresh={version:10,P:{x:1500,y:1100},wood:0,stone:0,food:0,shells:0,fish:0,cookedFish:0,totalCaught:0,xpv:0,coins:0,health:100,energy:100,spear:0,rod:0,raft:0,treasure:0,secondFound:0,returned:0,baseLevel:0,basePos:null,campfire:0,questsDone:{fish:0,supplies:0},activities:activityRules.freshActivities(),adventures:chapterRules.freshAdventures(),appearance:myAppearance};
  if(cloud.session)return restartCloudSoloGame(fresh);
  try{localStorage.setItem(SAVE_KEY,JSON.stringify(fresh))}catch(e){$('newGameError').textContent=tr('Nie udało się zapisać nowej gry. Poprzedni postęp został zachowany. Spróbuj ponownie.');return}
  try{localStorage.removeItem('myIsland08')}catch(e){}
@@ -736,6 +770,7 @@ function attack(){
 }
 function interact(){
  if(activePanel)return;
+ const chapterTarget=nearChapter();if(chapterTarget)return chapterInteract(chapterTarget.id);
  if(net.room){let target=null,d=75;for(const o of O){const q=distance(P,o);if(q<d){d=q;target=o}}return roomAction({kind:'interact',...(target?{target:target.id}:{})})}
  if(distance(P,activityRules.BOARD)<95)return toggle('workPanel',1);
  const garden=activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y));if(campActivities.completed>=3&&garden&&distance(P,garden)<95)return collectGarden();
@@ -747,7 +782,7 @@ function interact(){
  const f=firePosition();if(campfire&&f&&distance(P,f)<95)return toggle('basePanel',1);
  let target=null,d=75;for(const o of O){const q=distance(P,o);if(q<d){d=q;target=o}}
  if(!target)return say(tr('Podejdź do zasobu, mieszkańca albo ogniska.'));
- if(--target.hp>0){target.shakeUntil=Date.now()+150;return say(tr('Jeszcze jedno uderzenie.'))}
+ animateAction('gather');if(--target.hp>0){target.shakeUntil=Date.now()+150;return say(tr('Jeszcze jedno uderzenie.'))}
  O.splice(O.indexOf(target),1);
  let found;if(target.t==='tree'){wood+=2;activityRules.recordWork(campActivities,'wood',2);found=tr('2 drewna')}else if(target.t==='rock'){stone++;activityRules.recordWork(campActivities,'stone',1);found=tr('1 kamień')}else if(target.t==='shell'){shells++;activityRules.recordWork(campActivities,'shells',1);found=tr('1 muszelka')}else{food++;activityRules.recordWork(campActivities,'food',1);found=tr('1 kokos')}
  xpv+=10;coins+=2;save();update();say(tr('Zebrano: ')+found+'.');
@@ -755,7 +790,7 @@ function interact(){
 function goFish(){
  if(activePanel)return;if(net.room)return roomAction({kind:'fish'});if(!rod)return say(tr('Najpierw zrób wędkę w warsztacie.'));
  if(!sea(P.x,P.y)&&![[-80,0],[80,0],[0,-80],[0,80]].some(([x,y])=>sea(P.x+x,P.y+y)))return say(tr('Podejdź do brzegu, żeby łowić.'));
- if(rand()<.7){fish++;totalCaught++;xpv+=20;say(tr('Złowiona ryba! Upiecz ją lub sprzedaj Leonowi.'))}else say(tr('Ryba uciekła. Spróbuj ponownie.'));save();update();
+ animateAction('fish');if(rand()<.7){fish++;totalCaught++;xpv+=20;say(tr('Złowiona ryba! Upiecz ją lub sprzedaj Leonowi.'))}else say(tr('Ryba uciekła. Spróbuj ponownie.'));save();update();
 }
 function craftSpear(){if(net.room)return roomAction({kind:'craft',item:'spear'});if(spear)return say(tr('Masz już włócznię.'));if(wood<6||stone<4)return say(tr('Potrzebujesz 6 drewna i 4 kamieni.'));wood-=6;stone-=4;spear=1;setSpearStowed(false);done(tr('Włócznia gotowa!'))}
 function craftRod(){if(net.room)return roomAction({kind:'craft',item:'rod'});if(rod)return say(tr('Masz już wędkę.'));if(wood<5||shells<2)return say(tr('Potrzebujesz 5 drewna i 2 muszelek.'));wood-=5;shells-=2;rod=1;done(tr('Wędka gotowa!'))}
@@ -778,7 +813,7 @@ function buildFire(){
 function cookFish(){
  if(net.room)return roomAction({kind:'cook'});
  if(!nearFire())return say(tr('Podejdź do rozpalonego ogniska przy bazie.'));if(fish<1||wood<1)return say(tr('Potrzebujesz surowej ryby i 1 drewna.'));
- fish--;wood--;cookedFish++;activityRules.recordWork(campActivities,'cookedFish',1);xpv+=10;save();update();say(tr('Ryba upieczona! Znajdziesz ją w plecaku.'));
+ animateAction('cook');fish--;wood--;cookedFish++;activityRules.recordWork(campActivities,'cookedFish',1);xpv+=10;save();update();say(tr('Ryba upieczona! Znajdziesz ją w plecaku.'));
 }
 function eat(kind){
  if(net.room)return roomAction({kind:'eat',item:kind});
@@ -818,6 +853,27 @@ function prepareBasePlot(){
  const bank=gameState(),removed=activityRules.clearBasePlot(bank,O),set=new Set(removed);applyBank(bank);if(removed.length)O.splice(0,O.length,...O.filter(o=>!set.has(o)));
  P=activityRules.releasePlayer(P,activityRules.sceneSolids(O,basePos,baseLevel),p=>p.x>=60&&p.x<=4540&&p.y>=60&&p.y<=2840&&(!deep(p.x,p.y)||raft));
 }
+function playerLook(p){return p?.appearance?characterRules.colors(p.appearance):p?playerLooks[p.slot]||playerLooks[0]:characterRules.colors(myAppearance)}
+function animateAction(kind){ownMotion={kind,at:performance.now(),duration:characterRules.MOTIONS[kind]||1000};}
+function currentMotion(){if(!ownMotion)return null;const elapsed=Math.max(0,performance.now()-ownMotion.at);if(elapsed>=ownMotion.duration)return null;return {kind:ownMotion.kind,phase:elapsed/ownMotion.duration};}
+function remoteMotion(p){return p?.motion&&p.motion.remaining-Math.max(0,time-p.received)>0?{kind:p.motion.kind,phase:Math.min(1,1-(p.motion.remaining-Math.max(0,time-p.received))/(characterRules.MOTIONS[p.motion.kind]||1000))}:null;}
+function cycleLook(key){if(!play||!soloReady())return;const max={shirt:6,skin:4,hair:4,style:3}[key];if(!max)return;myAppearance[key]=(myAppearance[key]+1)%max;appearancePreference={...myAppearance};try{localStorage.setItem('myIslandAppearanceV1',JSON.stringify(myAppearance))}catch(e){}if(net.room)syncRoom();else save();update();$('appearanceStatus').textContent=tr('Wygląd zapisany.');}
+function emote(kind){if(!play||!['wave','cheer'].includes(kind))return;if(net.room)return roomAction({kind:'emote',mode:kind});toggle('characterPanel',0);animateAction(kind);say(tr(kind==='wave'?'Machasz do znajomych.':'Cieszysz się z przygody!'));}
+function updateCharacterUI(){const look=characterRules.colors(myAppearance);for(const key of ['shirt','skin','hair']){$(key+'Preview').style.background=look[key];$(key+'Swatch').style.background=look[key];$(key+'Value').textContent=(myAppearance[key]+1)+'/'+({shirt:6,skin:4,hair:4}[key]);}$('hairStyle').textContent=tr(characterRules.STYLES[myAppearance.style]);}
+function chapterMarkers(){return chapterRules.markers(chapterState,gameState(),(x,y)=>!sea(x,y))}
+function chapterGoal(){const all=chapterMarkers(),order=chapterState.active==='compass'&&chapterState.compass.stage===2?chapterRules.RUNES[chapterState.compass.runes]?.id:null;return order?all.find(p=>p.id===order):all.filter(p=>!p.done).sort((a,b)=>distance(P,a)-distance(P,b))[0];}
+function nearChapter(){return chapterMarkers().filter(p=>!p.done&&distance(P,p)<110).sort((a,b)=>distance(P,a)-distance(P,b))[0];}
+function startChapter(item){return chapterAction({mode:'start',item})}
+function chapterInteract(target){const p=target?chapterMarkers().find(p=>p.id===target):nearChapter();if(!p)return say(tr('Podejdź do oznaczonego celu wyprawy.'));return chapterAction({mode:'interact',target:p.id});}
+function chapterAction(action){if(!play||!soloReady())return;if(net.room)return roomAction({kind:'adventure',...action});const bank=gameState(),result=chapterRules.adventureAction(chapterState,bank,P,action,(x,y)=>!sea(x,y));if(result.ok){applyBank(bank);if(result.closePanel)toggle('adventurePanel',0);else animateAction('gather');save();update();}say(tr(result.message));}
+function updateAdventureUI(){
+ const s=chapterState,key=s.active,target=chapterGoal();$('adventureTitle').textContent=key?tr(chapterRules.CHAPTERS[key].title):tr('Kolejna przygoda czeka.');$('adventureObjective').textContent=tr(chapterRules.objective(s));
+ $('adventureProgress').textContent=key==='compass'?(s.compass.stage===1?tr('Fragmenty mapy: ')+s.compass.found.length+'/3':s.compass.stage===2?tr('Znaki: ')+s.compass.runes+'/3':''):key==='beacons'?tr('Naprawione sygnały: ')+s.beacons.lit.length+'/3':'';
+ $('adventureDirection').textContent=target?tr(target.label)+' · '+goalDirection(target):'';$('adventureInteract').style.display=key?'':'none';$('adventureInteract').disabled=!nearChapter();
+ $('compassState').textContent=tr(s.compass.stage===5?'Ukończono ✓':s.compass.stage?'Wyprawa trwa.':'Dostępne od razu.');$('compassStart').disabled=s.compass.stage===5||!!key&&key!=='compass';$('compassStart').style.display=key==='compass'?'none':'';
+ $('beaconsState').textContent=tr(s.beacons.stage===3?'Ukończono ✓':s.compass.stage!==5?'Odblokujesz po oddaniu kompasu Neli.':s.beacons.stage?'Wyprawa trwa.':'Wyprawa odblokowana!');$('beaconsStart').disabled=s.compass.stage!==5||s.beacons.stage===3||!!key&&key!=='beacons';$('beaconsStart').style.display=key==='beacons'?'none':'';
+ $('adventureFinish').textContent=s.beacons.stage===3?tr('Obie wyprawy ukończone! Wróć do prac, rozbudowy obozu i biegu.') :'';
+}
 function goalDirection(point){
  let dx=point.x-P.x,dy=point.y-P.y;if(islandView?.enabled){const r=islandView.vector(1,0),d=islandView.vector(0,1);[dx,dy]=[dx*r.x+dy*r.y,dx*d.x+dy*d.y]}
  const arrow=['→','↘','↓','↙','←','↖','↑','↗'][(Math.round(Math.atan2(dy,dx)/(Math.PI/4))+8)%8];return arrow+' '+Math.round(distance(P,point)/80)+' m';
@@ -848,7 +904,7 @@ function updateWorkUI(){
 }
 function toggle(id,on){if(!panels.includes(id)||cloud.resetting)return;if(net.joining&&!net.room&&(id!=='roomPanel'||!on))cancelRoomJoin();for(const name of panels)$(name).style.display='none';activePanel=on?id:null;if(on)$(id).style.display='block';pad.capture=null;focusPadButton(null);resetInput();if(id==='controllerPanel')updatePadUI();if(id==='roomPanel')updateRoomUI();if(on&&padDevice)focusPadMenu();update()}
 function update(){
- updateCloudUI();updateWorkUI();
+ updateCloudUI();updateWorkUI();updateAdventureUI();updateCharacterUI();
  for(const id of ['newSoloStart','newSoloButton','newSoloPad'])$(id).style.display=net.room?'none':'';
  $('bagIntro').textContent=net.room?tr('Wspólne zasoby drużyny. Jedzenie leczy osobę, która je zjada.'):tr('Zjedz coś przed kolejną wyprawą.');$('baseIntro').textContent=net.room?tr('Wspólna baza i ognisko całej drużyny.'):tr('Twoje miejsce odpoczynku.');
  const values={hp:Math.round(health),en:Math.round(energy),xp:xpv,co:coins,wo:wood,st:stone,fo:food,sh:shells,fi:fish+cookedFish,bl:baseLevel,baseLevel,bw:wood,bs:stone,bf:food,bsh:shells,bfi:fish,bcf:cookedFish,bp:spear?spearStowed?tr('schowana'):tr('w ręce'):tr('brak'),br:rod?tr('jest'):tr('brak'),bra:raft?tr('jest'):tr('brak'),bt:treasure?tr('zdobyty'):tr('brak'),shopCoins:coins};
@@ -873,8 +929,9 @@ function update(){
  else if(campActivities.active){const job=activityRules.JOBS[campActivities.active];title=tr(job.title);text=jobProgress(job);detail=activityRules.workReady(campActivities,gameState())?tr('Dostarcz i odbierz zapłatę')+' · '+goalDirection(job.npc):tr(job.description)}
  else if(!baseLevel||returned){title=tr('Praca i przygody');text=tr('Zajrzyj na tablicę zleceń.');detail=tr('Wybierz pracę albo bieg. Rozwijaj obóz.')}
  $('qt').textContent=title;$('qx').textContent=text;$('qp').textContent=detail;
+ if(chapterState.active&&!raceRun){const target=chapterGoal();$('qt').textContent=tr(chapterRules.CHAPTERS[chapterState.active].title);$('qx').textContent=tr(chapterRules.objective(chapterState));$('qp').textContent=target?tr(target.label)+' · '+goalDirection(target):'';}
  let hint='';if(!activePanel){if(distance(P,activityRules.BOARD)<95)hint=tr('Tablica zleceń i bieg · DZIAŁAJ');else if(campActivities.completed>=3&&nearGarden())hint=tr('Ogródek · DZIAŁAJ');else if(distance(P,leon)<110)hint=tr('Leon: handel i dostawa · DZIAŁAJ');else if(distance(P,nela)<110)hint=tr('Nela: zadania · DZIAŁAJ');else if(nearFire())hint=tr('Ognisko: gotuj i odpoczywaj · DZIAŁAJ');else if(O.some(o=>distance(P,o)<75))hint=tr('Zasób w zasięgu · DZIAŁAJ')}
- $('hint').textContent=hint;$('hint').style.display=hint?'block':'none';
+ const chapterNear=nearChapter();if(chapterNear&&!activePanel)hint=tr(chapterNear.label)+' · '+tr('DZIAŁAJ');$('hint').textContent=hint;$('hint').style.display=hint?'block':'none';
  document.querySelector('.act').textContent=!activePanel&&(distance(P,leon)<110||distance(P,nela)<110)?tr('POROZMAWIAJ'):tr('DZIAŁAJ');
 }
 function say(text){$('msg').textContent=tr(text);$('msg').classList.add('on');clearTimeout(msgTimer);msgTimer=setTimeout(()=>$('msg').classList.remove('on'),2600)}
@@ -891,7 +948,7 @@ function loadSoloState(d){
   spear=!!d.spear;rod=!!d.rod;raft=!!d.raft;treasure=!!d.treasure;secondFound=!!d.secondFound;returned=!!d.returned;baseLevel=Math.min(3,n('baseLevel'));campfire=!!d.campfire;
   basePos=d.basePos&&Number.isFinite(d.basePos.x)&&Number.isFinite(d.basePos.y)?{x:d.basePos.x,y:d.basePos.y}:null;
   if(baseLevel&&!basePos)basePos={x:1500,y:1100};
-  questsDone={fish:!!d.questsDone?.fish,supplies:!!d.questsDone?.supplies};campActivities=activityRules.activities(d.activities);raceRun=null;
+  questsDone={fish:!!d.questsDone?.fish,supplies:!!d.questsDone?.supplies};campActivities=activityRules.activities(d.activities);chapterState=chapterRules.adventures(d.adventures);myAppearance=appearancePreference?{...appearancePreference}:d.appearance!==undefined?characterRules.appearance(d.appearance):myAppearance;ownMotion=null;raceRun=null;
  }catch(e){console.warn('My Island: saved island restore failed ('+(e?.name||'Error')+').')}
 }
 function applySoloSnapshot(state){
@@ -1018,7 +1075,7 @@ async function restartCloudSoloGame(fresh){
   cloud.revision=data.save.revision;cloud.updatedAt=data.save.updatedAt;cloud.cache={state:data.save.state,revision:cloud.revision,updatedAt:cloud.updatedAt,dirty:false,pending:null};persistCloudCache();applySoloSnapshot(data.save.state);blocking=lastAttack=hitFlash=walkPhase=0;lastTime=0;cloud.error='';$('start').style.display='none';play=1;cloud.resetting=false;toggle('newGamePanel',0);draw();say(tr('Nowa przygoda zapisana na koncie!'));
  }catch(error){$('newGameError').textContent=tr(error.message||tr('Nie udało się rozpocząć nowej gry. Obecny postęp został zachowany.'))}finally{cloud.resetting=false;for(const b of $('newGamePanel').querySelectorAll('button'))b.disabled=false;updateCloudUI()}
 }
-function sceneState(){return {labels:{leon:tr('LEON · HANDEL'),nela:tr('NELA · ZADANIA'),board:tr('PRACA I ZABAWA'),finish:tr('META')},P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear:hasEquippedSpear(),spearOwned:!!spear,activities:campActivities,garden:activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y)),board:activityRules.BOARD,trail:raceRun?activityRules.COURSE[raceRun.next]:null,trailNumber:raceRun?raceRun.next+1:0,objects:O,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):[]}}
+function sceneState(){return {appearance:characterRules.colors(myAppearance),motion:currentMotion(),fishes:F,chapterMarkers:chapterMarkers().map(p=>({...p,label:tr(p.label)})),labels:{leon:tr('LEON · HANDEL'),nela:tr('NELA · ZADANIA'),board:tr('PRACA I ZABAWA'),finish:tr('META')},P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear:hasEquippedSpear(),spearOwned:!!spear,activities:campActivities,garden:activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y)),board:activityRules.BOARD,trail:raceRun?activityRules.COURSE[raceRun.next]:(chapterGoal()?{...chapterGoal(),label:tr(chapterGoal().label)}:null),trailNumber:raceRun?raceRun.next+1:0,objects:O,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):[]}}
 function updateView(){const active=!!islandView?.enabled;$('world3d').style.display=active?'block':'none';C.style.display=active?'none':'block';$('viewButton').textContent=active?tr('Widok 3D'):tr('Widok 2D');$('viewButton').setAttribute('aria-pressed',String(active));$('cameraLeft').disabled=$('cameraRight').disabled=!active;$('viewHelp').textContent=active?tr('WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera'):tr('WASD / strzałki · E działaj · Shift sprint · spacja atak')}
 function switchView(){if(!islandView)return;preferredView=islandView.enabled?'2d':'3d';islandView.setEnabled(preferredView==='3d');viewHeading=null;resetInput();try{localStorage.setItem('myIslandViewV1',preferredView)}catch(e){}updateView()}
 function orbitView(amount){if(islandView?.enabled)islandView.orbit(amount)}

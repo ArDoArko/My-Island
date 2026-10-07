@@ -1,4 +1,16 @@
-# My Island 0.16
+# My Island 0.17
+
+## Character identity and shared expeditions
+
+POSTAĆ changes the player's shirt (six colours), skin and hair (four colours each), and hairstyle (short, ponytail or curls). Gather, fish and cook actions use their own poses and tools. Wave and cheer emotes are visible to teammates. Personal colours and hairstyles work in both views and do not change movement, headroom, inventory or the stowed spear. The existing procedural human model now supports these choices; imported detailed character assets are not part of this release.
+
+PRZYGODY opens two sequential chapters. Lost Compass asks players to find three map fragments, solve the wave/palm/sun rune order, find the compass and return it to Nela for 160 coins and 220 XP. Lights for Castaways unlocks afterwards: repair three signals with four wood and two stone each, then return to Leon for 200 coins and 260 XP. The board shows the current objective, direction and distance. Visible markers and a destination beam help find each point. Points covered by an existing base are moved onto nearby reachable ground. Actions require proximity; repeated deliveries, request retries and simultaneous players cannot duplicate the reward.
+
+`expeditions.mjs` and `character.mjs` are shared byte-for-byte with the existing room server. Both chapters can be played solo or by up to four people with one shared progress state and bank. Optional `adventures` and `appearance` data preserve save format 10, room protocol 11 and account protocol 12. Older account clients that omit these fields preserve their saved values. Explicit fresh chapter data supports New Game. The device-local `myIslandAppearanceV1` preference keeps a chosen look when returning from a room to an older solo snapshot; otherwise the saved account/solo appearance is used. No account, password, ownership or existing world data is reset.
+
+Decorative schools of fish now have instanced 3D bodies, fins and tails above the water surface, including schools close to the shore. Fishing remains the existing shore action and does not require clicking a decorative fish. Fish placement does not change the saved world or resource generation seed.
+
+`tests/chapters.test.mjs` covers both complete solo chapters and reloads, puzzle order, proximity, single rewards, legacy data, marker relocation, appearance persistence, six languages, the pad, actual Three.js avatar geometry/poses and coastal fish placement. The corresponding authoritative engine tests and the actual Worker/D1 and SQLite room integration tests cover both chapters, concurrent progress and deliveries, optional data from old clients, four distinct players and each player's restored appearance. The release has 41 frontend and 10 engine tests, plus those two route integration checks.
 
 ## A usable camp and things to do
 
@@ -8,7 +20,7 @@ Expanding an existing base can cover old resources. Those resources are moved on
 
 PRACA I ZABAWA opens the job board. Three repeatable jobs ask players to gather wood and stone for Leon, cook fish for Nela, or collect shells and coconuts for Leon. Only gathering or cooking after accepting a job counts toward its progress. Delivery consumes the requested inventory near the named resident and pays once. Solo progress is saved; online progress and rewards are shared by all four players. Concurrent deliveries and request retries cannot duplicate a reward.
 
-The board also starts an ordered four-point island run. Its timer pauses in menus and when the game loses focus. The first finish pays a shared reward, subsequent runs can improve the record. An unfinished run is temporary and cancelling it does not count as a finish. Completed jobs gradually decorate the camp: lamps after one, a garden after three and a flag after six. A nearby player can harvest the garden once after each additional completed job. These additions are the requested small playable camp loop, not the later exploration, character-customization or chat stages below.
+The board also starts an ordered four-point island run. Its timer pauses in menus and when the game loses focus. The first finish pays a shared reward, subsequent runs can improve the record. An unfinished run is temporary and cancelling it does not count as a finish. Completed jobs gradually decorate the camp: lamps after one, a garden after three and a flag after six. A nearby player can harvest the garden once after each additional completed job. These additions form the playable camp loop introduced in 0.16. Exploration, collaborative building and chat remain separate later work.
 
 New optional `activities` fields fit inside save format 10 and room protocol 11. Account protocol stays 12. The account server preserves existing activity progress when an older client omits those fields; an explicit fresh activity state still supports the existing New Game action. The authoritative server must be published before the matching frontend so older clients continue to work during deployment.
 
@@ -22,7 +34,7 @@ Near Nela or Leon the action button reads TALK (translated into all six language
 
 ## Build and publish
 
-Run `npm ci` and `npm run verify` after editing gameplay, the renderer or translations. Commit sources, catalogs, package lock and generated bundles together. GitHub Pages serves `index.html`, `island3d.bundle.js`, `i18n.bundle.js`, `wildlife.bundle.js` and `island-play.bundle.js` from the main branch root. The graphics bundle includes Three.js 0.180.0, so the game makes no runtime requests for a graphics library, models or textures. See `THIRD_PARTY_NOTICES.txt` for its MIT license. The translation bundle loads synchronously before the existing game script and contains every language; changing language needs no network request.
+Run `npm ci` and `npm run verify` after editing gameplay, the renderer or translations. Commit sources, catalogs, package lock and generated bundles together. GitHub Pages serves `index.html`, `island3d.bundle.js`, `i18n.bundle.js`, `wildlife.bundle.js`, `island-play.bundle.js`, `expeditions.bundle.js` and `character.bundle.js` from the main branch root. The graphics bundle includes Three.js 0.180.0, so the game makes no runtime requests for a graphics library, models or textures. See `THIRD_PARTY_NOTICES.txt` for its MIT license. The translation bundle loads synchronously before the existing game script and contains every language; changing language needs no network request.
 
 `tests/adventures.test.mjs` checks the actual base meshes and headroom against collision geometry, swept movement, legacy resource conservation, jobs, delivery and cancellation, race order and pause, garden rewards, reload persistence and controller/menu behavior. The backend runs `node --test tests/*.test.mjs`, `node tests/accounts.integration.mjs` against the real account route in a local Worker with D1, and `node tests/rooms.integration.mjs /absolute/path/to/My-Island` against the real room route with SQLite and four current frontend runtimes. Those integration fixtures exercise optimistic transactions, concurrent rewards, old account clients, session recovery and restoration of each player's solo save. They create only local disposable test accounts, never accounts on the public service.
 
@@ -40,15 +52,15 @@ Language preference uses only `myIslandLanguageV1`, separate from the existing s
 
 The new renderer displays the existing saved island in 3D: beaches, ground height, palms, water, human avatars, characters, buildings, gathering resources and four players. Movement uses the camera direction; drag the background, use Q/R, the camera buttons, or the right stick of a standard gamepad to look around. The generic joystick's configured movement axes stay dedicated to movement. Users can switch to 2D, which is also the fallback if 3D is unavailable. Controls and all inventory operations remain in the original game script.
 
-The world-coordinate scale is 80 original units per 3D unit. The coastline is the same as the solo and room engines. Terrain height is deterministic and affects rendering only. No account, save format, room protocol, reward or ownership changes are made by the renderer. Avatar meshes are original procedural models with clothing, faces and leg animation; detailed character models and further animation are later work.
+The world-coordinate scale is 80 original units per 3D unit. The coastline is the same as the solo and room engines. Terrain height is deterministic and affects rendering only. No account, save format, room protocol, reward or ownership changes are made by the renderer. Avatar meshes are original procedural models with clothing, faces, leg animation, personal appearance and the action poses introduced in 0.17. Imported detailed models remain later work.
 
 Account protocol remains version 12 and save format version 10. Existing account, room, controller and solo storage keys remain compatible. View preference uses a separate `myIslandViewV1` key. There are no account credentials in the rendering snapshot.
 
 ## Agreed stages
 
 1. **0.14: first playable 3D island; 0.15: six languages.** Third-person view, ground contact, movement, resources and compatibility with saves and co-op. The language release preserves that first stage. Verify actual rendering and language selection on the published site before calling these releases complete.
-2. **Character identity and animation.** More detailed humanoid models, clothes and hair choices, fishing/gathering animations, emotes.
-3. **Co-op adventures.** Shared missions, puzzles and treasure expeditions designed for up to four players.
+2. **0.17: character identity and animation.** Clothes, skin and hair choices, three hairstyles, fishing/gathering/cooking poses and emotes in the existing procedural human model.
+3. **0.17: co-op adventures.** Two shared chapters with map fragments, a rune puzzle, compass treasure and signal repairs, designed for up to four players.
 4. **Creative shared base.** More building pieces, decorations and collaborative construction.
 5. **Exploration.** Boats, additional islands, caves and diving.
 6. **Social play.** Raft races and an animal companion.

@@ -3664,20 +3664,20 @@
     "¡Nueva aventura guardada en tu cuenta!"
   ],
   [
-    "My Island 0.16 — Twoja wyspa",
-    "My Island 0.16 — Your island",
-    "My Island 0.16 — Jouw eiland",
-    "My Island 0.16 — Deine Insel",
-    "My Island 0.16 — Votre île",
-    "My Island 0.16 — Tu isla"
+    "My Island 0.17 — Twoja wyspa",
+    "My Island 0.17 — Your island",
+    "My Island 0.17 — Jouw eiland",
+    "My Island 0.17 — Deine Insel",
+    "My Island 0.17 — Votre île",
+    "My Island 0.17 — Tu isla"
   ],
   [
-    "0.16 • Praca i przygody",
-    "0.16 • Work and adventures",
-    "0.16 • Werk en avontuur",
-    "0.16 • Arbeit und Abenteuer",
-    "0.16 • Travail et aventures",
-    "0.16 • Trabajo y aventuras"
+    "0.17 • Postać i wyprawy",
+    "0.17 • Character and expeditions",
+    "0.17 • Personage en expedities",
+    "0.17 • Figur und Expeditionen",
+    "0.17 • Personnage et expéditions",
+    "0.17 • Personaje y expediciones"
   ],
   [
     "PRACA I ZABAWA",
@@ -4134,5 +4134,645 @@
     "Auftragstafel schließen",
     "Fermer le panneau des missions",
     "Cerrar el tablón de encargos"
+  ],
+  [
+    "👤 POSTAĆ",
+    "👤 CHARACTER",
+    "👤 PERSONAGE",
+    "👤 FIGUR",
+    "👤 PERSONNAGE",
+    "👤 PERSONAJE"
+  ],
+  [
+    "🧭 PRZYGODY",
+    "🧭 ADVENTURES",
+    "🧭 AVONTUREN",
+    "🧭 ABENTEUER",
+    "🧭 AVENTURES",
+    "🧭 AVENTURAS"
+  ],
+  [
+    "🧭 Wyprawy",
+    "🧭 Expeditions",
+    "🧭 Expedities",
+    "🧭 Expeditionen",
+    "🧭 Expéditions",
+    "🧭 Expediciones"
+  ],
+  [
+    "Wyprawy",
+    "Expeditions",
+    "Expedities",
+    "Expeditionen",
+    "Expéditions",
+    "Expediciones"
+  ],
+  [
+    "Zamknij wyprawy",
+    "Close expeditions",
+    "Expedities sluiten",
+    "Expeditionen schließen",
+    "Fermer les expéditions",
+    "Cerrar expediciones"
+  ],
+  [
+    "Dwa rozdziały do przejścia solo lub razem. Online każdy pomaga, a nagrodę otrzymuje wspólna wyspa.",
+    "Two chapters to play alone or together. Online, everyone can help and the shared island receives the reward.",
+    "Twee hoofdstukken om alleen of samen te spelen. Online kan iedereen helpen en krijgt het gezamenlijke eiland de beloning.",
+    "Zwei Kapitel für dich allein oder gemeinsam. Online können alle helfen, und die gemeinsame Insel erhält die Belohnung.",
+    "Deux chapitres à jouer seul ou ensemble. En ligne, chacun peut aider et l'île commune reçoit la récompense.",
+    "Dos capítulos para jugar a solas o en equipo. En línea, todos pueden ayudar y la isla compartida recibe la recompensa."
+  ],
+  [
+    "DZIAŁAJ przy celu",
+    "ACT at the destination",
+    "ACTIE bij het doel",
+    "HANDELN am Ziel",
+    "AGIR à destination",
+    "ACTUAR en el destino"
+  ],
+  [
+    "1. Zaginiony kompas",
+    "1. The lost compass",
+    "1. Het verloren kompas",
+    "1. Der verlorene Kompass",
+    "1. La boussole perdue",
+    "1. La brújula perdida"
+  ],
+  [
+    "Zaginiony kompas",
+    "The lost compass",
+    "Het verloren kompas",
+    "Der verlorene Kompass",
+    "La boussole perdue",
+    "La brújula perdida"
+  ],
+  [
+    "Znajdź trzy fragmenty mapy, rozwiąż zagadkę znaków i przynieś Neli kompas.",
+    "Find three map fragments, solve the symbol puzzle and bring Nela the compass.",
+    "Vind drie kaartfragmenten, los de tekens op en breng het kompas naar Nela.",
+    "Finde drei Kartenstücke, löse das Zeichenrätsel und bring Nela den Kompass.",
+    "Trouve trois fragments de carte, résous l'énigme des symboles et rapporte la boussole à Nela.",
+    "Encuentra tres fragmentos del mapa, resuelve el acertijo de símbolos y lleva la brújula a Nela."
+  ],
+  [
+    "Wyrusz po kompas",
+    "Find the compass",
+    "Zoek het kompas",
+    "Suche den Kompass",
+    "Chercher la boussole",
+    "Buscar la brújula"
+  ],
+  [
+    "2. Światła dla rozbitków",
+    "2. Lights for the castaways",
+    "2. Lichten voor de schipbreukelingen",
+    "2. Lichter für die Schiffbrüchigen",
+    "2. Lumières pour les naufragés",
+    "2. Luces para los náufragos"
+  ],
+  [
+    "Światła dla rozbitków",
+    "Lights for the castaways",
+    "Lichten voor de schipbreukelingen",
+    "Lichter für die Schiffbrüchigen",
+    "Lumières pour les naufragés",
+    "Luces para los náufragos"
+  ],
+  [
+    "Po oddaniu kompasu napraw trzy sygnały na wybrzeżu. Każdy wymaga 4 drewna i 2 kamieni. Wróć do Leona po zapłatę.",
+    "After returning the compass, repair three coastal beacons. Each needs 4 wood and 2 stone. Return to Leon for payment.",
+    "Repareer na het terugbrengen van het kompas drie bakens aan de kust. Elk vereist 4 hout en 2 steen. Ga terug naar Leon voor je beloning.",
+    "Repariere nach der Rückgabe des Kompasses drei Küstensignale. Jedes braucht 4 Holz und 2 Stein. Kehre für die Bezahlung zu Leon zurück.",
+    "Après avoir rendu la boussole, répare trois signaux côtiers. Chacun nécessite 4 bois et 2 pierres. Retourne voir Leon pour être payé.",
+    "Tras entregar la brújula, repara tres señales costeras. Cada una necesita 4 de madera y 2 piedras. Vuelve con Leon para cobrar."
+  ],
+  [
+    "Pomóż rozbitkom",
+    "Help the castaways",
+    "Help de schipbreukelingen",
+    "Hilf den Schiffbrüchigen",
+    "Aider les naufragés",
+    "Ayudar a los náufragos"
+  ],
+  [
+    "Kolejna przygoda czeka.",
+    "Your next adventure awaits.",
+    "Je volgende avontuur wacht.",
+    "Dein nächstes Abenteuer wartet.",
+    "Ta prochaine aventure t'attend.",
+    "Tu próxima aventura te espera."
+  ],
+  [
+    "Fragmenty mapy: ",
+    "Map fragments: ",
+    "Kaartfragmenten: ",
+    "Kartenstücke: ",
+    "Fragments de carte : ",
+    "Fragmentos del mapa: "
+  ],
+  [
+    "Znaki: ",
+    "Symbols: ",
+    "Tekens: ",
+    "Zeichen: ",
+    "Symboles : ",
+    "Símbolos: "
+  ],
+  [
+    "Naprawione sygnały: ",
+    "Repaired beacons: ",
+    "Gerepareerde bakens: ",
+    "Reparierte Signale: ",
+    "Signaux réparés : ",
+    "Señales reparadas: "
+  ],
+  [
+    "Ukończono ✓",
+    "Completed ✓",
+    "Voltooid ✓",
+    "Abgeschlossen ✓",
+    "Terminé ✓",
+    "Completado ✓"
+  ],
+  [
+    "Wyprawa trwa.",
+    "Expedition in progress.",
+    "Expeditie bezig.",
+    "Expedition läuft.",
+    "Expédition en cours.",
+    "Expedición en curso."
+  ],
+  [
+    "Dostępne od razu.",
+    "Available now.",
+    "Nu beschikbaar.",
+    "Sofort verfügbar.",
+    "Disponible maintenant.",
+    "Disponible ahora."
+  ],
+  [
+    "Odblokujesz po oddaniu kompasu Neli.",
+    "Unlocks when you return the compass to Nela.",
+    "Ontgrendeld als je het kompas naar Nela brengt.",
+    "Wird nach der Rückgabe des Kompasses an Nela freigeschaltet.",
+    "Débloqué après avoir rendu la boussole à Nela.",
+    "Se desbloquea al entregar la brújula a Nela."
+  ],
+  [
+    "Wyprawa odblokowana!",
+    "Expedition unlocked!",
+    "Expeditie ontgrendeld!",
+    "Expedition freigeschaltet!",
+    "Expédition débloquée !",
+    "¡Expedición desbloqueada!"
+  ],
+  [
+    "Obie wyprawy ukończone! Wróć do prac, rozbudowy obozu i biegu.",
+    "Both expeditions completed! Return to jobs, camp upgrades and the race.",
+    "Beide expedities voltooid! Ga verder met werk, kampuitbreiding en de race.",
+    "Beide Expeditionen abgeschlossen! Kehre zu Arbeit, Lagerausbau und Wettlauf zurück.",
+    "Les deux expéditions sont terminées ! Reprends les travaux, l'amélioration du camp et la course.",
+    "¡Has completado ambas expediciones! Continúa con los trabajos, las mejoras del campamento y la carrera."
+  ],
+  [
+    "👤 Twoja postać",
+    "👤 Your character",
+    "👤 Je personage",
+    "👤 Deine Figur",
+    "👤 Ton personnage",
+    "👤 Tu personaje"
+  ],
+  [
+    "Wygląd postaci",
+    "Character appearance",
+    "Uiterlijk van je personage",
+    "Aussehen der Figur",
+    "Apparence du personnage",
+    "Aspecto del personaje"
+  ],
+  [
+    "Zamknij wygląd postaci",
+    "Close character appearance",
+    "Uiterlijk sluiten",
+    "Figurenansicht schließen",
+    "Fermer l'apparence du personnage",
+    "Cerrar el aspecto del personaje"
+  ],
+  [
+    "Wybierz swój wygląd. Zmiany są bezpłatne i widoczne dla znajomych online.",
+    "Choose your look. Changes are free and visible to friends online.",
+    "Kies je uiterlijk. Veranderingen zijn gratis en zichtbaar voor vrienden online.",
+    "Wähle dein Aussehen. Änderungen sind kostenlos und für Freunde online sichtbar.",
+    "Choisis ton apparence. Les changements sont gratuits et visibles par tes amis en ligne.",
+    "Elige tu aspecto. Los cambios son gratis y tus amigos pueden verlos en línea."
+  ],
+  [
+    "Koszulka",
+    "Shirt",
+    "Shirt",
+    "Oberteil",
+    "Haut",
+    "Camiseta"
+  ],
+  [
+    "Zmień kolor",
+    "Change colour",
+    "Kleur wijzigen",
+    "Farbe ändern",
+    "Changer la couleur",
+    "Cambiar color"
+  ],
+  [
+    "Odcień skóry",
+    "Skin tone",
+    "Huidskleur",
+    "Hautton",
+    "Teint",
+    "Tono de piel"
+  ],
+  [
+    "Zmień odcień",
+    "Change tone",
+    "Tint wijzigen",
+    "Hautton ändern",
+    "Changer le teint",
+    "Cambiar tono"
+  ],
+  [
+    "Kolor włosów",
+    "Hair colour",
+    "Haarkleur",
+    "Haarfarbe",
+    "Couleur des cheveux",
+    "Color del pelo"
+  ],
+  [
+    "Zmień fryzurę",
+    "Change hairstyle",
+    "Kapsel wijzigen",
+    "Frisur ändern",
+    "Changer la coiffure",
+    "Cambiar peinado"
+  ],
+  [
+    "Krótkie włosy",
+    "Short hair",
+    "Kort haar",
+    "Kurze Haare",
+    "Cheveux courts",
+    "Pelo corto"
+  ],
+  [
+    "Kucyk",
+    "Ponytail",
+    "Paardenstaart",
+    "Pferdeschwanz",
+    "Queue de cheval",
+    "Coleta"
+  ],
+  [
+    "Kręcone włosy",
+    "Curly hair",
+    "Krullend haar",
+    "Lockige Haare",
+    "Cheveux bouclés",
+    "Pelo rizado"
+  ],
+  [
+    "Gesty dla znajomych",
+    "Gestures for friends",
+    "Gebaren voor vrienden",
+    "Gesten für Freunde",
+    "Gestes pour les amis",
+    "Gestos para los amigos"
+  ],
+  [
+    "👋 Pomachaj",
+    "👋 Wave",
+    "👋 Zwaai",
+    "👋 Winken",
+    "👋 Faire signe",
+    "👋 Saludar"
+  ],
+  [
+    "🙌 Radość",
+    "🙌 Celebrate",
+    "🙌 Juich",
+    "🙌 Jubeln",
+    "🙌 Célébrer",
+    "🙌 Celebrar"
+  ],
+  [
+    "Wygląd zapisany.",
+    "Appearance saved.",
+    "Uiterlijk opgeslagen.",
+    "Aussehen gespeichert.",
+    "Apparence enregistrée.",
+    "Aspecto guardado."
+  ],
+  [
+    "Machasz do znajomych.",
+    "You wave to your friends.",
+    "Je zwaait naar je vrienden.",
+    "Du winkst deinen Freunden.",
+    "Tu fais signe à tes amis.",
+    "Saludas a tus amigos."
+  ],
+  [
+    "Cieszysz się z przygody!",
+    "You celebrate the adventure!",
+    "Je viert het avontuur!",
+    "Du feierst das Abenteuer!",
+    "Tu fêtes l'aventure !",
+    "¡Celebras la aventura!"
+  ],
+  [
+    "Fragment przy zachodniej plaży",
+    "Fragment by the western beach",
+    "Fragment bij het westelijke strand",
+    "Kartenstück am Weststrand",
+    "Fragment sur la plage ouest",
+    "Fragmento en la playa oeste"
+  ],
+  [
+    "Fragment przy południowej plaży",
+    "Fragment by the southern beach",
+    "Fragment bij het zuidelijke strand",
+    "Kartenstück am Südstrand",
+    "Fragment sur la plage sud",
+    "Fragmento en la playa sur"
+  ],
+  [
+    "Fragment przy palmach",
+    "Fragment by the palms",
+    "Fragment bij de palmen",
+    "Kartenstück bei den Palmen",
+    "Fragment près des palmiers",
+    "Fragmento junto a las palmeras"
+  ],
+  [
+    "Fala",
+    "Wave",
+    "Golf",
+    "Welle",
+    "Vague",
+    "Ola"
+  ],
+  [
+    "Palma",
+    "Palm",
+    "Palm",
+    "Palme",
+    "Palmier",
+    "Palmera"
+  ],
+  [
+    "Słońce",
+    "Sun",
+    "Zon",
+    "Sonne",
+    "Soleil",
+    "Sol"
+  ],
+  [
+    "Sygnał zachodni",
+    "Western beacon",
+    "Westelijk baken",
+    "Westsignal",
+    "Signal ouest",
+    "Señal oeste"
+  ],
+  [
+    "Sygnał południowy",
+    "Southern beacon",
+    "Zuidelijk baken",
+    "Südsignal",
+    "Signal sud",
+    "Señal sur"
+  ],
+  [
+    "Sygnał w zatoce",
+    "Bay beacon",
+    "Baken in de baai",
+    "Signal in der Bucht",
+    "Signal dans la baie",
+    "Señal de la bahía"
+  ],
+  [
+    "Skrzynia z kompasem",
+    "Compass chest",
+    "Kist met het kompas",
+    "Kompasstruhe",
+    "Coffre de la boussole",
+    "Cofre de la brújula"
+  ],
+  [
+    "Nela: oddaj kompas",
+    "Nela: return the compass",
+    "Nela: breng het kompas terug",
+    "Nela: Kompass zurückgeben",
+    "Nela : rendre la boussole",
+    "Nela: entrega la brújula"
+  ],
+  [
+    "Leon: odbierz nagrodę",
+    "Leon: collect your reward",
+    "Leon: haal je beloning op",
+    "Leon: Belohnung abholen",
+    "Leon : récupérer la récompense",
+    "Leon: recoge tu recompensa"
+  ],
+  [
+    "Znajdź trzy fragmenty mapy.",
+    "Find three map fragments.",
+    "Vind drie kaartfragmenten.",
+    "Finde drei Kartenstücke.",
+    "Trouve trois fragments de carte.",
+    "Encuentra tres fragmentos del mapa."
+  ],
+  [
+    "Dotknij znaków w kolejności: fala, palma, słońce.",
+    "Touch the symbols in order: wave, palm, sun.",
+    "Raak de tekens in deze volgorde aan: golf, palm, zon.",
+    "Berühre die Zeichen der Reihe nach: Welle, Palme, Sonne.",
+    "Touche les symboles dans l'ordre : vague, palmier, soleil.",
+    "Toca los símbolos en orden: ola, palmera, sol."
+  ],
+  [
+    "Otwórz skrzynię z kompasem.",
+    "Open the compass chest.",
+    "Open de kist met het kompas.",
+    "Öffne die Kompasstruhe.",
+    "Ouvre le coffre de la boussole.",
+    "Abre el cofre de la brújula."
+  ],
+  [
+    "Oddaj kompas Neli.",
+    "Return the compass to Nela.",
+    "Breng het kompas naar Nela.",
+    "Gib Nela den Kompass zurück.",
+    "Rends la boussole à Nela.",
+    "Entrega la brújula a Nela."
+  ],
+  [
+    "Napraw trzy sygnały. Każdy: 4 drewna i 2 kamienie.",
+    "Repair three beacons. Each: 4 wood and 2 stone.",
+    "Repareer drie bakens. Elk: 4 hout en 2 steen.",
+    "Repariere drei Signale. Jeweils: 4 Holz und 2 Stein.",
+    "Répare trois signaux. Chacun : 4 bois et 2 pierres.",
+    "Repara tres señales. Cada una: 4 de madera y 2 piedras."
+  ],
+  [
+    "Wróć do Leona po nagrodę.",
+    "Return to Leon for your reward.",
+    "Ga terug naar Leon voor je beloning.",
+    "Kehre für die Belohnung zu Leon zurück.",
+    "Retourne voir Leon pour ta récompense.",
+    "Vuelve con Leon para recibir tu recompensa."
+  ],
+  [
+    "Wybierz wyprawę. Możesz grać solo lub z drużyną.",
+    "Choose an expedition. Play alone or with your team.",
+    "Kies een expeditie. Speel alleen of met je team.",
+    "Wähle eine Expedition. Spiele allein oder mit deinem Team.",
+    "Choisis une expédition. Joue seul ou avec ton équipe.",
+    "Elige una expedición. Juega a solas o con tu equipo."
+  ],
+  [
+    "Nieznana wyprawa.",
+    "Unknown expedition.",
+    "Onbekende expeditie.",
+    "Unbekannte Expedition.",
+    "Expédition inconnue.",
+    "Expedición desconocida."
+  ],
+  [
+    "Najpierw dokończ aktywną wyprawę.",
+    "Finish your current expedition first.",
+    "Voltooi eerst je huidige expeditie.",
+    "Beende zuerst deine laufende Expedition.",
+    "Termine d'abord l'expédition en cours.",
+    "Primero termina la expedición actual."
+  ],
+  [
+    "Ta wyprawa jest już ukończona.",
+    "This expedition is already complete.",
+    "Deze expeditie is al voltooid.",
+    "Diese Expedition ist bereits abgeschlossen.",
+    "Cette expédition est déjà terminée.",
+    "Esta expedición ya está completada."
+  ],
+  [
+    "Najpierw oddaj kompas Neli.",
+    "Return the compass to Nela first.",
+    "Breng eerst het kompas naar Nela.",
+    "Gib zuerst Nela den Kompass zurück.",
+    "Rends d'abord la boussole à Nela.",
+    "Primero entrega la brújula a Nela."
+  ],
+  [
+    "Wyprawa rozpoczęta! Kierunek celu widać pod zadaniem.",
+    "Expedition started! The destination direction appears below the objective.",
+    "Expeditie gestart! De richting van het doel staat onder de opdracht.",
+    "Expedition gestartet! Die Richtung zum Ziel steht unter der Aufgabe.",
+    "Expédition commencée ! La direction du but apparaît sous l'objectif.",
+    "¡Expedición iniciada! La dirección del destino aparece debajo del objetivo."
+  ],
+  [
+    "Wybierz wyprawę w menu PRZYGODY.",
+    "Choose an expedition in the ADVENTURES menu.",
+    "Kies een expeditie in het menu AVONTUREN.",
+    "Wähle eine Expedition im Menü ABENTEUER.",
+    "Choisis une expédition dans le menu AVENTURES.",
+    "Elige una expedición en el menú AVENTURAS."
+  ],
+  [
+    "Podejdź do oznaczonego celu wyprawy.",
+    "Walk to the marked expedition destination.",
+    "Loop naar het gemarkeerde doel van de expeditie.",
+    "Gehe zum markierten Expeditionsziel.",
+    "Approche du but marqué de l'expédition.",
+    "Acércate al destino marcado de la expedición."
+  ],
+  [
+    "Ten punkt jest już ukończony.",
+    "This point is already complete.",
+    "Dit punt is al voltooid.",
+    "Dieser Punkt ist bereits abgeschlossen.",
+    "Ce point est déjà terminé.",
+    "Este punto ya está completado."
+  ],
+  [
+    "Fragment mapy znaleziony! Sprawdź kolejny cel.",
+    "Map fragment found! Check the next destination.",
+    "Kaartfragment gevonden! Bekijk het volgende doel.",
+    "Kartenstück gefunden! Sieh dir das nächste Ziel an.",
+    "Fragment de carte trouvé ! Consulte le prochain but.",
+    "¡Fragmento del mapa encontrado! Mira el siguiente destino."
+  ],
+  [
+    "Kolejność nie pasuje. Zacznij od fali, potem palma i słońce.",
+    "Wrong order. Start with the wave, then the palm and the sun.",
+    "Verkeerde volgorde. Begin met de golf, dan de palm en de zon.",
+    "Falsche Reihenfolge. Beginne mit der Welle, dann Palme und Sonne.",
+    "Mauvais ordre. Commence par la vague, puis le palmier et le soleil.",
+    "Orden incorrecto. Empieza por la ola, luego la palmera y el sol."
+  ],
+  [
+    "Zagadka rozwiązana! Skrzynia z kompasem jest otwarta.",
+    "Puzzle solved! The compass chest is unlocked.",
+    "Raadsel opgelost! De kist met het kompas is ontgrendeld.",
+    "Rätsel gelöst! Die Kompasstruhe ist geöffnet.",
+    "Énigme résolue ! Le coffre de la boussole est déverrouillé.",
+    "¡Acertijo resuelto! El cofre de la brújula está desbloqueado."
+  ],
+  [
+    "Znak pasuje. Podejdź do następnego.",
+    "Correct symbol. Walk to the next one.",
+    "Het teken klopt. Loop naar het volgende.",
+    "Das Zeichen stimmt. Gehe zum nächsten.",
+    "Le symbole est correct. Passe au suivant.",
+    "Símbolo correcto. Acércate al siguiente."
+  ],
+  [
+    "Kompas jest w plecaku. Oddaj go Neli.",
+    "The compass is in your backpack. Return it to Nela.",
+    "Het kompas zit in je rugzak. Breng het naar Nela.",
+    "Der Kompass ist im Rucksack. Gib ihn Nela zurück.",
+    "La boussole est dans ton sac. Rends-la à Nela.",
+    "La brújula está en tu mochila. Entrégasela a Nela."
+  ],
+  [
+    "Kompas oddany! Nagroda odebrana. Odblokowano Światła dla rozbitków.",
+    "Compass returned! Reward collected. Lights for the castaways unlocked.",
+    "Kompas teruggebracht! Beloning ontvangen. Lichten voor de schipbreukelingen ontgrendeld.",
+    "Kompass zurückgegeben! Belohnung erhalten. Lichter für die Schiffbrüchigen freigeschaltet.",
+    "Boussole rendue ! Récompense reçue. Lumières pour les naufragés débloqué.",
+    "¡Brújula entregada! Recompensa recibida. Luces para los náufragos desbloqueado."
+  ],
+  [
+    "Naprawa sygnału wymaga 4 drewna i 2 kamieni.",
+    "Repairing a beacon requires 4 wood and 2 stone.",
+    "Een baken repareren vereist 4 hout en 2 steen.",
+    "Die Reparatur eines Signals braucht 4 Holz und 2 Stein.",
+    "Réparer un signal nécessite 4 bois et 2 pierres.",
+    "Reparar una señal requiere 4 de madera y 2 piedras."
+  ],
+  [
+    "Sygnał naprawiony! Światło wskazuje drogę rozbitkom.",
+    "Beacon repaired! Its light guides the castaways.",
+    "Baken gerepareerd! Het licht wijst de schipbreukelingen de weg.",
+    "Signal repariert! Das Licht weist den Schiffbrüchigen den Weg.",
+    "Signal réparé ! La lumière guide les naufragés.",
+    "¡Señal reparada! Su luz guía a los náufragos."
+  ],
+  [
+    "Rozbitkowie są bezpieczni! Leon wypłacił nagrodę.",
+    "The castaways are safe! Leon paid the reward.",
+    "De schipbreukelingen zijn veilig! Leon heeft de beloning betaald.",
+    "Die Schiffbrüchigen sind sicher! Leon hat die Belohnung ausgezahlt.",
+    "Les naufragés sont en sécurité ! Leon a payé la récompense.",
+    "¡Los náufragos están a salvo! Leon ha pagado la recompensa."
   ]
 ]
