@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
-<title>My Island 0.15.1 — Twoja wyspa</title>
-<script defer src="island3d.bundle.js?v=0.15.1"></script>
+<title>My Island 0.16 — Twoja wyspa</title>
+<script defer src="island3d.bundle.js?v=0.16"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -56,6 +56,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 .recipe{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#ffffff0b;border:1px solid #ffffff12;border-radius:13px;padding:12px;margin:8px 0;font-size:13px}
 .recipe small{display:block;margin-top:4px;color:#a9ccd0;font-size:11px;line-height:1.4}
 .stock{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.stock span{background:#ffffff0d;border-radius:9px;padding:9px;font-size:12px}
+.work-summary{padding:14px;background:#ffffff0b;border-radius:14px;margin:14px 0}.work-summary p{margin:7px 0;font-size:13px}.work-actions{display:flex;gap:8px;flex-wrap:wrap}.panel .work-actions button{white-space:normal}.camp-unlocks{display:grid;gap:8px;font-size:13px;line-height:1.5}.camp-unlocks span{padding:10px;background:#ffffff08;border-radius:10px}.trail-next{color:#ffe087;font-variant-numeric:tabular-nums}.work-card{align-items:flex-start}.work-card small{font-size:12px}#workProgress{color:#ffe087}#workDeliver,#gardenHarvest{min-height:44px}
 .msg{position:fixed;z-index:30;left:50%;bottom:174px;transform:translateX(-50%);max-width:90vw;width:max-content;background:#07303eee;border:1px solid #ffffff28;padding:11px 16px;border-radius:14px;opacity:0;pointer-events:none;text-align:center;font-size:13px;transition:opacity .15s}
 .msg.on{opacity:1}
 .hint{position:fixed;z-index:6;left:50%;bottom:80px;transform:translateX(-50%);border-radius:10px;background:#073441cc;color:#e9f4e2;font-size:11px;padding:6px 10px;pointer-events:none;display:none;text-align:center;max-width:45vw}
@@ -81,7 +82,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 </head>
 <body>
 <div id="start" class="start"><div class="card">
- <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version"><span data-i18n="0.15.1 • Wyspa w sześciu językach">0.15.1 • Wyspa w sześciu językach</span></p>
+ <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version"><span data-i18n="0.16 • Praca i przygody">0.16 • Praca i przygody</span></p>
  <div class="language-picker"><label for="languageStart"><span data-i18n="🌐 Język">🌐 Język</span></label><select id="languageStart" onchange="setLanguage(this.value)" aria-label="Wybierz język" data-i18n-aria-label="Wybierz język"><option value="pl">Polski</option><option value="en">English</option><option value="nl">Nederlands</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option></select></div>
  <p class="desc"><span data-i18n="Odkrywaj wyspę sam albo z przyjaciółmi.">Odkrywaj wyspę sam albo z przyjaciółmi.</span><br><span data-i18n="Do czterech graczy, wspólna baza i wyprawa po skarb.">Do czterech graczy, wspólna baza i wyprawa po skarb.</span></p>
  <div class="play-choice"><button onclick="startGame()"><span data-i18n="GRAJ SOLO">GRAJ SOLO</span></button><button class="online-choice" onclick="toggle('roomPanel',1)"><span data-i18n="GRAJ ONLINE">GRAJ ONLINE</span></button></div><p class="keys"><span data-i18n="WASD lub strzałki • E działaj • Shift sprint • spacja atak">WASD lub strzałki • E działaj • Shift sprint • spacja atak</span></p>
@@ -100,6 +101,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <button id="accountButton" class="p pad-button" onclick="toggle('accountPanel',1)" aria-label="Konto gracza i zapis w chmurze" data-i18n-aria-label="Konto gracza i zapis w chmurze">☁️ KONTO</button>
  <button id="newSoloButton" class="p pad-button" onclick="askNewSoloGame()" aria-label="Nowa gra solo" data-i18n-aria-label="Nowa gra solo"><span data-i18n="↻ NOWA GRA">↻ NOWA GRA</span></button>
  <button id="languageButton" class="p pad-button" onclick="toggle('languagePanel',1)" aria-label="Język gry" data-i18n-aria-label="Język gry">🌐 PL</button>
+ <button id="workButton" class="p pad-button" onclick="toggle('workPanel',1)"><span data-i18n="📋 PRACA I ZABAWA">📋 PRACA I ZABAWA</span></button>
 </div>
 <div id="questBox" class="q">📜 <b id="qt">Wyprawa 0.13</b><br><span id="qx"></span><br><small id="qp"></small></div>
 <canvas id="game" aria-label="Wyspa, postacie i świat gry" data-i18n-aria-label="Wyspa, postacie i świat gry"></canvas>
@@ -187,6 +189,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <div class="recipe"><span><span data-i18n="Rozpal ognisko">Rozpal ognisko</span><small><span data-i18n="4 drewna + 2 kamienie · przy twojej bazie">4 drewna + 2 kamienie · przy twojej bazie</span></small></span><button id="fireBuild" onclick="buildFire()"><span data-i18n="Rozpal">Rozpal</span></button></div>
  <div class="recipe"><span><span data-i18n="Upiecz rybę">Upiecz rybę</span><small><span data-i18n="1 surowa ryba + 1 drewno · przy ognisku">1 surowa ryba + 1 drewno · przy ognisku</span></small></span><button onclick="cookFish()"><span data-i18n="Upiecz">Upiecz</span></button></div>
  <div class="recipe"><span><span data-i18n="Odpoczynek">Odpoczynek</span><small><span data-i18n="5 sekund · do +40 zdrowia i +70 energii">5 sekund · do +40 zdrowia i +70 energii</span></small></span><button id="restButton" onclick="restAtFire()">Odpocznij</button></div>
+ <button onclick="toggle('workPanel',1)" data-i18n="📋 Praca i przygody">📋 Praca i przygody</button>
 </div>
 <div id="bag" class="panel" role="dialog" aria-label="Plecak" data-i18n-aria-label="Plecak">
  <button class="close" aria-label="Zamknij plecak" onclick="toggle('bag',0)" data-i18n-aria-label="Zamknij plecak">✕</button><h2><span data-i18n="🎒 Plecak">🎒 Plecak</span></h2><p id="bagIntro" class="intro">Zjedz coś przed kolejną wyprawą.</p>
@@ -208,22 +211,38 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <div class="recipe"><span><span data-i18n="🐟 1 surowa ryba">🐟 1 surowa ryba</span><small><span data-i18n="Dostaniesz 12 monet">Dostaniesz 12 monet</span></small></span><button onclick="trade('sell','fish')"><span data-i18n="Sprzedaj">Sprzedaj</span></button></div>
  <div class="recipe"><span><span data-i18n="🐚 2 muszelki">🐚 2 muszelki</span><small><span data-i18n="Dostaniesz 8 monet">Dostaniesz 8 monet</span></small></span><button onclick="trade('sell','shells')"><span data-i18n="Sprzedaj">Sprzedaj</span></button></div>
  <h3><span data-i18n="📜 Dostawa dla Leona">📜 Dostawa dla Leona</span></h3><div class="recipe"><span><span data-i18n="6 drewna + 4 kamienie">6 drewna + 4 kamienie</span><small id="supplyQuest">Nagroda: 40 monet + 60 XP</small></span><button id="supplyButton" onclick="deliverQuest('supplies')"><span data-i18n="Dostarcz">Dostarcz</span></button></div>
+ <button onclick="toggle('workPanel',1)" data-i18n="📋 Praca i przygody">📋 Praca i przygody</button>
 </div>
 <div id="nelaPanel" class="panel" role="dialog" aria-label="Zadania Neli" data-i18n-aria-label="Zadania Neli">
  <button class="close" aria-label="Zamknij zadania" onclick="toggle('nelaPanel',0)" data-i18n-aria-label="Zamknij zadania">✕</button><h2><span data-i18n="👩‍🦰 Nela — zadania">👩‍🦰 Nela — zadania</span></h2><p class="intro"><span data-i18n="„Na wyspie zawsze przyda się pomocna dłoń.”">„Na wyspie zawsze przyda się pomocna dłoń.”</span></p>
  <div class="recipe"><span><span data-i18n="Ryby dla mieszkańców">Ryby dla mieszkańców</span><small id="fishQuest">Dostarcz 3 ryby (surowe lub pieczone). Nagroda: 70 monet + 80 XP</small></span><button id="fishQuestButton" onclick="deliverQuest('fish')"><span data-i18n="Dostarcz ryby">Dostarcz ryby</span></button></div>
  <h3><span data-i18n="💎 Wyprawa po skarb">💎 Wyprawa po skarb</span></h3><p id="treasureQuest">Zbuduj tratwę i znajdź drugą wyspę na południowym wschodzie.</p>
+ <button onclick="toggle('workPanel',1)" data-i18n="📋 Praca i przygody">📋 Praca i przygody</button>
+</div>
+<div id="workPanel" class="panel" role="dialog" aria-label="Praca i przygody" data-i18n-aria-label="Praca i przygody">
+ <button class="close" onclick="toggle('workPanel',0)" aria-label="Zamknij tablicę zleceń" data-i18n-aria-label="Zamknij tablicę zleceń">✕</button><h2 data-i18n="📋 Praca i przygody">📋 Praca i przygody</h2>
+ <p class="intro" data-i18n="Wybierz zajęcie. Zlecenia można powtarzać, a online pomagacie sobie całą drużyną. Postęp pracy i rekord biegu są zapisywane.">Wybierz zajęcie. Zlecenia można powtarzać, a online pomagacie sobie całą drużyną. Postęp pracy i rekord biegu są zapisywane.</p>
+ <div class="work-summary"><b id="workTitle"></b><p id="workDescription"></p><p id="workProgress" role="status"></p><p id="workDestination"></p><div class="work-actions"><button id="workDeliver" onclick="workAction('deliver')" data-i18n="Dostarcz i odbierz zapłatę">Dostarcz i odbierz zapłatę</button><button id="workCancel" onclick="workAction('cancel')" data-i18n="Anuluj zlecenie">Anuluj zlecenie</button></div></div>
+ <div id="jobChoices">
+  <div class="recipe work-card"><span><b data-i18n="🪵 Stolarz obozowy">🪵 Stolarz obozowy</b><small data-i18n="Zbierz 8 drewna i 4 kamienie. Dostarcz je Leonowi.">Zbierz 8 drewna i 4 kamienie. Dostarcz je Leonowi.</small><small>🪙 55 · ⭐ 80</small></span><button onclick="workAction('accept','carpenter')" data-i18n="Podejmij pracę">Podejmij pracę</button></div>
+  <div class="recipe work-card"><span><b data-i18n="🍳 Kucharz wyspy">🍳 Kucharz wyspy</b><small data-i18n="Upiecz 2 ryby przy ognisku. Dostarcz je Neli.">Upiecz 2 ryby przy ognisku. Dostarcz je Neli.</small><small>🪙 60 · ⭐ 90</small></span><button onclick="workAction('accept','cook')" data-i18n="Podejmij pracę">Podejmij pracę</button></div>
+  <div class="recipe work-card"><span><b data-i18n="🐚 Opiekun plaży">🐚 Opiekun plaży</b><small data-i18n="Zbierz 4 muszelki i 2 kokosy. Dostarcz je Leonowi.">Zbierz 4 muszelki i 2 kokosy. Dostarcz je Leonowi.</small><small>🪙 35 · ⭐ 55</small></span><button onclick="workAction('accept','beach')" data-i18n="Podejmij pracę">Podejmij pracę</button></div>
+ </div>
+ <h3 data-i18n="🏡 Rozwój obozu">🏡 Rozwój obozu</h3><p id="campRank"></p><div class="camp-unlocks"><span id="unlockLamp"></span><span id="unlockGarden"></span><span id="unlockFlag"></span></div><p class="intro" data-i18n="Ogródek daje 2 kokosy po każdej kolejnej ukończonej pracy. Ulepszenia pojawią się przy twojej bazie.">Ogródek daje 2 kokosy po każdej kolejnej ukończonej pracy. Ulepszenia pojawią się przy twojej bazie.</p><button id="gardenHarvest" onclick="collectGarden()" data-i18n="Zbierz plony ogródka">Zbierz plony ogródka</button>
+ <h3 data-i18n="🏁 Bieg po wyspie">🏁 Bieg po wyspie</h3><p class="intro" data-i18n="Start przy tablicy obok obozu Leona. Odwiedź 3 oznaczone punkty po kolei i wróć na start. Pierwsze ukończenie: 90 monet i 120 XP. Potem ścigasz swój rekord.">Start przy tablicy obok obozu Leona. Odwiedź 3 oznaczone punkty po kolei i wróć na start. Pierwsze ukończenie: 90 monet i 120 XP. Potem ścigasz swój rekord.</p><p id="raceStatus" role="status"></p><p id="raceRecord"></p><div class="work-actions"><button id="raceStart" onclick="startRace()" data-i18n="Rozpocznij bieg">Rozpocznij bieg</button><button id="raceCancel" onclick="cancelRace()" data-i18n="Przerwij bieg">Przerwij bieg</button></div>
 </div>
 <div id="languagePanel" class="panel" role="dialog" aria-label="Język gry" data-i18n-aria-label="Język gry">
  <button class="close" aria-label="Zamknij wybór języka" onclick="toggle('languagePanel',0)" data-i18n-aria-label="Zamknij wybór języka">✕</button><h2><span data-i18n="🌐 Język">🌐 Język</span></h2>
  <p class="intro"><span data-i18n="Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.">Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.</span></p>
  <div class="language-options"><button data-language="pl" onclick="setLanguage('pl')">Polski</button><button data-language="en" onclick="setLanguage('en')">English</button><button data-language="nl" onclick="setLanguage('nl')">Nederlands</button><button data-language="de" onclick="setLanguage('de')">Deutsch</button><button data-language="fr" onclick="setLanguage('fr')">Français</button><button data-language="es" onclick="setLanguage('es')">Español</button></div>
 </div>
-<script src="i18n.bundle.js?v=0.15.1"></script>
-<script src="wildlife.bundle.js?v=0.15.1"></script>
+<script src="i18n.bundle.js?v=0.16"></script>
+<script src="wildlife.bundle.js?v=0.16"></script>
+<script src="island-play.bundle.js?v=0.16"></script>
 <script>
 'use strict';
 const tr=(source)=>MyIslandI18n.t(source);
+const activityRules=MyIslandPlay;
 const $=id=>document.getElementById(id), C=$('game'), X=C.getContext('2d');
 const WORLD={w:4600,h:2900}, SAVE_KEY='myIsland09';
 let W=0,H=0,DPR=1,K={},play=0,P={x:1500,y:1100},cam={x:0,y:0};
@@ -232,8 +251,9 @@ let spear=0,rod=0,raft=0,treasure=0,sprint=0,blocking=0,lastAttack=0,secondFound
 let spearStowed=false;
 try{spearStowed=localStorage.getItem('myIslandWeaponV1')==='stowed'}catch(e){}
 let questsDone={fish:0,supplies:0},activePanel=null,resting=0,face='down',moving=false,walkPhase=0,time=0,lastTime=0,lastAutosave=0,lastUI=0,hitFlash=0,msgTimer=0;
+let campActivities=activityRules.freshActivities(),raceRun=null;
 const O=[],E=[],F=[],nela={x:3370,y:430},leon={x:1630,y:1160};
-const chest={x:4200,y:2450},panels=['craft','basePanel','bag','shop','nelaPanel','controllerPanel','roomPanel','newGamePanel','accountPanel','languagePanel'];
+const chest={x:4200,y:2450},panels=['craft','basePanel','bag','shop','nelaPanel','controllerPanel','roomPanel','newGamePanel','accountPanel','languagePanel','workPanel'];
 const ROOM_API='https://my-island-online.arekpoczta734.chatgpt.site/api/rooms',ROOM_KEY='myIslandRoomV1';
 const playerLooks=[{shirt:'#4c9cba',skin:'#e3b185',hair:'#463b32'},{shirt:'#df8168',skin:'#be895f',hair:'#382d29'},{shirt:'#9974c7',skin:'#efc69d',hair:'#725039'},{shirt:'#76b677',skin:'#a67152',hair:'#2f302b'}];
 const net={room:null,token:null,you:null,players:[],worldRev:-1,connected:false,busy:false,joining:false,epoch:0,lastOk:0,actions:[],timer:null,solo:null,reset:0,joinAbort:null};
@@ -258,7 +278,7 @@ function island2(x,y){return ellipseInside(x,y,4100,2400,390,290)}
 function sea(x,y){return !mainLand(x,y)&&!island2(x,y)}
 function deep(x,y){return sea(x,y)&&x>3500&&y>1150}
 function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
-function safeZone(x,y){return !!basePos&&baseLevel>0&&Math.hypot(x-basePos.x,y-basePos.y)<160}
+function safeZone(x,y){return activityRules.inBase({x,y},basePos,baseLevel,70)}
 function spawnResources(type,count){
  for(let i=0;i<count;i++){
   let x,y;do{x=rnd(350,3400);y=rnd(350,2100)}while(!ellipseInside(x,y,1750,1300,1410,840)||Math.hypot(x-1540,y-1120)<210);
@@ -383,7 +403,7 @@ function drawRaft(x,y){
  X.strokeStyle='#74684b';X.lineWidth=3;X.beginPath();X.moveTo(-34,0);X.lineTo(34,0);X.moveTo(-34,15);X.lineTo(34,15);X.stroke();
  X.strokeStyle='#b6a77b';X.lineWidth=3;X.beginPath();X.moveTo(25,-12);X.lineTo(49+Math.sin(walkPhase)*4,28);X.stroke();ellipse(X,49+Math.sin(walkPhase)*4,27,5,10,'#b6a77b');X.restore();
 }
-function firePosition(){if(!basePos)return null;for(const [dx,dy] of [[77,38],[-77,38],[0,-50],[0,0]]){const p={x:basePos.x+dx,y:basePos.y+dy};if(!sea(p.x,p.y))return p}return {x:basePos.x,y:basePos.y}}
+function firePosition(){return activityRules.firePosition(basePos,baseLevel,(x,y)=>!sea(x,y))}
 function drawFire(x,y){
  X.save();X.translate(x,y);const glow=X.createRadialGradient(0,-4,1,0,0,68);glow.addColorStop(0,'#ffb94745');glow.addColorStop(1,'#ffb94700');ellipse(X,0,0,68,38,glow);
  for(let i=0;i<7;i++){const a=i*6.28/7;ellipse(X,Math.cos(a)*18,Math.sin(a)*9,5,4,'#80928b')}
@@ -394,14 +414,20 @@ function drawFire(x,y){
  X.restore();
 }
 function drawBase(){
- if(!basePos)return;const {x,y}=basePos;shadow(x,y,48,12);X.save();X.translate(x,y);
- if(baseLevel===1){
-  X.fillStyle='#dfcf98';X.beginPath();X.moveTo(-38,3);X.lineTo(0,-55);X.lineTo(38,3);X.closePath();X.fill();X.fillStyle='#b4aa7c';X.beginPath();X.moveTo(0,-55);X.lineTo(38,3);X.lineTo(8,3);X.closePath();X.fill();
-  X.fillStyle='#5d7265';X.beginPath();X.moveTo(-14,3);X.lineTo(0,-28);X.lineTo(14,3);X.fill();X.strokeStyle='#827857';X.lineWidth=2;X.beginPath();X.moveTo(-38,3);X.lineTo(-53,9);X.moveTo(38,3);X.lineTo(52,9);X.stroke();
- }else{
-  rounded(X,-35,-45,70,47,3,baseLevel===2?'#bda16e':'#e3d1a2');X.fillStyle=baseLevel===2?'#527c51':'#b67c56';X.beginPath();X.moveTo(-46,-41);X.lineTo(0,-78);X.lineTo(46,-41);X.closePath();X.fill();
-  rounded(X,-8,-29,18,31,2,'#6a6e50');rounded(X,-26,-31,13,14,2,'#91bdc4');rounded(X,17,-31,13,14,2,'#91bdc4');X.strokeStyle='#f2e0a6';X.lineWidth=2;X.beginPath();X.moveTo(-20,-30);X.lineTo(-20,-17);X.moveTo(23,-30);X.lineTo(23,-17);X.stroke();
- }X.restore();label(x,y-87,(net.room?tr('WSPÓLNA BAZA'):tr('TWOJA BAZA'))+' · L'+baseLevel);
+ const b=activityRules.baseLayout(basePos,baseLevel);if(!b)return;const f=b.floor;
+ rounded(X,f.x-f.w/2,f.y-f.h/2,f.w,f.h,6,'#c2a16b');
+ X.strokeStyle='#a78452';X.lineWidth=1;for(let x=f.x-f.w/2+20;x<f.x+f.w/2;x+=20){X.beginPath();X.moveTo(x,f.y-f.h/2);X.lineTo(x,f.y+f.h/2);X.stroke()}
+ for(const wall of b.walls)rounded(X,wall.x-wall.w/2,wall.y-wall.h/2,wall.w,wall.h,3,'#77573d');
+ for(const post of b.posts)ellipse(X,post.x,post.y,post.radius,post.radius,'#77573d');
+ for(const bed of b.beds){rounded(X,bed.x-bed.w/2,bed.y-bed.h/2,bed.w,bed.h,4,'#e0d6ad');rounded(X,bed.x-bed.w/2+4,bed.y-bed.h/2+4,bed.w-8,18,3,'#f1e9cd')}
+ if(campActivities.completed>=1)for(const side of [-1,1]){const p=b.point(side*(b.width/2+24),b.depth/2+20);ellipse(X,p.x,p.y,9,9,'#ffd477')}
+ if(campActivities.completed>=6){const p=b.point(b.width/2+34,b.depth/2+32);X.strokeStyle='#79593e';X.lineWidth=3;X.beginPath();X.moveTo(p.x,p.y);X.lineTo(p.x,p.y-45);X.stroke();X.fillStyle='#39a6ae';X.fillRect(p.x,p.y-45,23,14)}
+ label(f.x,f.y-f.h/2-24,(net.room?tr('WSPÓLNA BAZA'):tr('TWOJA BAZA'))+' · L'+baseLevel);
+}
+function drawActivities(){
+ const p=activityRules.BOARD;if(visible(p.x,p.y)){rounded(X,p.x-40,p.y-42,80,30,5,'#234f58');label(p.x,p.y-55,tr('PRACA I ZABAWA'));X.font='22px system-ui';X.textAlign='center';X.fillText('📋 🏁',p.x,p.y-20)}
+ const g=activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y));if(g&&campActivities.completed>=3){rounded(X,g.x-52,g.y-38,104,76,7,'#785b3a');for(let i=0;i<6;i++){const x=g.x-32+(i%3)*32,y=g.y-18+Math.floor(i/3)*36;ellipse(X,x,y,10,12,'#619a47');if(campActivities.gardenClaimed<campActivities.completed)ellipse(X,x+4,y-2,5,5,'#dcc873')}label(g.x,g.y-52,tr('OGRÓDEK'))}
+ if(raceRun){const target=activityRules.COURSE[raceRun.next];X.strokeStyle='#30c6e3';X.lineWidth=4;X.beginPath();X.arc(target.x,target.y,80,0,Math.PI*2);X.stroke();label(target.x,target.y-95,raceRun.next===3?tr('META'):String(raceRun.next+1))}
 }
 function drawChest(){shadow(chest.x,chest.y,22,8);rounded(X,chest.x-20,chest.y-25,40,28,4,'#a77a40');rounded(X,chest.x-20,chest.y-33,40,14,4,'#be9455');X.fillStyle='#e2c67b';X.fillRect(chest.x-12,chest.y-32,4,34);X.fillRect(chest.x+8,chest.y-32,4,34);rounded(X,chest.x-4,chest.y-17,8,9,2,'#f6d779')}
 function drawStall(){
@@ -425,9 +451,9 @@ function draw(){
  X.strokeStyle='#fbf4d791';X.lineWidth=2;
  for(const [x,y,rx,ry] of [[1750,1300,1545,975],[3380,500,525,315],[4100,2400,395,295]]){X.beginPath();X.ellipse(x,y,rx+Math.sin(time*.001)*3,ry+Math.sin(time*.001)*3,0,0,6.28);X.stroke()}
  if(visible(leon.x,leon.y))drawStall();
+ drawBase();drawActivities();
  const things=O.filter(o=>visible(o.x,o.y)).map(o=>({y:o.y,draw:()=>o.t==='tree'?drawPalm(o):o.t==='rock'?drawRock(o):o.t==='shell'?drawShell(o):drawCoconut(o)}));
  for(const e of E)if(visible(e.x,e.y))things.push({y:e.y,draw:()=>drawBoar(e)});
- if(basePos&&visible(basePos.x,basePos.y))things.push({y:basePos.y,draw:drawBase});
  const fire=firePosition();if(campfire&&fire&&visible(fire.x,fire.y))things.push({y:fire.y,draw:()=>drawFire(fire.x,fire.y)});
  if(!treasure&&visible(chest.x,chest.y))things.push({y:chest.y,draw:drawChest});
  for(const [person,kind,name] of [[nela,'nela',tr('NELA · ZADANIA')],[leon,'leon',tr('LEON · HANDLARZ')]]){
@@ -447,7 +473,7 @@ function draw(){
  }X.restore();
 }
 function enemies(step){
- const navigation=MyIslandWildlife.wildlifeNavigation(O,mainLand);
+ const navigation=MyIslandWildlife.wildlifeNavigation(O,mainLand,activityRules.sceneSolids([],basePos,baseLevel));
  for(const e of E){
   const d=distance(P,e),safe=safeZone(P.x,P.y);
   const target=d<260&&!safe?P:{x:e.sx+Math.sin(time*.0005+e.phase)*32,y:e.sy+Math.cos(time*.0006+e.phase)*23};
@@ -455,17 +481,17 @@ function enemies(step){
   MyIslandWildlife.moveBoar(e,target,Math.min(Math.max(0,distance(e,target)-3),speed*step),navigation,time);
   if(distance(P,e)<42&&!safe&&navigation.clear(e,P,0)&&Date.now()-e.hit>1500){
    e.hit=Date.now();health=Math.max(0,health-(blocking||pad.blocking?2:6));hitFlash=12;
-   if(health<=0){health=50;P=basePos?{x:basePos.x+70,y:basePos.y}:{x:1500,y:1100};resetInput();save();say(tr('Odrodzenie przy bazie. Zjedz coś lub odpocznij przy ognisku.'))}
+   if(health<=0){health=50;P=activityRules.releasePlayer(activityRules.baseSpawn(basePos,baseLevel),activityRules.sceneSolids(O,basePos,baseLevel));raceRun=null;resetInput();save();say(tr('Odrodzenie przy bazie. Zjedz coś lub odpocznij przy ognisku.'))}
   }
  }
 }
-function gameState(){return {version:10,P,wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,health,energy,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone}}
+function gameState(){return {version:10,P,wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,health,energy,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone,activities:campActivities}}
 function soloSnapshot(){return {...copyState(gameState()),world:{resources:O.map(o=>({t:o.t,x:o.x,y:o.y,hp:o.hp,phase:o.phase})),enemies:E.map(e=>({x:e.x,y:e.y,sx:e.sx,sy:e.sy,hp:e.hp,hit:0,phase:e.phase})),seed,face}}}
 function copyState(value){return JSON.parse(JSON.stringify(value))}
-function applyBank(b){({wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone}=b)}
-function captureSolo(){return {state:copyState(gameState()),resources:copyState(O),enemies:copyState(E),seed,face,walkPhase}}
+function applyBank(b){({wood,stone,food,shells,fish,cookedFish,totalCaught,xpv,coins,spear,rod,raft,treasure,secondFound,returned,baseLevel,basePos,campfire,questsDone}=b);campActivities=activityRules.activities(b.activities)}
+function captureSolo(){return {state:copyState(gameState()),resources:copyState(O),enemies:copyState(E),seed,face,walkPhase,race:copyState(raceRun)}}
 function restoreSolo(saved){
- if(!saved)return;const s=saved.state;applyBank(s);P={...s.P};health=s.health;energy=s.energy;O.splice(0,O.length,...saved.resources);E.splice(0,E.length,...saved.enemies);seed=saved.seed;face=saved.face;walkPhase=saved.walkPhase;resting=0;moving=false;
+ if(!saved)return;const s=saved.state;applyBank(s);P={...s.P};health=s.health;energy=s.energy;O.splice(0,O.length,...saved.resources);E.splice(0,E.length,...saved.enemies);seed=saved.seed;face=saved.face;walkPhase=saved.walkPhase;raceRun=saved.race||null;resting=0;moving=false;
 }
 function remotePosition(person,now){const t=Math.max(0,Math.min(1,(now-person.received)/180));return {x:person.fromX+(person.x-person.fromX)*t,y:person.fromY+(person.y-person.fromY)*t}}
 function updateRoomUI(){
@@ -493,7 +519,8 @@ function applyRoomSnapshot(data,initial=false){
  const now=performance.now(),previous=net.players;
  net.players=data.players.map(p=>{const old=previous.find(q=>q.id===p.id),start=old?remotePosition(old,now):p,teleport=Math.hypot(start.x-p.x,start.y-p.y)>350;return {...p,fromX:teleport?p.x:start.x,fromY:teleport?p.y:start.y,received:now}});
  applyBank(data.bank);if(Array.isArray(data.resources))O.splice(0,O.length,...data.resources);if(Array.isArray(data.enemies))E.splice(0,E.length,...data.enemies.map(e=>({...e,hit:0})));
- if(initial||mine.reset!==net.reset||Math.hypot(P.x-mine.x,P.y-mine.y)>130){P={x:mine.x,y:mine.y};resetInput()}
+ if(initial||mine.motionBlocked||mine.reset!==net.reset||Math.hypot(P.x-mine.x,P.y-mine.y)>130){P={x:mine.x,y:mine.y};resetInput()}
+ if(mine.raceFinish&&mine.raceFinish!==previous.find(p=>p.id===mine.id)?.raceFinish&&!initial)say(tr('Bieg ukończony! Rekord jest na tablicy.'));raceRun=mine.race?{...mine.race}:null;
  if(mine.health<health)hitFlash=12;health=mine.health;energy=mine.energy;resting=mine.resting;net.reset=mine.reset;net.you=data.you;net.worldRev=data.worldRev;net.connected=true;net.lastOk=now;net.ended=false;
  update();updateRoomUI();
 }
@@ -508,7 +535,7 @@ async function connectRoom(mode){
  try{
   const payload=mode==='create'?{op:'create',name}:mode==='resume'?{op:'join',name,code:lastRoom.code,token:lastRoom.token}:{op:'join',name,code};
   const data=await roomRequest(payload,net.joinAbort.signal);if(epoch!==net.epoch)return;
-  net.joining=false;net.solo=solo;net.room=data.code;net.token=data.token||lastRoom?.token;net.actions=[];net.worldRev=-1;net.reset=-1;net.players=[];
+  net.joining=false;net.solo=solo;net.room=data.code;net.token=data.token||lastRoom?.token;net.actions=[];net.worldRev=-1;net.reset=-1;net.players=[];raceRun=null;
   if(!net.token)throw new Error(tr('Nie udało się rozpocząć sesji. Dołącz ponownie.'));
   lastRoom={code:net.room,token:net.token,name};try{localStorage.setItem(ROOM_KEY,JSON.stringify(lastRoom))}catch(e){}
   $('start').style.display='none';play=1;toggle('roomPanel',0);applyRoomSnapshot(data,true);net.timer=setInterval(()=>syncRoom(),180);syncRoom();say(tr('Wspólna wyspa gotowa! Kod: ')+net.room);
@@ -662,7 +689,8 @@ function loop(timestamp=performance.now()){
   const wet=sea(P.x,P.y),fast=(sprint||pad.sprinting)&&energy>0&&moving,speed=wet?(raft?6:2):(fast?7:4);
   if(!net.room&&!activePanel)energy=Math.max(0,Math.min(100,energy+(wet&&!raft?-.2:fast?-.28:.12)*step));
   let nx=Math.max(60,Math.min(4540,P.x+dx*speed*step)),ny=Math.max(60,Math.min(2840,P.y+dy*speed*step));
-  if(deep(nx,ny)&&!raft){nx=P.x;ny=P.y}P.x=nx;P.y=ny;
+  const before={...P};P=activityRules.movePlayer(P,{x:nx,y:ny},activityRules.sceneSolids(O,basePos,baseLevel),p=>p.x>=60&&p.x<=4540&&p.y>=60&&p.y<=2840&&(!deep(p.x,p.y)||raft));moving=!!(Math.hypot(P.x-before.x,P.y-before.y)>.05);
+  if(!net.room&&raceRun&&!activePanel&&inputFocused&&!document.hidden&&activityRules.advanceCourse(raceRun,P,step*16.667)){const bank=gameState();activityRules.finishCourse(campActivities,bank,raceRun.elapsed);applyBank(bank);raceRun=null;save();say(tr('Bieg ukończony! Rekord jest na tablicy.'))}
   if(!net.room&&island2(P.x,P.y)&&!secondFound){secondFound=1;xpv+=150;coins+=75;say(tr('Odkryto Wyspę Skarbu!'));save()}
   if(!net.room&&resting>0){const seconds=step/60;health=Math.min(100,health+seconds*8);energy=Math.min(100,energy+seconds*14);resting=Math.max(0,resting-seconds);if(!resting){save();say(tr('Odpoczynek zakończony. Czas na przygodę!'))}}
   if(!net.room&&!activePanel&&mainLand(P.x,P.y))enemies(step);hitFlash=Math.max(0,hitFlash-step);
@@ -689,11 +717,11 @@ function askNewSoloGame(){
 }
 function restartSoloGame(){
  if(activePanel!=='newGamePanel'||net.room||net.joining)return;
- const fresh={version:10,P:{x:1500,y:1100},wood:0,stone:0,food:0,shells:0,fish:0,cookedFish:0,totalCaught:0,xpv:0,coins:0,health:100,energy:100,spear:0,rod:0,raft:0,treasure:0,secondFound:0,returned:0,baseLevel:0,basePos:null,campfire:0,questsDone:{fish:0,supplies:0}};
+ const fresh={version:10,P:{x:1500,y:1100},wood:0,stone:0,food:0,shells:0,fish:0,cookedFish:0,totalCaught:0,xpv:0,coins:0,health:100,energy:100,spear:0,rod:0,raft:0,treasure:0,secondFound:0,returned:0,baseLevel:0,basePos:null,campfire:0,questsDone:{fish:0,supplies:0},activities:activityRules.freshActivities()};
  if(cloud.session)return restartCloudSoloGame(fresh);
  try{localStorage.setItem(SAVE_KEY,JSON.stringify(fresh))}catch(e){$('newGameError').textContent=tr('Nie udało się zapisać nowej gry. Poprzedni postęp został zachowany. Spróbuj ponownie.');return}
  try{localStorage.removeItem('myIsland08')}catch(e){}
- applyBank(fresh);P={...fresh.P};health=energy=100;populateSoloWorld();resting=blocking=lastAttack=hitFlash=walkPhase=0;face='down';moving=false;lastTime=0;lastAutosave=performance.now();lastUI=0;
+ applyBank(fresh);raceRun=null;P={...fresh.P};health=energy=100;populateSoloWorld();resting=blocking=lastAttack=hitFlash=walkPhase=0;face='down';moving=false;lastTime=0;lastAutosave=performance.now();lastUI=0;
  $('start').style.display='none';play=1;toggle('newGamePanel',0);cam.x=Math.max(0,Math.min(Math.max(0,WORLD.w-W),P.x-W/2));cam.y=Math.max(0,Math.min(Math.max(0,WORLD.h-H),P.y-H/2));draw();say(tr('Nowa przygoda rozpoczęta! Wyspa czeka na ciebie.'));
 }
 function block(){if(activePanel)return;blocking=1;setTimeout(()=>blocking=0,1200)}
@@ -702,13 +730,15 @@ function setSpearStowed(value){spearStowed=!!value;try{localStorage.setItem('myI
 function toggleSpear(){if(!play||!soloReady()||(activePanel&&activePanel!=='bag'))return;if(!spear)return say(tr('Potrzebujesz włóczni. Zrobisz ją w warsztacie.'));setSpearStowed(!spearStowed);say(spearStowed?tr('Włócznia schowana. Nadal jest w plecaku.'):tr('Włócznia w ręce.'))}
 function attack(){
  if(activePanel)return;if(spear&&spearStowed)setSpearStowed(false);if(net.room)return roomAction({kind:'attack'});if(!spear)return say(tr('Potrzebujesz włóczni. Zrobisz ją w warsztacie.'));if(Date.now()-lastAttack<650)return;lastAttack=Date.now();
- const navigation=MyIslandWildlife.wildlifeNavigation(O,mainLand);
+ const navigation=MyIslandWildlife.wildlifeNavigation(O,mainLand,activityRules.sceneSolids([],basePos,baseLevel));
  let target=null,d=105;for(const e of E){const q=distance(P,e);if(q<d&&navigation.clear(P,e,0)){d=q;target=e}}if(!target)return say(tr('Nic w zasięgu włóczni.'));
  target.hp-=2;if(target.hp<=0){E.splice(E.indexOf(target),1);coins+=20;xpv+=35;save();update();say(tr('Dzik pokonany: +20 monet, +35 XP.'))}
 }
 function interact(){
  if(activePanel)return;
  if(net.room){let target=null,d=75;for(const o of O){const q=distance(P,o);if(q<d){d=q;target=o}}return roomAction({kind:'interact',...(target?{target:target.id}:{})})}
+ if(distance(P,activityRules.BOARD)<95)return toggle('workPanel',1);
+ const garden=activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y));if(campActivities.completed>=3&&garden&&distance(P,garden)<95)return collectGarden();
  if(distance(P,leon)<110)return toggle('shop',1);
  if(distance(P,nela)<110){
   if(treasure&&!returned){returned=1;coins+=250;xpv+=300;save();say(tr('Nela: Skarb odnaleziony! +250 monet, +300 XP.'))}return toggle('nelaPanel',1);
@@ -719,7 +749,7 @@ function interact(){
  if(!target)return say(tr('Podejdź do zasobu, mieszkańca albo ogniska.'));
  if(--target.hp>0){target.shakeUntil=Date.now()+150;return say(tr('Jeszcze jedno uderzenie.'))}
  O.splice(O.indexOf(target),1);
- let found;if(target.t==='tree'){wood+=2;found=tr('2 drewna')}else if(target.t==='rock'){stone++;found=tr('1 kamień')}else if(target.t==='shell'){shells++;found=tr('1 muszelka')}else{food++;found=tr('1 kokos')}
+ let found;if(target.t==='tree'){wood+=2;activityRules.recordWork(campActivities,'wood',2);found=tr('2 drewna')}else if(target.t==='rock'){stone++;activityRules.recordWork(campActivities,'stone',1);found=tr('1 kamień')}else if(target.t==='shell'){shells++;activityRules.recordWork(campActivities,'shells',1);found=tr('1 muszelka')}else{food++;activityRules.recordWork(campActivities,'food',1);found=tr('1 kokos')}
  xpv+=10;coins+=2;save();update();say(tr('Zebrano: ')+found+'.');
 }
 function goFish(){
@@ -734,21 +764,21 @@ function upgradeBase(level){
  if(net.room)return roomAction({kind:'base',level});
  if(level!==baseLevel+1)return say(tr('Zbuduj kolejno poziomy L1, L2 i L3.'));if(level===1&&sea(P.x,P.y))return say(tr('Bazę zbuduj na lądzie.'));
  const w=[0,12,18,28][level],s=[0,8,12,18][level],c=[0,0,50,100][level];
- if(wood<w||stone<s||coins<c)return say(tr('Brakuje materiałów lub monet.'));wood-=w;stone-=s;coins-=c;baseLevel=level;
- if(!basePos){basePos={x:P.x+70,y:P.y+20};if(sea(basePos.x,basePos.y))basePos={x:P.x,y:P.y}}
+ if(wood<w||stone<s||coins<c)return say(tr('Brakuje materiałów lub monet.'));const site=basePos||activityRules.baseSite(P,(x,y)=>!sea(x,y));if(!site)return say(tr('Znajdź większy kawałek lądu pod bazę.'));wood-=w;stone-=s;coins-=c;baseLevel=level;
+ basePos=site;prepareBasePlot();
  xpv+=level*100;toggle('basePanel',0);save();update();say(tr('Baza L')+level+tr(' gotowa! W pobliżu jesteś bezpieczny przed dzikami.'));
 }
 function nearFire(){const f=firePosition();return campfire&&f&&distance(P,f)<150}
 function buildFire(){
  if(net.room)return roomAction({kind:'fire'});
  if(campfire)return say(tr('Ognisko już płonie.'));if(!baseLevel)return say(tr('Najpierw zbuduj bazę L1.'));
- if(distance(P,basePos)>150)return say(tr('Wróć do swojej bazy, żeby rozpalić ognisko.'));if(wood<4||stone<2)return say(tr('Potrzebujesz 4 drewna i 2 kamieni.'));
+ if(!activityRules.inBase(P,basePos,baseLevel,120))return say(tr('Wróć do swojej bazy, żeby rozpalić ognisko.'));if(wood<4||stone<2)return say(tr('Potrzebujesz 4 drewna i 2 kamieni.'));
  wood-=4;stone-=2;campfire=1;xpv+=40;save();update();say(tr('Ognisko płonie. Możesz piec ryby i odpoczywać.'));
 }
 function cookFish(){
  if(net.room)return roomAction({kind:'cook'});
  if(!nearFire())return say(tr('Podejdź do rozpalonego ogniska przy bazie.'));if(fish<1||wood<1)return say(tr('Potrzebujesz surowej ryby i 1 drewna.'));
- fish--;wood--;cookedFish++;xpv+=10;save();update();say(tr('Ryba upieczona! Znajdziesz ją w plecaku.'));
+ fish--;wood--;cookedFish++;activityRules.recordWork(campActivities,'cookedFish',1);xpv+=10;save();update();say(tr('Ryba upieczona! Znajdziesz ją w plecaku.'));
 }
 function eat(kind){
  if(net.room)return roomAction({kind:'eat',item:kind});
@@ -784,9 +814,41 @@ function deliverQuest(key){
  questsDone[key]=1;save();update();say(tr('Dostawa przyjęta! Otrzymujesz monety i XP.'));
 }
 function done(text){toggle('craft',0);xpv+=40;save();update();say(text)}
+function prepareBasePlot(){
+ const bank=gameState(),removed=activityRules.clearBasePlot(bank,O),set=new Set(removed);applyBank(bank);if(removed.length)O.splice(0,O.length,...O.filter(o=>!set.has(o)));
+ P=activityRules.releasePlayer(P,activityRules.sceneSolids(O,basePos,baseLevel),p=>p.x>=60&&p.x<=4540&&p.y>=60&&p.y<=2840&&(!deep(p.x,p.y)||raft));
+}
+function goalDirection(point){
+ let dx=point.x-P.x,dy=point.y-P.y;if(islandView?.enabled){const r=islandView.vector(1,0),d=islandView.vector(0,1);[dx,dy]=[dx*r.x+dy*r.y,dx*d.x+dy*d.y]}
+ const arrow=['→','↘','↓','↙','←','↖','↑','↗'][(Math.round(Math.atan2(dy,dx)/(Math.PI/4))+8)%8];return arrow+' '+Math.round(distance(P,point)/80)+' m';
+}
+function jobProgress(job){const icons={wood:'🪵',stone:'🪨',cookedFish:'🍽️',shells:'🐚',food:'🥥'};return Object.entries(job.needs).map(([key,qty])=>icons[key]+' '+(campActivities.progress[key]||0)+'/'+qty).join(' · ')}
+function workAction(mode,item){
+ if(net.room)return roomAction({kind:'work',mode,item});
+ if(mode==='accept'){if(!activityRules.acceptWork(campActivities,item))return say(tr('Najpierw ukończ lub anuluj obecne zlecenie.'));toggle('workPanel',0);say(tr('Zlecenie przyjęte. Postęp widać na tablicy.'))}
+ else if(mode==='cancel'){campActivities.active=null;campActivities.progress={};say(tr('Zlecenie anulowane. Zasoby pozostają w plecaku.'))}
+ else if(mode==='deliver'){const bank=gameState();if(!activityRules.deliverWork(campActivities,bank,P))return say(tr('Zbierz wymagane zasoby po przyjęciu zlecenia i podejdź do odbiorcy.'));applyBank(bank);say(tr('Zlecenie wykonane! Zapłata i XP są w plecaku.'))}
+ else return;save();update();
+}
+function nearGarden(){const p=activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y));return p&&distance(P,p)<100}
+function collectGarden(){if(net.room)return roomAction({kind:'garden'});const bank=gameState();if(!activityRules.harvestGarden(campActivities,bank,P,(x,y)=>!sea(x,y)))return say(tr('Ogródek daje plony po ukończeniu kolejnego zlecenia. Podejdź do niego.'));applyBank(bank);save();update();say(tr('Zebrano 2 kokosy z ogródka.'))}
+function startRace(){if(net.room)return roomAction({kind:'race',mode:'start'});if(raceRun)return;if(distance(P,activityRules.BOARD)>=110)return say(tr('Podejdź do tablicy zleceń, żeby rozpocząć bieg.'));raceRun={next:0,elapsed:0};toggle('workPanel',0);say(tr('Bieg rozpoczęty! Odwiedź punkty po kolei.'))}
+function cancelRace(){if(net.room)return roomAction({kind:'race',mode:'cancel'});raceRun=null;update();say(tr('Bieg zakończony bez wyniku.'))}
+function updateWorkUI(){
+ const job=activityRules.JOBS[campActivities.active],n=campActivities.completed;
+ $('workTitle').textContent=job?tr(job.title):tr('Wybierz pracę dla siebie.');$('workDescription').textContent=job?tr(job.description):tr('Liczą się zasoby zebrane lub potrawy przygotowane po przyjęciu zlecenia.');
+ $('workProgress').textContent=job?jobProgress(job):'';$('workDestination').textContent=job?(job.npc===activityRules.NELA?'Nela':'Leon')+' · '+goalDirection(job.npc)+' · 🪙 '+job.coins+' · ⭐ '+job.xp:'';
+ $('workDeliver').style.display=$('workCancel').style.display=job?'':'none';$('jobChoices').style.display=job?'none':'';$('workDeliver').disabled=!job||!activityRules.workReady(campActivities,gameState())||distance(P,job.npc)>=110;
+ $('campRank').textContent=tr('Ukończone zlecenia: ')+n;
+ $('unlockLamp').textContent=(n>=1?'✓ ':'🔒 ')+tr('1 zlecenie: oświetlenie bazy');$('unlockGarden').textContent=(n>=3?'✓ ':'🔒 ')+tr('3 zlecenia: ogródek z plonami');$('unlockFlag').textContent=(n>=6?'✓ ':'🔒 ')+tr('6 zleceń: flaga obozu');
+ $('gardenHarvest').disabled=n<3||campActivities.gardenClaimed>=n||!nearGarden();
+ $('raceStart').disabled=!!raceRun||distance(P,activityRules.BOARD)>=110;$('raceCancel').style.display=raceRun?'':'none';
+ $('raceStatus').textContent=raceRun?tr('Punkt ')+(raceRun.next+1)+'/4 · '+(raceRun.elapsed/1000).toFixed(1)+' s · '+goalDirection(activityRules.COURSE[raceRun.next]):tr('Tablica startowa: ')+goalDirection(activityRules.BOARD);
+ $('raceRecord').textContent=campActivities.bestMs?tr('Rekord: ')+(campActivities.bestMs/1000).toFixed(1)+' s':tr('Ukończ bieg, żeby ustanowić rekord.');
+}
 function toggle(id,on){if(!panels.includes(id)||cloud.resetting)return;if(net.joining&&!net.room&&(id!=='roomPanel'||!on))cancelRoomJoin();for(const name of panels)$(name).style.display='none';activePanel=on?id:null;if(on)$(id).style.display='block';pad.capture=null;focusPadButton(null);resetInput();if(id==='controllerPanel')updatePadUI();if(id==='roomPanel')updateRoomUI();if(on&&padDevice)focusPadMenu();update()}
 function update(){
- updateCloudUI();
+ updateCloudUI();updateWorkUI();
  for(const id of ['newSoloStart','newSoloButton','newSoloPad'])$(id).style.display=net.room?'none':'';
  $('bagIntro').textContent=net.room?tr('Wspólne zasoby drużyny. Jedzenie leczy osobę, która je zjada.'):tr('Zjedz coś przed kolejną wyprawą.');$('baseIntro').textContent=net.room?tr('Wspólna baza i ognisko całej drużyny.'):tr('Twoje miejsce odpoczynku.');
  const values={hp:Math.round(health),en:Math.round(energy),xp:xpv,co:coins,wo:wood,st:stone,fo:food,sh:shells,fi:fish+cookedFish,bl:baseLevel,baseLevel,bw:wood,bs:stone,bf:food,bsh:shells,bfi:fish,bcf:cookedFish,bp:spear?spearStowed?tr('schowana'):tr('w ręce'):tr('brak'),br:rod?tr('jest'):tr('brak'),bra:raft?tr('jest'):tr('brak'),bt:treasure?tr('zdobyty'):tr('brak'),shopCoins:coins};
@@ -807,8 +869,11 @@ function update(){
  else if(!treasure){text=tr('Przeszukaj Wyspę Skarbu.');detail=tr('Znajdź skrzynię i użyj DZIAŁAJ.')}
  else if(!returned){text=tr('Wróć do Neli.');detail=tr('Czeka w Północnej Zatoce.')}
  else{title=tr('Żywa wyspa');text=questsDone.fish&&questsDone.supplies?tr('Mieszkańcy dziękują za pomoc!'):tr('Pomóż mieszkańcom.');detail=tr('Nela potrzebuje ryb, Leon materiałów. Rozwijaj bazę.')}
+ if(raceRun){title=tr('Bieg po wyspie');text=tr('Punkt ')+(raceRun.next+1)+'/4 · '+(raceRun.elapsed/1000).toFixed(1)+' s';detail=goalDirection(activityRules.COURSE[raceRun.next])}
+ else if(campActivities.active){const job=activityRules.JOBS[campActivities.active];title=tr(job.title);text=jobProgress(job);detail=activityRules.workReady(campActivities,gameState())?tr('Dostarcz i odbierz zapłatę')+' · '+goalDirection(job.npc):tr(job.description)}
+ else if(!baseLevel||returned){title=tr('Praca i przygody');text=tr('Zajrzyj na tablicę zleceń.');detail=tr('Wybierz pracę albo bieg. Rozwijaj obóz.')}
  $('qt').textContent=title;$('qx').textContent=text;$('qp').textContent=detail;
- let hint='';if(!activePanel){if(distance(P,leon)<110)hint=tr('Leon: handel i dostawa · DZIAŁAJ');else if(distance(P,nela)<110)hint=tr('Nela: zadania · DZIAŁAJ');else if(nearFire())hint=tr('Ognisko: gotuj i odpoczywaj · DZIAŁAJ');else if(O.some(o=>distance(P,o)<75))hint=tr('Zasób w zasięgu · DZIAŁAJ')}
+ let hint='';if(!activePanel){if(distance(P,activityRules.BOARD)<95)hint=tr('Tablica zleceń i bieg · DZIAŁAJ');else if(campActivities.completed>=3&&nearGarden())hint=tr('Ogródek · DZIAŁAJ');else if(distance(P,leon)<110)hint=tr('Leon: handel i dostawa · DZIAŁAJ');else if(distance(P,nela)<110)hint=tr('Nela: zadania · DZIAŁAJ');else if(nearFire())hint=tr('Ognisko: gotuj i odpoczywaj · DZIAŁAJ');else if(O.some(o=>distance(P,o)<75))hint=tr('Zasób w zasięgu · DZIAŁAJ')}
  $('hint').textContent=hint;$('hint').style.display=hint?'block':'none';
  document.querySelector('.act').textContent=!activePanel&&(distance(P,leon)<110||distance(P,nela)<110)?tr('POROZMAWIAJ'):tr('DZIAŁAJ');
 }
@@ -826,13 +891,13 @@ function loadSoloState(d){
   spear=!!d.spear;rod=!!d.rod;raft=!!d.raft;treasure=!!d.treasure;secondFound=!!d.secondFound;returned=!!d.returned;baseLevel=Math.min(3,n('baseLevel'));campfire=!!d.campfire;
   basePos=d.basePos&&Number.isFinite(d.basePos.x)&&Number.isFinite(d.basePos.y)?{x:d.basePos.x,y:d.basePos.y}:null;
   if(baseLevel&&!basePos)basePos={x:1500,y:1100};
-  questsDone={fish:!!d.questsDone?.fish,supplies:!!d.questsDone?.supplies};
+  questsDone={fish:!!d.questsDone?.fish,supplies:!!d.questsDone?.supplies};campActivities=activityRules.activities(d.activities);raceRun=null;
  }catch(e){}
 }
 function applySoloSnapshot(state){
  loadSoloState(state);populateSoloWorld();const w=state?.world;
  if(w&&Array.isArray(w.resources)&&w.resources.length<=303&&Array.isArray(w.enemies)&&w.enemies.length<=6){O.splice(0,O.length,...copyState(w.resources));E.splice(0,E.length,...copyState(w.enemies));if(Number.isInteger(w.seed))seed=w.seed;if(['up','down','left','right'].includes(w.face))face=w.face}
- resting=0;moving=false;walkPhase=0;hitFlash=0;lastAttack=0;resetInput();lastAutosave=performance.now();update();
+ prepareBasePlot();resting=0;moving=false;walkPhase=0;hitFlash=0;lastAttack=0;resetInput();lastAutosave=performance.now();update();
 }
 function load(){
  if(cloud.session){if(cloud.cache?.state)applySoloSnapshot(cloud.cache.state);return}
@@ -953,7 +1018,7 @@ async function restartCloudSoloGame(fresh){
   cloud.revision=data.save.revision;cloud.updatedAt=data.save.updatedAt;cloud.cache={state:data.save.state,revision:cloud.revision,updatedAt:cloud.updatedAt,dirty:false,pending:null};persistCloudCache();applySoloSnapshot(data.save.state);blocking=lastAttack=hitFlash=walkPhase=0;lastTime=0;cloud.error='';$('start').style.display='none';play=1;cloud.resetting=false;toggle('newGamePanel',0);draw();say(tr('Nowa przygoda zapisana na koncie!'));
  }catch(error){$('newGameError').textContent=tr(error.message||tr('Nie udało się rozpocząć nowej gry. Obecny postęp został zachowany.'))}finally{cloud.resetting=false;for(const b of $('newGamePanel').querySelectorAll('button'))b.disabled=false;updateCloudUI()}
 }
-function sceneState(){return {labels:{leon:tr('LEON · HANDEL'),nela:tr('NELA · ZADANIA')},P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear:hasEquippedSpear(),spearOwned:!!spear,objects:O,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):[]}}
+function sceneState(){return {labels:{leon:tr('LEON · HANDEL'),nela:tr('NELA · ZADANIA'),board:tr('PRACA I ZABAWA'),finish:tr('META')},P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear:hasEquippedSpear(),spearOwned:!!spear,activities:campActivities,garden:activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y)),board:activityRules.BOARD,trail:raceRun?activityRules.COURSE[raceRun.next]:null,trailNumber:raceRun?raceRun.next+1:0,objects:O,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):[]}}
 function updateView(){const active=!!islandView?.enabled;$('world3d').style.display=active?'block':'none';C.style.display=active?'none':'block';$('viewButton').textContent=active?tr('Widok 3D'):tr('Widok 2D');$('viewButton').setAttribute('aria-pressed',String(active));$('cameraLeft').disabled=$('cameraRight').disabled=!active;$('viewHelp').textContent=active?tr('WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera'):tr('WASD / strzałki · E działaj · Shift sprint · spacja atak')}
 function switchView(){if(!islandView)return;preferredView=islandView.enabled?'2d':'3d';islandView.setEnabled(preferredView==='3d');viewHeading=null;resetInput();try{localStorage.setItem('myIslandViewV1',preferredView)}catch(e){}updateView()}
 function orbitView(amount){if(islandView?.enabled)islandView.orbit(amount)}

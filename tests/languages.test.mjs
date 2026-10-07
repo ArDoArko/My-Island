@@ -56,7 +56,7 @@ for (const [index, code] of languageCodes.entries()) test(code + ': all screens 
   assert.equal(g.run('JSON.stringify(soloSnapshot())'), before);
   assert.deepEqual(g.stored(), { ...stored, myIslandLanguageV1: code });
   assert.equal(g.requests.length, 0);
-  for (const id of ['bag', 'craft', 'basePanel', 'shop', 'nelaPanel', 'roomPanel', 'controllerPanel', 'accountPanel']) {
+  for (const id of ['bag', 'craft', 'basePanel', 'shop', 'nelaPanel', 'roomPanel', 'controllerPanel', 'accountPanel', 'workPanel']) {
     g.run("toggle('" + id + "',1)");
     assert.equal(g.element(id).style.display, 'block');
     for (const element of g.element(id).querySelectorAll('[data-i18n]')) assert.equal(element.textContent, catalog.get(element.dataset.i18n)[index]);
@@ -131,16 +131,24 @@ test('translated gameplay keeps gathering, crafting and old-save migration intac
   g.run('wood=30;stone=12;shells=9;craftSpear();craftRod();craftRaft()');
   assert.equal(g.run('!!(spear&&rod&&raft)'), true);
   assert.equal(g.run('shells'), 1);
+  const baseline = game();baseline.run('startGame()');
+  const value = save => {
+    const totals = Object.fromEntries(['wood','stone','food','shells'].map(key => [key,save[key]]));
+    for (const resource of save.world.resources) totals[resource.t === 'tree' ? 'wood' : resource.t === 'rock' ? 'stone' : resource.t === 'shell' ? 'shells' : 'food'] += resource.t === 'tree' ? 2 : 1;
+    return totals;
+  };
+  const expected = value(baseline.run('soloSnapshot()'));
+  for (const [key,amount] of Object.entries({wood:32,stone:9,food:5,shells:2})) expected[key] += amount;
   const old = game({ preferred: ['nl-NL'], storage: { myIsland09: JSON.stringify({ wood: 32, stone: 9, food: 8, fish: 3, shells: 2, coins: 450, xpv: 1200, health: 60, energy: 70, baseLevel: 2, rod: 1, raft: 1 }) } });
   old.run('startGame();save()');
-  assert.equal(old.run('food'), 5);
+  assert.deepEqual(value(old.run('soloSnapshot()')),expected,'Expanded base conserves inventory plus resources on the island');
   assert.equal(old.run('totalCaught'), 3);
   assert.equal(old.run('coins'), 450);
   const reloaded = game({ storage: old.stored() });
   reloaded.run('startGame()');
-  assert.equal(reloaded.run('food'), 5);
+  assert.deepEqual(value(reloaded.run('soloSnapshot()')),expected,'Reload must never pay for cleared resources a second time');
   assert.equal(reloaded.run('gameState().version'), 10);
-  for (const item of [g, old, reloaded]) item.close();
+  for (const item of [g, baseline, old, reloaded]) item.close();
 });
 
 test('3D labels follow language while view, ground contact and camera controls remain compatible', () => {

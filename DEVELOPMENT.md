@@ -1,4 +1,16 @@
-# My Island 0.15.1
+# My Island 0.16
+
+## A usable camp and things to do
+
+The base now has a walkable entrance and a larger floor, walls and roof. Its saved anchor stays in place; the entrance faces the nearby residents. Wall collisions, doorway clearance, rocks, palms, the trading stall and wildlife use `island-play.mjs`, shared byte-for-byte with the room server. Movement is swept in small steps and can slide along an obstacle. Existing players embedded in the old geometry are released onto nearby free ground. The 3D floor, walls and doorway use the same layout; the cutaway roof clears the human avatar. A coastal legacy base may have no safe garden location, which both gameplay and rendering handle.
+
+Expanding an existing base can cover old resources. Those resources are moved once into the shared inventory with their normal value, rather than silently disappearing. This does not grant work credit, experience or money. Reopening a save or room must not repeat the transfer. Banks, base level and location, quests, accounts and ownership otherwise remain intact.
+
+PRACA I ZABAWA opens the job board. Three repeatable jobs ask players to gather wood and stone for Leon, cook fish for Nela, or collect shells and coconuts for Leon. Only gathering or cooking after accepting a job counts toward its progress. Delivery consumes the requested inventory near the named resident and pays once. Solo progress is saved; online progress and rewards are shared by all four players. Concurrent deliveries and request retries cannot duplicate a reward.
+
+The board also starts an ordered four-point island run. Its timer pauses in menus and when the game loses focus. The first finish pays a shared reward, subsequent runs can improve the record. An unfinished run is temporary and cancelling it does not count as a finish. Completed jobs gradually decorate the camp: lamps after one, a garden after three and a flag after six. A nearby player can harvest the garden once after each additional completed job. These additions are the requested small playable camp loop, not the later exploration, character-customization or chat stages below.
+
+New optional `activities` fields fit inside save format 10 and room protocol 11. Account protocol stays 12. The account server preserves existing activity progress when an older client omits those fields; an explicit fresh activity state still supports the existing New Game action. The authoritative server must be published before the matching frontend so older clients continue to work during deployment.
 
 ## Interaction and wildlife patch
 
@@ -10,7 +22,9 @@ Near Nela or Leon the action button reads TALK (translated into all six language
 
 ## Build and publish
 
-Run `npm ci` and `npm run verify` after editing the renderer or translations. Commit sources, catalogs, package lock and both generated bundles together. GitHub Pages serves `index.html`, `island3d.bundle.js` and `i18n.bundle.js` from the main branch root. The graphics bundle includes Three.js 0.180.0, so the game makes no runtime requests for a graphics library, models or textures. See `THIRD_PARTY_NOTICES.txt` for its MIT license. The translation bundle loads synchronously before the existing game script and contains every language; changing language needs no network request.
+Run `npm ci` and `npm run verify` after editing gameplay, the renderer or translations. Commit sources, catalogs, package lock and generated bundles together. GitHub Pages serves `index.html`, `island3d.bundle.js`, `i18n.bundle.js`, `wildlife.bundle.js` and `island-play.bundle.js` from the main branch root. The graphics bundle includes Three.js 0.180.0, so the game makes no runtime requests for a graphics library, models or textures. See `THIRD_PARTY_NOTICES.txt` for its MIT license. The translation bundle loads synchronously before the existing game script and contains every language; changing language needs no network request.
+
+`tests/adventures.test.mjs` checks the actual base meshes and headroom against collision geometry, swept movement, legacy resource conservation, jobs, delivery and cancellation, race order and pause, garden rewards, reload persistence and controller/menu behavior. The backend runs `node --test tests/*.test.mjs`, `node tests/accounts.integration.mjs` against the real account route in a local Worker with D1, and `node tests/rooms.integration.mjs /absolute/path/to/My-Island` against the real room route with SQLite and four current frontend runtimes. Those integration fixtures exercise optimistic transactions, concurrent rewards, old account clients, session recovery and restoration of each player's solo save. They create only local disposable test accounts, never accounts on the public service.
 
 ## Six languages
 

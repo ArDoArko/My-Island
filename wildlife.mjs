@@ -17,9 +17,20 @@ function segmentDistance(a, b, circle) {
   return Math.hypot(a.x + t * dx - circle.x, a.y + t * dy - circle.y);
 }
 
-export function wildlifeNavigation(objects, isLand) {
-  const solids = objects.filter(o => obstacleRadius(o)).map(o => ({ x: o.x, y: o.y, radius: obstacleRadius(o) }));
-  const key = solids.map(o => `${o.x},${o.y},${o.radius}`).join('|');
+export function wildlifeNavigation(objects, isLand, buildings = {}) {
+  const solids = [...objects.filter(o => obstacleRadius(o)).map(o => ({ x: o.x, y: o.y, radius: obstacleRadius(o) })),...(buildings.circles||[])];
+  const rects=buildings.rects||[];
+  const key = solids.map(o => `${o.x},${o.y},${o.radius}`).join('|')+JSON.stringify(rects);
+  const hitsRect=(point,r,radius)=>Math.hypot(Math.max(0,Math.abs(point.x-r.x)-r.w/2),Math.max(0,Math.abs(point.y-r.y)-r.h/2))<radius+EPSILON;
+  function segmentHitsRect(a,b,r,radius){
+    let lo=0,hi=1;
+    for(const [axis,size] of [['x','w'],['y','h']]){
+      const half=r[size]/2+radius+EPSILON,d=b[axis]-a[axis],min=r[axis]-half,max=r[axis]+half;
+      if(Math.abs(d)<1e-9){if(a[axis]<min||a[axis]>max)return false;continue}
+      const one=(min-a[axis])/d,two=(max-a[axis])/d;lo=Math.max(lo,Math.min(one,two));hi=Math.min(hi,Math.max(one,two));if(lo>hi)return false;
+    }
+    return true;
+  }
   function onLand(point) {
     for (let i = 0; i < 8; i++) {
       const a = i * Math.PI / 4;
@@ -28,10 +39,10 @@ export function wildlifeNavigation(objects, isLand) {
     return isLand(point.x, point.y);
   }
   function walkable(point) {
-    return onLand(point) && solids.every(o => distance(point, o) >= o.radius + BOAR_RADIUS + EPSILON);
+    return onLand(point) && solids.every(o => distance(point, o) >= o.radius + BOAR_RADIUS + EPSILON)&&rects.every(r=>!hitsRect(point,r,BOAR_RADIUS));
   }
   function clear(a, b, radius = BOAR_RADIUS) {
-    if (solids.some(o => segmentDistance(a, b, o) < o.radius + radius + EPSILON)) return false;
+    if (solids.some(o => segmentDistance(a, b, o) < o.radius + radius + EPSILON)||rects.some(r=>segmentHitsRect(a,b,r,radius))) return false;
     if (!radius) return true;
     const count = Math.max(1, Math.ceil(distance(a, b) / 8));
     for (let i = 0; i <= count; i++) {

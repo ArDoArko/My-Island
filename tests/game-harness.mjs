@@ -5,6 +5,7 @@ import { JSDOM } from 'jsdom';
 export const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const translations = readFileSync(new URL('../i18n.bundle.js', import.meta.url), 'utf8');
 const wildlife = readFileSync(new URL('../wildlife.bundle.js', import.meta.url), 'utf8');
+const activities = readFileSync(new URL('../island-play.bundle.js', import.meta.url), 'utf8');
 const gameScript = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 
 // This runs the real DOM and game script with local fixtures. It never contacts
@@ -49,6 +50,7 @@ export function game({ storage = {}, preferred = ['pl-PL'], storageBlocked = fal
   if (storageBlocked) Object.defineProperty(window, 'localStorage', { get() { throw new Error('Storage blocked'); } });
   window.eval(translations);
   window.eval(wildlife);
+  window.eval(activities);
   const context = dom.getInternalVMContext();
   runInContext(gameScript, context);
   for (const element of window.document.querySelectorAll('[onclick],[onchange],[onsubmit]')) {

@@ -3304,16 +3304,36 @@
     "My Island 0.15.1 — Tu isla"
   ],
   [
-    "Schowaj włócznię", "Stow spear", "Speer opbergen", "Speer wegstecken", "Ranger la lance", "Guardar lanza"
+    "Schowaj włócznię",
+    "Stow spear",
+    "Speer opbergen",
+    "Speer wegstecken",
+    "Ranger la lance",
+    "Guardar lanza"
   ],
   [
-    "Wyciągnij włócznię", "Draw spear", "Speer pakken", "Speer ziehen", "Sortir la lance", "Sacar lanza"
+    "Wyciągnij włócznię",
+    "Draw spear",
+    "Speer pakken",
+    "Speer ziehen",
+    "Sortir la lance",
+    "Sacar lanza"
   ],
   [
-    "schowana", "stowed", "opgeborgen", "weggesteckt", "rangée", "guardada"
+    "schowana",
+    "stowed",
+    "opgeborgen",
+    "weggesteckt",
+    "rangée",
+    "guardada"
   ],
   [
-    "w ręce", "in hand", "in de hand", "in der Hand", "en main", "en la mano"
+    "w ręce",
+    "in hand",
+    "in de hand",
+    "in der Hand",
+    "en main",
+    "en la mano"
   ],
   [
     "H: schowaj lub wyciągnij. ATAK wyciąga włócznię.",
@@ -3332,10 +3352,20 @@
     "Lanza guardada. Sigue en tu mochila."
   ],
   [
-    "Włócznia w ręce.", "Spear in hand.", "Speer in de hand.", "Speer in der Hand.", "Lance en main.", "Lanza en la mano."
+    "Włócznia w ręce.",
+    "Spear in hand.",
+    "Speer in de hand.",
+    "Speer in der Hand.",
+    "Lance en main.",
+    "Lanza en la mano."
   ],
   [
-    "POROZMAWIAJ", "TALK", "PRATEN", "SPRECHEN", "PARLER", "HABLAR"
+    "POROZMAWIAJ",
+    "TALK",
+    "PRATEN",
+    "SPRECHEN",
+    "PARLER",
+    "HABLAR"
   ],
   [
     "Kod pokoju skopiowany: ",
@@ -3632,5 +3662,477 @@
     "Neues Abenteuer im Konto gespeichert!",
     "Nouvelle aventure sauvegardée sur votre compte !",
     "¡Nueva aventura guardada en tu cuenta!"
+  ],
+  [
+    "My Island 0.16 — Twoja wyspa",
+    "My Island 0.16 — Your island",
+    "My Island 0.16 — Jouw eiland",
+    "My Island 0.16 — Deine Insel",
+    "My Island 0.16 — Votre île",
+    "My Island 0.16 — Tu isla"
+  ],
+  [
+    "0.16 • Praca i przygody",
+    "0.16 • Work and adventures",
+    "0.16 • Werk en avontuur",
+    "0.16 • Arbeit und Abenteuer",
+    "0.16 • Travail et aventures",
+    "0.16 • Trabajo y aventuras"
+  ],
+  [
+    "PRACA I ZABAWA",
+    "WORK AND FUN",
+    "WERK EN PLEZIER",
+    "ARBEIT UND SPASS",
+    "TRAVAIL ET LOISIRS",
+    "TRABAJO Y DIVERSIÓN"
+  ],
+  [
+    "Praca i przygody",
+    "Work and adventures",
+    "Werk en avontuur",
+    "Arbeit und Abenteuer",
+    "Travail et aventures",
+    "Trabajo y aventuras"
+  ],
+  [
+    "📋 PRACA I ZABAWA",
+    "📋 WORK AND FUN",
+    "📋 WERK EN PLEZIER",
+    "📋 ARBEIT UND SPASS",
+    "📋 TRAVAIL ET LOISIRS",
+    "📋 TRABAJO Y DIVERSIÓN"
+  ],
+  [
+    "📋 Praca i przygody",
+    "📋 Work and adventures",
+    "📋 Werk en avontuur",
+    "📋 Arbeit und Abenteuer",
+    "📋 Travail et aventures",
+    "📋 Trabajo y aventuras"
+  ],
+  [
+    "Wybierz zajęcie. Zlecenia można powtarzać, a online pomagacie sobie całą drużyną. Postęp pracy i rekord biegu są zapisywane.",
+    "Choose an activity. Jobs can be repeated, and online the whole team can help. Job progress and your race record are saved.",
+    "Kies een activiteit. Je kunt opdrachten herhalen en online helpt het hele team mee. Je voortgang en looprecord worden opgeslagen.",
+    "Wähle eine Aktivität. Aufträge sind wiederholbar, und online hilft das ganze Team. Auftragsfortschritt und Laufrekord werden gespeichert.",
+    "Choisissez une activité. Les missions sont répétables et toute l’équipe peut aider en ligne. La progression et le record de course sont sauvegardés.",
+    "Elige una actividad. Puedes repetir los encargos y todo el equipo puede ayudar en línea. Se guardan el progreso y el récord de carrera."
+  ],
+  [
+    "Wybierz pracę dla siebie.",
+    "Choose a job.",
+    "Kies een opdracht.",
+    "Wähle einen Auftrag.",
+    "Choisissez une mission.",
+    "Elige un encargo."
+  ],
+  [
+    "Liczą się zasoby zebrane lub potrawy przygotowane po przyjęciu zlecenia.",
+    "Only resources gathered or food cooked after accepting the job count.",
+    "Alleen materialen die je verzamelt of eten dat je bereidt na het aannemen van de opdracht tellen mee.",
+    "Es zählen nur Ressourcen, die nach Auftragsannahme gesammelt werden, und danach zubereitete Gerichte.",
+    "Seuls les matériaux récoltés ou les plats préparés après avoir accepté la mission comptent.",
+    "Solo cuentan los recursos recogidos o la comida preparada después de aceptar el encargo."
+  ],
+  [
+    "Stolarz obozowy",
+    "Camp carpenter",
+    "Kamp-timmerman",
+    "Lagerzimmermann",
+    "Charpentier du camp",
+    "Carpintero del campamento"
+  ],
+  [
+    "🪵 Stolarz obozowy",
+    "🪵 Camp carpenter",
+    "🪵 Kamp-timmerman",
+    "🪵 Lagerzimmermann",
+    "🪵 Charpentier du camp",
+    "🪵 Carpintero del campamento"
+  ],
+  [
+    "Zbierz 8 drewna i 4 kamienie. Dostarcz je Leonowi.",
+    "Gather 8 wood and 4 stones. Deliver them to Leon.",
+    "Verzamel 8 hout en 4 stenen. Breng ze naar Leon.",
+    "Sammle 8 Holz und 4 Steine. Liefere sie an Leon.",
+    "Récoltez 8 bois et 4 pierres. Apportez-les à Leon.",
+    "Recoge 8 de madera y 4 piedras. Entrégaselas a Leon."
+  ],
+  [
+    "Kucharz wyspy",
+    "Island cook",
+    "Eilandkok",
+    "Inselkoch",
+    "Cuisinier de l’île",
+    "Cocinero de la isla"
+  ],
+  [
+    "🍳 Kucharz wyspy",
+    "🍳 Island cook",
+    "🍳 Eilandkok",
+    "🍳 Inselkoch",
+    "🍳 Cuisinier de l’île",
+    "🍳 Cocinero de la isla"
+  ],
+  [
+    "Upiecz 2 ryby przy ognisku. Dostarcz je Neli.",
+    "Cook 2 fish at the campfire. Deliver them to Nela.",
+    "Bak 2 vissen bij het kampvuur. Breng ze naar Nela.",
+    "Brate 2 Fische am Lagerfeuer. Liefere sie an Nela.",
+    "Faites cuire 2 poissons au feu de camp. Apportez-les à Nela.",
+    "Cocina 2 peces en la hoguera. Entrégaselos a Nela."
+  ],
+  [
+    "Opiekun plaży",
+    "Beach caretaker",
+    "Strandbeheerder",
+    "Strandwart",
+    "Gardien de la plage",
+    "Cuidador de la playa"
+  ],
+  [
+    "🐚 Opiekun plaży",
+    "🐚 Beach caretaker",
+    "🐚 Strandbeheerder",
+    "🐚 Strandwart",
+    "🐚 Gardien de la plage",
+    "🐚 Cuidador de la playa"
+  ],
+  [
+    "Zbierz 4 muszelki i 2 kokosy. Dostarcz je Leonowi.",
+    "Gather 4 shells and 2 coconuts. Deliver them to Leon.",
+    "Verzamel 4 schelpen en 2 kokosnoten. Breng ze naar Leon.",
+    "Sammle 4 Muscheln und 2 Kokosnüsse. Liefere sie an Leon.",
+    "Récoltez 4 coquillages et 2 noix de coco. Apportez-les à Leon.",
+    "Recoge 4 conchas y 2 cocos. Entrégaselos a Leon."
+  ],
+  [
+    "Podejmij pracę",
+    "Accept job",
+    "Opdracht aannemen",
+    "Auftrag annehmen",
+    "Accepter la mission",
+    "Aceptar encargo"
+  ],
+  [
+    "Dostarcz i odbierz zapłatę",
+    "Deliver and collect payment",
+    "Afleveren en betaling ontvangen",
+    "Liefern und Bezahlung erhalten",
+    "Livrer et recevoir le paiement",
+    "Entregar y cobrar"
+  ],
+  [
+    "Anuluj zlecenie",
+    "Cancel job",
+    "Opdracht annuleren",
+    "Auftrag abbrechen",
+    "Annuler la mission",
+    "Cancelar encargo"
+  ],
+  [
+    "Ukończone zlecenia: ",
+    "Completed jobs: ",
+    "Voltooide opdrachten: ",
+    "Erledigte Aufträge: ",
+    "Missions terminées : ",
+    "Encargos completados: "
+  ],
+  [
+    "🏡 Rozwój obozu",
+    "🏡 Camp improvements",
+    "🏡 Kamp uitbreiden",
+    "🏡 Lagerausbau",
+    "🏡 Améliorations du camp",
+    "🏡 Mejoras del campamento"
+  ],
+  [
+    "1 zlecenie: oświetlenie bazy",
+    "1 job: base lighting",
+    "1 opdracht: verlichting bij de basis",
+    "1 Auftrag: Beleuchtung der Basis",
+    "1 mission : éclairage de la base",
+    "1 encargo: iluminación de la base"
+  ],
+  [
+    "3 zlecenia: ogródek z plonami",
+    "3 jobs: a garden with crops",
+    "3 opdrachten: een tuin met oogst",
+    "3 Aufträge: Garten mit Ernte",
+    "3 missions : jardin avec récoltes",
+    "3 encargos: huerto con cosechas"
+  ],
+  [
+    "6 zleceń: flaga obozu",
+    "6 jobs: camp flag",
+    "6 opdrachten: kampvlag",
+    "6 Aufträge: Lagerflagge",
+    "6 missions : drapeau du camp",
+    "6 encargos: bandera del campamento"
+  ],
+  [
+    "Ogródek daje 2 kokosy po każdej kolejnej ukończonej pracy. Ulepszenia pojawią się przy twojej bazie.",
+    "The garden gives 2 coconuts after each additional completed job. Improvements appear beside your base.",
+    "De tuin geeft 2 kokosnoten na elke volgende voltooide opdracht. Verbeteringen verschijnen bij je basis.",
+    "Der Garten liefert nach jedem weiteren erledigten Auftrag 2 Kokosnüsse. Verbesserungen erscheinen an deiner Basis.",
+    "Le jardin donne 2 noix de coco après chaque nouvelle mission terminée. Les améliorations apparaissent près de votre base.",
+    "El huerto da 2 cocos después de cada nuevo encargo completado. Las mejoras aparecen junto a tu base."
+  ],
+  [
+    "Zbierz plony ogródka",
+    "Harvest garden",
+    "Tuin oogsten",
+    "Garten abernten",
+    "Récolter le jardin",
+    "Cosechar el huerto"
+  ],
+  [
+    "OGRÓDEK",
+    "GARDEN",
+    "TUIN",
+    "GARTEN",
+    "JARDIN",
+    "HUERTO"
+  ],
+  [
+    "🏁 Bieg po wyspie",
+    "🏁 Island race",
+    "🏁 Eilandloop",
+    "🏁 Insellauf",
+    "🏁 Course sur l’île",
+    "🏁 Carrera por la isla"
+  ],
+  [
+    "Bieg po wyspie",
+    "Island race",
+    "Eilandloop",
+    "Insellauf",
+    "Course sur l’île",
+    "Carrera por la isla"
+  ],
+  [
+    "Start przy tablicy obok obozu Leona. Odwiedź 3 oznaczone punkty po kolei i wróć na start. Pierwsze ukończenie: 90 monet i 120 XP. Potem ścigasz swój rekord.",
+    "Start at the board beside Leon’s camp. Visit 3 marked checkpoints in order, then return to the start. First finish: 90 coins and 120 XP. After that, beat your record.",
+    "Start bij het bord naast Leons kamp. Ga op volgorde langs 3 gemarkeerde punten en keer terug naar de start. Eerste finish: 90 munten en 120 XP. Daarna probeer je je record te verbeteren.",
+    "Starte an der Tafel neben Leons Lager. Besuche 3 markierte Punkte in Reihenfolge und kehre zum Start zurück. Erster Abschluss: 90 Münzen und 120 XP. Danach verbesserst du deinen Rekord.",
+    "Partez du panneau près du camp de Leon. Passez par 3 points balisés dans l’ordre, puis revenez au départ. Première arrivée : 90 pièces et 120 XP. Ensuite, battez votre record.",
+    "Empieza en el tablón junto al campamento de Leon. Visita 3 puntos marcados en orden y vuelve al inicio. Primera llegada: 90 monedas y 120 XP. Después intenta superar tu récord."
+  ],
+  [
+    "Rozpocznij bieg",
+    "Start race",
+    "Loop starten",
+    "Lauf starten",
+    "Démarrer la course",
+    "Empezar carrera"
+  ],
+  [
+    "Przerwij bieg",
+    "Cancel race",
+    "Loop afbreken",
+    "Lauf abbrechen",
+    "Abandonner la course",
+    "Cancelar carrera"
+  ],
+  [
+    "Punkt ",
+    "Checkpoint ",
+    "Controlepunt ",
+    "Kontrollpunkt ",
+    "Point ",
+    "Punto "
+  ],
+  [
+    "Tablica startowa: ",
+    "Starting board: ",
+    "Startbord: ",
+    "Starttafel: ",
+    "Panneau de départ : ",
+    "Tablón de salida: "
+  ],
+  [
+    "Rekord: ",
+    "Record: ",
+    "Record: ",
+    "Rekord: ",
+    "Record : ",
+    "Récord: "
+  ],
+  [
+    "Ukończ bieg, żeby ustanowić rekord.",
+    "Finish the race to set a record.",
+    "Voltooi de loop om een record neer te zetten.",
+    "Beende den Lauf, um einen Rekord aufzustellen.",
+    "Terminez la course pour établir un record.",
+    "Termina la carrera para establecer un récord."
+  ],
+  [
+    "META",
+    "FINISH",
+    "FINISH",
+    "ZIEL",
+    "ARRIVÉE",
+    "META"
+  ],
+  [
+    "Wybierz pracę albo bieg. Rozwijaj obóz.",
+    "Choose a job or a race. Improve your camp.",
+    "Kies een opdracht of een loop. Breid je kamp uit.",
+    "Wähle einen Auftrag oder einen Lauf. Baue dein Lager aus.",
+    "Choisissez une mission ou une course. Améliorez votre camp.",
+    "Elige un encargo o una carrera. Mejora tu campamento."
+  ],
+  [
+    "Zajrzyj na tablicę zleceń.",
+    "Visit the job board.",
+    "Bekijk het opdrachtenbord.",
+    "Sieh dir die Auftragstafel an.",
+    "Consultez le panneau des missions.",
+    "Consulta el tablón de encargos."
+  ],
+  [
+    "Tablica zleceń i bieg · DZIAŁAJ",
+    "Jobs and race board · ACT",
+    "Opdrachten- en loopbord · ACTIE",
+    "Auftrags- und Lauftafel · AKTION",
+    "Missions et course · AGIR",
+    "Encargos y carrera · ACTUAR"
+  ],
+  [
+    "Ogródek · DZIAŁAJ",
+    "Garden · ACT",
+    "Tuin · ACTIE",
+    "Garten · AKTION",
+    "Jardin · AGIR",
+    "Huerto · ACTUAR"
+  ],
+  [
+    "Wspólna baza L",
+    "Shared base L",
+    "Gezamenlijke basis L",
+    "Gemeinsame Basis L",
+    "Base commune N",
+    "Base compartida N"
+  ],
+  [
+    "Zebrano dla drużyny: ",
+    "Gathered for the team: ",
+    "Verzameld voor het team: ",
+    "Für das Team gesammelt: ",
+    "Récolté pour l’équipe : ",
+    "Recogido para el equipo: "
+  ],
+  [
+    "Najpierw ukończ lub anuluj obecne zlecenie.",
+    "Finish or cancel your current job first.",
+    "Voltooi of annuleer eerst je huidige opdracht.",
+    "Beende oder storniere zuerst den aktuellen Auftrag.",
+    "Terminez ou annulez d’abord la mission en cours.",
+    "Primero termina o cancela tu encargo actual."
+  ],
+  [
+    "Zlecenie przyjęte. Postęp widać na tablicy.",
+    "Job accepted. Track progress on the board.",
+    "Opdracht aangenomen. Je ziet de voortgang op het bord.",
+    "Auftrag angenommen. Der Fortschritt steht auf der Tafel.",
+    "Mission acceptée. La progression est affichée sur le panneau.",
+    "Encargo aceptado. Consulta el progreso en el tablón."
+  ],
+  [
+    "Zlecenie anulowane. Zasoby pozostają w plecaku.",
+    "Job cancelled. Your resources remain in your backpack.",
+    "Opdracht geannuleerd. Je materialen blijven in je rugzak.",
+    "Auftrag abgebrochen. Deine Ressourcen bleiben im Rucksack.",
+    "Mission annulée. Les ressources restent dans le sac à dos.",
+    "Encargo cancelado. Tus recursos siguen en la mochila."
+  ],
+  [
+    "Zbierz wymagane zasoby po przyjęciu zlecenia i podejdź do odbiorcy.",
+    "Gather the required resources after accepting the job and approach the recipient.",
+    "Verzamel de benodigde materialen nadat je de opdracht hebt aangenomen en loop naar de ontvanger.",
+    "Sammle die nötigen Ressourcen nach Auftragsannahme und gehe zum Empfänger.",
+    "Récoltez les ressources demandées après avoir accepté la mission et approchez du destinataire.",
+    "Recoge los recursos necesarios después de aceptar el encargo y acércate al destinatario."
+  ],
+  [
+    "Zlecenie wykonane! Zapłata i XP są w plecaku.",
+    "Job completed! Payment and XP have been added.",
+    "Opdracht voltooid! Je betaling en XP zijn toegevoegd.",
+    "Auftrag erledigt! Bezahlung und XP wurden hinzugefügt.",
+    "Mission terminée ! Le paiement et les XP ont été ajoutés.",
+    "¡Encargo completado! Se han añadido el pago y la XP."
+  ],
+  [
+    "Podejdź do tablicy zleceń, żeby rozpocząć bieg.",
+    "Approach the job board to start the race.",
+    "Loop naar het opdrachtenbord om de loop te starten.",
+    "Gehe zur Auftragstafel, um den Lauf zu starten.",
+    "Approchez du panneau des missions pour démarrer la course.",
+    "Acércate al tablón de encargos para empezar la carrera."
+  ],
+  [
+    "Bieg już trwa.",
+    "A race is already in progress.",
+    "Er is al een loop bezig.",
+    "Ein Lauf ist bereits aktiv.",
+    "Une course est déjà en cours.",
+    "Ya hay una carrera en curso."
+  ],
+  [
+    "Bieg rozpoczęty! Odwiedź punkty po kolei.",
+    "Race started! Visit the checkpoints in order.",
+    "Loop gestart! Bezoek de punten op volgorde.",
+    "Lauf gestartet! Besuche die Punkte in Reihenfolge.",
+    "Course démarrée ! Passez par les points dans l’ordre.",
+    "¡Carrera iniciada! Visita los puntos en orden."
+  ],
+  [
+    "Bieg ukończony! Rekord jest na tablicy.",
+    "Race finished! Your record is on the board.",
+    "Loop voltooid! Je record staat op het bord.",
+    "Lauf beendet! Dein Rekord steht auf der Tafel.",
+    "Course terminée ! Le record est sur le panneau.",
+    "¡Carrera terminada! El récord está en el tablón."
+  ],
+  [
+    "Bieg zakończony bez wyniku.",
+    "Race ended without a result.",
+    "Loop beëindigd zonder resultaat.",
+    "Lauf ohne Ergebnis beendet.",
+    "Course abandonnée sans résultat.",
+    "Carrera terminada sin resultado."
+  ],
+  [
+    "Ogródek daje plony po ukończeniu kolejnego zlecenia. Podejdź do niego.",
+    "The garden gives a harvest after the next completed job. Approach it to collect.",
+    "De tuin geeft oogst na de volgende voltooide opdracht. Loop ernaartoe om te oogsten.",
+    "Der Garten liefert nach dem nächsten erledigten Auftrag eine Ernte. Gehe zum Garten, um sie einzusammeln.",
+    "Le jardin donne une récolte après la prochaine mission terminée. Approchez-vous pour la ramasser.",
+    "El huerto da una cosecha tras el siguiente encargo completado. Acércate para recogerla."
+  ],
+  [
+    "Zebrano 2 kokosy z ogródka.",
+    "Collected 2 coconuts from the garden.",
+    "2 kokosnoten geoogst uit de tuin.",
+    "2 Kokosnüsse aus dem Garten geerntet.",
+    "2 noix de coco récoltées dans le jardin.",
+    "Se han recogido 2 cocos del huerto."
+  ],
+  [
+    "Znajdź większy kawałek lądu pod bazę.",
+    "Find a larger patch of land for your base.",
+    "Zoek een groter stuk land voor je basis.",
+    "Suche ein größeres Stück Land für deine Basis.",
+    "Trouvez un terrain plus grand pour votre base.",
+    "Busca un terreno más amplio para tu base."
+  ],
+  [
+    "Zamknij tablicę zleceń",
+    "Close job board",
+    "Opdrachtenbord sluiten",
+    "Auftragstafel schließen",
+    "Fermer le panneau des missions",
+    "Cerrar el tablón de encargos"
   ]
 ]

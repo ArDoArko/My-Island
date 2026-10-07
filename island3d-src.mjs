@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { BOARD, baseLayout } from './island-play.mjs';
 
 // Rendering only. Authoritative inventory, save ownership and room state stay in index.html.
 export const SCALE = 80;
@@ -20,6 +21,37 @@ export function cameraVector(x,y,yaw) {
 export function legPose(y,z) {
   const upper=.43,lower=.43,d=clamp(Math.hypot(y,z),.08,upper+lower-.005);
   return {hip:-Math.atan2(z,-y)-Math.acos(clamp((upper*upper+d*d-lower*lower)/(2*upper*d),-1,1)),knee:Math.PI-Math.acos(clamp((upper*upper+lower*lower-d*d)/(2*upper*lower),-1,1))};
+}
+export function baseElevation(layout){
+  if(!layout)return 0;
+  return Math.max(...[-1,0,1].flatMap(x=>[-1,0,1].map(y=>{const p=layout.point(x*layout.width/2,y*layout.depth/2);return terrainHeight(p.x/SCALE,p.y/SCALE)})));
+}
+export function walkSurface(x,z,layout,elevation=baseElevation(layout)){
+  const y=terrainHeight(x,z);if(!layout)return y;
+  const f=layout.floor;if(Math.abs(x*SCALE-f.x)<=f.w/2&&Math.abs(z*SCALE-f.y)<=f.h/2)return Math.max(y,elevation+.16);
+  // A short ramp connects the saved doorway to the higher level floor.
+  const dx=x*SCALE-layout.center.x,dy=z*SCALE-layout.center.y,u=dx*layout.fy-dy*layout.fx,v=dx*layout.fx+dy*layout.fy;
+  if(Math.abs(u)<layout.door/2&&v>layout.depth/2&&v<layout.depth/2+64)return y+(Math.max(y,elevation+.16)-y)*(1-(v-layout.depth/2)/64);
+  return y;
+}
+// The renderer and geometry tests use these exact meshes, without a GPU mock.
+export function buildBase(layout,elevation,helpers={}){
+  const make=(parent,color,p,s,g)=>{const o=new T.Mesh(g,new T.MeshStandardMaterial({color}));o.position.set(...p);o.scale.set(...s);parent.add(o);return o};
+  const cube=helpers.cube||((parent,color,p,s)=>make(parent,color,p,s,new T.BoxGeometry(1,1,1)));
+  const tube=helpers.tube||((parent,color,p,s)=>make(parent,color,p,s,new T.CylinderGeometry(1,1,1,10)));
+  const hut=new T.Group(),w=layout.width/SCALE,d=layout.depth/SCALE,h=layout.wallHeight/SCALE,ridge=layout.roofRidge/SCALE,door=layout.door/SCALE;
+  hut.name='base';hut.position.set(layout.center.x/SCALE,elevation,layout.center.y/SCALE);hut.rotation.y=layout.yaw;
+  cube(hut,'#a68854',[0,.08,0],[w,.16,d]).name='floor';
+  for(const px of [-w/2+.1,w/2-.1])for(const pz of [-d/2+.1,d/2-.1])tube(hut,'#876742',[px,h/2,pz],[.075,h,.075]).name='post';
+  for(const side of [-1,1]){const roof=cube(hut,'#c5b478',[side*w/4,(h+ridge)/2,0],[Math.hypot(w/2+.2,ridge-h),.1,d+.36]);roof.rotation.z=-side*Math.atan2(ridge-h,w/2+.2);roof.name='roof';}
+  for(const wall of layout.walls){
+    const dx=wall.x-layout.center.x,dy=wall.y-layout.center.y,x=(dx*layout.fy-dy*layout.fx)/SCALE,z=(dx*layout.fx+dy*layout.fy)/SCALE;
+    cube(hut,'#ba9b64',[x,h/2,z],[layout.fy?wall.w/SCALE:wall.h/SCALE,h,layout.fy?wall.h/SCALE:wall.w/SCALE]).name='wall';
+  }
+  if(layout.walls.length>=5){const dh=layout.doorHeight/SCALE;cube(hut,'#845f3f',[0,(h+dh)/2,d/2],[door,h-dh,.125]).name='lintel';}
+  for(const bed of layout.beds){const dx=bed.x-layout.center.x,dy=bed.y-layout.center.y,x=(dx*layout.fy-dy*layout.fx)/SCALE,z=(dx*layout.fx+dy*layout.fy)/SCALE;
+    cube(hut,'#7d654b',[x,.17,z],[.65,.34,1.125]).name='bed';cube(hut,'#cec6a0',[x,.38,z],[.65,.14,1.125]);cube(hut,'#ede3bd',[x,.49,z-.35],[.5,.09,.26]);}
+  return hut;
 }
 
 export function create({canvas,terrain,getState,onLost}) {
@@ -198,9 +230,10 @@ export function create({canvas,terrain,getState,onLost}) {
     }
     person.name=name;person.tag=textSprite(name,color);person.root.add(person.tag);
   }
+  let frameBase=null,frameElevation=0;
   function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,state) {
     const x=point.x/SCALE,z=point.y/SCALE,wet=state.sea(point.x,point.y);
-    const surface=wet?0:terrainHeight(x,z);
+    const surface=wet?0:walkSurface(x,z,frameBase,frameElevation);
     person.root.position.set(x,surface+(wet?(state.raft?.18:-.95):0),z);
     person.yaw+=angleDelta(person.yaw,lookYaw)*Math.min(1,step*12);person.rig.rotation.y=person.yaw;
     const active=isMoving&&speed>.05;person.phase+=active?step*(speed>4?10:7):0;
@@ -210,7 +243,7 @@ export function create({canvas,terrain,getState,onLost}) {
       const p=phase+(leg.side<0?Math.PI:0),stride=Math.sin(p)*amount,lift=active?Math.max(0,Math.cos(p))*.105:0;
       const sx=x+Math.cos(person.yaw)*leg.side*.115+Math.sin(person.yaw)*stride;
       const sz=z-Math.sin(person.yaw)*leg.side*.115+Math.cos(person.yaw)*stride;
-      const slope=wet?0:terrainHeight(sx,sz)-surface;
+      const slope=wet?0:walkSurface(sx,sz,frameBase,frameElevation)-surface;
       const pose=legPose(-person.hips.position.y+.07+slope+lift,stride);
       leg.thigh.rotation.x=pose.hip;leg.calf.rotation.x=pose.knee;leg.shoe.rotation.x=-pose.hip-pose.knee;
     }
@@ -236,18 +269,24 @@ export function create({canvas,terrain,getState,onLost}) {
   cube(chestRoot,'#765734',[0,.18,0],[.56,.36,.4]);cube(chestRoot,'#9a743e',[0,.39,0],[.6,.1,.42]);
   for(const x of [-.19,.19])cube(chestRoot,'#d5b15a',[x,.2,.215],[.045,.35,.026]);cube(chestRoot,'#ecd178',[0,.32,.22],[.08,.09,.03]);
   const marker=new T.Mesh(new T.RingGeometry(.24,.29,32),new T.MeshBasicMaterial({color:'#ffe087',transparent:true,opacity:.8,side:T.DoubleSide,depthWrite:false}));marker.rotation.x=-Math.PI/2;scene.add(marker);
-  let buildingsKey='',buildings=new T.Group(),fireLight=null,flame=null;scene.add(buildings);
+  const boardPerson={root:new T.Group(),tag:null,name:null};scene.add(boardPerson.root);boardPerson.root.position.set(BOARD.x/SCALE,terrainHeight(BOARD.x/SCALE,BOARD.y/SCALE),BOARD.y/SCALE);
+  tube(boardPerson.root,'#786040',[0,.95,0],[.12,1.9,.12]);cube(boardPerson.root,'#234f58',[0,1.65,0],[1.55,.55,.1]);
+  const trailRoot=new T.Group();scene.add(trailRoot);
+  const trailRing=new T.Mesh(new T.RingGeometry(.93,1.06,40),new T.MeshBasicMaterial({color:'#54e4ef',transparent:true,opacity:.85,side:T.DoubleSide,depthWrite:false}));trailRing.rotation.x=-Math.PI/2;trailRing.position.y=.04;trailRoot.add(trailRing);
+  const trailBeam=mesh(trailRoot,new T.CylinderGeometry(.035,.035,1,8),new T.MeshBasicMaterial({color:'#76eff7',transparent:true,opacity:.5}),[0,1.25,0],[1,2.5,1],false);
+  let trailTag=null,trailNumber=0;
+  let buildingsKey='',buildings=new T.Group(),fireLight=null,flame=null,cutaway=[];scene.add(buildings);
   function updateBuildings(s){
-    const key=JSON.stringify([s.baseLevel,s.basePos,s.campfire,s.fire]);if(key===buildingsKey)return;buildingsKey=key;
-    if(flame){flame.geometry.dispose();flame.material.dispose();}scene.remove(buildings);buildings=new T.Group();scene.add(buildings);flame=null;fireLight=null;
+    const n=s.activities?.completed||0,ready=n>=3&&s.activities.gardenClaimed<n;
+    const key=JSON.stringify([s.baseLevel,s.basePos,s.campfire,s.fire,n>=1,n>=3,n>=6,ready,s.activities?.raceWon]);if(key===buildingsKey)return;buildingsKey=key;
+    if(flame){flame.geometry.dispose();flame.material.dispose();}for(const m of cutaway)m.dispose();cutaway=[];scene.remove(buildings);buildings=new T.Group();scene.add(buildings);flame=null;fireLight=null;
     if(s.basePos&&s.baseLevel){
-      const hut=new T.Group(),x=s.basePos.x/SCALE,z=s.basePos.y/SCALE;hut.position.set(x,terrainHeight(x,z),z);buildings.add(hut);
-      cube(hut,'#a68854',[0,.08,0],[2,.16,1.5]);
-      for(const px of [-.85,.85])for(const pz of [-.62,.62])tube(hut,'#876742',[px,.82,pz],[.055,1.64,.055]);
-      for(const side of [-1,1]){const roof=cube(hut,'#c5b478',[side*.49,1.64,0],[1.26,.10,1.86]);roof.rotation.z=-side*.36;}
-      if(s.baseLevel>=2){cube(hut,'#b09260',[0,.76,-.67],[1.86,1.25,.10]);for(const side of [-1,1])cube(hut,'#ba9b64',[side*.9,.7,0],[.09,1.1,1.35]);}
-      if(s.baseLevel>=3){for(const x of [-.61,.61])cube(hut,'#b99760',[x,.82,.64],[.51,1.32,.08]);cube(hut,'#845f3f',[0,1.5,.63],[.72,.12,.1]);}
-      cube(hut,'#cec6a0',[-.4,.21,-.27],[.57,.11,.94]);
+      const b=frameBase,hut=buildBase(b,frameElevation,{cube,tube});buildings.add(hut);
+      hut.traverse(o=>{if(['roof','wall','lintel'].includes(o.name)){o.material=o.material.clone();o.material.transparent=true;cutaway.push(o.material)}});
+      if(n>=1)for(const side of [-1,1]){const lamp=ell(hut,'#ffdc80',[side*(b.width/SCALE/2-.15),2.35,b.depth/SCALE/2],[.09,.14,.09]);lamp.material=mat('#ffdc80',{emissive:'#dca739',emissiveIntensity:.7});}
+      if(n>=6){tube(hut,'#6e5942',[b.width/SCALE/2+.2,1.75,-b.depth/SCALE/2],[.03,3.5,.03]);cube(hut,'#5bbca9',[b.width/SCALE/2+.55,3.1,-b.depth/SCALE/2],[.7,.42,.03]);}
+      if(n>=3&&s.garden){const p=s.garden,g=new T.Group();g.position.set(p.x/SCALE,terrainHeight(p.x/SCALE,p.y/SCALE),p.y/SCALE);buildings.add(g);cube(g,'#785d40',[0,.07,0],[1.35,.14,1]);
+        for(const x of [-.4,0,.4])for(const z of [-.25,.25]){tube(g,'#587b37',[x,.21,z],[.025,.3,.025]);ell(g,'#6caa49',[x,.35,z],[.16,.12,.12]);if(ready)ell(g,'#cfa565',[x+.055,.27,z],[.07,.065,.07]);}}
     }
     if(s.campfire&&s.fire){
       const f=new T.Group(),x=s.fire.x/SCALE,z=s.fire.y/SCALE;f.position.set(x,terrainHeight(x,z),z);buildings.add(f);
@@ -278,6 +317,9 @@ export function create({canvas,terrain,getState,onLost}) {
   function frame(now){
     if(!enabled||lost)return;
     const s=getState(),seconds=now/1000,step=last?clamp((now-last)/1000,0,.06):1/60;last=now;
+    frameBase=baseLayout(s.basePos,s.baseLevel);frameElevation=baseElevation(frameBase);
+    updateName(boardPerson,s.labels?.board,'#ffe087');if(boardPerson.tag){boardPerson.tag.position.y=1.65;boardPerson.tag.scale.set(1.4,.36,1)}
+    trailRoot.visible=!!s.trail;if(s.trail){trailRoot.position.set(s.trail.x/SCALE,terrainHeight(s.trail.x/SCALE,s.trail.y/SCALE),s.trail.y/SCALE);trailBeam.material.opacity=.35+.13*Math.sin(seconds*3);if(trailNumber!==s.trailNumber||trailTag?.userData.text!==(s.trailNumber===4?s.labels?.finish||'4':String(s.trailNumber))){if(trailTag){trailRoot.remove(trailTag);trailTag.material.map.dispose();trailTag.material.dispose()}trailNumber=s.trailNumber;trailTag=textSprite(trailNumber===4?s.labels?.finish||'4':String(trailNumber),'#54e4ef');trailTag.userData.text=trailNumber===4?s.labels?.finish||'4':String(trailNumber);trailTag.position.y=1.5;trailTag.scale.set(1,.4,1);trailRoot.add(trailTag)}}
     updateName(merchant,s.labels?.leon,'#b49966');
     updateName(guide,s.labels?.nela,'#609991');
     const x=s.P.x/SCALE,z=s.P.y/SCALE;
@@ -300,6 +342,8 @@ export function create({canvas,terrain,getState,onLost}) {
     stall.position.set(s.leon.x/SCALE+.9,terrainHeight(s.leon.x/SCALE+.9,s.leon.y/SCALE+.15),s.leon.y/SCALE+.15);
     chestRoot.position.set(s.chest.x/SCALE,terrainHeight(s.chest.x/SCALE,s.chest.y/SCALE),s.chest.y/SCALE);chestRoot.visible=!s.treasure;
     updateBuildings(s);updateBoars(s.enemies,seconds);
+    const indoors=frameBase&&Math.abs(s.P.x-frameBase.floor.x)<frameBase.floor.w/2&&Math.abs(s.P.y-frameBase.floor.y)<frameBase.floor.h/2;
+    for(const material of cutaway){material.opacity=indoors?.23:1;material.depthWrite=!indoors;}
     if(flame){flame.scale.y=1+Math.sin(seconds*13)*.18;fireLight.intensity=2.5+Math.sin(seconds*17)*.4;}
     const nearest=s.objects.filter(o=>Math.hypot(o.x-s.P.x,o.y-s.P.y)<75).sort((a,b)=>Math.hypot(a.x-s.P.x,a.y-s.P.y)-Math.hypot(b.x-s.P.x,b.y-s.P.y))[0];
     marker.visible=!!(s.play&&!s.paused&&nearest);if(nearest)marker.position.set(nearest.x/SCALE,terrainHeight(nearest.x/SCALE,nearest.y/SCALE)+.03,nearest.y/SCALE);
