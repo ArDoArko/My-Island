@@ -879,7 +879,7 @@ function update(){
 }
 function say(text){$('msg').textContent=tr(text);$('msg').classList.add('on');clearTimeout(msgTimer);msgTimer=setTimeout(()=>$('msg').classList.remove('on'),2600)}
 function save(){
- if(net.room||!soloReady())return;const state=soloSnapshot();if(cloud.session){if(!cloud.cache)return;if(JSON.stringify(state)!==JSON.stringify(cloud.cache.state)){cloud.cache.state=state;cloud.cache.dirty=true;persistCloudCache()}flushCloud();updateCloudUI();return}try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(e){}
+ if(net.room||!soloReady())return;const state=soloSnapshot();if(cloud.session){if(!cloud.cache)return;if(JSON.stringify(state)!==JSON.stringify(cloud.cache.state)){cloud.cache.state=state;cloud.cache.dirty=true;persistCloudCache()}flushCloud();updateCloudUI();return}try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(e){console.warn('My Island: local save failed ('+(e?.name||'Error')+').')}
 }
 function loadSoloState(d){
  try{
@@ -901,7 +901,7 @@ function applySoloSnapshot(state){
 }
 function load(){
  if(cloud.session){if(cloud.cache?.state)applySoloSnapshot(cloud.cache.state);return}
- try{const state=JSON.parse(localStorage.getItem(SAVE_KEY))||JSON.parse(localStorage.getItem('myIsland08'));if(state)applySoloSnapshot(state)}catch(e){}
+ try{const state=JSON.parse(localStorage.getItem(SAVE_KEY))||JSON.parse(localStorage.getItem('myIsland08'));if(state)applySoloSnapshot(state)}catch(e){console.warn('My Island: local load failed ('+(e?.name||'Error')+').')}
 }
 function soloReady(){return !!net.room||!cloud.authBusy&&(!cloud.session||cloud.ready&&!cloud.loading&&!cloud.conflict&&!cloud.resetting)}
 function cloudID(){return typeof crypto.randomUUID==='function'?crypto.randomUUID():Array.from(crypto.getRandomValues(new Uint8Array(20)),n=>n.toString(16).padStart(2,'0')).join('')}
