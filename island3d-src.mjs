@@ -2,6 +2,7 @@ import * as T from 'three';
 import { BOARD, baseLayout } from './island-play.mjs';
 import { colors, motionPose, MOTIONS } from './character.mjs';
 import { createMaterials, cameraPose, addGroundCover, detailBase, terrainMask } from './island-environment.mjs';
+import { createArchipelagoGroup } from './archipelago-terrain.mjs';
 
 // Rendering only. Authoritative inventory, save ownership and room state stay in index.html.
 export const SCALE = 80;
@@ -177,6 +178,12 @@ export function create({canvas,terrain,getState,onLost}) {
   const splat=terrainMask(terrain),map=new T.CanvasTexture(splat);map.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());
   const land=materials.ground(map);
   const ground=new T.Mesh(groundGeo,land);ground.receiveShadow=true;scene.add(ground);
+  // Phase 1: draw the new islands beyond the eastern edge of the legacy map.
+  // Keep the original coastline and save-coordinate system completely intact.
+  const archipelago=createArchipelagoGroup({segments:small?24:48});
+  archipelago.scale.set(1/SCALE,1,1/SCALE);
+  archipelago.position.x=6500/SCALE;
+  scene.add(archipelago);
   const meadow=addGroundCover(scene,terrainHeight,SCALE,splat,small);
   const waterGeo=new T.PlaneGeometry(700,700,100,100);waterGeo.rotateX(-Math.PI/2);
   const waterMat=new T.ShaderMaterial({uniforms:{uTime:{value:0},uEye:{value:new T.Vector3()}},vertexShader:`
