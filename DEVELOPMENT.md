@@ -1,4 +1,18 @@
-# My Island 0.17
+# My Island 0.18
+
+## Eye-level graphics and natural materials
+
+3D now starts with an eye-level first-person camera. The camera button switches between first person and the existing third-person view; the 2D button remains independent. Drag, Q/R, the camera buttons, the standard pad right stick and camera-relative movement work in both modes. The wheel changes first-person field of view or third-person distance. Third-person raycasts pull the camera in at the existing base and market rather than seeing through a wall. Interior walls and roofs stay opaque in first person. A held hand, spear and action tools match the player's chosen colours; the full self model is hidden only in first person.
+
+`island-environment.mjs` keeps these presentation changes separate from gameplay. Original photographic surface assets cover cobblestones, beach sand, grass, ivory plaster, teal plaster, roof tiles, wood, rocks and palm leaves. Terrain uses a semantic material mask with the existing coast and route locations and a wider paved camp clearing. Ground cover, bent taller palms with individual leaflets, rougher rocks, daylight, cloud noise and shallow water improve the environment. The existing base has textured plaster, shutters, cornices and a tiled roof; the existing trading stall has an aged wooden counter, teal surfaces and a higher tiled canopy. Their gameplay footprints and doorway remain unchanged. In-world labels have a screen-size cap so nearby residents do not cover the view.
+
+This is a playable first graphics upgrade, not a Far Cry 6 quality remake. People and animals still use the original procedural models. Imported detailed character meshes and a full town of new buildings are later work. No additional building collisions, new map locations or backend changes are introduced by this release.
+
+`myIslandCameraV1` stores only `first` or `third` locally. Save format 10, account protocol 12, room protocol 11, existing resources, world generation seed, ownership and cloud data remain unchanged. A blocked storage device can still change camera during the session. All camera labels are translated into the existing six languages, including Nederlands. The new camera tests exercise eye height on ground, ramps, raised floors and water; forward direction at several headings; preference persistence; unchanged progress; 2D fallback; Dutch labels; and blocked storage.
+
+Material assets were generated with the built-in ImageGen tool and packed into nine local 512px WebP tiles in `assets/materials-v018/`: `paving.webp`, `sand.webp`, `grass.webp`, `plaster.webp`, `teal.webp`, `roof.webp`, `wood.webp`, `rock.webp`, `leaf.webp`. The complete set is approximately 893KB. They load from the game's own origin and need no external CDN. A missing material leaves the game playable with its material colour. The original generated atlas is an intermediate, not a runtime dependency.
+
+Material generation brief: one square 3-by-3 photographic albedo atlas with equal edge-to-edge tiles, no labels, borders, objects, perspective or directional shadows. Rows: weathered limestone cobblestones / fine beige sand / dense tropical grass; ivory lime plaster / faded teal stucco / dusty terracotta barrel roof tiles; aged brown wooden planks / gray-brown rough stone / green palm leaflets. Neutral diffuse daylight, fine surface detail, natural muted colours and repeatable surfaces.
 
 ## Character identity and shared expeditions
 
@@ -34,7 +48,7 @@ Near Nela or Leon the action button reads TALK (translated into all six language
 
 ## Build and publish
 
-Run `npm ci` and `npm run verify` after editing gameplay, the renderer or translations. Commit sources, catalogs, package lock and generated bundles together. GitHub Pages serves `index.html`, `island3d.bundle.js`, `i18n.bundle.js`, `wildlife.bundle.js`, `island-play.bundle.js`, `expeditions.bundle.js` and `character.bundle.js` from the main branch root. The graphics bundle includes Three.js 0.180.0, so the game makes no runtime requests for a graphics library, models or textures. See `THIRD_PARTY_NOTICES.txt` for its MIT license. The translation bundle loads synchronously before the existing game script and contains every language; changing language needs no network request.
+Run `npm ci` and `npm run verify` after editing gameplay, the renderer or translations. Commit sources, catalogs, package lock, generated bundles and the material assets together. GitHub Pages serves `index.html`, `island3d.bundle.js`, `i18n.bundle.js`, `wildlife.bundle.js`, `island-play.bundle.js`, `expeditions.bundle.js`, `character.bundle.js` and `assets/materials-v018/` from the main branch root. The graphics bundle includes Three.js 0.180.0, so the game makes no runtime request for a graphics library or imported model. The nine material tiles load from the same origin. See `THIRD_PARTY_NOTICES.txt` for its MIT license. The translation bundle loads synchronously before the existing game script and contains every language; changing language needs no network request.
 
 `tests/adventures.test.mjs` checks the actual base meshes and headroom against collision geometry, swept movement, legacy resource conservation, jobs, delivery and cancellation, race order and pause, garden rewards, reload persistence and controller/menu behavior. The backend runs `node --test tests/*.test.mjs`, `node tests/accounts.integration.mjs` against the real account route in a local Worker with D1, and `node tests/rooms.integration.mjs /absolute/path/to/My-Island` against the real room route with SQLite and four current frontend runtimes. Those integration fixtures exercise optimistic transactions, concurrent rewards, old account clients, session recovery and restoration of each player's solo save. They create only local disposable test accounts, never accounts on the public service.
 
@@ -66,3 +80,4 @@ Account protocol remains version 12 and save format version 10. Existing account
 6. **Social play.** Raft races and an animal companion.
 
 Keep each stage playable and test the existing accounts and progress before publishing it. Do not present planned features as shipped features.
+

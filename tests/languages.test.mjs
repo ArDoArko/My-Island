@@ -24,7 +24,7 @@ test('Dutch in Belgium is selected automatically and a saved choice wins on relo
   const dutch = game({ preferred: ['nl-BE', 'fr-BE'] });
   assert.equal(dutch.document.documentElement.lang, 'nl');
   assert.equal(dutch.element('languageStart').value, 'nl');
-  assert(dutch.document.title.includes('Jouw eiland'));
+  assert.equal(dutch.document.title,'My Island 0.18 — Door je eigen ogen');
   dutch.run("setLanguage('es')");
   const reload = game({ preferred: ['nl-BE'], storage: dutch.stored() });
   assert.equal(reload.document.documentElement.lang, 'es');
@@ -211,3 +211,4 @@ test('requests keep account protocol 12 and room protocol 11', async () => {
   assert(g.requests.every(request => request.url.startsWith('https://my-island-online.arekpoczta734.chatgpt.site/api/')));
   g.close();
 });
+

@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
-<title>My Island 0.17 — Twoja wyspa</title>
-<script defer src="island3d.bundle.js?v=0.17"></script>
+<title>My Island 0.18 — Oczami postaci</title>
+<script defer src="island3d.bundle.js?v=0.18"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -79,11 +79,15 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 @media(max-height:600px){.start{align-items:flex-start}}
 @media(max-height:450px) and (min-width:701px){.panel{inset:4% 12%;padding:16px}.help{display:none}}
 .chapter-card{background:#174655;border:1px solid #49757d;border-radius:14px;padding:18px;margin:12px 0}.chapter-card p{line-height:1.5}.chapter-card .reward{color:#ffdc85}.chapter-goal{background:#113d48;border-left:4px solid #5ce5d3;padding:14px;border-radius:8px;margin-bottom:16px}.chapter-goal p{margin:8px 0}.look-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:12px;background:#174655;border-radius:12px}.look-swatch{display:inline-block;width:26px;height:26px;border:2px solid #fff5;border-radius:50%;vertical-align:middle;margin-right:10px}.look-row button{min-width:110px}.look-preview{display:flex;justify-content:center;gap:16px;padding:12px}.look-preview span{width:38px;height:38px;border-radius:50%;border:2px solid #fff6}.chapter-objective{font-weight:700;color:#c5ffed}.chapter-list{line-height:1.65}.chapter-card button:disabled{opacity:.65}.panel button{white-space:normal}.panel button:focus-visible{outline:3px solid #7effdf;outline-offset:3px}
+#lookReticle{display:none;position:fixed;z-index:4;top:50%;left:50%;width:5px;height:5px;margin:-2.5px;border-radius:50%;background:#fff9;box-shadow:0 0 2px #132520;pointer-events:none}body[data-view="first"] #lookReticle{display:block}
+.hud{left:12px;width:calc(100% - 24px);gap:5px;justify-content:flex-start}.p,.q{background:#102d2ab8;border-color:#ffffff28;border-radius:7px;box-shadow:0 2px 12px #0002;font-size:13px;backdrop-filter:blur(10px)}.p{padding:6px 9px;min-height:31px}.q{top:108px;max-width:255px;font-size:13px;line-height:1.55}.q small{font-size:12px}.camera-button{min-height:34px}.camera-button:first-child{background:#eedfa8e8;color:#25362d}.ctrl button,.btn,.side,.act{border-color:#ffffff70;box-shadow:0 2px 6px #13251e44}.ctrl button{background:#e8ece3dd;color:#243a30;border-radius:10px}.btn,.side{border-radius:9px;font-size:12px}.help{font-size:12px}.hint{font-size:13px;background:#102d2ad9;border:1px solid #ffffff30}.start{background:linear-gradient(90deg,#0a201b99,#16392525)}.card{background:#102822d9;border-radius:18px;border-color:#ffffff38;backdrop-filter:blur(16px)}.card .mark{font-size:34px}.card .desc{font-size:14px}.card .keys,.card .pad-start{font-size:12px}.panel{background:#102822f5;border-radius:18px}.panel .intro{font-size:14px}
+@media(max-width:700px){.hud{left:8px;width:calc(100% - 16px);gap:3px}.p{font-size:11px;padding:5px 7px;min-height:29px}.camera-button{font-size:12px}.q{top:150px;max-width:210px;font-size:12px}.q small{font-size:11px}.btn,.side{font-size:11px}.hint{font-size:12px;max-width:205px}.card{padding:22px}.card .desc{font-size:14px}}
+@media(max-height:520px){.q{top:105px;max-width:210px;font-size:12px}.hud{max-width:calc(100% - 16px)}.side{width:68px;height:34px}.base{bottom:216px}.bag{bottom:178px}.build{bottom:140px}.fish{bottom:102px}}
 </style>
 </head>
 <body>
 <div id="start" class="start"><div class="card">
- <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version"><span data-i18n="0.17 • Postać i wyprawy">0.17 • Postać i wyprawy</span></p>
+ <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version"><span data-i18n="0.18 • Oczami postaci">0.18 • Oczami postaci</span></p>
  <div class="language-picker"><label for="languageStart"><span data-i18n="🌐 Język">🌐 Język</span></label><select id="languageStart" onchange="setLanguage(this.value)" aria-label="Wybierz język" data-i18n-aria-label="Wybierz język"><option value="pl">Polski</option><option value="en">English</option><option value="nl">Nederlands</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option></select></div>
  <p class="desc"><span data-i18n="Odkrywaj wyspę sam albo z przyjaciółmi.">Odkrywaj wyspę sam albo z przyjaciółmi.</span><br><span data-i18n="Do czterech graczy, wspólna baza i wyprawa po skarb.">Do czterech graczy, wspólna baza i wyprawa po skarb.</span></p>
  <div class="play-choice"><button onclick="startGame()"><span data-i18n="GRAJ SOLO">GRAJ SOLO</span></button><button class="online-choice" onclick="toggle('roomPanel',1)"><span data-i18n="GRAJ ONLINE">GRAJ ONLINE</span></button></div><p class="keys"><span data-i18n="WASD lub strzałki • E działaj • Shift sprint • spacja atak">WASD lub strzałki • E działaj • Shift sprint • spacja atak</span></p>
@@ -92,6 +96,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <p class="desc"><span data-i18n="wspólna wyspa · kod pokoju · pad i joystick">wspólna wyspa · kod pokoju · pad i joystick</span></p>
 </div></div>
 <div class="hud">
+ <button id="cameraModeButton" class="p camera-button" onclick="switchCamera()" disabled aria-label="Przełącz kamerę" data-i18n-aria-label="Przełącz kamerę">Oczami postaci</button>
  <button id="viewButton" class="p camera-button" onclick="switchView()" disabled aria-label="Przełącz widok wyspy" data-i18n-aria-label="Przełącz widok wyspy">Widok 2D</button><button id="cameraLeft" class="p camera-button" onclick="orbitView(-.25)" disabled aria-label="Obróć kamerę w lewo" data-i18n-aria-label="Obróć kamerę w lewo">↶</button><button id="cameraRight" class="p camera-button" onclick="orbitView(.25)" disabled aria-label="Obróć kamerę w prawo" data-i18n-aria-label="Obróć kamerę w prawo">↷</button>
  <div class="p">❤️ <b id="hp">100</b></div><div class="p">⚡ <b id="en">100</b></div><div class="p">⭐ <b id="xp">0</b></div>
  <div class="p">🪙 <b id="co">0</b></div><div class="p">🪵 <b id="wo">0</b></div><div class="p">🪨 <b id="st">0</b></div>
@@ -113,7 +118,7 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 <div class="ctrl"><button class="u" data-k="ArrowUp" aria-label="Idź w górę" data-i18n-aria-label="Idź w górę">▲</button><button class="l" data-k="ArrowLeft" aria-label="Idź w lewo" data-i18n-aria-label="Idź w lewo">◀</button><button class="d" data-k="ArrowDown" aria-label="Idź w dół" data-i18n-aria-label="Idź w dół">▼</button><button class="r" data-k="ArrowRight" aria-label="Idź w prawo" data-i18n-aria-label="Idź w prawo">▶</button></div>
 <button class="btn sprint"><span data-i18n="🏃 SPRINT">🏃 SPRINT</span></button><button class="btn block" onclick="block()"><span data-i18n="🛡️ BLOK">🛡️ BLOK</span></button><button class="btn attack" onclick="attack()"><span data-i18n="⚔️ ATAK">⚔️ ATAK</span></button>
 <button class="side base" onclick="toggle('basePanel',1)"><span data-i18n="🏠 BAZA">🏠 BAZA</span></button><button class="side bag" onclick="toggle('bag',1)"><span data-i18n="🎒 PLECAK">🎒 PLECAK</span></button><button class="side build" onclick="toggle('craft',1)"><span data-i18n="🔨 BUDUJ">🔨 BUDUJ</span></button><button class="side fish" onclick="goFish()"><span data-i18n="🎣 ŁÓW">🎣 ŁÓW</span></button><button class="act" onclick="interact()"><span data-i18n="DZIAŁAJ">DZIAŁAJ</span></button>
-<div class="help" id="viewHelp">WASD / strzałki · E działaj · Shift sprint · spacja atak</div>
+<div class="help" id="viewHelp">WASD / strzałki · E działaj · Shift sprint · spacja atak</div><div id="lookReticle" aria-hidden="true"></div>
 <div id="accountPanel" class="panel" role="dialog" aria-label="Konto gracza i zapis w chmurze" data-i18n-aria-label="Konto gracza i zapis w chmurze">
  <button class="close" aria-label="Zamknij konto gracza" onclick="toggle('accountPanel',0)" data-i18n-aria-label="Zamknij konto gracza">✕</button><h2><span data-i18n="☁️ Twoja wyspa">☁️ Twoja wyspa</span></h2>
  <p class="intro"><span data-i18n="Ten sam postęp solo na telefonie i komputerze.">Ten sam postęp solo na telefonie i komputerze.</span></p>
@@ -259,11 +264,11 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <p class="intro"><span data-i18n="Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.">Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.</span></p>
  <div class="language-options"><button data-language="pl" onclick="setLanguage('pl')">Polski</button><button data-language="en" onclick="setLanguage('en')">English</button><button data-language="nl" onclick="setLanguage('nl')">Nederlands</button><button data-language="de" onclick="setLanguage('de')">Deutsch</button><button data-language="fr" onclick="setLanguage('fr')">Français</button><button data-language="es" onclick="setLanguage('es')">Español</button></div>
 </div>
-<script src="i18n.bundle.js?v=0.17"></script>
-<script src="wildlife.bundle.js?v=0.17"></script>
-<script src="island-play.bundle.js?v=0.17"></script>
-<script src="expeditions.bundle.js?v=0.17"></script>
-<script src="character.bundle.js?v=0.17"></script>
+<script src="i18n.bundle.js?v=0.18"></script>
+<script src="wildlife.bundle.js?v=0.18"></script>
+<script src="island-play.bundle.js?v=0.18"></script>
+<script src="expeditions.bundle.js?v=0.18"></script>
+<script src="character.bundle.js?v=0.18"></script>
 <script>
 'use strict';
 const tr=(source)=>MyIslandI18n.t(source);
@@ -295,8 +300,9 @@ let padProfiles=Object.create(null),padProfile=null,padDevice=null,inputFocused=
 const pad={index:null,id:'',x:0,y:0,sprinting:false,blocking:false,buttons:[],ready:false,menuDirection:0,nextMenu:0,capture:null,captureUntil:0,lastUI:0};
 try{const stored=JSON.parse(localStorage.getItem(PAD_KEY));if(stored&&typeof stored==='object'&&!Array.isArray(stored))Object.assign(padProfiles,stored)}catch(e){}
 let terrain=null,waterGradient=null,seed=710;
-let islandView=null,viewHeading=null,preferredView='3d';
+let islandView=null,viewHeading=null,preferredView='3d',preferredCamera='first';
 try{if(localStorage.getItem('myIslandViewV1')==='2d')preferredView='2d'}catch(e){}
+try{if(localStorage.getItem('myIslandCameraV1')==='third')preferredCamera='third'}catch(e){}
 function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
 function rnd(a,b){return a+rand()*(b-a)}
 function ellipseInside(x,y,cx,cy,rx,ry){return ((x-cx)/rx)**2+((y-cy)/ry)**2<1}
@@ -1076,10 +1082,11 @@ async function restartCloudSoloGame(fresh){
  }catch(error){$('newGameError').textContent=tr(error.message||tr('Nie udało się rozpocząć nowej gry. Obecny postęp został zachowany.'))}finally{cloud.resetting=false;for(const b of $('newGamePanel').querySelectorAll('button'))b.disabled=false;updateCloudUI()}
 }
 function sceneState(){return {appearance:characterRules.colors(myAppearance),motion:currentMotion(),fishes:F,chapterMarkers:chapterMarkers().map(p=>({...p,label:tr(p.label)})),labels:{leon:tr('LEON · HANDEL'),nela:tr('NELA · ZADANIA'),board:tr('PRACA I ZABAWA'),finish:tr('META')},P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear:hasEquippedSpear(),spearOwned:!!spear,activities:campActivities,garden:activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y)),board:activityRules.BOARD,trail:raceRun?activityRules.COURSE[raceRun.next]:(chapterGoal()?{...chapterGoal(),label:tr(chapterGoal().label)}:null),trailNumber:raceRun?raceRun.next+1:0,objects:O,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):[]}}
-function updateView(){const active=!!islandView?.enabled;$('world3d').style.display=active?'block':'none';C.style.display=active?'none':'block';$('viewButton').textContent=active?tr('Widok 3D'):tr('Widok 2D');$('viewButton').setAttribute('aria-pressed',String(active));$('cameraLeft').disabled=$('cameraRight').disabled=!active;$('viewHelp').textContent=active?tr('WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera'):tr('WASD / strzałki · E działaj · Shift sprint · spacja atak')}
+function updateView(){const active=!!islandView?.enabled;$('world3d').style.display=active?'block':'none';C.style.display=active?'none':'block';document.body.dataset.view=active?preferredCamera:'2d';$('viewButton').textContent=active?tr('Widok 3D'):tr('Widok 2D');$('viewButton').setAttribute('aria-pressed',String(active));$('cameraLeft').disabled=$('cameraRight').disabled=!active;$('cameraModeButton').disabled=!active;$('cameraModeButton').textContent=tr(preferredCamera==='first'?'Oczami postaci':'Zza postaci');$('cameraModeButton').setAttribute('aria-pressed',String(preferredCamera==='first'));$('viewHelp').textContent=active?tr('WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera'):tr('WASD / strzałki · E działaj · Shift sprint · spacja atak')}
 function switchView(){if(!islandView)return;preferredView=islandView.enabled?'2d':'3d';islandView.setEnabled(preferredView==='3d');viewHeading=null;resetInput();try{localStorage.setItem('myIslandViewV1',preferredView)}catch(e){}updateView()}
+function switchCamera(){if(!islandView?.enabled)return;preferredCamera=preferredCamera==='first'?'third':'first';islandView.setCamera?.(preferredCamera);viewHeading=null;resetInput();try{localStorage.setItem('myIslandCameraV1',preferredCamera)}catch(e){}updateView()}
 function orbitView(amount){if(islandView?.enabled)islandView.orbit(amount)}
-function boot3D(){if(islandView||!globalThis.MyIsland3D)return;try{islandView=globalThis.MyIsland3D.create({canvas:$('world3d'),terrain,getState:sceneState,onLost:()=>{updateView();resetInput();say(tr('Grafika 3D została przerwana. Kontynuuj w 2D albo włącz 3D ponownie.'))}});islandView.setEnabled(preferredView==='3d');$('viewButton').disabled=false;updateView()}catch(error){console.warn('Nie można włączyć 3D:',error);$('viewButton').textContent=tr('Widok 2D');$('viewButton').title=tr('Ta przeglądarka nie udostępnia grafiki 3D.')}}
+function boot3D(){if(islandView||!globalThis.MyIsland3D)return;try{islandView=globalThis.MyIsland3D.create({canvas:$('world3d'),terrain,getState:sceneState,onLost:()=>{updateView();resetInput();say(tr('Grafika 3D została przerwana. Kontynuuj w 2D albo włącz 3D ponownie.'))}});islandView.setCamera?.(preferredCamera);islandView.setEnabled(preferredView==='3d');$('viewButton').disabled=false;updateView()}catch(error){console.warn('Nie można włączyć 3D:',error);$('viewButton').textContent=tr('Widok 2D');$('viewButton').title=tr('Ta przeglądarka nie udostępnia grafiki 3D.')}}
 function refreshTranslations(){
  MyIslandI18n.apply(document);update();updateRoomUI();updatePadUI();updateView();
  for(const id of ['roomStatus','newGameError','newGameDescription','cloudRecoveryStatus','msg'])$(id).textContent=tr($(id).textContent);
@@ -1092,3 +1099,4 @@ cloud.bootstrap=bootCloud();
 </script>
 </body>
 </html>
+
