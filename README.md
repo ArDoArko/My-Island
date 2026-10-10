@@ -1,5 +1,7 @@
 # My-Island
-# My Island 0.19.1
+# My Island 0.20
+
+Tropikalny port w fabule: sześć domów z okiennicami i balkonami, brukowane uliczki, naturalniejsze brzegi, palmy i nowa woda. Kamera startuje oczami postaci; widok zza postaci jest dostępny przyciskiem kamery. Poprawka zachowuje istniejące zapisy.
 
 [Uruchom grę](https://ardoarko.github.io/My-Island/).
 

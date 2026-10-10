@@ -93,7 +93,7 @@ export function cameraPose({x,z,surface,yaw,pitch,mode='first',distance=4.8,bob=
 export function addGroundCover(scene,terrainHeight,scale,mask,small) {
   const random=(()=>{let seed=90210;return ()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);})();
   const g=new T.BufferGeometry();
-  g.setAttribute('position',new T.Float32BufferAttribute([-.035,0,0,.035,0,0,-.028,.14,.02,.028,.14,.02,0,.28,.075],3));
+  g.setAttribute('position',new T.Float32BufferAttribute([-.015,0,0,.015,0,0,-.012,.08,.01,.012,.08,.01,0,.16,.035],3));
   g.setAttribute('uv',new T.Float32BufferAttribute([0,0,1,0,0,.5,1,.5,.5,1],2));g.setIndex([0,1,2,1,3,2,2,3,4]);g.computeVertexNormals();
   const m=new T.MeshStandardMaterial({color:'#ffffff',side:T.DoubleSide,roughness:1});
   m.defines={USE_UV:''};
@@ -116,7 +116,7 @@ export function addGroundCover(scene,terrainHeight,scale,mask,small) {
     if(data[i+1]<data[i]+12||data[i+1]<85)continue;
     const x=px/scale,z=pz/scale,y=terrainHeight(x,z);if(y<.1)continue;
     dummy.position.set(x,y-.015,z);dummy.rotation.set(0,random()*Math.PI*2,0);dummy.scale.setScalar(.7+random()*.8);dummy.updateMatrix();batch.setMatrixAt(placed,dummy.matrix);
-    batch.setColorAt(placed,new T.Color().setHSL(.20+random()*.055,.25+random()*.15,.3+random()*.12));placed++;
+    batch.setColorAt(placed,new T.Color().setHSL(.20+random()*.055,.30+random()*.15,.22+random()*.08));placed++;
   }
   batch.count=placed;scene.add(batch);
   return {update(seconds,layout){wind.value=seconds;if(layout)base.value.set(layout.floor.x/scale,layout.floor.y/scale,layout.floor.w/(scale*2)+.1,layout.floor.h/(scale*2)+.1);else base.value.set(0,0,0,0);},dispose(){scene.remove(batch);g.dispose();m.dispose();batch.dispose();}};

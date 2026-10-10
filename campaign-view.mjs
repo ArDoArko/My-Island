@@ -2,6 +2,8 @@ import * as T from 'three';
 import { ISLANDS } from './archipelago-layout.mjs';
 import { createIslandTerrain } from './archipelago-terrain.mjs';
 import { createMaterials, cameraPose } from './island-environment.mjs';
+import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
+import { sceneryBlocked } from './campaign-scenery.mjs';
 import { SCALE, docks, points, PEOPLE, ground, goal, nearby } from './campaign.mjs';
 
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
@@ -12,7 +14,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
   const scene=new T.Scene(),camera=new T.PerspectiveCamera(68,innerWidth/innerHeight,.04,500);
-  scene.add(camera);scene.background=new T.Color('#b9dbe5');scene.fog=new T.Fog('#b9dbe5',95,280);
+  scene.add(camera);scene.background=new T.Color('#b9dbe5');scene.fog=new T.Fog('#b9dbe5',130,380);
   const hemi=new T.HemisphereLight('#d5ecfa','#566143',2.0),sun=new T.DirectionalLight('#fff2d6',2.8);
   sun.castShadow=true;sun.shadow.mapSize.set(mobile?1024:2048,mobile?1024:2048);
   Object.assign(sun.shadow.camera,{left:-22,right:22,top:22,bottom:-22,near:.1,far:100});
@@ -36,42 +38,30 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     const colours=new Float32Array(p.count*3),c=new T.Color();
     for(let j=0;j<p.count;j++){
       const r=Math.hypot(p.getX(j),p.getZ(j))/i.radius;
-      c.set(r>.85?'#decc9f':i.biome==='rocky'?'#8e9979':'#779967');
+      c.set(r>.80?'#fff7e4':i.biome==='rocky'?'#d1d4c5':'#dce2c8');
       c.toArray(colours,j*3);
     }
     land.geometry.setAttribute('color',new T.BufferAttribute(colours,3));land.geometry.computeVertexNormals();
-    land.material.dispose();land.material=surfaces.surface('grass','#eee7d1',5,.05).clone();
+    land.material.dispose();land.material=islandMaterial(surfaces,SCALE);
     land.material.vertexColors=true;world.add(land);
-    const beach=new T.Mesh(new T.RingGeometry(i.radius*.86/SCALE,i.radius*1.02/SCALE,72),surfaces.surface('sand','#e6dfc7',3,.04));
-    beach.rotation.x=-Math.PI/2;beach.position.set(i.x/SCALE,.015,i.z/SCALE);beach.receiveShadow=true;world.add(beach);
     const dock=docks[i.id],bridge=new T.Group();bridge.position.set(dock.shore.x/SCALE,.18,dock.shore.z/SCALE);
     bridge.rotation.y=Math.atan2(dock.ux,dock.uz);world.add(bridge);
     const length=dist2(dock,dock.shore)/SCALE;
     cube(bridge,'#a98961',[0,.02,length/2],[1.5,.16,length+.6]);
     for(let j=0;j<=Math.ceil(length*3);j++)cube(bridge,'#876742',[0,.12,j/3],[1.47,.025,.06]);
     for(const x of [-.65,.65])for(const z of [0,length])tube(bridge,'#876742',[x,-.38,z],[.075,1.3,.075]);
-    // Deterministic palms stay clear of the harbor and campaign interaction points.
-    for(let j=0;j<(mobile?10:18);j++){
-      const a=j*2.399+i.x*.001,r=i.radius*(.38+(j%5)*.075),x=i.x+Math.sin(a)*r,z=i.z+Math.cos(a)*r;
-      if((i.id==='home'&&x>220)||(i.id==='jungle'&&dist2({x,z},points.cave)<100)||
-        (i.id==='fortress'&&Math.abs(x-i.x)<125&&Math.abs(z-i.z)<145))continue;
-      const palm=new T.Group();palm.position.set(x/SCALE,ground(x,z),z/SCALE);world.add(palm);
-      const trunk=tube(palm,'#876742',[0,1.9,0],[.11,3.8,.11]);trunk.rotation.z=.1*Math.sin(j);
-      for(let k=0;k<8;k++){
-        const leaf=ell(palm,'#456d42',[Math.sin(k*Math.PI/4)*.9,3.65,Math.cos(k*Math.PI/4)*.9],[.28,.09,1.45]);
-        leaf.rotation.y=k*Math.PI/4;leaf.rotation.x=.18;
-      }
-      for(let k=0;k<3;k++)ell(palm,'#8c6944',[(k-1)*.13,3.55,0],[.13,.17,.13]);
-    }
     if(['paradise','smugglers','highlands'].includes(i.id)){
       const cache=new T.Group();cache.position.set(i.x/SCALE,ground(i.x,i.z),i.z/SCALE);world.add(cache);
       cube(cache,'#a98961',[0,.35,0],[1.3,.7,.8]);cube(cache,'#debb63',[0,.73,0],[1.4,.08,.85]);
     }
   }
-  const seaMaterial=new T.ShaderMaterial({uniforms:{clock:{value:0}},vertexShader:
-    'varying vec3 place; uniform float clock; void main(){vec3 p=position;p.y+=sin(p.x*.21+clock)*.035+cos(p.z*.31+clock*.8)*.025;place=p;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}',
-    fragmentShader:'varying vec3 place; uniform float clock; void main(){float w=sin(place.x*1.4+place.z*1.8+clock*1.3);vec3 col=mix(vec3(.045,.29,.38),vec3(.10,.48,.52),.5+.5*w);float glint=pow(max(0.,sin(place.x*2.+place.z*.8+clock)),25.);gl_FragColor=vec4(col+glint*.11,1.);}'});
-  const sea=new T.Mesh(new T.PlaneGeometry(650,650,72,72),seaMaterial);sea.geometry.rotateX(-Math.PI/2);sea.position.y=-.06;world.add(sea);
+  const ocean=createOcean(ISLANDS.map(i=>[i.x/SCALE,i.z/SCALE,i.radius*.955/SCALE,i.radius*.955/SCALE]));world.add(ocean.mesh);
+  const sky=createTropicalSky();world.add(sky);
+  const vegetation=decorateIslands(world,ISLANDS,{scale:SCALE,height:ground,surfaces,small:mobile,
+    clear:(i,x,z)=>sceneryBlocked({x,z},i.id)||(i.id==='home'&&(x>220||Math.abs(z-40)<55||Math.abs(x-23)<45))||
+      (i.id==='jungle'&&dist2({x,z},points.cave)<100)||(i.id==='fortress'&&Math.abs(x-i.x)<125&&Math.abs(z-i.z)<155)||
+      dist2({x,z},docks[i.id].shore)<65});
+  const village=addVillage(world,{scale:SCALE,height:ground,surfaces,helpers});
   const boat=new T.Group();world.add(boat);
   ell(boat,'#233f52',[0,.05,0],[.85,.36,1.9]);
   ell(boat,'#dedbd0',[0,.22,0],[.8,.23,1.85]);
@@ -107,6 +97,13 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   for(const x of [-1.4,1.4])tube(mansion,'#e2dbc7',[x,1.3,4.65],[.16,2.6,.16]);
   cube(mansion,'#a68854',[0,2.67,4.65],[3.3,.20,1.4]);
   for(let j=0;j<3;j++)cube(mansion,'#92968b',[0,-.03+j*.06,4.4+j*.4],[2.6,.15,1.25-j*.25]);
+  for(const x of [-3.4,3.4])for(const y of [1.7,4.3]){
+    cube(mansion,'#587e7c',[x,y,4.07],[.32,1.35,.10]);
+    for(let j=0;j<8;j++)cube(mansion,'#876742',[x,y-.50+j*.14,4.14],[.30,.025,.045]);
+  }
+  cube(mansion,'#e2dbc7',[0,3.10,4.55],[8.5,.16,1.25]);
+  for(let j=-10;j<=10;j++)tube(mansion,'#e2dbc7',[j*.39,3.57,5.05],[.033,.83,.033]);
+  cube(mansion,'#e2dbc7',[0,4.0,5.05],[8.5,.08,.08]);
   const roomGroups={};
   function room(name,w=11,d=15){
     const root=new T.Group();root.name=name;rooms.add(root);roomGroups[name]=root;
@@ -162,7 +159,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const halo=new T.Mesh(new T.TorusGeometry(.42,.035,8,32),new T.MeshBasicMaterial({color:'#f3d48a'}));
   halo.rotation.x=-Math.PI/2;scene.add(halo);
   const tracer=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]),new T.LineBasicMaterial({color:'#ffe8ad'}));scene.add(tracer);
-  let yaw=0,pitch=.12,mode='third',last=0,enabled=true,lost=false,drag=null,oldArea;
+  const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3();
+  let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
   function placeHuman(person,p,height,heading,walking,seconds){
@@ -215,9 +213,17 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       pose.position.x=T.MathUtils.clamp(pose.position.x,-5.1,5.1);
       pose.position.z=T.MathUtils.clamp(pose.position.z,-5.0,8.1);
     }
+    if(!area&&mode==='third'){
+      world.updateMatrixWorld(true);
+      cameraDirection.subVectors(pose.position,pose.target);const length=cameraDirection.length();cameraDirection.normalize();
+      cameraRay.set(pose.target,cameraDirection);cameraRay.far=length;
+      const hit=cameraRay.intersectObjects([...village.houses,mansion],true).find(h=>h.distance>.2);
+      if(hit)pose.position.copy(pose.target).addScaledVector(cameraDirection,Math.max(.35,hit.distance-.22));
+      pose.position.y=Math.max(pose.position.y,ground(pose.position.x*SCALE,pose.position.z*SCALE)+.24);
+    }
     camera.position.copy(pose.position);camera.lookAt(pose.target);
     sun.position.set(s.p.x/SCALE-12,25,s.p.z/SCALE-8);sun.target.position.set(s.p.x/SCALE,0,s.p.z/SCALE);
-    seaMaterial.uniforms.clock.value=seconds;
+    ocean.update(seconds,camera.position);sky.position.copy(camera.position);
     tracer.visible=!!s.shot;
     if(s.shot){
       const y=surface+1.35,a=s.shot.from,b=s.shot.to;

@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import * as C from '../campaign.mjs';
 import { rows } from '../campaign-text.mjs';
 import { game, controller } from './game-harness.mjs';
+import { VILLAGE } from '../campaign-scenery.mjs';
+import { ISLANDS } from '../archipelago-layout.mjs';
 
 function travel(s,target,{fight=false}={}){
   for(let n=0;n<3000&&C.dist(s.p,target)>3;n++){
@@ -71,6 +73,23 @@ test('paused combat and cooldown stop while menus or a background tab are open',
   const before=C.snapshot(s);for(let i=0;i<100;i++)C.tick(s,.1,{paused:true});
   assert.deepEqual(C.snapshot(s),before);
   for(let i=0;i<30;i++)C.tick(s,.1);assert(s.hp<100);
+});
+
+test('village walls stop swept movement, streets and all docks stay reachable, and old campaign progress survives relocation',()=>{
+  const s=C.fresh();s.boat=false;s.island='home';s.p={...C.docks.home.shore};
+  travel(s,C.points.pump);travel(s,{x:23,z:40});travel(s,{x:-250,z:40});travel(s,{x:23,z:40});
+  travel(s,{x:23,z:-255});travel(s,{x:23,z:40});travel(s,C.docks.home.shore);
+  for(const b of VILLAGE){
+    s.p={x:b.x+b.w/2+10,z:b.z};for(let j=0;j<20;j++)C.move(s,-1,0,.1);
+    assert(s.p.x>=b.x+b.w/2+7,'walked through a house wall');
+    const old={...C.snapshot(s),p:{x:b.x,z:b.z},gun:true,paper:true,key:true,tanked:true,fuel:73,ammo:31,released:[0,2]};
+    const restored=C.restore(old);assert(C.allowed(restored,restored.p));
+    assert.equal(restored.fuel,73);assert.equal(restored.ammo,31);assert.deepEqual(restored.released,[0,2]);assert(restored.gun&&restored.paper&&restored.tanked);
+  }
+  for(const i of ISLANDS){
+    s.island=i.id;s.p={...C.docks[i.id].shore};assert(C.allowed(s,s.p));
+    s.boat=true;assert(C.allowed(s,C.docks[i.id]));assert(!C.allowed(s,{x:i.x,z:i.z}));s.boat=false;
+  }
 });
 
 test('real campaign controls preserve legacy saves, account and room data on start, reload and exit',()=>{

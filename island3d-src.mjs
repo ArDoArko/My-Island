@@ -2,7 +2,10 @@ import * as T from 'three';
 import { BOARD, baseLayout } from './island-play.mjs';
 import { colors, motionPose, MOTIONS } from './character.mjs';
 import { createMaterials, cameraPose, addGroundCover, detailBase, terrainMask } from './island-environment.mjs';
-import { createArchipelagoGroup } from './archipelago-terrain.mjs';
+import { createArchipelagoGroup, islandElevation } from './archipelago-terrain.mjs';
+import { ISLANDS, getIslandAt } from './archipelago-layout.mjs';
+import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
+import { sceneryBlocked } from './campaign-scenery.mjs';
 import { createCampaignView, drawCampaign2D } from './campaign-view.mjs';
 export { drawCampaign2D };
 export function createCampaign(options){return createCampaignView({...options,makeHuman:buildHuman});}
@@ -159,7 +162,7 @@ export function create({canvas,terrain,getState,onLost}) {
   renderer.toneMapping=T.ACESFilmicToneMapping;
   renderer.toneMappingExposure=.94;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
-  const scene=new T.Scene();scene.background=new T.Color('#c5dbe5');scene.fog=new T.Fog('#c5dbe5',42,115);
+  const scene=new T.Scene();scene.background=new T.Color('#c5dbe5');scene.fog=new T.Fog('#c5dbe5',70,240);
   const camera=new T.PerspectiveCamera(72,innerWidth/innerHeight,.04,350);scene.add(camera);
   const hemi=new T.HemisphereLight('#c9e3ff','#71694d',1.85);scene.add(hemi);
   const sun=new T.DirectionalLight('#fff0d2',3.1);sun.castShadow=true;
@@ -191,45 +194,27 @@ export function create({canvas,terrain,getState,onLost}) {
   const splat=terrainMask(terrain),map=new T.CanvasTexture(splat);map.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());
   const land=materials.ground(map);
   const ground=new T.Mesh(groundGeo,land);ground.receiveShadow=true;scene.add(ground);
-  // Phase 1: draw the new islands beyond the eastern edge of the legacy map.
-  // Keep the original coastline and save-coordinate system completely intact.
+  // Full landscape presentation beyond the saved legacy coastline. The saved
+  // island and its resource/collision coordinates stay exactly where they were.
   const archipelago=createArchipelagoGroup({segments:small?24:48});
-  archipelago.scale.set(1/SCALE,1,1/SCALE);
+  const distantScale=40;
+  archipelago.scale.set(1/distantScale,1,1/distantScale);
   archipelago.position.x=6500/SCALE;
+  for(const mesh of archipelago.children){
+    mesh.material.dispose();mesh.material=islandMaterial(materials,distantScale);
+    mesh.geometry.setAttribute('color',new T.Float32BufferAttribute(new Float32Array(mesh.geometry.attributes.position.count*3).fill(1),3));
+  }
+  const distantScenery=new T.Group();distantScenery.scale.set(distantScale,1,distantScale);archipelago.add(distantScenery);
+  const distantHeight=(x,z)=>{const i=getIslandAt(x,z);return i?islandElevation(i,x,z):-.32;};
+  decorateIslands(distantScenery,ISLANDS,{scale:distantScale,height:distantHeight,surfaces:materials,small,
+    clear:(i,x,z)=>sceneryBlocked({x,z},i.id)||(i.id==='home'&&(Math.abs(z-40)<55||Math.abs(x-23)<45))});
+  addVillage(distantScenery,{scale:distantScale,height:distantHeight,surfaces:materials,helpers:{cube,tube}});
   scene.add(archipelago);
   const meadow=addGroundCover(scene,terrainHeight,SCALE,splat,small);
-  const waterGeo=new T.PlaneGeometry(700,700,100,100);waterGeo.rotateX(-Math.PI/2);
-  const waterMat=new T.ShaderMaterial({uniforms:{uTime:{value:0},uEye:{value:new T.Vector3()}},vertexShader:`
-    uniform float uTime;varying vec3 vWorld;
-    void main(){vec3 p=position;p.y+=sin(p.x*.55+uTime*.8)*.018+sin(p.z*.7-uTime*.6)*.016;vWorld=(modelMatrix*vec4(p,1.)).xyz;gl_Position=projectionMatrix*viewMatrix*vec4(vWorld,1.);}`,
-    fragmentShader:`uniform float uTime;uniform vec3 uEye;varying vec3 vWorld;
-    float edge(vec2 p,vec2 c,vec2 r){return abs(length((p-c)/r)-1.);}
-    void main(){vec2 p=vWorld.xz;float wave=sin(p.x*5.+p.y*4.-uTime*1.5)+sin(p.y*7.-p.x*3.+uTime);
-    vec3 n=normalize(vec3(cos(p.x*5.+p.y*4.-uTime*1.5)*.11,1.,sin(p.y*7.-p.x*3.+uTime)*.1));
-    vec3 view=normalize(uEye-vWorld);float fresnel=pow(1.-max(dot(n,view),0.),3.);
-    vec3 color=mix(vec3(.012,.24,.32),vec3(.52,.72,.80),fresnel);
-    float shore=min(edge(p,vec2(21.875,16.25),vec2(19.25,12.125)),min(edge(p,vec2(42.25,6.25),vec2(6.5,3.875)),edge(p,vec2(51.25,30.),vec2(4.875,3.625))));
-    float shallow=1.-smoothstep(.01,.16,shore);color=mix(color,vec3(.07,.62,.59),shallow*(1.-fresnel)*.8);
-    float foam=(1.-smoothstep(.006,.025,shore))*(.5+.5*sin(uTime*1.5+wave));
-    float shine=pow(max(dot(reflect(normalize(vec3(-.45,-1.,-.2)),n),view),0.),75.);
-    color+=wave*.006+shine*.9;gl_FragColor=vec4(mix(color,vec3(.90,.95,.88),foam*.75),1.);
-    #include <tonemapping_fragment>
-    #include <colorspace_fragment>
-    }`});
-  const ocean=new T.Mesh(waterGeo,waterMat);ocean.position.set(28,0,18);scene.add(ocean);
-
-  const skyGeo=new T.SphereGeometry(180,24,12);
-  const sky=new T.Mesh(skyGeo,new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{},vertexShader:`varying vec3 vSky;void main(){vSky=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-  fragmentShader:`varying vec3 vSky;
-  float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-  float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.)),f.x),f.y);}
-  float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*noise(p);p=p*2.03+vec2(7.,3.);a*=.5;}return v;}
-  void main(){vec3 dir=normalize(vSky);float h=dir.y;vec3 color=mix(vec3(.68,.79,.85),vec3(.08,.31,.55),smoothstep(0.,.85,h));
-  vec2 p=dir.xz/max(.12,h)*2.8;float n=fbm(p);float clouds=smoothstep(.54,.72,n)*smoothstep(.02,.20,h);
-  color=mix(color,mix(vec3(.64,.70,.74),vec3(.98,.96,.91),smoothstep(.5,.72,n)),clouds);
-  float halo=pow(max(dot(dir,normalize(vec3(-.55,.82,-.36))),0.),35.);color+=vec3(.22,.16,.07)*halo;
-  gl_FragColor=vec4(color,1.);#include <colorspace_fragment>}`.replace(';#include',';\n#include')}));
-  sky.renderOrder=-10;sky.frustumCulled=false;scene.add(sky);
+  const ocean=createOcean([...coasts.map(([x,z,rx,rz])=>[x/SCALE,z/SCALE,rx/SCALE,rz/SCALE]),
+    ...ISLANDS.map(i=>[archipelago.position.x+i.x/distantScale,i.z/distantScale,i.radius*.955/distantScale,i.radius*.955/distantScale])]);
+  scene.add(ocean.mesh);
+  const sky=createTropicalSky(320);scene.add(sky);
 
   // Real leaf silhouettes, still batched for phones.
   function frondGeometry(){
@@ -477,14 +462,14 @@ export function create({canvas,terrain,getState,onLost}) {
     held.position.y=bob*.4;held.rotation.x=s.motion?Math.sin(s.motion.phase*Math.PI*2)*.07:0;
     hand.material=mat(s.appearance?.skin||'#dda879');sleeve.material=mat(s.appearance?.shirt||'#4c9cba');
     sun.position.set(x-12,18,z-8);sun.target.position.set(x,0,z);
-    sky.position.copy(camera.position);waterMat.uniforms.uTime.value=seconds;waterMat.uniforms.uEye.value.copy(camera.position);
+    sky.position.copy(camera.position);ocean.update(seconds,camera.position);
     renderer.render(scene,camera);
     if(s.play&&step>.038)slow+=step;else slow=Math.max(0,slow-step);
     if(slow>3&&renderer.getPixelRatio()>.85){renderer.setPixelRatio(Math.max(.85,renderer.getPixelRatio()-.15));resize();slow=0;}
   }
   function removePerson(person){scene.remove(person.root);if(person.tag){person.tag.material.map.dispose();person.tag.material.dispose();}}
   function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;return enabled;}
-  function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();land.dispose();waterGeo.dispose();waterMat.dispose();skyGeo.dispose();sky.material.dispose();map.dispose();meadow.dispose();materials.dispose();leafMat.dispose();for(const b of [...Object.values(batches),...fishBatches]){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
+  function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();land.dispose();ocean.dispose();sky.geometry.dispose();sky.material.dispose();archipelago.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});map.dispose();meadow.dispose();materials.dispose();leafMat.dispose();for(const b of [...Object.values(batches),...fishBatches]){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
   return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,camera:cameraMode,eye:camera.position.toArray(),materials:materials.stats()})};
 }
 

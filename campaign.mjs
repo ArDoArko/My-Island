@@ -1,4 +1,5 @@
 import { ISLANDS, ISLAND_BY_ID, getIslandAt } from './archipelago-layout.mjs';
+import { sceneryBlocked } from './campaign-scenery.mjs';
 import { islandElevation } from './archipelago-terrain.mjs';
 export { text } from './campaign-text.mjs';
 export { ISLANDS };
@@ -52,9 +53,7 @@ export function restore(input) {
   const safePosition=()=>s.interior?{x:0,z:120}:s.boat?{x:docks[s.boatAt].x,z:docks[s.boatAt].z}:{...docks[s.island].shore};
   if(Number.isFinite(input.p?.x)&&Number.isFinite(input.p?.z)){
     const p={x:input.p.x,z:input.p.z};
-    if(s.interior&&Math.abs(p.x)<=140&&p.z>=-125&&p.z<=175)s.p=p;
-    else if(!s.interior&&Math.abs(p.x)<2500&&p.z>-1700&&p.z<1900&&
-      (s.boat?allowed(s,p):getIslandAt(p.x,p.z)?.id===s.island))s.p=p;
+    if(allowed(s,p))s.p=p;
     else s.p=safePosition();
   } else s.p=safePosition();
   s.guards=GUARDS.map(g=>{
@@ -74,6 +73,7 @@ export function ground(x,z) {
   return islandElevation(i,x,z);
 }
 function blocked(s,p) {
+  if(!s.interior&&sceneryBlocked(p,s.island))return true;
   if(!s.interior&&Math.abs(p.x-1900)<90&&p.z>465&&p.z<635)return true;
   if(s.interior==='cellar'&&p.z<-30){
     const cell=PEOPLE.find(v=>Math.abs(v.x-p.x)<22);
@@ -85,9 +85,9 @@ export function allowed(s,p) {
   if(!Number.isFinite(p.x)||!Number.isFinite(p.z))return false;
   if(s.interior)return p.x>=-110&&p.x<=110&&p.z>=-115&&p.z<=170&&!blocked(s,p);
   if(Math.abs(p.x)>2450||p.z<-1600||p.z>1850)return false;
-  if(s.boat)return !ISLANDS.some(i=>dist(p,i)<i.radius*.94);
+  if(s.boat)return !ISLANDS.some(i=>dist(p,i)<i.radius&&islandElevation(i,p.x,p.z)>-.025);
   const i=ISLAND_BY_ID[s.island];
-  return dist(p,i)<i.radius*.99&&!blocked(s,p);
+  return dist(p,i)<i.radius*.99&&ground(p.x,p.z)>.005&&!blocked(s,p);
 }
 function lineClear(s,a,b) {
   const n=Math.ceil(dist(a,b)/12);

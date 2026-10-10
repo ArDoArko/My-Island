@@ -17,6 +17,11 @@ test('real Three.js campaign geometry and both cameras run through every mission
   const state=C.fresh();let view;
   try{
     view=createCampaignView({canvas:document.querySelector('canvas'),getState:()=>state,makeHuman:buildHuman,rendererFactory:()=>renderer});
+    assert.equal(view.cameraMode,'first');view.frame(0);
+    const houses=[];scene.traverse(o=>{if(o.name==='village-house')houses.push(o);});assert.equal(houses.length,6);
+    assert(houses.reduce((n,o)=>n+o.children.length,0)<100,'facade details were not batched for mobile');
+    assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);
+    assert(scene.getObjectByName('tropical-ocean').material.uniforms.uCoasts.value.length===9);
     for(const mode of ['third','first']){
       view.setCamera(mode);
       for(const area of [null,'cave','estate','cellar']){
