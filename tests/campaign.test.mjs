@@ -94,6 +94,7 @@ test('real campaign controls preserve legacy saves, account and room data on sta
 test('campaign supports a remapped pad, pausing and blocked storage',()=>{
   const g=game({storageBlocked:true}),pad=controller();g.setPads([pad]);g.run('startCampaign()');g.frame();g.frame();
   assert.equal(g.run('campaignUse3D'),false);
+  assert(g.element('campaignViewButton').disabled&&g.element('campaignCameraButton').disabled);
   g.run('padProfile.x=2;padProfile.y=3');pad.axes[3]=-1;
   const before=g.run('JSON.stringify(campaign.p)');g.frame(100);
   assert.notEqual(g.run('JSON.stringify(campaign.p)'),before);pad.axes[3]=0;

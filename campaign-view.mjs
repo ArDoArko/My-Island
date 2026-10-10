@@ -4,8 +4,8 @@ import { createIslandTerrain } from './archipelago-terrain.mjs';
 import { createMaterials, cameraPose } from './island-environment.mjs';
 import { SCALE, docks, points, PEOPLE, ground, goal, nearby } from './campaign.mjs';
 
-export function createCampaignView({canvas,getState,makeHuman,onLost}) {
-  const renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
+  const renderer=rendererFactory({canvas,antialias:true,powerPreference:'high-performance'});
   const mobile=innerWidth<=700;
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?1.1:1.5));
   renderer.setSize(innerWidth,innerHeight,false);

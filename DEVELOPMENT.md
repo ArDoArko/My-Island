@@ -1,4 +1,4 @@
-# My Island 0.19
+# My Island 0.19.1
 
 ## Rescue campaign and repaired publication
 
@@ -12,7 +12,7 @@ Campaign state uses the new device-local key `myIslandCampaignV1`. It does not s
 
 The previous archipelago changes existed in source but were absent from the checked-in browser bundle. Pages could report a successful deployment while serving the old renderer. `scripts/bundle-targets.mjs` now defines all seven browser bundles for both build and verification. `npm run check:bundles` rebuilds in memory and rejects stale or missing checked-in output. The Verify game workflow runs this check before the tests. This workflow reports failures separately from the existing Pages workflow; it does not gate automatic Pages publication. Always commit sources and regenerated output together and verify the actual public game after Pages completes.
 
-`npm run verify` passes 54 frontend tests. Campaign coverage traverses the complete physical rescue route, combat, five cells and boat evacuation with repeated reloads; checks locked progress, collision, fuel/ammunition recovery, paused combat, invalid saves, real UI input, remapped pad axes/buttons, blocked storage, six languages and legacy-save preservation. DOM tests do not verify actual GPU rendering, so public browser QA remains a separate required step.
+`npm run verify` passes 55 frontend tests. Campaign coverage traverses the complete physical rescue route, combat, five cells and boat evacuation with repeated reloads; checks locked progress, collision, fuel/ammunition recovery, paused combat, invalid saves, real UI input, remapped pad axes/buttons, blocked storage, six languages and legacy-save preservation. A separate scene test constructs the actual Three.js geometry and runs both cameras through the exterior, cave, estate and cellar with a stubbed GPU backend, including rescued characters and camera-to-floor contact. Public browser QA confirmed boat movement, docking, refueling to 100%, menu pause, a restored objective/fuel after reload and the Dutch interface. WebGL is disabled in the current test browser, so actual GPU appearance remains unverified and must be checked separately.
 
 ## Eye-level graphics and natural materials
 

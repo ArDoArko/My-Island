@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
-<title>My Island 0.19 — Akcja ratunkowa</title>
-<script defer src="island3d.bundle.js?v=0.19"></script>
+<title>My Island 0.19.1 — Akcja ratunkowa</title>
+<script defer src="island3d.bundle.js?v=0.19.1"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -107,7 +107,7 @@ body.campaign-active[data-campaign-camera="third"] #lookReticle,body.campaign-ac
 </head>
 <body>
 <div id="start" class="start"><div class="card">
- <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version"><span data-i18n="0.19 • Akcja ratunkowa">0.19 • Akcja ratunkowa</span></p>
+ <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version"><span data-i18n="0.19.1 • Akcja ratunkowa">0.19.1 • Akcja ratunkowa</span></p>
  <div class="language-picker"><label for="languageStart"><span data-i18n="🌐 Język">🌐 Język</span></label><select id="languageStart" onchange="setLanguage(this.value)" aria-label="Wybierz język" data-i18n-aria-label="Wybierz język"><option value="pl">Polski</option><option value="en">English</option><option value="nl">Nederlands</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option></select></div>
  <p class="campaign-brief" data-campaign-text="brief"></p><button id="campaignStart" class="campaign-entry" onclick="startCampaign()" data-campaign-text="start"></button><p class="campaign-local" data-campaign-text="local"></p>
  <p class="desc"><span data-i18n="Odkrywaj wyspę sam albo z przyjaciółmi.">Odkrywaj wyspę sam albo z przyjaciółmi.</span><br><span data-i18n="Do czterech graczy, wspólna baza i wyprawa po skarb.">Do czterech graczy, wspólna baza i wyprawa po skarb.</span></p>
@@ -139,8 +139,8 @@ body.campaign-active[data-campaign-camera="third"] #lookReticle,body.campaign-ac
 <div id="campaignHud">
  <span class="campaign-title" data-campaign-text="title"></span>
  <div class="campaign-stats"><span>❤️ <b id="campaignHp">100</b></span><span>⛽ <b id="campaignFuel">12</b>%</span><span>🔫 <b id="campaignAmmo">0</b></span><span>👥 <b id="campaignPeople">0</b>/5</span></div>
- <button onclick="campaignCamera()"><span data-campaign-text="camera"></span> · <span id="campaignCameraLabel"></span></button>
- <button onclick="campaignView()"><span data-campaign-text="view"></span> · <span id="campaignViewLabel">3D</span></button>
+ <button id="campaignCameraButton" onclick="campaignCamera()"><span data-campaign-text="camera"></span> · <span id="campaignCameraLabel"></span></button>
+ <button id="campaignViewButton" onclick="campaignView()"><span data-campaign-text="view"></span> · <span id="campaignViewLabel">3D</span></button>
  <button onclick="toggle('campaignHelp',1)" data-campaign-text="menu"></button>
  <button onclick="toggle('languagePanel',1)" id="campaignLanguage">🌐 PL</button>
  <button class="campaign-exit" onclick="leaveCampaign()" data-campaign-text="exit"></button>
@@ -148,7 +148,7 @@ body.campaign-active[data-campaign-camera="third"] #lookReticle,body.campaign-ac
 <div id="campaignGoal"><p id="campaignObjective"></p><small id="campaignDistance"></small><small id="campaignSave"></small></div>
 <canvas id="campaignMap" width="368" height="228" aria-label="Mapa sześciu wysp"></canvas>
 <div id="campaignHelp" class="panel" role="dialog" aria-labelledby="campaignHelpTitle">
- <button class="close" onclick="toggle('campaignHelp',0)" aria-label="Zamknij">✕</button>
+ <button class="close" onclick="toggle('campaignHelp',0)" aria-label="Zamknij" data-i18n-aria-label="Zamknij">✕</button>
  <h2 id="campaignHelpTitle" data-campaign-text="title"></h2><p id="campaignHelpGoal"></p>
  <p data-campaign-text="controls"></p><p data-campaign-text="local"></p>
  <button onclick="toggle('controllerPanel',1)" data-i18n="🎮 Sterowanie padem i joystickiem">🎮 Sterowanie padem i joystickiem</button>
@@ -304,8 +304,8 @@ body.campaign-active[data-campaign-camera="third"] #lookReticle,body.campaign-ac
  <p class="intro"><span data-i18n="Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.">Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.</span></p>
  <div class="language-options"><button data-language="pl" onclick="setLanguage('pl')">Polski</button><button data-language="en" onclick="setLanguage('en')">English</button><button data-language="nl" onclick="setLanguage('nl')">Nederlands</button><button data-language="de" onclick="setLanguage('de')">Deutsch</button><button data-language="fr" onclick="setLanguage('fr')">Français</button><button data-language="es" onclick="setLanguage('es')">Español</button></div>
 </div>
-<script src="campaign.bundle.js?v=0.19"></script>
-<script src="i18n.bundle.js?v=0.19"></script>
+<script src="campaign.bundle.js?v=0.19.1"></script>
+<script src="i18n.bundle.js?v=0.19.1"></script>
 <script src="wildlife.bundle.js?v=0.18"></script>
 <script src="island-play.bundle.js?v=0.18"></script>
 <script src="expeditions.bundle.js?v=0.18"></script>
@@ -1140,6 +1140,7 @@ function refreshCampaignLabels(){
  for(const el of document.querySelectorAll('[data-campaign-text]'))el.textContent=ct(el.dataset.campaignText);
  try{$('campaignStart').textContent=ct(localStorage.getItem(campaignRules.SAVE_KEY)?'resume':'start')}catch(e){}
  $('campaign3d').setAttribute('aria-label',ct('title'));$('campaign2d').setAttribute('aria-label',ct('title')+' · 2D');
+ $('campaignMap').setAttribute('aria-label',ct('map'));
  if(campaignMode)updateCampaign();
 }
 function saveCampaign(){
@@ -1184,6 +1185,7 @@ function applyCampaignView(){
  const active=campaignUse3D&&campaignRenderer?.enabled;
  $('campaign3d').style.display=active?'block':'none';$('campaign2d').style.display=active?'none':'block';
  $('campaignViewLabel').textContent=active?'3D':'2D';
+ $('campaignCameraButton').disabled=$('campaignViewButton').disabled=!campaignRenderer?.enabled;
  $('campaignCameraLabel').textContent=ct(campaignRenderer?.cameraMode==='first'?'first':'third');
  document.body.dataset.campaignCamera=active?campaignRenderer.cameraMode:'2d';
 }

@@ -10,6 +10,7 @@ export const rows={
   exit:['Wróć do menu','Return to menu','Terug naar het menu','Zurück zum Menü','Retour au menu','Volver al menú'],
   camera:['Kamera','Camera','Camera','Kamera','Caméra','Cámara'],
   view:['Widok','View','Beeld','Ansicht','Vue','Vista'],
+  map:['Mapa sześciu wysp','Map of six islands','Kaart van zes eilanden','Karte der sechs Inseln','Carte des six îles','Mapa de seis islas'],
   first:['Oczami postaci','First person','Eerste persoon','Ich-Perspektive','Première personne','Primera persona'],
   third:['Zza postaci','Third person','Derde persoon','Dritte Person','Troisième personne','Tercera persona'],
   saved:['Fabuła zapisana','Story saved','Verhaal opgeslagen','Geschichte gespeichert','Histoire enregistrée','Historia guardada'],
