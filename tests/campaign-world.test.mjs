@@ -56,6 +56,19 @@ test('0.19/0.20 campaign saves migrate once and preserve every mission stage and
   }
 });
 
+test('cardinal keyboard and touch directions traverse each angled pier in both directions',()=>{
+  const s=C.fresh();s.boat=false;
+  for(const d of Object.values(C.docks)){
+    s.island=d.id;s.p={...d.land};
+    const axis=Math.abs(d.ux)>Math.abs(d.uz)?{x:Math.sign(d.ux),z:0}:{x:0,z:Math.sign(d.uz)};
+    for(const [target,sign] of [[d.shore,1],[d.land,-1]]){
+      for(let n=0;n<110&&C.dist(s.p,target)>5;n++)C.move(s,axis.x*sign,axis.z*sign,.1);
+      assert(C.dist(s.p,target)<=5,'cardinal movement stuck on '+d.id);
+      assert(C.allowed(s,s.p));
+    }
+  }
+});
+
 test('the actual human pelvis rests on the seat and both boots rest on the deck under yaw and roll',()=>{
   const root=new T.Group(),materials=new Map(),geometries=new Map();
   const mat=c=>{if(!materials.has(c))materials.set(c,new T.MeshStandardMaterial({color:c}));return materials.get(c);};

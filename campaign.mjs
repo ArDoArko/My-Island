@@ -79,6 +79,16 @@ export function move(s,dx,dz,dt,{sprint=false}={}) {
   dt=clamp(dt,0,.1);const length=Math.hypot(dx,dz);
   if(length>1){dx/=length;dz/=length;}
   if(!dx&&!dz)return;
+  if(!s.boat&&!s.interior){
+    const pier=pierAt(s.p.x,s.p.z,s.island);
+    if(pier){
+      const d=pier.dock,along=dx*d.ux+dz*d.uz,across=dx*d.uz-dz*d.ux;
+      // Cardinal keys follow angled planks; sideways movement remains free.
+      if(Math.abs(along)>Math.abs(across)){
+        const strength=Math.hypot(dx,dz)*Math.sign(along);dx=d.ux*strength;dz=d.uz*strength;
+      }
+    }
+  }
   s.heading=Math.atan2(dx,dz);
   const speed=s.boat?(s.fuel>0?260:40):sprint?115:78;
   const travel=Math.hypot(dx,dz)*speed*dt,n=Math.max(1,Math.ceil(travel/6));
