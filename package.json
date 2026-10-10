@@ -1,12 +1,13 @@
 {
   "name": "my-island",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node --test tests/*.test.mjs",
-    "verify": "npm run build && npm test"
+    "check:bundles": "node scripts/check-bundles.mjs",
+    "verify": "npm run build && npm test && npm run check:bundles"
   },
   "dependencies": {
     "three": "0.180.0"
@@ -16,4 +17,3 @@
     "jsdom": "26.1.0"
   }
 }
-

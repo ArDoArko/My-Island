@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
-<title>My Island 0.18 — Oczami postaci</title>
-<script defer src="island3d.bundle.js?v=0.18"></script>
+<title>My Island 0.19 — Akcja ratunkowa</title>
+<script defer src="island3d.bundle.js?v=0.19"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -83,12 +83,33 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 .hud{left:12px;width:calc(100% - 24px);gap:5px;justify-content:flex-start}.p,.q{background:#102d2ab8;border-color:#ffffff28;border-radius:7px;box-shadow:0 2px 12px #0002;font-size:13px;backdrop-filter:blur(10px)}.p{padding:6px 9px;min-height:31px}.q{top:108px;max-width:255px;font-size:13px;line-height:1.55}.q small{font-size:12px}.camera-button{min-height:34px}.camera-button:first-child{background:#eedfa8e8;color:#25362d}.ctrl button,.btn,.side,.act{border-color:#ffffff70;box-shadow:0 2px 6px #13251e44}.ctrl button{background:#e8ece3dd;color:#243a30;border-radius:10px}.btn,.side{border-radius:9px;font-size:12px}.help{font-size:12px}.hint{font-size:13px;background:#102d2ad9;border:1px solid #ffffff30}.start{background:linear-gradient(90deg,#0a201b99,#16392525)}.card{background:#102822d9;border-radius:18px;border-color:#ffffff38;backdrop-filter:blur(16px)}.card .mark{font-size:34px}.card .desc{font-size:14px}.card .keys,.card .pad-start{font-size:12px}.panel{background:#102822f5;border-radius:18px}.panel .intro{font-size:14px}
 @media(max-width:700px){.hud{left:8px;width:calc(100% - 16px);gap:3px}.p{font-size:11px;padding:5px 7px;min-height:29px}.camera-button{font-size:12px}.q{top:150px;max-width:210px;font-size:12px}.q small{font-size:11px}.btn,.side{font-size:11px}.hint{font-size:12px;max-width:205px}.card{padding:22px}.card .desc{font-size:14px}}
 @media(max-height:520px){.q{top:105px;max-width:210px;font-size:12px}.hud{max-width:calc(100% - 16px)}.side{width:68px;height:34px}.base{bottom:216px}.bag{bottom:178px}.build{bottom:140px}.fish{bottom:102px}}
+.start{overflow:auto;padding:16px 0}.card{max-height:calc(100dvh - 32px);overflow:auto}
+.card .campaign-entry{display:block;width:100%;padding:17px;margin:12px 0 7px;background:#edda98;color:#24382d;font-weight:850;border-radius:12px;font-size:18px;border:0}
+.campaign-brief{font-size:15px;margin:10px 0 3px;color:#e9dec1}.campaign-local{font-size:12px;color:#bdd2c8;margin:7px 0 17px}
+#campaign3d,#campaign2d{position:fixed;inset:0;z-index:2;display:none;touch-action:none}
+#campaignHud,#campaignGoal,#campaignMap{display:none}
+body.campaign-active .hud,body.campaign-active .side,body.campaign-active .help,body.campaign-active #questBox,body.campaign-active .block{display:none}
+body.campaign-active #game,body.campaign-active #world3d{display:none!important}
+body.campaign-active #campaignHud{display:flex;position:fixed;top:max(9px,env(safe-area-inset-top));left:12px;right:12px;z-index:7;gap:7px;flex-wrap:wrap;align-items:center;font-size:13px}
+.campaign-title{color:#eddba3;font-weight:850;font-size:16px;padding:8px 11px;background:#122e2ddb;border-radius:8px}
+.campaign-stats{display:flex;gap:12px;padding:9px 12px;background:#122e2ddb;border-radius:8px;font-weight:750}
+#campaignHud button{border:1px solid #e5e9d349;border-radius:8px;padding:8px 11px;color:#f1ecd8;background:#122e2de6;font-size:13px;min-height:35px}
+#campaignHud .campaign-exit{margin-left:auto}
+body.campaign-active #campaignGoal{display:block;position:fixed;top:108px;left:12px;z-index:7;max-width:280px;border-left:3px solid #eccd83;border-radius:8px;background:#122e2ddb;padding:12px 14px;font-size:14px;line-height:1.5;color:#ece6d2;pointer-events:none}
+#campaignGoal p{margin:0 0 8px;font-weight:700}#campaignGoal small{color:#c8d8cf;display:block;font-size:12px}
+body.campaign-active #campaignMap{display:block;position:fixed;right:12px;top:108px;width:184px;height:114px;z-index:7;border:1px solid #cee3d554;border-radius:9px;background:#102d2dda;pointer-events:none}
+#campaignHelp{z-index:50}#campaignHelp p{font-size:15px}
+body.campaign-active #lookReticle{display:block}
+body.campaign-active[data-campaign-camera="third"] #lookReticle,body.campaign-active[data-campaign-camera="2d"] #lookReticle{display:none}
+@media(max-width:700px){body.campaign-active #campaignHud{left:8px;right:8px;gap:4px;font-size:11px}.campaign-title{font-size:13px;padding:7px}.campaign-stats{gap:7px;padding:8px}#campaignHud button{padding:7px;font-size:11px;min-height:32px}body.campaign-active #campaignGoal{top:132px;left:8px;max-width:calc(100vw - 150px);font-size:12px;padding:9px}body.campaign-active #campaignMap{top:132px;right:8px;width:126px;height:85px}}
+@media(max-height:500px){body.campaign-active #campaignGoal{top:88px;max-width:260px}body.campaign-active #campaignMap{top:88px;width:140px;height:90px}.campaign-title{font-size:13px}#campaignHud button{font-size:11px;padding:6px}}
 </style>
 </head>
 <body>
 <div id="start" class="start"><div class="card">
- <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version"><span data-i18n="0.18 • Oczami postaci">0.18 • Oczami postaci</span></p>
+ <div class="mark">🏝️</div><h1>MY ISLAND</h1><p class="version"><span data-i18n="0.19 • Akcja ratunkowa">0.19 • Akcja ratunkowa</span></p>
  <div class="language-picker"><label for="languageStart"><span data-i18n="🌐 Język">🌐 Język</span></label><select id="languageStart" onchange="setLanguage(this.value)" aria-label="Wybierz język" data-i18n-aria-label="Wybierz język"><option value="pl">Polski</option><option value="en">English</option><option value="nl">Nederlands</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option></select></div>
+ <p class="campaign-brief" data-campaign-text="brief"></p><button id="campaignStart" class="campaign-entry" onclick="startCampaign()" data-campaign-text="start"></button><p class="campaign-local" data-campaign-text="local"></p>
  <p class="desc"><span data-i18n="Odkrywaj wyspę sam albo z przyjaciółmi.">Odkrywaj wyspę sam albo z przyjaciółmi.</span><br><span data-i18n="Do czterech graczy, wspólna baza i wyprawa po skarb.">Do czterech graczy, wspólna baza i wyprawa po skarb.</span></p>
  <div class="play-choice"><button onclick="startGame()"><span data-i18n="GRAJ SOLO">GRAJ SOLO</span></button><button class="online-choice" onclick="toggle('roomPanel',1)"><span data-i18n="GRAJ ONLINE">GRAJ ONLINE</span></button></div><p class="keys"><span data-i18n="WASD lub strzałki • E działaj • Shift sprint • spacja atak">WASD lub strzałki • E działaj • Shift sprint • spacja atak</span></p>
  <button class="cloud-entry" onclick="toggle('accountPanel',1)"><span data-i18n="☁️ Konto i zapis">☁️ Konto i zapis</span></button><p id="cloudStartStatus" role="status">Zaloguj się, aby kontynuować na innym urządzeniu.</p>
@@ -114,6 +135,25 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 <div id="questBox" class="q">📜 <b id="qt">Wyprawa 0.13</b><br><span id="qx"></span><br><small id="qp"></small></div>
 <canvas id="game" aria-label="Wyspa, postacie i świat gry" data-i18n-aria-label="Wyspa, postacie i świat gry"></canvas>
 <canvas id="world3d" aria-label="Wyspa 3D z kamerą zza pleców postaci" data-i18n-aria-label="Wyspa 3D z kamerą zza pleców postaci"></canvas>
+<canvas id="campaign3d" aria-label="Archipelag i akcja ratunkowa"></canvas><canvas id="campaign2d" aria-label="Archipelag i akcja ratunkowa w 2D"></canvas>
+<div id="campaignHud">
+ <span class="campaign-title" data-campaign-text="title"></span>
+ <div class="campaign-stats"><span>❤️ <b id="campaignHp">100</b></span><span>⛽ <b id="campaignFuel">12</b>%</span><span>🔫 <b id="campaignAmmo">0</b></span><span>👥 <b id="campaignPeople">0</b>/5</span></div>
+ <button onclick="campaignCamera()"><span data-campaign-text="camera"></span> · <span id="campaignCameraLabel"></span></button>
+ <button onclick="campaignView()"><span data-campaign-text="view"></span> · <span id="campaignViewLabel">3D</span></button>
+ <button onclick="toggle('campaignHelp',1)" data-campaign-text="menu"></button>
+ <button onclick="toggle('languagePanel',1)" id="campaignLanguage">🌐 PL</button>
+ <button class="campaign-exit" onclick="leaveCampaign()" data-campaign-text="exit"></button>
+</div>
+<div id="campaignGoal"><p id="campaignObjective"></p><small id="campaignDistance"></small><small id="campaignSave"></small></div>
+<canvas id="campaignMap" width="368" height="228" aria-label="Mapa sześciu wysp"></canvas>
+<div id="campaignHelp" class="panel" role="dialog" aria-labelledby="campaignHelpTitle">
+ <button class="close" onclick="toggle('campaignHelp',0)" aria-label="Zamknij">✕</button>
+ <h2 id="campaignHelpTitle" data-campaign-text="title"></h2><p id="campaignHelpGoal"></p>
+ <p data-campaign-text="controls"></p><p data-campaign-text="local"></p>
+ <button onclick="toggle('controllerPanel',1)" data-i18n="🎮 Sterowanie padem i joystickiem">🎮 Sterowanie padem i joystickiem</button>
+ <button onclick="toggle('campaignHelp',0)" data-campaign-text="back"></button><button onclick="leaveCampaign()" data-campaign-text="exit"></button>
+</div>
 <div id="msg" class="msg" role="status"></div><div id="hint" class="hint"></div>
 <div class="ctrl"><button class="u" data-k="ArrowUp" aria-label="Idź w górę" data-i18n-aria-label="Idź w górę">▲</button><button class="l" data-k="ArrowLeft" aria-label="Idź w lewo" data-i18n-aria-label="Idź w lewo">◀</button><button class="d" data-k="ArrowDown" aria-label="Idź w dół" data-i18n-aria-label="Idź w dół">▼</button><button class="r" data-k="ArrowRight" aria-label="Idź w prawo" data-i18n-aria-label="Idź w prawo">▶</button></div>
 <button class="btn sprint"><span data-i18n="🏃 SPRINT">🏃 SPRINT</span></button><button class="btn block" onclick="block()"><span data-i18n="🛡️ BLOK">🛡️ BLOK</span></button><button class="btn attack" onclick="attack()"><span data-i18n="⚔️ ATAK">⚔️ ATAK</span></button>
@@ -264,7 +304,8 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
  <p class="intro"><span data-i18n="Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.">Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.</span></p>
  <div class="language-options"><button data-language="pl" onclick="setLanguage('pl')">Polski</button><button data-language="en" onclick="setLanguage('en')">English</button><button data-language="nl" onclick="setLanguage('nl')">Nederlands</button><button data-language="de" onclick="setLanguage('de')">Deutsch</button><button data-language="fr" onclick="setLanguage('fr')">Français</button><button data-language="es" onclick="setLanguage('es')">Español</button></div>
 </div>
-<script src="i18n.bundle.js?v=0.18"></script>
+<script src="campaign.bundle.js?v=0.19"></script>
+<script src="i18n.bundle.js?v=0.19"></script>
 <script src="wildlife.bundle.js?v=0.18"></script>
 <script src="island-play.bundle.js?v=0.18"></script>
 <script src="expeditions.bundle.js?v=0.18"></script>
@@ -301,6 +342,9 @@ const pad={index:null,id:'',x:0,y:0,sprinting:false,blocking:false,buttons:[],re
 try{const stored=JSON.parse(localStorage.getItem(PAD_KEY));if(stored&&typeof stored==='object'&&!Array.isArray(stored))Object.assign(padProfiles,stored)}catch(e){}
 let terrain=null,waterGradient=null,seed=710;
 let islandView=null,viewHeading=null,preferredView='3d',preferredCamera='first';
+let campaignMode=false,campaign=null,campaignRenderer=null,campaignUse3D=true,campaignResume=0,campaignStored=false,campaignLastSave=0,campaignLastUI=0;
+const campaignRules=MyIslandCampaign,ct=key=>campaignRules.text(key,MyIslandI18n.current());
+panels.push('campaignHelp');
 try{if(localStorage.getItem('myIslandViewV1')==='2d')preferredView='2d'}catch(e){}
 try{if(localStorage.getItem('myIslandCameraV1')==='third')preferredCamera='third'}catch(e){}
 function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
@@ -705,7 +749,13 @@ function pollController(now){
   if(pad.focusedButton?.disabled||!padMenuButtons().includes(pad.focusedButton))focusPadMenu();
   navigatePadMenu(vector,now);if(pressed('interact'))pad.focusedButton?.click();return;
  }
- if(!play){if(pressed('interact'))startGame();else if(pressed('menu'))toggle('controllerPanel',1);return}
+ if(campaignMode){
+  if(pressed('menu')||pressed('back')){toggle('campaignHelp',1);return}
+  pad.x=vector.x;pad.y=vector.y;pad.sprinting=!!down[padProfile.buttons.sprint];
+  if(pressed('interact'))campaignInteract();else if(pressed('attack'))campaignAttack();
+  return;
+ }
+ if(!play){if(pressed('interact'))startCampaign();else if(pressed('menu'))toggle('controllerPanel',1);return}
  if(pressed('menu')){toggle('controllerPanel',1);return}
  for(const [key,panel] of [['bag','bag'],['base','basePanel'],['craft','craft']])if(pressed(key)){toggle(panel,1);return}
  pad.x=vector.x;pad.y=vector.y;pad.sprinting=!!down[padProfile.buttons.sprint];pad.blocking=!!down[padProfile.buttons.block];
@@ -715,6 +765,7 @@ addEventListener('gamepaddisconnected',e=>{if(e.gamepad.index===pad.index)select
 function loop(timestamp=performance.now()){
  const step=lastTime?Math.max(.1,Math.min(3,(timestamp-lastTime)/16.667)):1;lastTime=timestamp;time=timestamp;
  pollController(timestamp);
+ if(campaignMode){campaignFrame(timestamp,step/60);requestAnimationFrame(loop);return}
  if(net.room&&net.connected&&timestamp-net.lastOk>2500){net.connected=false;resetInput();updateRoomUI()}
  if(play&&soloReady()){
   let dx=0,dy=0;if(!activePanel&&onlineReady()){if(K.ArrowUp||K.w)dy--;if(K.ArrowDown||K.s)dy++;if(K.ArrowLeft||K.a)dx--;if(K.ArrowRight||K.d)dx++;
@@ -742,12 +793,12 @@ function loop(timestamp=performance.now()){
 requestAnimationFrame(loop);
 function resetInput(){K={};sprint=0;clearPadInput()}
 addEventListener('keydown',e=>{
- if(e.key==='Escape'){if(pad.capture)cancelPadBinding();else if(activePanel)toggle(activePanel,0);return}if(!play||activePanel)return;
+ if(e.key==='Escape'){if(pad.capture)cancelPadBinding();else if(activePanel)toggle(activePanel,0);else if(campaignMode)toggle('campaignHelp',1);return}if(!play||activePanel)return;
  const k=e.key.length===1?e.key.toLowerCase():e.key;K[k]=1;if(e.key.startsWith('Arrow')||e.key===' ')e.preventDefault();
- if(e.key===' '&&!e.repeat)attack();if(k==='e'&&!e.repeat)interact();if(k==='h'&&!e.repeat)toggleSpear();if(e.key==='Shift')sprint=1;
+ if(e.key===' '&&!e.repeat)attack();if(k==='e'&&!e.repeat)interact();if(k==='h'&&!e.repeat){if(campaignMode)campaignCamera();else toggleSpear();}if(e.key==='Shift')sprint=1;
 });
 addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;K[k]=0;if(e.key==='Shift')sprint=0});
-addEventListener('blur',()=>{inputFocused=false;resetInput()});addEventListener('focus',()=>{inputFocused=true;resetInput()});document.addEventListener('visibilitychange',()=>{if(document.hidden){if(play&&soloReady())save();resetInput()}});addEventListener('pagehide',()=>{if(play&&soloReady())save();if(cloud.session&&cloud.cache?.dirty)flushCloud(true)});
+addEventListener('blur',()=>{inputFocused=false;resetInput()});addEventListener('focus',()=>{inputFocused=true;resetInput()});document.addEventListener('visibilitychange',()=>{if(document.hidden){if(play&&(campaignMode||soloReady()))save();resetInput()}});addEventListener('pagehide',()=>{if(play&&(campaignMode||soloReady()))save();if(cloud.session&&cloud.cache?.dirty)flushCloud(true)});
 function holdControl(b,on,off){b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);on()};b.onpointerup=b.onpointercancel=b.onlostpointercapture=off}
 document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;holdControl(b,()=>{if(!activePanel)K[k]=1},()=>K[k]=0)});
 holdControl(document.querySelector('.sprint'),()=>{if(!activePanel)sprint=1},()=>sprint=0);
@@ -769,12 +820,14 @@ function hasEquippedSpear(){return !!spear&&!spearStowed}
 function setSpearStowed(value){spearStowed=!!value;try{localStorage.setItem('myIslandWeaponV1',spearStowed?'stowed':'held')}catch(e){}update()}
 function toggleSpear(){if(!play||!soloReady()||(activePanel&&activePanel!=='bag'))return;if(!spear)return say(tr('Potrzebujesz włóczni. Zrobisz ją w warsztacie.'));setSpearStowed(!spearStowed);say(spearStowed?tr('Włócznia schowana. Nadal jest w plecaku.'):tr('Włócznia w ręce.'))}
 function attack(){
+ if(campaignMode)return campaignAttack();
  if(activePanel)return;if(spear&&spearStowed)setSpearStowed(false);if(net.room)return roomAction({kind:'attack'});if(!spear)return say(tr('Potrzebujesz włóczni. Zrobisz ją w warsztacie.'));if(Date.now()-lastAttack<650)return;lastAttack=Date.now();
  const navigation=MyIslandWildlife.wildlifeNavigation(O,mainLand,activityRules.sceneSolids([],basePos,baseLevel));
  let target=null,d=105;for(const e of E){const q=distance(P,e);if(q<d&&navigation.clear(P,e,0)){d=q;target=e}}if(!target)return say(tr('Nic w zasięgu włóczni.'));
  target.hp-=2;if(target.hp<=0){E.splice(E.indexOf(target),1);coins+=20;xpv+=35;save();update();say(tr('Dzik pokonany: +20 monet, +35 XP.'))}
 }
 function interact(){
+ if(campaignMode)return campaignInteract();
  if(activePanel)return;
  const chapterTarget=nearChapter();if(chapterTarget)return chapterInteract(chapterTarget.id);
  if(net.room){let target=null,d=75;for(const o of O){const q=distance(P,o);if(q<d){d=q;target=o}}return roomAction({kind:'interact',...(target?{target:target.id}:{})})}
@@ -908,8 +961,9 @@ function updateWorkUI(){
  $('raceStatus').textContent=raceRun?tr('Punkt ')+(raceRun.next+1)+'/4 · '+(raceRun.elapsed/1000).toFixed(1)+' s · '+goalDirection(activityRules.COURSE[raceRun.next]):tr('Tablica startowa: ')+goalDirection(activityRules.BOARD);
  $('raceRecord').textContent=campActivities.bestMs?tr('Rekord: ')+(campActivities.bestMs/1000).toFixed(1)+' s':tr('Ukończ bieg, żeby ustanowić rekord.');
 }
-function toggle(id,on){if(!panels.includes(id)||cloud.resetting)return;if(net.joining&&!net.room&&(id!=='roomPanel'||!on))cancelRoomJoin();for(const name of panels)$(name).style.display='none';activePanel=on?id:null;if(on)$(id).style.display='block';pad.capture=null;focusPadButton(null);resetInput();if(id==='controllerPanel')updatePadUI();if(id==='roomPanel')updateRoomUI();if(on&&padDevice)focusPadMenu();update()}
+function toggle(id,on){if(campaignMode&&on&&!['campaignHelp','languagePanel','controllerPanel'].includes(id))return;if(!panels.includes(id)||cloud.resetting)return;if(net.joining&&!net.room&&(id!=='roomPanel'||!on))cancelRoomJoin();for(const name of panels)$(name).style.display='none';activePanel=on?id:null;if(on)$(id).style.display='block';pad.capture=null;focusPadButton(null);resetInput();if(id==='controllerPanel')updatePadUI();if(id==='roomPanel')updateRoomUI();if(on&&padDevice)focusPadMenu();update()}
 function update(){
+ if(campaignMode){updateCampaign();return}
  updateCloudUI();updateWorkUI();updateAdventureUI();updateCharacterUI();
  for(const id of ['newSoloStart','newSoloButton','newSoloPad'])$(id).style.display=net.room?'none':'';
  $('bagIntro').textContent=net.room?tr('Wspólne zasoby drużyny. Jedzenie leczy osobę, która je zjada.'):tr('Zjedz coś przed kolejną wyprawą.');$('baseIntro').textContent=net.room?tr('Wspólna baza i ognisko całej drużyny.'):tr('Twoje miejsce odpoczynku.');
@@ -942,6 +996,7 @@ function update(){
 }
 function say(text){$('msg').textContent=tr(text);$('msg').classList.add('on');clearTimeout(msgTimer);msgTimer=setTimeout(()=>$('msg').classList.remove('on'),2600)}
 function save(){
+ if(campaignMode)return saveCampaign();
  if(net.room||!soloReady())return;const state=soloSnapshot();if(cloud.session){if(!cloud.cache)return;if(JSON.stringify(state)!==JSON.stringify(cloud.cache.state)){cloud.cache.state=state;cloud.cache.dirty=true;persistCloudCache()}flushCloud();updateCloudUI();return}try{const text=JSON.stringify(state);localStorage.setItem(SAVE_KEY,text);if(localStorage.getItem(SAVE_KEY)!==text)throw new Error('Local save was not retained')}catch(e){console.warn('My Island: local save failed ('+(e?.name||'Error')+').')}
 }
 function loadSoloState(d){
@@ -1081,6 +1136,124 @@ async function restartCloudSoloGame(fresh){
   cloud.revision=data.save.revision;cloud.updatedAt=data.save.updatedAt;cloud.cache={state:data.save.state,revision:cloud.revision,updatedAt:cloud.updatedAt,dirty:false,pending:null};persistCloudCache();applySoloSnapshot(data.save.state);blocking=lastAttack=hitFlash=walkPhase=0;lastTime=0;cloud.error='';$('start').style.display='none';play=1;cloud.resetting=false;toggle('newGamePanel',0);draw();say(tr('Nowa przygoda zapisana na koncie!'));
  }catch(error){$('newGameError').textContent=tr(error.message||tr('Nie udało się rozpocząć nowej gry. Obecny postęp został zachowany.'))}finally{cloud.resetting=false;for(const b of $('newGamePanel').querySelectorAll('button'))b.disabled=false;updateCloudUI()}
 }
+function refreshCampaignLabels(){
+ for(const el of document.querySelectorAll('[data-campaign-text]'))el.textContent=ct(el.dataset.campaignText);
+ try{$('campaignStart').textContent=ct(localStorage.getItem(campaignRules.SAVE_KEY)?'resume':'start')}catch(e){}
+ $('campaign3d').setAttribute('aria-label',ct('title'));$('campaign2d').setAttribute('aria-label',ct('title')+' · 2D');
+ if(campaignMode)updateCampaign();
+}
+function saveCampaign(){
+ if(!campaign)return false;
+ try{const data=JSON.stringify(campaignRules.snapshot(campaign));localStorage.setItem(campaignRules.SAVE_KEY,data);campaignStored=localStorage.getItem(campaignRules.SAVE_KEY)===data}
+ catch(e){campaignStored=false}
+ return campaignStored;
+}
+function startCampaign(){
+ if(campaignMode||net.room||net.joining)return;
+ if(play&&soloReady())save();campaignResume=play;
+ if(activePanel)toggle(activePanel,0);
+ let stored=null;try{stored=JSON.parse(localStorage.getItem(campaignRules.SAVE_KEY))}catch(e){}
+ campaign=campaignRules.restore(stored);campaignMode=true;play=1;lastTime=0;resetInput();
+ document.body.classList.add('campaign-active');$('start').style.display='none';$('hint').style.display='none';
+ ensureCampaign3D();
+ campaignUse3D=!!campaignRenderer?.enabled;resizeCampaign();applyCampaignView();saveCampaign();refreshCampaignLabels();
+ if(campaign.notice){say(ct(campaign.notice));campaign.notice=null}
+}
+function ensureCampaign3D(){
+ if(!campaignMode)return;
+ if(!campaignRenderer&&globalThis.MyIsland3D?.createCampaign){
+  try{campaignRenderer=MyIsland3D.createCampaign({canvas:$('campaign3d'),getState:()=>campaign,onLost:()=>{campaignUse3D=false;applyCampaignView();say(tr('Widok 3D jest chwilowo niedostępny. Możesz kontynuować w 2D.'))}});
+    campaignRenderer.setCamera('third');
+  }catch(e){console.warn('Campaign 3D unavailable:',e?.message)}
+ }
+}
+function leaveCampaign(){
+ if(!campaignMode)return;saveCampaign();
+ if(activePanel)toggle(activePanel,0);campaignMode=false;play=campaignResume;resetInput();lastTime=0;
+ document.body.classList.remove('campaign-active');$('campaign3d').style.display=$('campaign2d').style.display='none';
+ $('lookReticle').style.display='';$('hint').style.display='none';$('start').style.display=play?'none':'flex';
+ document.querySelector('.attack').innerHTML='<span data-i18n="⚔️ ATAK">'+tr('⚔️ ATAK')+'</span>';
+ document.querySelector('.act').textContent=tr('DZIAŁAJ');refreshTranslations();boot3D();
+}
+function resizeCampaign(){
+ const c=$('campaign2d');c.width=Math.round(innerWidth*Math.min(devicePixelRatio||1,1.5));c.height=Math.round(innerHeight*Math.min(devicePixelRatio||1,1.5));
+ campaignRenderer?.resize();
+}
+function applyCampaignView(){
+ if(!campaignMode)return;
+ const active=campaignUse3D&&campaignRenderer?.enabled;
+ $('campaign3d').style.display=active?'block':'none';$('campaign2d').style.display=active?'none':'block';
+ $('campaignViewLabel').textContent=active?'3D':'2D';
+ $('campaignCameraLabel').textContent=ct(campaignRenderer?.cameraMode==='first'?'first':'third');
+ document.body.dataset.campaignCamera=active?campaignRenderer.cameraMode:'2d';
+}
+function campaignView(){campaignUse3D=!!campaignRenderer?.enabled&&!campaignUse3D;applyCampaignView()}
+function campaignCamera(){if(!campaignRenderer)return;campaignRenderer.setCamera(campaignRenderer.cameraMode==='first'?'third':'first');applyCampaignView()}
+function campaignInteract(){
+ if(!campaignMode||activePanel)return;
+ campaignRules.interact(campaign);saveCampaign();updateCampaign();campaignNotice();
+}
+function campaignAttack(){
+ if(!campaignMode||activePanel)return;
+ campaignRules.shoot(campaign,campaignUse3D&&campaignRenderer?.enabled?campaignRenderer.aim():campaign.heading);
+ saveCampaign();updateCampaign();campaignNotice();
+}
+function campaignNotice(){if(campaign.notice){say(ct(campaign.notice));campaign.notice=null}}
+function updateCampaign(){
+ if(!campaign)return;
+ const objective=campaignRules.goal(campaign),target=objective.target;
+ $('campaignHp').textContent=Math.ceil(campaign.hp);$('campaignFuel').textContent=Math.ceil(campaign.fuel);
+ $('campaignAmmo').textContent=campaign.ammo;$('campaignPeople').textContent=campaign.released.length;
+ $('campaignObjective').textContent=ct(objective.key);$('campaignHelpGoal').textContent=ct(objective.key);
+ let direction='';if(target){const angle=(Math.atan2(target.x-campaign.p.x,campaign.p.z-target.z)*180/Math.PI+360)%360;
+  direction=['N','NE','E','SE','S','SW','W','NW'][Math.round(angle/45)%8]+' · '+Math.round(campaignRules.dist(target,campaign.p)/campaignRules.SCALE)+' m'}
+ $('campaignDistance').textContent=direction;$('campaignSave').textContent=ct(campaignStored?'saved':'unsaved');
+ const near=campaignRules.nearby(campaign);
+ $('hint').textContent=near?ct(near.label)+' · '+tr('DZIAŁAJ'):campaign.fuel<=0&&campaign.boat?ct('paddle'):'';
+ $('hint').style.display=!activePanel&&$('hint').textContent?'block':'none';
+ document.querySelector('.act').textContent=near?ct(near.label):tr('DZIAŁAJ');
+ document.querySelector('.attack').textContent='🔫 '+tr('ATAK');
+ $('campaignLanguage').textContent='🌐 '+MyIslandI18n.current().toUpperCase();
+ $('lookReticle').style.display=campaignUse3D&&!campaign.boat&&campaign.gun?'block':'none';
+ applyCampaignView();drawCampaignMap();
+}
+function drawCampaignMap(){
+ const ctx=$('campaignMap').getContext('2d'),w=368,h=228;ctx.clearRect(0,0,w,h);
+ const map=p=>({x:(p.x+2100)/4400*w,y:(p.z+1350)/3300*h});
+ ctx.fillStyle='#143a43';ctx.fillRect(0,0,w,h);
+ for(const i of campaignRules.ISLANDS){const p=map(i);ctx.fillStyle='#a2b286';ctx.beginPath();ctx.arc(p.x,p.y,i.radius/4400*w,0,Math.PI*2);ctx.fill()}
+ const target=campaignRules.goal(campaign).target;
+ if(target&&!campaign.interior){const p=map(target);ctx.strokeStyle='#f4d281';ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.stroke()}
+ const position=campaign.interior?campaignRules.docks[campaign.island].shore:campaign.p,p=map(position);
+ ctx.fillStyle='#f5df9e';ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#dfe9d6';ctx.font='18px system-ui';ctx.textAlign='left';ctx.fillText(campaign.interior?ct(campaign.interior==='cave'?'enter-cave':campaign.interior==='cellar'?'cellar':'enter-estate'):ct(campaign.island),10,h-10);
+}
+function campaignFrame(timestamp,dt){
+ campaign.paused=!!activePanel||!inputFocused||document.hidden;
+ let dx=0,dz=0;
+ if(!campaign.paused){
+  if(K.ArrowUp||K.w)dz--;if(K.ArrowDown||K.s)dz++;if(K.ArrowLeft||K.a)dx--;if(K.ArrowRight||K.d)dx++;
+  if(!dx&&!dz){dx=pad.x;dz=pad.y}
+  if(campaignUse3D&&campaignRenderer?.enabled){
+   campaignRenderer.orbit(((K.q?-1:0)+(K.r?1:0))*.03*dt*60);
+   if(pad.ready&&padDevice?.mapping==='standard'&&padProfile.x<2&&padProfile.y<2){
+    const ax=padDevice.axes?.[2]||0,ay=padDevice.axes?.[3]||0;campaignRenderer.orbit(Math.abs(ax)>.18?-ax*.035*dt*60:0,Math.abs(ay)>.18?ay*.02*dt*60:0);
+   }
+   ({x:dx,z:dz}=campaignRenderer.vector(dx,dz));
+  }
+  const before={...campaign.p};campaignRules.move(campaign,dx,dz,dt,{sprint:!!(sprint||pad.sprinting)});
+  campaign.walking=campaignRules.dist(before,campaign.p)>.01;campaignRules.tick(campaign,dt);campaignNotice();
+ }else campaign.walking=false;
+ if(timestamp-campaignLastSave>5000){saveCampaign();campaignLastSave=timestamp}
+ if(timestamp-campaignLastUI>150){updateCampaign();campaignLastUI=timestamp}
+ if(campaignUse3D&&campaignRenderer?.enabled){
+  try{campaignRenderer.frame(timestamp)}catch(e){console.warn('Campaign graphics:',e?.message);campaignUse3D=false;applyCampaignView()}
+ }else{
+  const c=$('campaign2d'),ctx=c.getContext('2d'),ratio=c.width/innerWidth;ctx.setTransform(ratio,0,0,ratio,0,0);
+  campaignRules.drawCampaign2D(ctx,campaign,innerWidth,innerHeight,ct);
+ }
+}
+addEventListener('resize',()=>{if(campaignMode)resizeCampaign()});
 function sceneState(){return {appearance:characterRules.colors(myAppearance),motion:currentMotion(),fishes:F,chapterMarkers:chapterMarkers().map(p=>({...p,label:tr(p.label)})),labels:{leon:tr('LEON · HANDEL'),nela:tr('NELA · ZADANIA'),board:tr('PRACA I ZABAWA'),finish:tr('META')},P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear:hasEquippedSpear(),spearOwned:!!spear,activities:campActivities,garden:activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y)),board:activityRules.BOARD,trail:raceRun?activityRules.COURSE[raceRun.next]:(chapterGoal()?{...chapterGoal(),label:tr(chapterGoal().label)}:null),trailNumber:raceRun?raceRun.next+1:0,objects:O,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):[]}}
 function updateView(){const active=!!islandView?.enabled;$('world3d').style.display=active?'block':'none';C.style.display=active?'none':'block';document.body.dataset.view=active?preferredCamera:'2d';$('viewButton').textContent=active?tr('Widok 3D'):tr('Widok 2D');$('viewButton').setAttribute('aria-pressed',String(active));$('cameraLeft').disabled=$('cameraRight').disabled=!active;$('cameraModeButton').disabled=!active;$('cameraModeButton').textContent=tr(preferredCamera==='first'?'Oczami postaci':'Zza postaci');$('cameraModeButton').setAttribute('aria-pressed',String(preferredCamera==='first'));$('viewHelp').textContent=active?tr('WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera'):tr('WASD / strzałki · E działaj · Shift sprint · spacja atak')}
 function switchView(){if(!islandView)return;preferredView=islandView.enabled?'2d':'3d';islandView.setEnabled(preferredView==='3d');viewHeading=null;resetInput();try{localStorage.setItem('myIslandViewV1',preferredView)}catch(e){}updateView()}
@@ -1091,9 +1264,11 @@ function refreshTranslations(){
  MyIslandI18n.apply(document);update();updateRoomUI();updatePadUI();updateView();
  for(const id of ['roomStatus','newGameError','newGameDescription','cloudRecoveryStatus','msg'])$(id).textContent=tr($(id).textContent);
  if($('viewButton').title)$('viewButton').title=tr($('viewButton').title);
+ refreshCampaignLabels();
 }
 function setLanguage(code){if(!MyIslandI18n.set(code,document))return;resetInput();refreshTranslations()}
 addEventListener('load',boot3D);
+addEventListener('load',()=>{if(campaignMode){ensureCampaign3D();campaignUse3D=!!campaignRenderer?.enabled;resizeCampaign();applyCampaignView()}});
 refreshTranslations();
 cloud.bootstrap=bootCloud();
 </script>

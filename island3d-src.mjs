@@ -3,6 +3,9 @@ import { BOARD, baseLayout } from './island-play.mjs';
 import { colors, motionPose, MOTIONS } from './character.mjs';
 import { createMaterials, cameraPose, addGroundCover, detailBase, terrainMask } from './island-environment.mjs';
 import { createArchipelagoGroup } from './archipelago-terrain.mjs';
+import { createCampaignView, drawCampaign2D } from './campaign-view.mjs';
+export { drawCampaign2D };
+export function createCampaign(options){return createCampaignView({...options,makeHuman:buildHuman});}
 
 // Rendering only. Authoritative inventory, save ownership and room state stay in index.html.
 export const SCALE = 80;
@@ -75,7 +78,17 @@ export function buildHuman(look={},kind='player',helpers={}){
     const skin=look.skin||'#dda879',hair=look.hair||'#43332b',shirt=look.shirt||'#4c9cba';
     const hips=new T.Group();hips.position.y=.87;rig.add(hips);
     ell(hips,'#3f4d4f',[0,.05,0],[.22,.17,.13]);
-    ell(hips,shirt,[0,.36,0],[.255,.31,.15]);
+    const torso=geo('human-torso',()=>new T.LatheGeometry([
+      new T.Vector2(.16,.13),new T.Vector2(.205,.20),new T.Vector2(.215,.38),
+      new T.Vector2(.25,.49),new T.Vector2(.26,.52),new T.Vector2(.19,.57),new T.Vector2(.09,.64)
+    ],18));
+    mesh(hips,torso,mat(shirt),[0,0,0],[1,1,.66]);
+    for(const side of [-1,1]){
+      const collar=cube(hips,shirt,[side*.065,.60,.071],[.085,.075,.024]);collar.rotation.z=-side*.3;
+      cube(hips,shirt,[side*.11,.37,.142],[.105,.09,.022]);
+    }
+    for(let j=0;j<4;j++)ell(hips,'#d7d5c2',[0,.24+j*.075,.15],[.009,.01,.005]);
+    if(kind==='guard')cube(hips,'#39483f',[0,.35,.11],[.34,.36,.09]);
     cube(hips,'#3b4c48',[0,.135,-.01],[.4,.045,.255]);
     tube(hips,skin,[0,.64,0],[.064,.13,.064]);
     const head=new T.Group();head.position.y=.79;hips.add(head);
@@ -109,11 +122,11 @@ export function buildHuman(look={},kind='player',helpers={}){
     for(const side of [-1,1]){
       const arm=new T.Group();arm.position.set(side*.27,.54,0);hips.add(arm);
       tube(arm,shirt,[0,-.095,0],[.087,.19,.087]);tube(arm,skin,[0,-.24,0],[.061,.15,.061]);
-      const forearm=new T.Group();forearm.position.y=-.31;arm.add(forearm);tube(forearm,skin,[0,-.13,0],[.053,.26,.053]);ell(forearm,skin,[0,-.28,0],[.06,.082,.046]);
+      const forearm=new T.Group();forearm.position.y=-.31;arm.add(forearm);mesh(forearm,geo('human-forearm',()=>new T.CylinderGeometry(.057,.040,.26,12)),mat(skin),[0,-.13,0]);ell(forearm,skin,[0,-.28,0],[.06,.082,.046]);
       arms.push({arm,forearm,side});
       const thigh=new T.Group();thigh.position.set(side*.115,0,0);hips.add(thigh);
-      tube(thigh,'#52625f',[0,-.21,0],[.093,.42,.093]);
-      const calf=new T.Group();calf.position.y=-.43;thigh.add(calf);tube(calf,'#52625f',[0,-.18,0],[.069,.36,.069]);
+      mesh(thigh,geo('human-thigh',()=>new T.CylinderGeometry(.098,.074,.42,12)),mat('#52625f'),[0,-.21,0]);
+      const calf=new T.Group();calf.position.y=-.43;thigh.add(calf);mesh(calf,geo('human-calf',()=>new T.CylinderGeometry(.069,.046,.36,12)),mat('#52625f'),[0,-.18,0]);
       const shoe=ell(calf,'#4b3b2e',[0,-.395,.055],[.075,.052,.14]);legs.push({thigh,calf,shoe,side});
     }
     const spear=new T.Group();tube(spear,'#8c6944',[0,.56,0],[.018,1.75,.018]);ell(spear,'#dad9c5',[0,1.45,0],[.045,.15,.03]);spear.position.set(.35,.2,.08);rig.add(spear);spear.visible=false;

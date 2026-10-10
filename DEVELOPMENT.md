@@ -1,4 +1,18 @@
-# My Island 0.18
+# My Island 0.19
+
+## Rescue campaign and repaired publication
+
+The start screen now offers PLAY THE STORY as its primary action, alongside the existing solo island and online modes. The campaign opens aboard a motorboat with low fuel and a marked harbor. Players dock, refuel, sail to Jungle Island, enter a cave, move a newspaper and pick up the hidden pistol. The guarded estate on Fortress Island contains a boss and cellar key. Five prisoners, including two children, must be freed and escorted back to the boat; returning to the main harbor completes the mission. Six distinct islands are rendered and can be visited. The other three islands provide supplies.
+
+The campaign has actual swept movement, island/sea boundaries, mansion walls, guarded cells, aiming and ammunition, hostile guards, recovery at the last harbor, and objectives with direction and distance. An empty tank allows slow boat movement, and the cave and island caches replenish supplies. Menus, an inactive tab and focus loss pause movement and combat. Keyboard, touch controls and existing remappable controller profiles work. Campaign text uses all six existing languages.
+
+The 3D scene includes island terrain, beaches, docks, palms, a motorboat, fuel pump, cave, estate, interior rooms, prison bars, guards and rescued people. Both first- and third-person cameras are available. Human geometry now has a shaped continuous torso, clothing details and tapered limbs, but remains procedural rather than an imported photorealistic character. The independent 2D renderer supports the entire mission even when the graphics bundle or WebGL is unavailable.
+
+Campaign state uses the new device-local key `myIslandCampaignV1`. It does not synchronize to an account or online room; the UI states this explicitly. Starting, saving and leaving the campaign preserve the existing island, resources, account and room data. Save format 10, account protocol 12 and room protocol 11 remain unchanged. No backend deployment is required. `campaign.mjs` holds gameplay and validated restore logic; `campaign-view.mjs` holds Three.js presentation; `campaign-2d.mjs` provides the fallback, and `campaign-text.mjs` holds translations.
+
+The previous archipelago changes existed in source but were absent from the checked-in browser bundle. Pages could report a successful deployment while serving the old renderer. `scripts/bundle-targets.mjs` now defines all seven browser bundles for both build and verification. `npm run check:bundles` rebuilds in memory and rejects stale or missing checked-in output. The Verify game workflow runs this check before the tests. This workflow reports failures separately from the existing Pages workflow; it does not gate automatic Pages publication. Always commit sources and regenerated output together and verify the actual public game after Pages completes.
+
+`npm run verify` passes 54 frontend tests. Campaign coverage traverses the complete physical rescue route, combat, five cells and boat evacuation with repeated reloads; checks locked progress, collision, fuel/ammunition recovery, paused combat, invalid saves, real UI input, remapped pad axes/buttons, blocked storage, six languages and legacy-save preservation. DOM tests do not verify actual GPU rendering, so public browser QA remains a separate required step.
 
 ## Eye-level graphics and natural materials
 
