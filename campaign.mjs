@@ -1,35 +1,18 @@
-import { ISLANDS, ISLAND_BY_ID, getIslandAt } from './archipelago-layout.mjs';
+import { ISLANDS,ISLAND_BY_ID,getIslandAt,SCALE,WORLD_VERSION,docks,points,GUARDS,VILLAGE,bounds,
+  estateCenter,fortressApproach,ground,pierAt,migratePosition,migrateGuard } from './campaign-world.mjs';
 import { sceneryBlocked } from './campaign-scenery.mjs';
 import { islandElevation } from './archipelago-terrain.mjs';
 export { text } from './campaign-text.mjs';
-export { ISLANDS };
+export { ISLANDS,SCALE,docks,points,GUARDS,bounds,estateCenter,fortressApproach,ground };
 
 // The campaign has its own world and save. Legacy accounts and co-op are untouched.
 export const VERSION = 1;
 export const SAVE_KEY = 'myIslandCampaignV1';
-export const SCALE = 20;
 export const dist = (a,b) => Math.hypot(a.x-b.x,a.z-b.z);
 const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
-export const docks = Object.fromEntries(ISLANDS.map(i=>{
-  const d=Math.hypot(i.dock.x-i.x,i.dock.z-i.z),ux=(i.dock.x-i.x)/d,uz=(i.dock.z-i.z)/d;
-  return [i.id,{id:i.id,x:i.x+ux*i.radius*1.06,z:i.z+uz*i.radius*1.06,
-    shore:{x:i.x+ux*i.radius*.84,z:i.z+uz*i.radius*.84},ux,uz}];
-}));
-export const points = {
-  pump:{x:330,z:65}, cave:{x:1080,z:-415}, estate:{x:1900,z:652},
-  paper:{x:0,z:-40}, caveExit:{x:0,z:150}, estateExit:{x:0,z:130},
-  stairs:{x:70,z:-95}, cellarExit:{x:0,z:150}, key:{x:0,z:-60},
-  supply:{x:1230,z:-520}
-};
 export const PEOPLE = Array.from({length:5},(_,id)=>({id,x:(id-2)*38,z:-80,child:id>2}));
-export const GUARDS = [
-  {id:'gate',area:null,x:1785,z:695,hp:2},
-  {id:'patrol',area:null,x:2010,z:635,hp:2},
-  {id:'hall',area:'estate',x:-65,z:15,hp:2},
-  {id:'boss',area:'estate',x:0,z:-60,hp:3}
-];
 export function fresh() {
-  return {version:VERSION,p:{x:docks.home.x+180,z:docks.home.z+70},heading:Math.PI,
+  return {version:VERSION,worldVersion:WORLD_VERSION,p:{x:docks.home.x+180,z:docks.home.z+70},heading:Math.PI,
     boat:true,boatAt:'home',interior:null,island:'home',fuel:12,hp:100,ammo:0,
     docked:false,tanked:false,paper:false,gun:false,key:false,escaped:false,complete:false,
     released:[],boarded:false,supplyUsed:false,guards:GUARDS.map(g=>({...g,cooldown:2})),elapsed:0,
@@ -52,12 +35,14 @@ export function restore(input) {
   s.ammo=s.gun?Math.floor(s.ammo):0;
   const safePosition=()=>s.interior?{x:0,z:120}:s.boat?{x:docks[s.boatAt].x,z:docks[s.boatAt].z}:{...docks[s.island].shore};
   if(Number.isFinite(input.p?.x)&&Number.isFinite(input.p?.z)){
-    const p={x:input.p.x,z:input.p.z};
+    const raw={x:input.p.x,z:input.p.z},p=input.worldVersion===WORLD_VERSION?raw:migratePosition(raw,s);
     if(allowed(s,p))s.p=p;
     else s.p=safePosition();
   } else s.p=safePosition();
   s.guards=GUARDS.map(g=>{
-    const old=Array.isArray(input.guards)?input.guards.find(v=>v?.id===g.id):null,hp=Number.isFinite(old?.hp)?clamp(Math.floor(old.hp),0,g.hp):g.hp;
+    let old=Array.isArray(input.guards)?input.guards.find(v=>v?.id===g.id):null;
+    if(old&&input.worldVersion!==WORLD_VERSION)old=migrateGuard(old);
+    const hp=Number.isFinite(old?.hp)?clamp(Math.floor(old.hp),0,g.hp):g.hp;
     const valid=old&&Number.isFinite(old.x)&&Number.isFinite(old.z)&&dist(old,g)<170;
     return {...g,...(valid?{x:old.x,z:old.z}:{}),hp,cooldown:2};
   });
@@ -67,14 +52,9 @@ export function snapshot(s) {
   const {shot,notice,lastShot,paused,walking,...saved}=s;
   return JSON.parse(JSON.stringify(saved));
 }
-export function ground(x,z) {
-  const i=getIslandAt(x,z);if(!i)return -.32;
-  if(i.id==='fortress'&&Math.abs(x-i.x)<110&&Math.abs(z-i.z)<110)return .85;
-  return islandElevation(i,x,z);
-}
 function blocked(s,p) {
-  if(!s.interior&&sceneryBlocked(p,s.island))return true;
-  if(!s.interior&&Math.abs(p.x-1900)<90&&p.z>465&&p.z<635)return true;
+  if(!s.interior&&sceneryBlocked(p,s.island,VILLAGE))return true;
+  if(!s.interior&&Math.abs(p.x-estateCenter.x)<90&&Math.abs(p.z-estateCenter.z)<85)return true;
   if(s.interior==='cellar'&&p.z<-30){
     const cell=PEOPLE.find(v=>Math.abs(v.x-p.x)<22);
     if(cell&&!s.released.includes(cell.id))return true;
@@ -84,10 +64,10 @@ function blocked(s,p) {
 export function allowed(s,p) {
   if(!Number.isFinite(p.x)||!Number.isFinite(p.z))return false;
   if(s.interior)return p.x>=-110&&p.x<=110&&p.z>=-115&&p.z<=170&&!blocked(s,p);
-  if(Math.abs(p.x)>2450||p.z<-1600||p.z>1850)return false;
+  if(p.x<bounds.minX||p.x>bounds.maxX||p.z<bounds.minZ||p.z>bounds.maxZ)return false;
   if(s.boat)return !ISLANDS.some(i=>dist(p,i)<i.radius&&islandElevation(i,p.x,p.z)>-.025);
   const i=ISLAND_BY_ID[s.island];
-  return dist(p,i)<i.radius*.99&&ground(p.x,p.z)>.005&&!blocked(s,p);
+  return (!!pierAt(p.x,p.z,s.island)||dist(p,i)<i.radius*.99&&ground(p.x,p.z)>.005)&&!blocked(s,p);
 }
 function lineClear(s,a,b) {
   const n=Math.ceil(dist(a,b)/12);
@@ -109,7 +89,7 @@ export function move(s,dx,dz,dt,{sprint=false}={}) {
     const z={x:s.p.x,z:s.p.z+dz*speed*dt/n};
     if(allowed(s,z))s.p.z=z.z;
   }
-  if(s.boat)s.fuel=Math.max(0,s.fuel-dist(before,s.p)*.004);
+  if(s.boat)s.fuel=Math.max(0,s.fuel-dist(before,s.p)*.0008);
 }
 function guardsIn(s) {
   if(s.boat||s.interior==='cave'||s.interior==='cellar')return [];
@@ -227,7 +207,7 @@ export function interact(s) {
   }
   return true;
 }
-export function goal(s) {
+function objective(s) {
   if(s.complete)return {key:'complete',target:null};
   if(!s.docked)return {key:'dock-goal',target:docks.home};
   if(!s.tanked)return {key:'fuel-goal',target:s.boat?docks.home:points.pump};
@@ -250,4 +230,13 @@ export function goal(s) {
   if(s.interior)return {key:'escort-goal',target:s.interior==='cellar'?points.cellarExit:points.estateExit};
   if(!s.boarded)return {key:'boat-goal',target:docks.fortress.shore};
   return {key:'home-goal',target:s.boat?docks.home:s.island==='home'?docks.home.shore:docks[s.island].shore};
+}
+export function goal(s) {
+  const result=objective(s);
+  if(s.boat||s.interior||!result.target)return result;
+  const dock=docks[s.island],onPier=!!pierAt(s.p.x,s.p.z,s.island);
+  if(result.target===dock.shore){
+    if(!onPier&&dist(s.p,dock.land)>65)return {...result,target:dock.land};
+  }else if(onPier&&dist(s.p,dock.land)>45)return {...result,target:dock.land};
+  return result;
 }

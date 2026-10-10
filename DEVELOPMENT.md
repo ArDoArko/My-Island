@@ -1,4 +1,14 @@
-# My Island 0.20
+# My Island 0.21
+
+## Large campaign islands and boat contact (0.21)
+
+The photographed 0.20 campaign exposed two concrete problems: the main island was only 48 metres across, and the seated player was roughly 0.76 metres above the chair. The campaign now uses `campaign-world.mjs`, with a main landmass roughly 844 by 729 metres, irregular bays, broad hills and a coastal harbor. Other islands are hundreds of metres across, with larger separation and an inland trail. The physical scale stays 20 planning units per metre: house footprints, people, combat and walking speeds are unchanged. Existing solo/co-op geography continues to use `archipelago-layout.mjs`.
+
+Campaign snapshots retain version 1 and `myIslandCampaignV1`, adding `worldVersion: 2`. Old exterior positions and guards migrate to their corresponding harbor or mission area; interiors keep their coordinates. Invalid positions recover at the current dock without resetting fuel, health, ammunition, elapsed time, flags, defeated guards or freed prisoners. New coordinates are not migrated again on reload. Boat fuel consumption is adjusted for the longer voyages; the full rescue route returns with reserve fuel. The minimap derives its bounds from the six expanded islands.
+
+Every pier has a fixed 28-metre length, a shared rendered/walkable deck height and an inland endpoint. Boat boarding is at the seaward end; objective markers first guide walkers along the pier to land. The player model is parented to the motorboat while seated, with pelvis-to-seat, boot-to-deck and hand-to-wheel contact. Hull yaw and rocking carry the driver together with the seat. The first-person camera uses the seated eye height. Disembarking restores the standing rig.
+
+Validation: `npm run verify` passes 60 tests and checks all seven browser bundles. Tests traverse the entire larger mission with reloads, old campaign migration, legacy/account/room preservation, all six walkable piers, actual rendered pier-to-beach contact and actual seat/deck contact under yaw and roll. The island, distant island, ocean and sky GLSL programs compile and link in Mesa OpenGL ES 3.2. Those checks do not establish full GPU appearance or device frame rate; browser rendering remains a separate check. This is still a procedural scene and character system.
 
 ## Tropical harbor and landscape correction
 

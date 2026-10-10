@@ -46,7 +46,7 @@ export function t(source) {
 }
 export function apply(root = document) {
   root.documentElement.lang = language;
-  root.title = t('My Island 0.20 — Akcja ratunkowa');
+  root.title = t('My Island 0.21 — Akcja ratunkowa');
   for (const element of root.querySelectorAll('[data-i18n]')) {
     element.textContent = t(element.getAttribute('data-i18n'));
   }

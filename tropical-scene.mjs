@@ -10,10 +10,10 @@ float fbm21(vec2 p){float f=0.,a=.5;for(int i=0;i<4;i++){f+=a*noise21(p);p=mat2(
 
 // One ocean in both modes. Unequal wave directions and noise break up the old
 // high-frequency stripes; the coast uniforms give each shore its own shallows.
-export function createOcean(coasts,{size=900,segments=72}={}) {
+export function createOcean(coasts,{size=900,segments=72,coastSeeds=[]}={}) {
   const shore=Array.from({length:9},(_,j)=>new T.Vector4(...(coasts[j]||[10000,10000,1,1])));
   const material=new T.ShaderMaterial({fog:true,uniforms:{...T.UniformsUtils.clone(T.UniformsLib.fog),
-    uTime:{value:0},uEye:{value:new T.Vector3()},uCoasts:{value:shore}},
+    uTime:{value:0},uEye:{value:new T.Vector3()},uCoasts:{value:shore},uCoastSeeds:{value:Array.from({length:9},(_,j)=>coastSeeds[j]??-100)}},
   vertexShader:`uniform float uTime;varying vec3 vWater;
     #include <fog_pars_vertex>
     void main(){vec3 p=position;
@@ -21,7 +21,7 @@ export function createOcean(coasts,{size=900,segments=72}={}) {
     vWater=(modelMatrix*vec4(p,1.)).xyz;vec4 mvPosition=viewMatrix*vec4(vWater,1.);gl_Position=projectionMatrix*mvPosition;
     #include <fog_vertex>
     }`,
-  fragmentShader:`uniform float uTime;uniform vec3 uEye;uniform vec4 uCoasts[9];varying vec3 vWater;
+  fragmentShader:`uniform float uTime;uniform vec3 uEye;uniform vec4 uCoasts[9];uniform float uCoastSeeds[9];varying vec3 vWater;
     #include <fog_pars_fragment>
     ${noiseGLSL}
     float wave(vec2 p){return sin(dot(p,vec2(.7,.3))+uTime*.8)*.046+
@@ -30,7 +30,10 @@ export function createOcean(coasts,{size=900,segments=72}={}) {
     void main(){vec2 p=vWater.xz;float eps=.055,h=wave(p);
       vec3 n=normalize(vec3((h-wave(p+vec2(eps,0.)))/eps,1.,(h-wave(p+vec2(0.,eps)))/eps));
       vec3 view=normalize(uEye-vWater);float fresnel=.025+.975*pow(1.-max(dot(n,view),0.),5.);
-      float coast=1000.;for(int i=0;i<9;i++){vec4 c=uCoasts[i];coast=min(coast,(length((p-c.xy)/c.zw)-1.)*min(c.z,c.w));}
+      float coast=1000.;for(int i=0;i<9;i++){
+        vec4 c=uCoasts[i];vec2 delta=(p-c.xy)/c.zw;float boundary=1.,seed=uCoastSeeds[i];
+        if(seed>-99.){float a=atan(delta.y,delta.x);boundary=.855+.07*sin(a*2.+seed)+.045*cos(a*3.-seed)+.025*sin(a*7.+seed);}
+        coast=min(coast,(length(delta)-boundary)*min(c.z,c.w));}
       float shallow=1.-smoothstep(.0,3.4,coast);vec3 depth=mix(vec3(.008,.15,.21),vec3(.045,.47,.43),shallow);
       float ripple=fbm21(p*.52+vec2(uTime*.04,0.));depth*=.94+ripple*.12;
       vec3 reflection=mix(vec3(.58,.76,.82),vec3(.19,.46,.63),smoothstep(0.,.8,n.y-view.y));
@@ -104,11 +107,12 @@ export function palmFronds(detail=14) {
   const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(vertices,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(indices);g.computeVertexNormals();return g;
 }
 
-export function decorateIslands(root,islands,{scale,height,surfaces,small=false,clear=()=>false}={}) {
+export function decorateIslands(root,islands,{scale,height,surfaces,small=false,clear=()=>false,dense=false}={}) {
   const positions=[];
-  for(const i of islands)for(let j=0;j<(small?22:42);j++){
-    const a=j*2.39996+i.x*.001,r=i.radius*(.36+(j%7)*.075),x=i.x+Math.sin(a)*r,z=i.z+Math.cos(a)*r;
+  for(const i of islands)for(let j=0;j<(dense?(i.id==='home'?(small?700:1500):(small?280:650)):(small?22:42));j++){
+    const a=j*2.39996+i.x*.001,r=i.radius*(dense?Math.sqrt((j*.6180339)%1)*.91:.36+(j%7)*.075),x=i.x+Math.sin(a)*r,z=i.z+Math.cos(a)*r;
     if(clear(i,x,z))continue;
+    if(height(x,z)<.32)continue;
     positions.push({x:x/scale,z:z/scale,y:height(x,z),a,h:3.8+(j%5)*.42,size:.76+(j%4)*.11});
   }
   const trunk=new T.CylinderGeometry(.085,.16,1,10,8);trunk.translate(0,.5,0);
@@ -137,7 +141,7 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
 
 // Colonial facades with shutters, balconies and arcaded ground-floor porches.
 // All solid building footprints come from VILLAGE, also read by gameplay.
-export function addVillage(root,{scale,height,surfaces,helpers}) {
+export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,paths,marketPoint={x:290,z:-30}}) {
   const {cube,tube}=helpers,houses=[];
   function batch(group){
     const byMaterial=new Map();group.updateMatrix();
@@ -153,7 +157,7 @@ export function addVillage(root,{scale,height,surfaces,helpers}) {
   function building(b,parent=root,coordinates=true){
     const g=new T.Group();g.name='village-house';parent.add(g);
     g.position.set(coordinates?b.x/scale:b.x,coordinates?height(b.x,b.z):0,coordinates?b.z/scale:b.z);
-    if(b.z>60)g.rotation.y=Math.PI;
+    g.rotation.y=b.facing??(b.z>60?Math.PI:0);
     const w=b.w/scale,d=b.d/scale,h=b.h;
     const wall=cube(g,b.color,[0,h/2,0],[w,h,d]);wall.material=surfaces.surface('plaster',b.color,2,.035);
     const roofMaterial=surfaces.surface('roof','#d5bbab',2,.065);
@@ -186,7 +190,7 @@ export function addVillage(root,{scale,height,surfaces,helpers}) {
     batch(g);houses.push(g);
     return g;
   }
-  for(const b of VILLAGE)building(b);
+  for(const b of village)building(b);
   // Paths follow the same height function as feet, including uneven ground.
   function path(points,width){
     const verts=[],uv=[],indices=[];let distance=0;
@@ -200,10 +204,19 @@ export function addVillage(root,{scale,height,surfaces,helpers}) {
     const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(verts,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.setIndex(indices);geo.computeVertexNormals();
     const mesh=new T.Mesh(geo,surfaces.surface('paving','#ded9c9',.75,.045));mesh.name='village-path';mesh.receiveShadow=true;root.add(mesh);
   }
-  path(Array.from({length:31},(_,j)=>({x:385-j*21,z:36+Math.sin(j*.19)*9})),55);
-  path(Array.from({length:15},(_,j)=>({x:23,z:-280+j*39})),40);
+  for(const p of paths||[
+    {points:Array.from({length:31},(_,j)=>({x:385-j*21,z:36+Math.sin(j*.19)*9})),width:55},
+    {points:Array.from({length:15},(_,j)=>({x:23,z:-280+j*39})),width:40}
+  ]){
+    const samples=[p.points[0]];
+    for(let j=1;j<p.points.length;j++){
+      const a=p.points[j-1],b=p.points[j],n=Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/30);
+      for(let k=1;k<=n;k++)samples.push({x:a.x+(b.x-a.x)*k/n,z:a.z+(b.z-a.z)*k/n});
+    }
+    path(samples,p.width);
+  }
   // Harbor canopy beside the fuel pump. It leaves the interactive pump clear.
-  const market=new T.Group();market.name='harbor-market';market.position.set(290/scale,height(290,-30),-30/scale);root.add(market);
+  const market=new T.Group();market.name='harbor-market';market.position.set(marketPoint.x/scale,height(marketPoint.x,marketPoint.z),marketPoint.z/scale);root.add(market);
   for(const x of [-1.4,1.4])for(const z of [-.6,.6])tube(market,'#876742',[x,1.2,z],[.045,2.4,.045]);
   const canopy=cube(market,'#cc8660',[0,2.35,0],[3.2,.07,1.8]);canopy.rotation.x=.07;
   cube(market,'#a98961',[0,.7,0],[2.8,.15,.9]);

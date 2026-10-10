@@ -22,6 +22,16 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert(houses.reduce((n,o)=>n+o.children.length,0)<100,'facade details were not batched for mobile');
     assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);
     assert(scene.getObjectByName('tropical-ocean').material.uniforms.uCoasts.value.length===9);
+    for(const d of Object.values(C.docks)){
+      const deck=scene.getObjectByName('pier-deck-'+d.id),land=scene.getObjectByName('archipelago-'+d.id);
+      for(let j=0;j<=20;j++){
+        const x=(d.land.x+(d.end.x-d.land.x)*j/20)/C.SCALE,z=(d.land.z+(d.end.z-d.land.z)*j/20)/C.SCALE;
+        const ray=new T.Raycaster(new T.Vector3(x,30,z),new T.Vector3(0,-1,0));
+        const hit=ray.intersectObject(deck)[0];
+        assert(hit&&Math.abs(hit.point.y-C.ground(x*C.SCALE,z*C.SCALE))<.015,'rendered pier disagrees with foot height: '+d.id);
+        if(j===0){const beach=ray.intersectObject(land)[0];assert(beach&&Math.abs(beach.point.y-hit.point.y)<.18,'pier does not connect to beach: '+d.id);}
+      }
+    }
     for(const mode of ['third','first']){
       view.setCamera(mode);
       for(const area of [null,'cave','estate','cellar']){
@@ -29,7 +39,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
         assert(camera.isPerspectiveCamera);assert(camera.position.toArray().every(Number.isFinite));
         const rooms=scene.getObjectByName('cellar').parent;
         for(const room of rooms.children)assert.equal(room.visible,room.name===area);
-        if(mode==='first')assert(Math.abs(camera.position.y-(area?1.64:2.39))<.001);
+        if(mode==='first')assert(Math.abs(camera.position.y-(area?1.64:1.67))<.001);
         let visibleMeshes=0;scene.traverseVisible(o=>{if(!o.isMesh)return;visibleMeshes++;assert(o.position.toArray().every(Number.isFinite));const p=o.geometry.attributes.position;assert(p&&p.count>0);});
         assert(visibleMeshes>0,'empty scene in '+mode+'/'+area);
         if(area){

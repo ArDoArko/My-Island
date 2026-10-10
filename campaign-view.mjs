@@ -1,5 +1,6 @@
 import * as T from 'three';
-import { ISLANDS } from './archipelago-layout.mjs';
+import { ISLANDS,VILLAGE,PATHS,market,estateCenter,pathClear,terrainHeight,bounds } from './campaign-world.mjs';
+import { buildMotorboat,seatDriver,HELM } from './campaign-boat.mjs';
 import { createIslandTerrain } from './archipelago-terrain.mjs';
 import { createMaterials, cameraPose } from './island-environment.mjs';
 import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
@@ -13,8 +14,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   renderer.setSize(innerWidth,innerHeight,false);
   renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
-  const scene=new T.Scene(),camera=new T.PerspectiveCamera(68,innerWidth/innerHeight,.04,500);
-  scene.add(camera);scene.background=new T.Color('#b9dbe5');scene.fog=new T.Fog('#b9dbe5',130,380);
+  const scene=new T.Scene(),camera=new T.PerspectiveCamera(68,innerWidth/innerHeight,.04,6000);
+  scene.add(camera);scene.background=new T.Color('#b9dbe5');scene.fog=new T.Fog('#b9dbe5',650,2400);
   const hemi=new T.HemisphereLight('#d5ecfa','#566143',2.0),sun=new T.DirectionalLight('#fff2d6',2.8);
   sun.castShadow=true;sun.shadow.mapSize.set(mobile?1024:2048,mobile?1024:2048);
   Object.assign(sun.shadow.camera,{left:-22,right:22,top:22,bottom:-22,near:.1,far:100});
@@ -31,10 +32,10 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const helpers={mat,geo,mesh,cube,tube,ell},world=new T.Group(),rooms=new T.Group();
   scene.add(world,rooms);
   for(const i of ISLANDS){
-    const land=createIslandTerrain(i,{segments:mobile?32:64});
+    const land=createIslandTerrain(i,{segments:mobile?96:192});
     land.scale.set(1/SCALE,1,1/SCALE);land.position.set(i.x/SCALE,0,i.z/SCALE);
     const p=land.geometry.attributes.position;
-    for(let j=0;j<p.count;j++)p.setY(j,ground(i.x+p.getX(j),i.z+p.getZ(j)));
+    for(let j=0;j<p.count;j++)p.setY(j,terrainHeight(i.x+p.getX(j),i.z+p.getZ(j),i));
     const colours=new Float32Array(p.count*3),c=new T.Color();
     for(let j=0;j<p.count;j++){
       const r=Math.hypot(p.getX(j),p.getZ(j))/i.radius;
@@ -44,36 +45,34 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     land.geometry.setAttribute('color',new T.BufferAttribute(colours,3));land.geometry.computeVertexNormals();
     land.material.dispose();land.material=islandMaterial(surfaces,SCALE);
     land.material.vertexColors=true;world.add(land);
-    const dock=docks[i.id],bridge=new T.Group();bridge.position.set(dock.shore.x/SCALE,.18,dock.shore.z/SCALE);
+    const dock=docks[i.id],bridge=new T.Group(),start=terrainHeight(dock.land.x,dock.land.z);
+    bridge.name='pier-'+i.id;bridge.position.set(dock.land.x/SCALE,start,dock.land.z/SCALE);
     bridge.rotation.y=Math.atan2(dock.ux,dock.uz);world.add(bridge);
-    const length=dist2(dock,dock.shore)/SCALE;
-    cube(bridge,'#a98961',[0,.02,length/2],[1.5,.16,length+.6]);
-    for(let j=0;j<=Math.ceil(length*3);j++)cube(bridge,'#876742',[0,.12,j/3],[1.47,.025,.06]);
-    for(const x of [-.65,.65])for(const z of [0,length])tube(bridge,'#876742',[x,-.38,z],[.075,1.3,.075]);
+    const length=dist2(dock.end,dock.land)/SCALE,count=Math.ceil(length/.26);
+    const planks=new T.InstancedMesh(geo('box',()=>new T.BoxGeometry()),mat('#a98961'),count+1),dummy=new T.Object3D();
+    planks.name='pier-deck-'+i.id;
+    for(let j=0;j<=count;j++){
+      const z=length*j/count;dummy.position.set(0,(dock.deck-start)*j/count-.075,z);
+      dummy.scale.set(dock.width/SCALE,.15,length/count+.006);dummy.updateMatrix();planks.setMatrixAt(j,dummy.matrix);
+    }
+    planks.castShadow=planks.receiveShadow=true;bridge.add(planks);
+    for(const x of [-.80,.80])for(const z of [0,length*.33,length*.66,length]){
+      const y=(dock.deck-start)*z/length;tube(bridge,'#876742',[x,y-.65,z],[.075,1.6,.075]);
+    }
     if(['paradise','smugglers','highlands'].includes(i.id)){
       const cache=new T.Group();cache.position.set(i.x/SCALE,ground(i.x,i.z),i.z/SCALE);world.add(cache);
       cube(cache,'#a98961',[0,.35,0],[1.3,.7,.8]);cube(cache,'#debb63',[0,.73,0],[1.4,.08,.85]);
     }
   }
-  const ocean=createOcean(ISLANDS.map(i=>[i.x/SCALE,i.z/SCALE,i.radius*.955/SCALE,i.radius*.955/SCALE]));world.add(ocean.mesh);
-  const sky=createTropicalSky();world.add(sky);
-  const vegetation=decorateIslands(world,ISLANDS,{scale:SCALE,height:ground,surfaces,small:mobile,
-    clear:(i,x,z)=>sceneryBlocked({x,z},i.id)||(i.id==='home'&&(x>220||Math.abs(z-40)<55||Math.abs(x-23)<45))||
-      (i.id==='jungle'&&dist2({x,z},points.cave)<100)||(i.id==='fortress'&&Math.abs(x-i.x)<125&&Math.abs(z-i.z)<155)||
-      dist2({x,z},docks[i.id].shore)<65});
-  const village=addVillage(world,{scale:SCALE,height:ground,surfaces,helpers});
-  const boat=new T.Group();world.add(boat);
-  ell(boat,'#233f52',[0,.05,0],[.85,.36,1.9]);
-  ell(boat,'#dedbd0',[0,.22,0],[.8,.23,1.85]);
-  cube(boat,'#6e5942',[0,.4,-.15],[1.3,.08,2.7]);
-  cube(boat,'#3b5355',[0,.57,-.6],[1.15,.30,.48]);
-  cube(boat,'#e7e0d0',[0,.73,.5],[1,.65,.36]);
-  const glass=new T.Mesh(new T.BoxGeometry(1.2,.48,.025),new T.MeshPhysicalMaterial({color:'#b9e4eb',transparent:true,opacity:.4,roughness:.1}));
-  glass.position.set(0,1.15,.68);boat.add(glass);
-  const wheel=new T.Mesh(new T.TorusGeometry(.20,.026,8,20),mat('#2e3538'));wheel.position.set(0,1.02,.28);boat.add(wheel);
-  cube(boat,'#303b40',[0,.35,-1.75],[.42,.6,.38]);cube(boat,'#303b40',[0,-.12,-1.85],[.22,.65,.25]);
-  const wake=new T.Mesh(new T.PlaneGeometry(1.5,5),new T.MeshBasicMaterial({color:'#d0ebe6',transparent:true,opacity:.25,depthWrite:false}));
-  wake.rotation.x=-Math.PI/2;wake.position.set(0,.03,-3.3);boat.add(wake);
+  const waterSize=Math.max(bounds.maxX-bounds.minX,bounds.maxZ-bounds.minZ)/SCALE+12000;
+  const ocean=createOcean(ISLANDS.map(i=>[i.x/SCALE,i.z/SCALE,i.radius/SCALE,i.radius/SCALE]),{size:waterSize,coastSeeds:ISLANDS.map(i=>i.coastSeed)});world.add(ocean.mesh);
+  const sky=createTropicalSky(5000);world.add(sky);
+  const vegetation=decorateIslands(world,ISLANDS,{scale:SCALE,height:terrainHeight,surfaces,small:mobile,dense:true,
+    clear:(i,x,z)=>sceneryBlocked({x,z},i.id,VILLAGE)||(i.id==='home'&&pathClear(x,z))||
+      (i.id==='jungle'&&dist2({x,z},points.cave)<100)||(i.id==='fortress'&&Math.abs(x-estateCenter.x)<125&&Math.abs(z-estateCenter.z)<155)||
+      dist2({x,z},docks[i.id].land)<90});
+  const village=addVillage(world,{scale:SCALE,height:terrainHeight,surfaces,helpers,village:VILLAGE,paths:PATHS,marketPoint:market});
+  const {boat,wake}=buildMotorboat(world,helpers);
   const pump=new T.Group();pump.position.set(points.pump.x/SCALE,ground(points.pump.x,points.pump.z),points.pump.z/SCALE);world.add(pump);
   cube(pump,'#e6d6b8',[0,.6,0],[.75,1.2,.65]);cube(pump,'#bd6e4e',[0,1.30,0],[.78,.3,.68]);
   cube(pump,'#263f41',[0,.94,.34],[.42,.2,.04]);tube(pump,'#2d3435',[.53,.7,0],[.035,1.1,.035]);
@@ -81,7 +80,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   for(const x of [-1.6,1.6])ell(caveEntrance,'#92968b',[x,1.5,0],[.7,1.7,1.3]);
   ell(caveEntrance,'#777a6b',[0,2.9,0],[2.1,.8,1.3]);
   cube(caveEntrance,'#171e19',[0,1.25,-.85],[2.8,2.5,.15]);
-  const mansion=new T.Group();mansion.position.set(95,.85,27.5);world.add(mansion);
+  const mansion=new T.Group();mansion.position.set(estateCenter.x/SCALE,.85,estateCenter.z/SCALE);world.add(mansion);
   cube(mansion,'#e2dbc7',[0,1.55,0],[8,3.1,8]);
   cube(mansion,'#a68854',[0,3.2,0],[8.6,.25,8.6]);
   cube(mansion,'#e2dbc7',[0,4.35,-.4],[6.5,2.3,6.5]);
@@ -144,7 +143,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     cube(cellar,'#a68854',[p.x/SCALE,.18,-4.8],[1.55,.36,.8]);cube(cellar,'#e2dbc7',[p.x/SCALE,.4,-4.8],[1.5,.1,.8]);
   }
   const self=makeHuman({shirt:'#577c87',skin:'#ddb08c',hair:'#40362f'},'player',helpers);
-  scene.add(self.root);const guardModels=new Map(),prisoners=new Map();
+  self.root.name='campaign-player';scene.add(self.root);const guardModels=new Map(),prisoners=new Map();
   for(const g of getState().guards){
     const person=makeHuman({shirt:g.id==='boss'?'#43433e':'#526252',skin:'#c29574',hair:'#302e28'},'guard',helpers);
     scene.add(person.root);pistol(person.arms[1].forearm).position.set(0,-.24,.14);guardModels.set(g.id,person);
@@ -164,10 +163,10 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
   function placeHuman(person,p,height,heading,walking,seconds){
-    person.root.position.set(p.x/SCALE,height,p.z/SCALE);person.rig.rotation.y=heading;
+    person.root.position.set(p.x/SCALE,height,p.z/SCALE);person.root.rotation.set(0,0,0);person.rig.rotation.y=heading;
     const phase=seconds*7,step=walking?.24:0;
     for(const leg of person.legs){leg.thigh.rotation.x=Math.sin(phase+(leg.side<0?Math.PI:0))*step;leg.calf.rotation.x=Math.max(0,-Math.sin(phase+(leg.side<0?Math.PI:0)))*step;leg.shoe.rotation.x=-leg.calf.rotation.x*.6;}
-    for(const a of person.arms){a.arm.rotation.x=walking?Math.sin(phase+(a.side<0?0:Math.PI))*.25:0;a.forearm.rotation.x=-.18;}
+    for(const a of person.arms){a.arm.rotation.x=walking?Math.sin(phase+(a.side<0?0:Math.PI))*.25:0;a.arm.rotation.z=0;a.forearm.rotation.x=-.18;}
     person.hips.position.y=.87+(walking?Math.cos(phase*2)*.009:0);
   }
   function frame(now) {
@@ -178,14 +177,14 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     for(const [id,root] of Object.entries(roomGroups))root.visible=id===area;
     scene.background.set(area?'#202c29':'#b9dbe5');scene.fog.color.copy(scene.background);
     hemi.intensity=area?.65:2.0;sun.intensity=area?.15:2.8;
-    const surface=area?0:s.boat?.28:ground(s.p.x,s.p.z);
+    const surface=area?0:ground(s.p.x,s.p.z);
     self.root.visible=!s.boat||mode==='third';
-    placeHuman(self,s.p,surface+(s.boat?.35:0),s.heading,s.walking&&!s.boat,seconds);
+    if(!s.boat){scene.add(self.root);placeHuman(self,s.p,surface,s.heading,s.walking,seconds);}
     self.rig.visible=mode==='third';
     boat.position.set((s.boat?s.p.x:docks[s.boatAt].x)/SCALE,.02,(s.boat?s.p.z:docks[s.boatAt].z)/SCALE);
     boat.rotation.y=s.boat?s.heading:Math.atan2(docks[s.boatAt].ux,docks[s.boatAt].uz);
     boat.rotation.z=s.boat?Math.sin(seconds*2)*.015:0;wake.visible=s.boat&&s.walking;
-    if(s.boat){for(const a of self.arms){a.arm.rotation.x=-.8;a.forearm.rotation.x=-.4;}for(const l of self.legs){l.thigh.rotation.x=-1.1;l.calf.rotation.x=1.2;}}
+    if(s.boat)seatDriver(self,boat);
     paperMesh.visible=!s.paper;hiddenGun.visible=s.paper&&!s.gun;keyMesh.visible=!s.key&&s.guards.find(g=>g.id==='boss').hp===0;
     keyMesh.rotation.y=seconds;cellBars.forEach((b,i)=>b.visible=!s.released.includes(i));
     for(const g of s.guards){
@@ -207,8 +206,10 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     halo.scale.setScalar(1+Math.sin(seconds*3)*.10);
     handheld.visible=s.gun&&!s.boat&&mode==='first';
     handheld.position.z=s.shot?.025:0;
-    const cameraSurface=s.boat?.75:surface;
-    const pose=cameraPose({x:s.p.x/SCALE,z:s.p.z/SCALE,surface:cameraSurface,yaw,pitch,mode,distance:s.boat?7.5:4.6});
+    const cameraSurface=s.boat?.02+HELM.eye-1.64:surface;
+    const driverOffset=s.boat?HELM.seatZ:0;
+    const pose=cameraPose({x:s.p.x/SCALE+Math.sin(s.heading)*driverOffset,z:s.p.z/SCALE+Math.cos(s.heading)*driverOffset,
+      surface:cameraSurface,yaw,pitch,mode,distance:s.boat?7.5:4.6});
     if(area&&mode==='third'){
       pose.position.x=T.MathUtils.clamp(pose.position.x,-5.1,5.1);
       pose.position.z=T.MathUtils.clamp(pose.position.z,-5.0,8.1);

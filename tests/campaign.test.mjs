@@ -3,11 +3,10 @@ import assert from 'node:assert/strict';
 import * as C from '../campaign.mjs';
 import { rows } from '../campaign-text.mjs';
 import { game, controller } from './game-harness.mjs';
-import { VILLAGE } from '../campaign-scenery.mjs';
-import { ISLANDS } from '../archipelago-layout.mjs';
+import { VILLAGE,ISLANDS,villageAnchor } from '../campaign-world.mjs';
 
 function travel(s,target,{fight=false}={}){
-  for(let n=0;n<3000&&C.dist(s.p,target)>3;n++){
+  for(let n=0;n<10000&&C.dist(s.p,target)>3;n++){
     if(fight){
       const enemy=s.guards.filter(g=>g.hp>0&&g.area===s.interior&&C.dist(g,s.p)<190)
         .find(g=>Array.from({length:15},(_,i)=>({x:s.p.x+(g.x-s.p.x)*i/14,z:s.p.z+(g.z-s.p.z)*i/14})).every(p=>C.allowed(s,p)));
@@ -24,16 +23,16 @@ function reload(s){return C.restore(C.snapshot(s));}
 
 test('entire physical rescue route, combat, five cells and boat evacuation survive reloads',()=>{
   let s=C.fresh();assert.equal(C.goal(s).key,'dock-goal');
-  actAt(s,C.docks.home);assert(!s.boat);actAt(s,C.points.pump);
+  actAt(s,C.docks.home);assert(!s.boat);travel(s,C.docks.home.land);actAt(s,C.points.pump);
   assert.equal(s.fuel,100);assert(s.tanked);s=reload(s);
-  actAt(s,C.docks.home.shore);actAt(s,C.docks.jungle);
-  actAt(s,C.points.cave);assert.equal(s.interior,'cave');
+  travel(s,C.docks.home.land);actAt(s,C.docks.home.shore);actAt(s,C.docks.jungle);
+  travel(s,C.docks.jungle.land);actAt(s,C.points.cave);assert.equal(s.interior,'cave');
   actAt(s,C.points.paper);assert(s.paper&&!s.gun);s=reload(s);
   assert(C.interact(s));assert(s.gun&&s.ammo===24);
   assert(C.interact(s));assert.equal(s.ammo,48);
-  actAt(s,C.points.caveExit);actAt(s,C.docks.jungle.shore);
+  actAt(s,C.points.caveExit);travel(s,C.docks.jungle.land);actAt(s,C.docks.jungle.shore);
   actAt(s,C.docks.fortress);assert(!s.boat);
-  travel(s,{x:1785,z:690},{fight:true});travel(s,C.points.estate,{fight:true});assert(C.interact(s));
+  travel(s,C.docks.fortress.land);travel(s,C.fortressApproach,{fight:true});travel(s,C.points.estate,{fight:true});assert(C.interact(s));
   assert.equal(s.interior,'estate');
   travel(s,{x:0,z:20},{fight:true});
   for(let n=0;n<80&&s.guards.find(g=>g.id==='boss').hp>0;n++){
@@ -45,9 +44,9 @@ test('entire physical rescue route, combat, five cells and boat evacuation survi
   for(const p of C.PEOPLE){travel(s,{x:p.x,z:-10});assert(C.interact(s));}
   assert.equal(s.released.length,5);s=reload(s);
   actAt(s,C.points.cellarExit);actAt(s,C.points.estateExit);
-  travel(s,{x:1785,z:690},{fight:true});actAt(s,C.docks.fortress.shore);
+  travel(s,C.fortressApproach,{fight:true});travel(s,C.docks.fortress.land);actAt(s,C.docks.fortress.shore);
   assert(s.boarded&&s.boat);s=reload(s);
-  actAt(s,C.docks.home);assert(s.complete);assert.equal(C.goal(s).key,'complete');
+  actAt(s,C.docks.home);assert(s.complete);assert.equal(C.goal(s).key,'complete');assert(s.fuel>30,'expanded voyages exhausted the fuel reserve');
   assert.equal(reload(s).released.length,5);
 });
 
@@ -58,7 +57,7 @@ test('locked stages, range, collision, ammunition and empty fuel do not trap pro
   s.gun=true;s.paper=true;s.ammo=0;s.interior='estate';s.p={...C.points.stairs};
   assert.equal(C.interact(s),false);assert.equal(s.interior,'estate');assert.equal(s.key,false);
   assert.equal(C.shoot(s,0),false);assert.equal(s.ammo,0);
-  s.interior=null;s.p={x:1800,z:550};C.move(s,1,0,.1);assert(s.p.x<=1810);
+  s.interior=null;s.p={x:C.estateCenter.x-100,z:C.estateCenter.z};C.move(s,1,0,.1);assert(s.p.x<=C.estateCenter.x-90);
   s.hp=0;C.tick(s,.1);assert.equal(s.hp,100);assert.equal(s.ammo,12);
   assert.equal(C.restore({version:1,released:{},guards:{},gun:true,key:true,p:{x:NaN,z:Infinity}}).released.length,0);
   for(const input of [
@@ -77,8 +76,9 @@ test('paused combat and cooldown stop while menus or a background tab are open',
 
 test('village walls stop swept movement, streets and all docks stay reachable, and old campaign progress survives relocation',()=>{
   const s=C.fresh();s.boat=false;s.island='home';s.p={...C.docks.home.shore};
-  travel(s,C.points.pump);travel(s,{x:23,z:40});travel(s,{x:-250,z:40});travel(s,{x:23,z:40});
-  travel(s,{x:23,z:-255});travel(s,{x:23,z:40});travel(s,C.docks.home.shore);
+  const street=(x,z)=>({x:x+villageAnchor.x,z:z+villageAnchor.z});
+  travel(s,C.docks.home.land);travel(s,C.points.pump);travel(s,street(23,40));travel(s,street(-250,40));travel(s,street(23,40));
+  travel(s,street(23,-255));travel(s,street(23,40));travel(s,C.docks.home.land);travel(s,C.docks.home.shore);
   for(const b of VILLAGE){
     s.p={x:b.x+b.w/2+10,z:b.z};for(let j=0;j<20;j++)C.move(s,-1,0,.1);
     assert(s.p.x>=b.x+b.w/2+7,'walked through a house wall');

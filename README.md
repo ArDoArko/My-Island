@@ -1,7 +1,7 @@
 # My-Island
-# My Island 0.20
+# My Island 0.21
 
-Tropikalny port w fabule: sześć domów z okiennicami i balkonami, brukowane uliczki, naturalniejsze brzegi, palmy i nowa woda. Kamera startuje oczami postaci; widok zza postaci jest dostępny przyciskiem kamery. Poprawka zachowuje istniejące zapisy.
+Duże wyspy w kampanii: główny ląd ma około 844 × 729 metrów, z portem na wybrzeżu, lasem, wzgórzami i ścieżką w głąb wyspy. Domy i postacie zachowują swoją wielkość. Kierowca siedzi na fotelu łodzi, a pomosty mają powierzchnię połączoną z plażą. Zapisy fabuły z wersji 0.19 i 0.20 migrują z zachowaniem postępu i zasobów.
 
 [Uruchom grę](https://ardoarko.github.io/My-Island/).
 

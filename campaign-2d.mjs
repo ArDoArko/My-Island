@@ -1,6 +1,7 @@
 import { ISLANDS, docks, points, PEOPLE, goal } from './campaign.mjs';
 import { islandCoastline } from './archipelago-terrain.mjs';
-import { VILLAGE, sceneryBlocked } from './campaign-scenery.mjs';
+import { VILLAGE,PATHS,estateCenter,pathClear } from './campaign-world.mjs';
+import { sceneryBlocked } from './campaign-scenery.mjs';
 
 export function drawCampaign2D(ctx,s,w,h,text) {
   const zoom=s.interior?1.8:s.boat?.65:1.3;
@@ -16,23 +17,22 @@ export function drawCampaign2D(ctx,s,w,h,text) {
       coast(i,1.045,'#398b8b');coast(i,1,'#d9cba2');coast(i,.83,i.biome==='highlands'?'#8f9882':'#759575');
       for(let j=0;j<26;j++){
         const a=j*2.39996+i.x*.001,r=i.radius*(.36+(j%7)*.075),x=i.x+Math.sin(a)*r,z=i.z+Math.cos(a)*r;
-        if(i.id==='home'&&(sceneryBlocked({x,z},i.id)||x>220||Math.abs(z-40)<55||Math.abs(x-23)<45))continue;
-        if(i.id==='fortress'&&Math.abs(x-i.x)<125&&Math.abs(z-i.z)<155)continue;
+        if(i.id==='home'&&(sceneryBlocked({x,z},i.id,VILLAGE)||pathClear(x,z)))continue;
+        if(i.id==='fortress'&&Math.abs(x-estateCenter.x)<125&&Math.abs(z-estateCenter.z)<155)continue;
         ctx.strokeStyle='#365e49';ctx.lineWidth=5;
         for(let k=0;k<7;k++){const b=k*Math.PI*2/7;ctx.beginPath();ctx.moveTo(x,z);ctx.quadraticCurveTo(x+Math.sin(b+.25)*13,z+Math.cos(b+.25)*13,x+Math.sin(b)*25,z+Math.cos(b)*25);ctx.stroke();}
       }
       ctx.fillStyle='#fff4cc';ctx.font='18px system-ui';ctx.textAlign='center';ctx.fillText(text(i.id),i.x,i.z-i.radius*.58);
-      const d=docks[i.id];ctx.strokeStyle='#a2865b';ctx.lineWidth=24;ctx.beginPath();ctx.moveTo(d.shore.x,d.shore.z);ctx.lineTo(d.x,d.z);ctx.stroke();
+      const d=docks[i.id];ctx.strokeStyle='#a2865b';ctx.lineWidth=d.width;ctx.beginPath();ctx.moveTo(d.land.x,d.land.z);ctx.lineTo(d.end.x,d.end.z);ctx.stroke();
     }
-    ctx.strokeStyle='#b7baa5';ctx.lineWidth=50;ctx.beginPath();ctx.moveTo(385,40);ctx.lineTo(-250,40);ctx.stroke();
-    ctx.lineWidth=36;ctx.beginPath();ctx.moveTo(23,-270);ctx.lineTo(23,270);ctx.stroke();
+    for(const path of PATHS){ctx.strokeStyle='#b7baa5';ctx.lineWidth=path.width;ctx.beginPath();path.points.forEach((p,j)=>j?ctx.lineTo(p.x,p.z):ctx.moveTo(p.x,p.z));ctx.stroke();}
     for(const b of VILLAGE){
       ctx.fillStyle='#304f43';ctx.fillRect(b.x-b.w/2+7,b.z-b.d/2+9,b.w,b.d);
       ctx.fillStyle=b.color;ctx.fillRect(b.x-b.w/2,b.z-b.d/2,b.w,b.d);
       ctx.fillStyle='#ab7861';ctx.fillRect(b.x-b.w/2-3,b.z-b.d/2+4,b.w+6,b.d-8);
       ctx.strokeStyle='#d4aa83';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(b.x-b.w/2,b.z);ctx.lineTo(b.x+b.w/2,b.z);ctx.stroke();
     }
-    ctx.fillStyle='#e0d5b9';ctx.fillRect(1820,470,160,160);ctx.fillStyle='#352e25';ctx.fillRect(1880,626,40,12);
+    ctx.fillStyle='#e0d5b9';ctx.fillRect(estateCenter.x-80,estateCenter.z-80,160,160);ctx.fillStyle='#352e25';ctx.fillRect(estateCenter.x-20,estateCenter.z+76,40,12);
     ctx.fillStyle='#404b40';ctx.fillRect(points.cave.x-36,points.cave.z-30,72,36);
     ctx.fillStyle='#d28757';ctx.fillRect(points.pump.x-15,points.pump.z-16,30,32);
   }

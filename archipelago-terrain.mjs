@@ -4,6 +4,10 @@ import { ISLANDS } from './archipelago-layout.mjs';
 // Separate, deterministic geometry. No save data, quest state or RNG is touched.
 // Coordinates in the layout are world-space planning coordinates.
 export function islandCoastline(island,angle) {
+  if(Number.isFinite(island.coastSeed)){
+    const phase=island.coastSeed;
+    return .855+.07*Math.sin(angle*2+phase)+.045*Math.cos(angle*3-phase)+.025*Math.sin(angle*7+phase);
+  }
   const phase=island.x*.002+island.z*.001;
   return .955+.023*Math.sin(angle*3+phase)+.012*Math.cos(angle*5-phase);
 }
@@ -14,6 +18,13 @@ export function islandElevation(island, x, z) {
   const a=Math.atan2(dz,dx),coastline=islandCoastline(island,a);
   const beach=Math.max(0,Math.min(1,(coastline-r)/.12));
   if(r>coastline)return -.32*Math.min(1,(r-coastline)/.04);
+  if(Number.isFinite(island.relief)){
+    const metres=(coastline-r)*island.radius/20;
+    const shore=Math.min(1,metres/18),t=Math.max(0,Math.min(1,(metres-18)/85));
+    const ridge=Math.exp(-((dx+.18)**2*4+(dz-.16)**2*5))*.7+
+      Math.exp(-((dx-.36)**2*11+(dz+.25)**2*8))*.42;
+    return .005+shore*.65+t*t*(3-2*t)*ridge*island.relief;
+  }
   const inland=Math.max(0,Math.min(1,(.79-r)/.22));
   const smooth=inland*inland*(3-2*inland);
   const hill=Math.exp(-((dx+.18)**2*4+(dz-.16)**2*5))*.7+
@@ -26,7 +37,8 @@ export function createIslandTerrain(island, {segments=48}={}) {
   const vertices=[0,islandElevation(island,island.x,island.z),0],uv=[.5,.5],indices=[];
   const rings=Math.ceil(segments/2);
   for(let ring=1;ring<=rings;ring++)for(let j=0;j<=segments;j++){
-    const a=j/segments*Math.PI*2,r=island.radius*1.02*ring/rings,x=Math.cos(a)*r,z=Math.sin(a)*r;
+    const a=j/segments*Math.PI*2,edge=Number.isFinite(island.relief)?islandCoastline(island,a)+.03:1.02;
+    const r=island.radius*edge*ring/rings,x=Math.cos(a)*r,z=Math.sin(a)*r;
     vertices.push(x,islandElevation(island,island.x+x,island.z+z),z);uv.push(.5+x/(island.radius*2.04),.5+z/(island.radius*2.04));
     const k=1+(ring-1)*(segments+1)+j;
     if(j===segments)continue;
