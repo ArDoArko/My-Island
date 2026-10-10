@@ -1,4 +1,4 @@
-import { ISLANDS, docks, points, PEOPLE, goal } from './campaign.mjs';
+import { ISLANDS, docks, points, PEOPLE, goal, SCALE } from './campaign.mjs';
 import { islandCoastline } from './archipelago-terrain.mjs';
 import { VILLAGE,PATHS,estateCenter,pathClear } from './campaign-world.mjs';
 import { sceneryBlocked } from './campaign-scenery.mjs';
@@ -14,7 +14,7 @@ export function drawCampaign2D(ctx,s,w,h,text) {
     if(s.interior==='cellar')for(const p of PEOPLE){ctx.strokeStyle='#bac6bf';if(!s.released.includes(p.id))ctx.strokeRect(p.x-18,-112,36,80);}
   }else{
     for(const i of ISLANDS){
-      coast(i,1.045,'#398b8b');coast(i,1,'#d9cba2');coast(i,.83,i.biome==='highlands'?'#8f9882':'#759575');
+      coast(i,1,'#398b8b',-4*SCALE);coast(i,1,'#d9cba2');coast(i,1,i.biome==='highlands'?'#8f9882':'#759575',18*SCALE);
       for(let j=0;j<26;j++){
         const a=j*2.39996+i.x*.001,r=i.radius*(.36+(j%7)*.075),x=i.x+Math.sin(a)*r,z=i.z+Math.cos(a)*r;
         if(i.id==='home'&&(sceneryBlocked({x,z},i.id,VILLAGE)||pathClear(x,z)))continue;
@@ -45,6 +45,6 @@ export function drawCampaign2D(ctx,s,w,h,text) {
   ctx.strokeStyle='#fff6c7';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,6);ctx.lineTo(0,28);ctx.stroke();ctx.restore();
   if(s.shot){ctx.strokeStyle='#ffeac5';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(s.shot.from.x,s.shot.from.z);ctx.lineTo(s.shot.to.x,s.shot.to.z);ctx.stroke();}
   ctx.restore();
-  function coast(i,factor,color){ctx.fillStyle=color;ctx.beginPath();for(let j=0;j<=96;j++){const a=j/96*Math.PI*2,r=i.radius*islandCoastline(i,a)*factor,x=i.x+Math.cos(a)*r,z=i.z+Math.sin(a)*r;if(j)ctx.lineTo(x,z);else ctx.moveTo(x,z);}ctx.closePath();ctx.fill();}
+  function coast(i,factor,color,inset=0){ctx.fillStyle=color;ctx.beginPath();for(let j=0;j<=96;j++){const a=j/96*Math.PI*2,r=i.radius*islandCoastline(i,a)*factor-inset,x=i.x+Math.cos(a)*r,z=i.z+Math.sin(a)*r;if(j)ctx.lineTo(x,z);else ctx.moveTo(x,z);}ctx.closePath();ctx.fill();}
   function dot(p,color,r){ctx.fillStyle=color;ctx.beginPath();ctx.arc(p.x,p.z,r,0,Math.PI*2);ctx.fill();}
 }
