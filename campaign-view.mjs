@@ -1,4 +1,5 @@
 import * as T from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ISLANDS,VILLAGE,PATHS,market,estateCenter,pathClear,terrainHeight,bounds } from './campaign-world.mjs';
 import { buildMotorboat,seatDriver,HELM } from './campaign-boat.mjs';
 import { createIslandTerrain } from './archipelago-terrain.mjs';
@@ -30,6 +31,17 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const tube=(p,c,pos,s)=>mesh(p,geo('cylinder',()=>new T.CylinderGeometry(1,1,1,12)),mat(c),pos,s);
   const ell=(p,c,pos,s)=>mesh(p,geo('sphere',()=>new T.SphereGeometry(1,16,12)),mat(c),pos,s);
   const helpers={mat,geo,mesh,cube,tube,ell},world=new T.Group(),rooms=new T.Group();
+  const batchGroup=group=>{
+    const byMaterial=new Map();group.updateMatrix();
+    for(const o of [...group.children])if(o.isMesh){
+      o.updateMatrix();const geometry=o.geometry.clone().applyMatrix4(o.matrix);
+      if(!byMaterial.has(o.material))byMaterial.set(o.material,[]);byMaterial.get(o.material).push(geometry);group.remove(o);
+    }
+    for(const [material,geometries] of byMaterial){
+      const geometry=mergeGeometries(geometries,false);geometries.forEach(g=>g.dispose());
+      const o=new T.Mesh(geometry,material);o.castShadow=o.receiveShadow=true;group.add(o);
+    }
+  };
   scene.add(world,rooms);
   for(const i of ISLANDS){
     const land=createIslandTerrain(i,{segments:mobile?96:192});
@@ -73,9 +85,19 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       dist2({x,z},docks[i.id].land)<90});
   const village=addVillage(world,{scale:SCALE,height:terrainHeight,surfaces,helpers,village:VILLAGE,paths:PATHS,marketPoint:market});
   const {boat,wake}=buildMotorboat(world,helpers);
-  const pump=new T.Group();pump.position.set(points.pump.x/SCALE,ground(points.pump.x,points.pump.z),points.pump.z/SCALE);world.add(pump);
-  cube(pump,'#e6d6b8',[0,.6,0],[.75,1.2,.65]);cube(pump,'#bd6e4e',[0,1.30,0],[.78,.3,.68]);
-  cube(pump,'#263f41',[0,.94,.34],[.42,.2,.04]);tube(pump,'#2d3435',[.53,.7,0],[.035,1.1,.035]);
+  const pump=new T.Group();pump.name='harbor-fuel-pump';pump.position.set(points.pump.x/SCALE,ground(points.pump.x,points.pump.z),points.pump.z/SCALE);world.add(pump);
+  cube(pump,'#a98961',[0,.06,0],[1.05,.12,.92]);
+  cube(pump,'#e6d6b8',[0,.68,0],[.75,1.24,.65]);cube(pump,'#bd6e4e',[0,1.34,0],[.82,.28,.72]);
+  cube(pump,'#263f41',[0,.99,.34],[.48,.25,.045]);
+  cube(pump,'#e8d99e',[0,.99,.37],[.31,.10,.018]);
+  tube(pump,'#2d3435',[.53,.72,0],[.035,1.18,.035]);
+  const nozzle=cube(pump,'#394447',[.53,.39,.29],[.10,.24,.08]);nozzle.rotation.z=-.22;
+  cube(pump,'#bd6e4e',[0,.39,.35],[.30,.10,.055]);
+  tube(pump,'#e6d6b8',[0,2.18,-.06],[.055,1.42,.055]);
+  const sign=tube(pump,'#bd6e4e',[0,2.90,-.06],[.42,.10,.42]);sign.rotation.x=Math.PI/2;
+  const signFace=tube(pump,'#f3dfbe',[0,2.90,.005],[.31,.115,.31]);signFace.rotation.x=Math.PI/2;
+  pump.userData.fuelDetails={display:true,hose:true,nozzle:true,marker:true};
+  batchGroup(pump);
   const caveEntrance=new T.Group();caveEntrance.position.set(points.cave.x/SCALE,ground(points.cave.x,points.cave.z),points.cave.z/SCALE);world.add(caveEntrance);
   for(const x of [-1.6,1.6])ell(caveEntrance,'#92968b',[x,1.5,0],[.7,1.7,1.3]);
   ell(caveEntrance,'#777a6b',[0,2.9,0],[2.1,.8,1.3]);

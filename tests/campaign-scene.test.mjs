@@ -38,6 +38,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const market=scene.getObjectByName('harbor-market');
     assert.deepEqual(market.userData.marketDetails,{canopyStripes:6,valances:6,produce:15});
     assert(market.children.length<10,'market fabric and produce must remain merged by material');
+    const pump=scene.getObjectByName('harbor-fuel-pump');
+    assert.deepEqual(pump.userData.fuelDetails,{display:true,hose:true,nozzle:true,marker:true});
+    assert(pump.children.length<10,'fuel-pump details must remain merged by material');
     assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);
     const treeBatches=[],frondBatches=[],rockBatches=[];scene.traverse(o=>{if(o.name.startsWith('grove-trunks'))treeBatches.push(o);if(o.name.startsWith('grove-fronds'))frondBatches.push(o);if(o.name.startsWith('shore-rocks'))rockBatches.push(o);});
     assert.equal(treeBatches.length,C.ISLANDS.length);assert.equal(frondBatches.length,C.ISLANDS.length);assert.equal(rockBatches.length,C.ISLANDS.length);
