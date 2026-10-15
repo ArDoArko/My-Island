@@ -241,6 +241,25 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
     return g;
   }
   for(const b of village)building(b);
+  const laundry=new T.Group();laundry.name='village-overhead-laundry';root.add(laundry);
+  const laundryColours=['#bd6f53','#e8d99e','#587e7c','#73868b'];
+  const byStreetSide=[...village].sort((a,b)=>a.z-b.z),rowSize=Math.ceil(byStreetSide.length/2);
+  let laundryLines=0,laundryGarments=0;
+  for(const row of [byStreetSide.slice(0,rowSize),byStreetSide.slice(rowSize)]){
+    const ordered=[...row].sort((a,b)=>a.x-b.x);
+    for(let j=1;j<ordered.length;j++){
+      const left=ordered[j-1],right=ordered[j],from=left.x+left.w/2,to=right.x-right.w/2;
+      if(to<=from)continue;
+      const x=(from+to)/2,z=(left.z+right.z)/2,y=Math.max(height(x,z)+3.35,3.55),length=(to-from)/scale;
+      const cord=tube(laundry,'#5a4b3d',[x/scale,y,z/scale],[.012,length,.012]);cord.rotation.z=Math.PI/2;laundryLines++;
+      for(let k=0;k<3;k++){
+        const px=(from+(to-from)*(k+1)/4)/scale,color=laundryColours[(laundryLines+k)%laundryColours.length];
+        const cloth=cube(laundry,color,[px,y-.24-(k%2)*.05,z/scale],[.46,.48+(k%2)*.10,.025]);
+        cloth.rotation.z=(k-1)*.06;laundryGarments++;
+      }
+    }
+  }
+  laundry.userData.laundryDetails={lines:laundryLines,garments:laundryGarments,clearance:true};batch(laundry);
   // Paths follow the same height function as feet, including uneven ground.
   function path(points,width,curb=false){
     const verts=[],uv=[],indices=[];let distance=0;

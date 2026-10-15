@@ -35,6 +35,10 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert(lampPosts.isInstancedMesh&&lampGlobes.isInstancedMesh&&lampPosts.count===7&&lampGlobes.count===7);
     assert(lampPosts.boundingSphere&&lampGlobes.boundingSphere&&lampPosts.frustumCulled&&lampGlobes.frustumCulled);
     assert(lampGlobes.material.emissiveIntensity>0&&!scene.children.some(o=>o.isPointLight),'street lamps must not add seven shadowed lights');
+    const laundry=scene.getObjectByName('village-overhead-laundry');
+    assert.deepEqual(laundry.userData.laundryDetails,{lines:4,garments:12,clearance:true});
+    assert(laundry.children.length<=5,'street laundry must remain merged by material');
+    assert(laundry.children.every(o=>{o.geometry.computeBoundingBox();return o.geometry.boundingBox.min.y>3;}),'street laundry must stay above walking height');
     const market=scene.getObjectByName('harbor-market');
     assert.deepEqual(market.userData.marketDetails,{canopyStripes:6,valances:6,produce:15});
     assert(market.children.length<10,'market fabric and produce must remain merged by material');
