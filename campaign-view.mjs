@@ -42,6 +42,21 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       const o=new T.Mesh(geometry,material);o.castShadow=o.receiveShadow=true;group.add(o);
     }
   };
+  const addSupplyCache=(id,x,z)=>{
+    const cache=new T.Group();cache.name='campaign-supply-cache-'+id;cache.position.set(x/SCALE,ground(x,z),z/SCALE);world.add(cache);
+    cube(cache,'#a98961',[0,.34,0],[1.45,.68,.88]);
+    cube(cache,'#debb63',[0,.72,0],[1.52,.09,.94]);
+    for(const sx of [-.54,.54])cube(cache,'#debb63',[sx,.35,.46],[.10,.62,.06]);
+    cube(cache,'#bd6e4e',[-1.02,.42,.04],[.42,.84,.55]);
+    cube(cache,'#394447',[-1.02,.87,.04],[.20,.08,.22]);
+    for(const sx of [-1.15,-.89])cube(cache,'#394447',[sx,.75,.04],[.05,.24,.05]);
+    cube(cache,'#394447',[-1.02,.84,.04],[.26,.05,.05]);
+    cube(cache,'#596b4e',[.93,.23,.04],[.72,.46,.58]);
+    cube(cache,'#394447',[.93,.48,.04],[.48,.05,.26]);
+    cube(cache,'#e2dbc7',[.82,.86,-.03],[.70,.34,.50]);
+    cube(cache,'#bd6e4e',[.82,.87,.235],[.34,.08,.025]);cube(cache,'#bd6e4e',[.82,.87,.235],[.08,.25,.025]);
+    cache.userData.supplyDetails={crate:true,fuelCan:true,medkit:true,ammoBox:true};batchGroup(cache);return cache;
+  };
   scene.add(world,rooms);
   for(const i of ISLANDS){
     const land=createIslandTerrain(i,{segments:mobile?96:192});
@@ -83,17 +98,15 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       dummy.position.set(x,y+.51,z);dummy.scale.set(.13,.08,.13);dummy.updateMatrix();bollards.setMatrixAt(bollardIndex++,dummy.matrix);
     }
     bollards.castShadow=bollards.receiveShadow=true;bollards.instanceMatrix.needsUpdate=true;bollards.computeBoundingSphere();bridge.add(bollards);
-    if(['paradise','smugglers','highlands'].includes(i.id)){
-      const cache=new T.Group();cache.position.set(i.x/SCALE,ground(i.x,i.z),i.z/SCALE);world.add(cache);
-      cube(cache,'#a98961',[0,.35,0],[1.3,.7,.8]);cube(cache,'#debb63',[0,.73,0],[1.4,.08,.85]);
-    }
+    if(['paradise','smugglers','highlands'].includes(i.id))addSupplyCache(i.id,i.x,i.z);
   }
+  addSupplyCache('jungle',points.supply.x,points.supply.z);
   const waterSize=Math.max(bounds.maxX-bounds.minX,bounds.maxZ-bounds.minZ)/SCALE+12000;
   const ocean=createOcean(ISLANDS.map(i=>[i.x/SCALE,i.z/SCALE,i.radius/SCALE,i.radius/SCALE]),{size:waterSize,coastSeeds:ISLANDS.map(i=>i.coastSeed)});world.add(ocean.mesh);
   const sky=createTropicalSky(5000);world.add(sky);
   const vegetation=decorateIslands(world,ISLANDS,{scale:SCALE,height:terrainHeight,surfaces,small:mobile,dense:true,
     clear:(i,x,z)=>sceneryBlocked({x,z},i.id,VILLAGE)||(i.id==='home'&&pathClear(x,z))||
-      (i.id==='jungle'&&dist2({x,z},points.cave)<100)||(i.id==='fortress'&&Math.abs(x-estateCenter.x)<125&&Math.abs(z-estateCenter.z)<155)||
+      (i.id==='jungle'&&(dist2({x,z},points.cave)<100||dist2({x,z},points.supply)<58))||(i.id==='fortress'&&Math.abs(x-estateCenter.x)<125&&Math.abs(z-estateCenter.z)<155)||
       dist2({x,z},docks[i.id].land)<90});
   const village=addVillage(world,{scale:SCALE,height:terrainHeight,surfaces,helpers,village:VILLAGE,paths:PATHS,marketPoint:market});
   const {boat,wake}=buildMotorboat(world,helpers);

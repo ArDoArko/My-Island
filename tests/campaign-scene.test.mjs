@@ -47,6 +47,13 @@ test('real Three.js campaign geometry and both cameras run through every mission
       const batch=scene.getObjectByName(name);assert(batch.isInstancedMesh,`${name} must be instanced`);assert.equal(batch.count,count);assert(batch.boundingSphere,`${name} must have a culling sphere`);
     }
     assert(scene.getObjectByName('cave-entrance-flames').material.emissiveIntensity>1,'cave flames must remain visibly emissive without extra lights');
+    const supplyPoints={jungle:C.points.supply,...Object.fromEntries(C.ISLANDS.filter(i=>['paradise','smugglers','highlands'].includes(i.id)).map(i=>[i.id,i]))};
+    for(const id of ['jungle','paradise','smugglers','highlands']){
+      const cache=scene.getObjectByName('campaign-supply-cache-'+id);
+      assert.deepEqual(cache.userData.supplyDetails,{crate:true,fuelCan:true,medkit:true,ammoBox:true});
+      assert(cache.children.length<=6,'supply cache materials must remain merged: '+id);
+      assert(Math.abs(cache.position.x-supplyPoints[id].x/C.SCALE)<1e-6&&Math.abs(cache.position.z-supplyPoints[id].z/C.SCALE)<1e-6,'supply cache must remain on its interaction marker: '+id);
+    }
     const estate=scene.getObjectByName('guarded-estate');
     assert.deepEqual(estate.userData.estateDetails,{planters:2,lanterns:2,crest:true});
     assert(estate.children.length<16,'estate facade and garden details must remain merged by material');
