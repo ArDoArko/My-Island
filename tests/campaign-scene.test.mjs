@@ -52,6 +52,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert(scene.getObjectByName('tropical-ocean').material.uniforms.uCoasts.value.length===9);
     for(const d of Object.values(C.docks)){
       const deck=scene.getObjectByName('pier-deck-'+d.id),land=scene.getObjectByName('archipelago-'+d.id);
+      const pilings=scene.getObjectByName('pier-pilings-'+d.id),bollards=scene.getObjectByName('pier-bollards-'+d.id);
+      assert(pilings.isInstancedMesh&&pilings.count===8&&pilings.boundingSphere,'pier supports must stay in one cullable batch: '+d.id);
+      assert(bollards.isInstancedMesh&&bollards.count===8&&bollards.boundingSphere,'four two-piece mooring bollards must stay batched: '+d.id);
       for(let j=0;j<=20;j++){
         const x=(d.land.x+(d.end.x-d.land.x)*j/20)/C.SCALE,z=(d.land.z+(d.end.z-d.land.z)*j/20)/C.SCALE;
         const ray=new T.Raycaster(new T.Vector3(x,30,z),new T.Vector3(0,-1,0));

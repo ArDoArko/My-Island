@@ -68,9 +68,21 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       dummy.scale.set(dock.width/SCALE,.15,length/count+.006);dummy.updateMatrix();planks.setMatrixAt(j,dummy.matrix);
     }
     planks.castShadow=planks.receiveShadow=true;bridge.add(planks);
+    const pilingGeometry=geo('pier-piling',()=>new T.CylinderGeometry(1,1,1,12));
+    const pilings=new T.InstancedMesh(pilingGeometry,mat('#876742'),8);pilings.name='pier-pilings-'+i.id;
+    let pilingIndex=0;
     for(const x of [-.80,.80])for(const z of [0,length*.33,length*.66,length]){
-      const y=(dock.deck-start)*z/length;tube(bridge,'#876742',[x,y-.65,z],[.075,1.6,.075]);
+      const y=(dock.deck-start)*z/length;dummy.position.set(x,y-.65,z);dummy.scale.set(.075,1.6,.075);dummy.updateMatrix();pilings.setMatrixAt(pilingIndex++,dummy.matrix);
     }
+    pilings.castShadow=pilings.receiveShadow=true;pilings.instanceMatrix.needsUpdate=true;pilings.computeBoundingSphere();bridge.add(pilings);
+    const bollards=new T.InstancedMesh(pilingGeometry,mat('#394447'),8);bollards.name='pier-bollards-'+i.id;
+    let bollardIndex=0;
+    for(const x of [-.72,.72])for(const z of [length*.78,length*.98]){
+      const y=(dock.deck-start)*z/length;
+      dummy.position.set(x,y+.25,z);dummy.scale.set(.075,.5,.075);dummy.updateMatrix();bollards.setMatrixAt(bollardIndex++,dummy.matrix);
+      dummy.position.set(x,y+.51,z);dummy.scale.set(.13,.08,.13);dummy.updateMatrix();bollards.setMatrixAt(bollardIndex++,dummy.matrix);
+    }
+    bollards.castShadow=bollards.receiveShadow=true;bollards.instanceMatrix.needsUpdate=true;bollards.computeBoundingSphere();bridge.add(bollards);
     if(['paradise','smugglers','highlands'].includes(i.id)){
       const cache=new T.Group();cache.position.set(i.x/SCALE,ground(i.x,i.z),i.z/SCALE);world.add(cache);
       cube(cache,'#a98961',[0,.35,0],[1.3,.7,.8]);cube(cache,'#debb63',[0,.73,0],[1.4,.08,.85]);
