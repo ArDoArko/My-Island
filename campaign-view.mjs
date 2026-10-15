@@ -317,7 +317,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   }
   function frame(now) {
     if(!enabled||lost)return;
-    const s=getState(),seconds=now/1000;last=now;surfaces.update();
+    const s=getState(),seconds=now/1000;last=now;surfaces.update();sky.material.uniforms.uTime.value=seconds;
     const area=s.interior;
     world.visible=!area;rooms.visible=!!area;
     for(const [id,root] of Object.entries(roomGroups))root.visible=id===area;

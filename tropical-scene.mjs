@@ -53,12 +53,12 @@ export function createOcean(coasts,{size=900,segments=72,coastSeeds=[]}={}) {
 }
 
 export function createTropicalSky(radius=420) {
-  const material=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,
+  const material=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{uTime:{value:0}},
   vertexShader:'varying vec3 vSky;void main(){vSky=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-  fragmentShader:`varying vec3 vSky;${noiseGLSL}
+  fragmentShader:`uniform float uTime;varying vec3 vSky;${noiseGLSL}
   void main(){vec3 dir=normalize(vSky);float h=dir.y;
     vec3 col=mix(vec3(.65,.79,.84),vec3(.095,.34,.59),smoothstep(-.02,.8,h));
-    vec2 p=dir.xz/max(.1,h)*2.3;float n=fbm21(p);
+    vec2 p=dir.xz/max(.1,h)*2.3+vec2(uTime*.006,uTime*.0025);float n=fbm21(p);
     float cloud=smoothstep(.52,.70,n)*smoothstep(.025,.20,h);
     col=mix(col,mix(vec3(.62,.69,.71),vec3(.98,.96,.89),smoothstep(.50,.70,n)),cloud);
     float sun=pow(max(dot(dir,normalize(vec3(-.55,.82,-.36))),0.),70.);col+=vec3(.35,.24,.12)*sun;

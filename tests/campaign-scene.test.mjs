@@ -99,6 +99,8 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert(scales(treeBatches[0])>12,'palms need varied silhouettes rather than repeating modulo sizes');
     assert(scales(rockBatches[0])>12,'shore rocks need varied proportions rather than repeating modulo sizes');
     assert(scene.getObjectByName('tropical-ocean').material.uniforms.uCoasts.value.length===9);
+    const sky=scene.getObjectByName('tropical-sky');view.frame(4321);
+    assert.equal(sky.material.uniforms.uTime.value,4.321,'procedural clouds must drift with campaign time');
     for(const d of Object.values(C.docks)){
       const deck=scene.getObjectByName('pier-deck-'+d.id),land=scene.getObjectByName('archipelago-'+d.id);
       const pilings=scene.getObjectByName('pier-pilings-'+d.id),bollards=scene.getObjectByName('pier-bollards-'+d.id);

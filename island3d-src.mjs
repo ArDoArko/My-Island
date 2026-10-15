@@ -419,7 +419,7 @@ export function create({canvas,terrain,getState,onLost}) {
     updateName(merchant,s.labels?.leon,'#b49966');
     updateName(guide,s.labels?.nela,'#609991');
     const x=s.P.x/SCALE,z=s.P.y/SCALE;
-    materials.update();meadow.update(seconds,frameBase);leafWind.value=seconds;
+    materials.update();meadow.update(seconds,frameBase);leafWind.value=seconds;sky.material.uniforms.uTime.value=seconds;
     resources(s.objects,seconds);updateFish(s.fishes,seconds,s.sea);updateChapters(s.chapterMarkers,seconds);
     const facing={down:0,up:Math.PI,left:-Math.PI/2,right:Math.PI/2};
     animatePerson(self,s.P,Number.isFinite(s.heading)?s.heading:facing[s.face]||0,s.moving,seconds,step,s.fast?5.25:3,s);
