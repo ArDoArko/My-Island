@@ -114,7 +114,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   for(const x of [-1.6,1.6])ell(caveEntrance,'#92968b',[x,1.5,0],[.7,1.7,1.3]);
   ell(caveEntrance,'#777a6b',[0,2.9,0],[2.1,.8,1.3]);
   cube(caveEntrance,'#171e19',[0,1.25,-.85],[2.8,2.5,.15]);
-  const mansion=new T.Group();mansion.position.set(estateCenter.x/SCALE,.85,estateCenter.z/SCALE);world.add(mansion);
+  const mansion=new T.Group();mansion.name='guarded-estate';mansion.position.set(estateCenter.x/SCALE,.85,estateCenter.z/SCALE);world.add(mansion);
   cube(mansion,'#e2dbc7',[0,1.55,0],[8,3.1,8]);
   cube(mansion,'#a68854',[0,3.2,0],[8.6,.25,8.6]);
   cube(mansion,'#e2dbc7',[0,4.35,-.4],[6.5,2.3,6.5]);
@@ -137,6 +137,20 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   cube(mansion,'#e2dbc7',[0,3.10,4.55],[8.5,.16,1.25]);
   for(let j=-10;j<=10;j++)tube(mansion,'#e2dbc7',[j*.39,3.57,5.05],[.033,.83,.033]);
   cube(mansion,'#e2dbc7',[0,4.0,5.05],[8.5,.08,.08]);
+  for(const x of [-2.45,2.45]){
+    cube(mansion,'#a98961',[x,.30,4.62],[1.25,.42,.55]);
+    for(let j=-2;j<=2;j++){
+      const leaf=ell(mansion,j%2?'#6f8f58':'#88a866',[x+j*.20,.67+Math.abs(j)*.025,4.62],[.18,.38,.18]);leaf.rotation.z=j*.12;
+    }
+  }
+  const lanternMaterial=new T.MeshStandardMaterial({color:'#ffe4a8',emissive:'#ffb85c',emissiveIntensity:.72,roughness:.34});
+  for(const x of [-1.03,1.03]){
+    cube(mansion,'#394447',[x,2.05,4.14],[.08,.10,.24]);
+    const lantern=ell(mansion,'#ffe4a8',[x,1.88,4.27],[.13,.19,.13]);lantern.material=lanternMaterial;
+  }
+  const crest=tube(mansion,'#d4a957',[0,3.02,4.11],[.38,.10,.38]);crest.rotation.x=Math.PI/2;
+  mansion.userData.estateDetails={planters:2,lanterns:2,crest:true};
+  batchGroup(mansion);
   const roomGroups={};
   function room(name,w=11,d=15){
     const root=new T.Group();root.name=name;rooms.add(root);roomGroups[name]=root;
