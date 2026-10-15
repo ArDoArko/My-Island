@@ -14,9 +14,31 @@ export function buildMotorboat(root,{cube,ell,mat}) {
   glass.position.set(0,1.15,.68);boat.add(glass);
   const wheel=new T.Mesh(new T.TorusGeometry(.20,.026,8,20),mat('#2e3538'));
   wheel.name='boat-wheel';wheel.position.set(0,1.05,.28);boat.add(wheel);
+  const railGeometry=new T.CylinderGeometry(1,1,1,8),rails=new T.InstancedMesh(railGeometry,mat('#d6dedc'),10),dummy=new T.Object3D();
+  rails.name='boat-rails';let railIndex=0;
+  for(const x of [-.68,.68]){
+    for(const z of [.15,.85,1.55]){
+      dummy.position.set(x,.75,z);dummy.rotation.set(0,0,0);dummy.scale.set(.025,.50,.025);dummy.updateMatrix();rails.setMatrixAt(railIndex++,dummy.matrix);
+    }
+    for(const y of [.86,1.01]){
+      dummy.position.set(x,y,.85);dummy.rotation.set(Math.PI/2,0,0);dummy.scale.set(.025,1.40,.025);dummy.updateMatrix();rails.setMatrixAt(railIndex++,dummy.matrix);
+    }
+  }
+  rails.castShadow=true;rails.instanceMatrix.needsUpdate=true;rails.computeBoundingSphere();boat.add(rails);
+  const gaugeMaterial=new T.MeshStandardMaterial({color:'#b7d6d8',emissive:'#31545a',emissiveIntensity:.38,roughness:.28});
+  const gauges=new T.InstancedMesh(new T.CylinderGeometry(.10,.10,.03,16),gaugeMaterial,3);gauges.name='boat-gauges';
+  for(let j=0;j<3;j++){
+    dummy.position.set((j-1)*.28,.91,.30);dummy.rotation.set(Math.PI/2,0,0);dummy.scale.set(j===1?1:.82,j===1?1:.82,1);dummy.updateMatrix();gauges.setMatrixAt(j,dummy.matrix);
+  }
+  gauges.instanceMatrix.needsUpdate=true;gauges.computeBoundingSphere();boat.add(gauges);
+  const portLight=ell(boat,'#d84e46',[-.65,.79,.94],[.075,.075,.075]),starboardLight=ell(boat,'#52b878',[.65,.79,.94],[.075,.075,.075]);
+  portLight.name='boat-port-light';starboardLight.name='boat-starboard-light';
+  portLight.material=new T.MeshStandardMaterial({color:'#d84e46',emissive:'#b32b25',emissiveIntensity:.9});
+  starboardLight.material=new T.MeshStandardMaterial({color:'#52b878',emissive:'#238547',emissiveIntensity:.9});
   cube(boat,'#303b40',[0,.35,-1.75],[.42,.6,.38]);cube(boat,'#303b40',[0,-.12,-1.85],[.22,.65,.25]);
   const wake=new T.Mesh(new T.PlaneGeometry(1.5,5),new T.MeshBasicMaterial({color:'#d0ebe6',transparent:true,opacity:.25,depthWrite:false}));
   wake.rotation.x=-Math.PI/2;wake.position.set(0,.03,-3.3);boat.add(wake);
+  boat.userData.boatDetails={rails:10,gauges:3,navigationLights:2};
   return {boat,wake};
 }
 export function seatDriver(person,boat) {

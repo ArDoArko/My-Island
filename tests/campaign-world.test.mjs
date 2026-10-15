@@ -76,6 +76,11 @@ test('the actual human pelvis rests on the seat and both boots rest on the deck 
   const cube=(parent,c,p,s)=>mesh(parent,new T.BoxGeometry(),c,p,s);
   const ell=(parent,c,p,s)=>mesh(parent,new T.SphereGeometry(1,16,12),c,p,s);
   const {boat}=buildMotorboat(root,{cube,ell,mat}),person=buildHuman();
+  assert.deepEqual(boat.userData.boatDetails,{rails:10,gauges:3,navigationLights:2});
+  const rails=boat.getObjectByName('boat-rails'),gauges=boat.getObjectByName('boat-gauges');
+  assert(rails.isInstancedMesh&&rails.count===10&&rails.boundingSphere,'motorboat rails must stay in one cullable batch');
+  assert(gauges.isInstancedMesh&&gauges.count===3&&gauges.boundingSphere,'dashboard gauges must stay in one cullable batch');
+  assert(['boat-port-light','boat-starboard-light'].every(name=>boat.getObjectByName(name)?.material.emissiveIntensity>0));
   const localBounds=o=>{
     const matrix=new T.Matrix4().copy(boat.matrixWorld).invert().multiply(o.matrixWorld);
     const p=o.geometry.attributes.position,box=new T.Box3(),point=new T.Vector3();
