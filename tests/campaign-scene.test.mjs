@@ -20,6 +20,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(view.cameraMode,'first');view.frame(0);
     const houses=[];scene.traverse(o=>{if(o.name==='village-house')houses.push(o);});assert.equal(houses.length,6);
     assert(houses.reduce((n,o)=>n+o.children.length,0)<100,'facade details were not batched for mobile');
+    assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.planters,0),12);
+    assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.awnings,0),8);
+    assert.equal(houses.filter(o=>o.userData.facadeDetails.balcony).length,2);
     assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);
     const treeBatches=[],frondBatches=[],rockBatches=[];scene.traverse(o=>{if(o.name.startsWith('grove-trunks'))treeBatches.push(o);if(o.name.startsWith('grove-fronds'))frondBatches.push(o);if(o.name.startsWith('shore-rocks'))rockBatches.push(o);});
     assert.equal(treeBatches.length,C.ISLANDS.length);assert.equal(frondBatches.length,C.ISLANDS.length);assert.equal(rockBatches.length,C.ISLANDS.length);

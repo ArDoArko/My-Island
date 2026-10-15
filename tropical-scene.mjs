@@ -169,10 +169,10 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
   return {trees:treeBatches[0],foliage:foliageBatches[0],treeBatches,foliageBatches,rocks:rockBatches[0],rockBatches};
 }
 
-// Colonial facades with shutters, balconies and arcaded ground-floor porches.
+// Colonial facades with shutters, balconies, fabric awnings and planted windows.
 // All solid building footprints come from VILLAGE, also read by gameplay.
 export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,paths,marketPoint={x:290,z:-30}}) {
-  const {cube,tube}=helpers,houses=[];
+  const {cube,tube,ell}=helpers,houses=[];
   function batch(group){
     const byMaterial=new Map();group.updateMatrix();
     for(const o of [...group.children])if(o.isMesh){
@@ -204,6 +204,17 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
         for(let j=0;j<9;j++)cube(g,'#876742',[x+side*.56,y-.52+j*.13,z+.085],[.33,.024,.04]);
       }
       cube(g,'#e2dbc7',[x,y-.68,z],[1.7,.10,.16]);cube(g,'#e2dbc7',[x,y+.68,z],[1.7,.13,.15]);
+      if(floor===0){
+        const planter=cube(g,'#876742',[x,.79,d/2+.25],[1.28,.20,.30]);planter.rotation.x=-.04;
+        if(ell)for(let j=-2;j<=2;j++){
+          const leaf=ell(g,j%2?'#6f8f58':'#88a866',[x+j*.22,.99+Math.abs(j)*.025,d/2+.27],[.17,.31,.15]);
+          leaf.rotation.z=j*.14;
+        }
+        if(floors===1){
+          const awning=cube(g,b.shutter,[x,2.32,d/2+.46],[1.55,.08,.82]);awning.rotation.x=-.15;
+          cube(g,b.shutter,[x,2.20,d/2+.83],[1.55,.17,.07]);
+        }
+      }
     }
     cube(g,'#5a4b3d',[0,1.05,d/2+.06],[.78,2.1,.10]);
     cube(g,'#e2dbc7',[0,2.18,d/2+.11],[1.1,.16,.18]);
@@ -217,6 +228,7 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
       cube(g,'#e2dbc7',[side*(w/2+.07),.82+floor*2.35,z],[.16,.10,1.05]);
       cube(g,'#e2dbc7',[side*(w/2+.07),2.18+floor*2.35,z],[.16,.12,1.05]);
     }
+    g.userData.facadeDetails={planters:2,awnings:floors===1?2:0,balcony:floors===2};
     batch(g);houses.push(g);
     return g;
   }

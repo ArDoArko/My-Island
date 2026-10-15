@@ -215,7 +215,7 @@ export function create({canvas,terrain,getState,onLost}) {
   const distantHeight=(x,z)=>{const i=getIslandAt(x,z);return i?islandElevation(i,x,z):-.32;};
   decorateIslands(distantScenery,ISLANDS,{scale:distantScale,height:distantHeight,surfaces:materials,small,
     clear:(i,x,z)=>sceneryBlocked({x,z},i.id)||(i.id==='home'&&(Math.abs(z-40)<55||Math.abs(x-23)<45))});
-  addVillage(distantScenery,{scale:distantScale,height:distantHeight,surfaces:materials,helpers:{cube,tube}});
+  addVillage(distantScenery,{scale:distantScale,height:distantHeight,surfaces:materials,helpers:{cube,tube,ell}});
   scene.add(archipelago);
   const meadow=addGroundCover(scene,terrainHeight,SCALE,splat,small);
   const ocean=createOcean([...coasts.map(([x,z,rx,rz])=>[x/SCALE,z/SCALE,rx/SCALE,rz/SCALE]),
