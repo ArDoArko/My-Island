@@ -28,6 +28,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert(houses.every(o=>o.userData.facadeDetails.doorway),'every house needs a framed entrance and threshold');
     assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.ridgeCaps,0),6);
     assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.eaveFascias,0),12);
+    assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.hangingSigns,0),6);
+    assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.signMarks,0),12);
+    assert(houses.every(o=>o.userData.facadeDetails.signClearance),'street signs must stay above walking height');
     const curbs=[];scene.traverse(o=>{if(o.name==='village-curb')curbs.push(o);});
     assert.equal(curbs.length,2,'curbs belong on the two village streets, not the jungle trail');
     assert(curbs.every(o=>o.isInstancedMesh&&o.count>20&&o.boundingSphere),'curb stones must stay batched and cullable');

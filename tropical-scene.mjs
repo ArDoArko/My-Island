@@ -184,7 +184,7 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
       const mesh=new T.Mesh(merged,material);mesh.castShadow=mesh.receiveShadow=true;group.add(mesh);
     }
   }
-  function building(b,parent=root,coordinates=true){
+  function building(b,parent=root,coordinates=true,shopIndex=0){
     const g=new T.Group();g.name='village-house';parent.add(g);
     g.position.set(coordinates?b.x/scale:b.x,coordinates?height(b.x,b.z):0,coordinates?b.z/scale:b.z);
     g.rotation.y=b.facing??(b.z>60?Math.PI:0);
@@ -226,6 +226,15 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
     cube(g,'#e2dbc7',[0,2.18,d/2+.11],[1.1,.16,.18]);
     cube(g,'#c9baa1',[0,.07,d/2+.34],[1.16,.14,.58]);
     if(ell)ell(g,'#caa457',[.27,1.04,d/2+.19],[.055,.055,.035]);
+    // A projecting sign is readable while walking along the street. It stays
+    // above head height and reuses facade materials, so batching adds no new
+    // material pass to the house.
+    const signX=(shopIndex%2?-1:1)*w*.42,signZ=d/2+.55;
+    const bracket=tube(g,'#e2dbc7',[signX,2.91,d/2+.34],[.035,.70,.035]);bracket.rotation.x=Math.PI/2;
+    cube(g,b.shutter,[signX,2.62,signZ],[.09,.56,.64]);
+    for(const side of [-1,1]){
+      const mark=cube(g,'#e2dbc7',[signX+side*.052,2.62,signZ],[.018,.22,.24]);mark.rotation.x=(shopIndex%3-1)*.22;
+    }
     if(floors===2){
       cube(g,'#e2dbc7',[0,2.75,d/2+.48],[w+.15,.18,.9]);
       for(let j=0;j<=10;j++)tube(g,'#e2dbc7',[-w/2+j*w/10,3.18,d/2+.84],[.034,.76,.034]);
@@ -236,11 +245,11 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
       cube(g,'#e2dbc7',[side*(w/2+.07),.82+floor*2.35,z],[.16,.10,1.05]);
       cube(g,'#e2dbc7',[side*(w/2+.07),2.18+floor*2.35,z],[.16,.12,1.05]);
     }
-    g.userData.facadeDetails={planters:2,awnings:floors===1?2:0,balcony:floors===2,windowPanes:floors*8,doorPanels:4,doorway:true,ridgeCaps:1,eaveFascias:2};
+    g.userData.facadeDetails={planters:2,awnings:floors===1?2:0,balcony:floors===2,windowPanes:floors*8,doorPanels:4,doorway:true,ridgeCaps:1,eaveFascias:2,hangingSigns:1,signMarks:2,signClearance:true};
     batch(g);houses.push(g);
     return g;
   }
-  for(const b of village)building(b);
+  village.forEach((b,index)=>building(b,root,true,index));
   const laundry=new T.Group();laundry.name='village-overhead-laundry';root.add(laundry);
   const laundryColours=['#bd6f53','#e8d99e','#587e7c','#73868b'];
   const byStreetSide=[...village].sort((a,b)=>a.z-b.z),rowSize=Math.ceil(byStreetSide.length/2);
