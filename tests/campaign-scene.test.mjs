@@ -47,6 +47,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const cave=scene.getObjectByName('cave'),caveFormations=scene.getObjectByName('cave-formations');
     assert.deepEqual(cave.userData.caveDetails,{stalactites:8,stalagmites:8,clearCenter:true});
     assert(caveFormations.isInstancedMesh&&caveFormations.count===16&&caveFormations.boundingSphere,'cave formations must stay in one cullable batch');
+    const estateInterior=scene.getObjectByName('estate'),estateDetails=scene.getObjectByName('estate-interior-details');
+    assert.deepEqual(estateInterior.userData.interiorDetails,{portraits:3,sconces:2,documents:3,deskLamp:true});
+    assert(estateDetails.children.length<10,'boss office wall and desk details must remain merged by material');
     const cellar=scene.getObjectByName('cellar'),cellarStatic=scene.getObjectByName('cellar-static');
     assert.deepEqual(cellar.userData.cellarDetails,{cells:5,hinges:10,padlocks:5,lamps:3,bedding:5});
     assert(cellarStatic.children.length<10,'cell bedding and wall lamps must remain merged by material');

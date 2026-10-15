@@ -194,6 +194,22 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const estate=room('estate',11,15);
   cube(estate,'#816947',[0,.42,-4.6],[2.6,.85,.9]);cube(estate,'#decc9f',[0,.05,1],[3,.025,10]);
   for(let j=0;j<6;j++)cube(estate,'#777a6b',[3.5,.06*j,-4.75+j*.28],[1.7,.12,.65]);
+  const estateStatic=new T.Group();estateStatic.name='estate-interior-details';estate.add(estateStatic);
+  const portraitColours=['#6f443d','#40626a','#718052'];
+  for(const [j,x] of [-2.7,0,2.7].entries()){
+    cube(estateStatic,'#a68854',[x,1.90,-6.31],[1.42,1.22,.08]);
+    cube(estateStatic,portraitColours[j],[x,1.90,-6.25],[1.12,.92,.045]);
+  }
+  cube(estateStatic,'#a68854',[0,.93,-6.29],[8.7,.08,.08]);
+  for(const x of [-4.35,4.35]){
+    cube(estateStatic,'#394447',[x,2.02,-6.24],[.10,.32,.10]);
+    const lamp=ell(estateStatic,'#ffe4a8',[x,1.79,-6.15],[.14,.19,.11]);lamp.material=lanternMaterial;
+  }
+  cube(estateStatic,'#394447',[0,.86,-4.58],[1.12,.025,.52]);
+  for(const x of [-.52,0,.52])cube(estateStatic,'#d8d2c3',[x,.88,-4.57],[.40,.012,.30]);
+  tube(estateStatic,'#394447',[.93,1.08,-4.58],[.035,.42,.035]);
+  const deskLamp=ell(estateStatic,'#ffe4a8',[.93,1.34,-4.58],[.18,.16,.18]);deskLamp.material=lanternMaterial;
+  estate.userData.interiorDetails={portraits:3,sconces:2,documents:3,deskLamp:true};batchGroup(estateStatic);
   const keyMesh=new T.Mesh(new T.TorusGeometry(.13,.036,8,16),new T.MeshStandardMaterial({color:'#f8ce60',emissive:'#8c6322',emissiveIntensity:.5}));
   keyMesh.position.set(0,.88,-3);estate.add(keyMesh);cube(keyMesh,'#debb63',[0,-.20,0],[.065,.32,.065]);
   const cellar=room('cellar',11,15),cellBars=[],cellarStatic=new T.Group();cellarStatic.name='cellar-static';cellar.add(cellarStatic);
