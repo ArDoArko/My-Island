@@ -44,6 +44,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const estate=scene.getObjectByName('guarded-estate');
     assert.deepEqual(estate.userData.estateDetails,{planters:2,lanterns:2,crest:true});
     assert(estate.children.length<16,'estate facade and garden details must remain merged by material');
+    const cave=scene.getObjectByName('cave'),caveFormations=scene.getObjectByName('cave-formations');
+    assert.deepEqual(cave.userData.caveDetails,{stalactites:8,stalagmites:8,clearCenter:true});
+    assert(caveFormations.isInstancedMesh&&caveFormations.count===16&&caveFormations.boundingSphere,'cave formations must stay in one cullable batch');
     assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);
     const treeBatches=[],frondBatches=[],rockBatches=[];scene.traverse(o=>{if(o.name.startsWith('grove-trunks'))treeBatches.push(o);if(o.name.startsWith('grove-fronds'))frondBatches.push(o);if(o.name.startsWith('shore-rocks'))rockBatches.push(o);});
     assert.equal(treeBatches.length,C.ISLANDS.length);assert.equal(frondBatches.length,C.ISLANDS.length);assert.equal(rockBatches.length,C.ISLANDS.length);

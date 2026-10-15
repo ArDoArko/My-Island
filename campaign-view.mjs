@@ -162,7 +162,20 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     return root;
   }
   const cave=room('cave',12,17);
-  for(let j=0;j<9;j++)ell(cave,'#777a6b',[-4.8+((j*3)%10),2.9,-5+j],[.25,.8,.25]);
+  const caveFormationGeometry=geo('cave-formation',()=>new T.ConeGeometry(1,1,9));
+  const caveFormations=new T.InstancedMesh(caveFormationGeometry,mat('#777a6b'),16),formationDummy=new T.Object3D();
+  caveFormations.name='cave-formations';
+  const caveEdges=[[-5.2,-5.4,.34,.92],[-5.2,-1.7,.27,.68],[-5.2,2.1,.38,1.06],[-5.2,5.1,.25,.78],
+    [5.2,-4.1,.31,.84],[5.2,-.3,.39,1.12],[5.2,3.4,.28,.72],[3.6,-6.7,.42,1.18]];
+  let caveFormationIndex=0;
+  for(const [x,z,radius,height] of caveEdges){
+    formationDummy.position.set(x,height/2,z);formationDummy.rotation.set(0,(caveFormationIndex*.71)%Math.PI,0);
+    formationDummy.scale.set(radius,height,radius);formationDummy.updateMatrix();caveFormations.setMatrixAt(caveFormationIndex++,formationDummy.matrix);
+    formationDummy.position.set(-x,3.3-height*.48,z+.55);formationDummy.rotation.set(0,(caveFormationIndex*.53)%Math.PI,Math.PI);
+    formationDummy.scale.set(radius*.82,height*.92,radius*.82);formationDummy.updateMatrix();caveFormations.setMatrixAt(caveFormationIndex++,formationDummy.matrix);
+  }
+  caveFormations.castShadow=caveFormations.receiveShadow=true;caveFormations.instanceMatrix.needsUpdate=true;caveFormations.computeBoundingSphere();cave.add(caveFormations);
+  cave.userData.caveDetails={stalactites:8,stalagmites:8,clearCenter:true};
   const table=cube(cave,'#a98961',[0,.75,-2],[2,.12,1.2]);
   for(const x of [-.75,.75])tube(cave,'#876742',[x,.35,-2],[.065,.7,.065]);
   const paperCanvas=document.createElement('canvas');paperCanvas.width=256;paperCanvas.height=320;
