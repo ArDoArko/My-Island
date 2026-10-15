@@ -24,6 +24,8 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.awnings,0),8);
     assert.equal(houses.filter(o=>o.userData.facadeDetails.balcony).length,2);
     assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.windowPanes,0),64);
+    assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.doorPanels,0),24);
+    assert(houses.every(o=>o.userData.facadeDetails.doorway),'every house needs a framed entrance and threshold');
     const curbs=[];scene.traverse(o=>{if(o.name==='village-curb')curbs.push(o);});
     assert.equal(curbs.length,2,'curbs belong on the two village streets, not the jungle trail');
     assert(curbs.every(o=>o.isInstancedMesh&&o.count>20&&o.boundingSphere),'curb stones must stay batched and cullable');

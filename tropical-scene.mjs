@@ -219,7 +219,11 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
       }
     }
     cube(g,'#5a4b3d',[0,1.05,d/2+.06],[.78,2.1,.10]);
+    for(const y of [.55,1.42])for(const x of [-.19,.19])cube(g,'#745f4c',[x,y,d/2+.125],[.29,.60,.045]);
+    for(const x of [-.48,.48])cube(g,'#e2dbc7',[x,1.08,d/2+.11],[.16,2.22,.18]);
     cube(g,'#e2dbc7',[0,2.18,d/2+.11],[1.1,.16,.18]);
+    cube(g,'#c9baa1',[0,.07,d/2+.34],[1.16,.14,.58]);
+    if(ell)ell(g,'#caa457',[.27,1.04,d/2+.19],[.055,.055,.035]);
     if(floors===2){
       cube(g,'#e2dbc7',[0,2.75,d/2+.48],[w+.15,.18,.9]);
       for(let j=0;j<=10;j++)tube(g,'#e2dbc7',[-w/2+j*w/10,3.18,d/2+.84],[.034,.76,.034]);
@@ -230,7 +234,7 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
       cube(g,'#e2dbc7',[side*(w/2+.07),.82+floor*2.35,z],[.16,.10,1.05]);
       cube(g,'#e2dbc7',[side*(w/2+.07),2.18+floor*2.35,z],[.16,.12,1.05]);
     }
-    g.userData.facadeDetails={planters:2,awnings:floors===1?2:0,balcony:floors===2,windowPanes:floors*8};
+    g.userData.facadeDetails={planters:2,awnings:floors===1?2:0,balcony:floors===2,windowPanes:floors*8,doorPanels:4,doorway:true};
     batch(g);houses.push(g);
     return g;
   }
