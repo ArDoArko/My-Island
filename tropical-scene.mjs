@@ -193,7 +193,9 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
     const roofMaterial=surfaces.surface('roof','#d5bbab',2,.065);
     for(const side of [-1,1]){
       const roof=cube(g,'#ba7655',[side*w/4,h+.43,0],[Math.hypot(w/2+.25,.85),.13,d+.5]);roof.rotation.z=-side*Math.atan2(.85,w/2+.25);roof.material=roofMaterial;
+      cube(g,'#a75f45',[side*(w/2+.13),h+.01,0],[.14,.22,d+.58]);
     }
+    const ridge=tube(g,'#a75f45',[0,h+.86,0],[.12,d+.62,.12]);ridge.rotation.x=Math.PI/2;
     for(const y of [.17,h*.52,h-.16])cube(g,'#e2dbc7',[0,y,d/2+.035],[w+.16,.14,.10]);
     const floors=h>5?2:1;
     for(let floor=0;floor<floors;floor++)for(const x of [-w*.31,w*.31]){
@@ -234,7 +236,7 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
       cube(g,'#e2dbc7',[side*(w/2+.07),.82+floor*2.35,z],[.16,.10,1.05]);
       cube(g,'#e2dbc7',[side*(w/2+.07),2.18+floor*2.35,z],[.16,.12,1.05]);
     }
-    g.userData.facadeDetails={planters:2,awnings:floors===1?2:0,balcony:floors===2,windowPanes:floors*8,doorPanels:4,doorway:true};
+    g.userData.facadeDetails={planters:2,awnings:floors===1?2:0,balcony:floors===2,windowPanes:floors*8,doorPanels:4,doorway:true,ridgeCaps:1,eaveFascias:2};
     batch(g);houses.push(g);
     return g;
   }
