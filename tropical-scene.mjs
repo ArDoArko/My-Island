@@ -302,8 +302,18 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
   const market=new T.Group();market.name='harbor-market';market.position.set(marketPoint.x/scale,height(marketPoint.x,marketPoint.z),marketPoint.z/scale);root.add(market);
   for(const x of [-1.4,1.4])for(const z of [-.6,.6])tube(market,'#876742',[x,1.2,z],[.045,2.4,.045]);
   const canopy=cube(market,'#cc8660',[0,2.35,0],[3.2,.07,1.8]);canopy.rotation.x=.07;
+  for(let j=0;j<6;j++){
+    const color=j%2?'#f3dfbe':'#bd6f53',x=(j-2.5)*.53;
+    const stripe=cube(market,color,[x,2.395,0],[.53,.035,1.76]);stripe.rotation.x=.07;
+    cube(market,color,[x,2.27,.92],[.49,.18,.055]);
+  }
   cube(market,'#a98961',[0,.7,0],[2.8,.15,.9]);
-  for(let j=0;j<5;j++)cube(market,'#a68854',[(j-2)*.5,.88,0],[.43,.20,.68]);
+  const fruitColors=['#ce5949','#e6b64d','#709a55'];
+  for(let j=0;j<5;j++){
+    const x=(j-2)*.5;cube(market,'#a68854',[x,.88,0],[.43,.20,.68]);
+    if(ell)for(let k=0;k<3;k++)ell(market,fruitColors[(j+k)%fruitColors.length],[x+(k-1)*.11,1.05,(k%2?-.11:.11)],[.075,.085,.075]);
+  }
+  market.userData.marketDetails={canopyStripes:6,valances:6,produce:15};
   batch(market);
   return {building,houses};
 }
