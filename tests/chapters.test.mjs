@@ -76,6 +76,8 @@ test('new menus remain operable by a pad and all six languages while view change
 
 test('real avatar meshes support all hairstyles, action poses and personal colours without changing contact or inventory',()=>{
   const first=buildHuman(colors({shirt:4,skin:3,hair:3,style:1})),second=buildHuman(colors({shirt:2,skin:1,hair:0,style:2}));
+  const joints=[];first.root.traverse(o=>{if(/^human-(shoulder|elbow|knee|ankle)$/.test(o.name))joints.push(o.name)});
+  assert.deepEqual(joints.sort(),['human-ankle','human-ankle','human-elbow','human-elbow','human-knee','human-knee','human-shoulder','human-shoulder'],'rounded joints must preserve a continuous human silhouette');
   assert.notEqual(first.shirtParts[0].material.color.getHexString(),second.shirtParts[0].material.color.getHexString());
   assert.deepEqual(first.hairStyles.map(p=>p.visible),[false,true,false]);assert.deepEqual(second.hairStyles.map(p=>p.visible),[false,false,true]);
   const geometryBounds=person=>{person.root.updateMatrixWorld(true);const box=new Box3();person.root.traverse(o=>{if(!o.isMesh)return;let parent=o;while(parent){if(!parent.visible)return;parent=parent.parent;}box.expandByObject(o);});return box};

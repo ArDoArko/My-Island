@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { BOARD, baseLayout } from './island-play.mjs';
 import { colors, motionPose, MOTIONS } from './character.mjs';
-import { createMaterials, cameraPose, addGroundCover, detailBase, terrainMask } from './island-environment.mjs';
+import { createMaterials, cameraPose, dampCameraVector, stabilizeSunShadow, addGroundCover, detailBase, terrainMask } from './island-environment.mjs';
 import { createArchipelagoGroup, islandElevation } from './archipelago-terrain.mjs';
 import { ISLANDS, getIslandAt } from './archipelago-layout.mjs';
 import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
@@ -124,12 +124,19 @@ export function buildHuman(look={},kind='player',helpers={}){
     const arms=[],legs=[];
     for(const side of [-1,1]){
       const arm=new T.Group();arm.position.set(side*.27,.54,0);hips.add(arm);
-      tube(arm,shirt,[0,-.095,0],[.087,.19,.087]);tube(arm,skin,[0,-.24,0],[.061,.15,.061]);
-      const forearm=new T.Group();forearm.position.y=-.31;arm.add(forearm);mesh(forearm,geo('human-forearm',()=>new T.CylinderGeometry(.057,.040,.26,12)),mat(skin),[0,-.13,0]);ell(forearm,skin,[0,-.28,0],[.06,.082,.046]);
+      const shoulder=ell(arm,shirt,[-side*.018,-.025,0],[.105,.13,.11]);shoulder.name='human-shoulder';
+      mesh(arm,geo('human-upper-arm',()=>new T.CylinderGeometry(.068,.086,.19,12)),mat(shirt),[0,-.105,0]);
+      mesh(arm,geo('human-lower-upper-arm',()=>new T.CylinderGeometry(.055,.064,.15,12)),mat(skin),[0,-.24,0]);
+      const forearm=new T.Group();forearm.position.y=-.31;arm.add(forearm);
+      const elbow=ell(forearm,skin,[0,0,0],[.061,.063,.061]);elbow.name='human-elbow';
+      mesh(forearm,geo('human-forearm',()=>new T.CylinderGeometry(.057,.040,.26,12)),mat(skin),[0,-.13,0]);ell(forearm,skin,[0,-.28,0],[.06,.082,.046]);
       arms.push({arm,forearm,side});
       const thigh=new T.Group();thigh.position.set(side*.115,0,0);hips.add(thigh);
-      mesh(thigh,geo('human-thigh',()=>new T.CylinderGeometry(.098,.074,.42,12)),mat('#52625f'),[0,-.21,0]);
-      const calf=new T.Group();calf.position.y=-.43;thigh.add(calf);mesh(calf,geo('human-calf',()=>new T.CylinderGeometry(.069,.046,.36,12)),mat('#52625f'),[0,-.18,0]);
+      mesh(thigh,geo('human-thigh',()=>new T.CylinderGeometry(.092,.108,.42,12)),mat('#52625f'),[0,-.21,0]);
+      const calf=new T.Group();calf.position.y=-.43;thigh.add(calf);
+      const knee=ell(calf,'#52625f',[0,0,.014],[.079,.074,.075]);knee.name='human-knee';
+      mesh(calf,geo('human-calf',()=>new T.CylinderGeometry(.069,.046,.36,12)),mat('#52625f'),[0,-.18,0]);
+      const ankle=ell(calf,'#52625f',[0,-.36,0],[.052,.06,.052]);ankle.name='human-ankle';
       const shoe=ell(calf,'#4b3b2e',[0,-.395,.055],[.075,.052,.14]);legs.push({thigh,calf,shoe,side});
     }
     const spear=new T.Group();tube(spear,'#8c6944',[0,.56,0],[.018,1.75,.018]);ell(spear,'#dad9c5',[0,1.45,0],[.045,.15,.03]);spear.position.set(.35,.2,.08);rig.add(spear);spear.visible=false;
@@ -393,7 +400,7 @@ export function create({canvas,terrain,getState,onLost}) {
   const tip=ell(heldSpear,'#b3b6ac',[.32,.61,-.91],[.039,.12,.025]);
   const heldTools={};for(const key of ['gather','fish','cook']){const tool=new T.Group();tool.position.set(.29,-.26,-.61);held.add(tool);personTool(key,tool,{cube,tube,ell});heldTools[key]=tool;}
   held.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false;o.frustumCulled=false;}});
-  const target=new T.Vector3(),desired=new T.Vector3(),lastPoint=new T.Vector3();
+  const target=new T.Vector3(),cameraTarget=new T.Vector3(),desired=new T.Vector3(),lastPoint=new T.Vector3();
   function orbit(dx,dy=0){if(!enabled||getState().paused)return;yaw+=dx;pitch=clamp(pitch+dy,cameraMode==='first'?-1.12:-.05,cameraMode==='first'?1.12:.75);}
   function setCamera(mode){cameraMode=mode==='third'?'third':'first';pitch=mode==='third'?.22:0;camera.fov=mode==='third'?58:72;camera.updateProjectionMatrix();drag=null;first=true;}
   canvas.addEventListener('pointerdown',e=>{const s=getState();if(!enabled||!s.play||s.paused||e.button>0||drag)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);});
@@ -450,9 +457,13 @@ export function create({canvas,terrain,getState,onLost}) {
       const hit=ray.intersectObjects([buildings,stall],true).find(h=>h.object.isMesh&&h.distance>.1);
       if(hit)desired.copy(target).addScaledVector(direction,Math.max(.35,hit.distance-.15));
     }
-    // A first-person camera follows position exactly so rapid turns never lag.
-    if(cameraMode==='first'||first||lastPoint.distanceTo(self.root.position)>5){camera.position.copy(desired);first=false;}else camera.position.lerp(desired,1-Math.exp(-step*8));
-    camera.lookAt(target);lastPoint.copy(self.root.position);
+    // First person follows exactly. Third person damps both the rig and its
+    // look target so a shoreline height change cannot snap the viewing angle.
+    if(cameraMode==='first'||first||lastPoint.distanceTo(self.root.position)>5){camera.position.copy(desired);cameraTarget.copy(target);first=false;}else{
+      dampCameraVector(camera.position,desired,step,8);
+      dampCameraVector(cameraTarget,target,step,12);
+    }
+    camera.lookAt(cameraMode==='first'?target:cameraTarget);lastPoint.copy(self.root.position);
     // Bound on-screen labels in pixels, including at very close talking range.
     const signPosition=new T.Vector3();scene.updateMatrixWorld(true);
     scene.traverse(o=>{if(!o.isSprite)return;if(!o.userData.signScale)o.userData.signScale=o.scale.clone();o.scale.copy(o.userData.signScale);o.getWorldPosition(signPosition);const distance=Math.max(.1,signPosition.distanceTo(camera.position)),pixels=o.scale.x*camera.projectionMatrix.elements[0]*innerWidth/(2*distance),cap=Math.min(240,innerWidth*.52);if(pixels>cap)o.scale.multiplyScalar(cap/pixels);});
@@ -461,7 +472,7 @@ export function create({canvas,terrain,getState,onLost}) {
     heldSpear.visible=!!s.spear&&!s.motion;for(const [key,o] of Object.entries(heldTools))o.visible=s.motion?.kind===key;
     held.position.y=bob*.4;held.rotation.x=s.motion?Math.sin(s.motion.phase*Math.PI*2)*.07:0;
     hand.material=mat(s.appearance?.skin||'#dda879');sleeve.material=mat(s.appearance?.shirt||'#4c9cba');
-    sun.position.set(x-12,18,z-8);sun.target.position.set(x,0,z);
+    stabilizeSunShadow(sun,x,z);
     sky.position.copy(camera.position);ocean.update(seconds,camera.position);
     renderer.render(scene,camera);
     if(s.play&&step>.038)slow+=step;else slow=Math.max(0,slow-step);

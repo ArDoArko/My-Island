@@ -90,6 +90,25 @@ export function cameraPose({x,z,surface,yaw,pitch,mode='first',distance=4.8,bob=
   return {position:new T.Vector3(x+Math.sin(yaw)*Math.cos(pitch)*distance,target.y+.65+Math.sin(pitch)*distance,z+Math.cos(yaw)*Math.cos(pitch)*distance),target};
 }
 
+// Exponential damping gives the same camera response at 30, 60 and 120 FPS.
+export function dampCameraVector(current,desired,step,response) {
+  if(!(step>0)||!(response>0))return current;
+  return current.lerp(desired,1-Math.exp(-step*response));
+}
+
+// Keep the directional-light projection aligned with its shadow texels. Without
+// this, sub-pixel player movement makes otherwise static shadow edges shimmer.
+export function stabilizeSunShadow(sun,x,z,{height=18,offsetX=-12,offsetZ=-8}={}) {
+  const span=Math.abs(sun.shadow.camera.right-sun.shadow.camera.left);
+  const resolution=sun.shadow.mapSize.width;
+  const texel=span>0&&resolution>0?span/resolution:0;
+  const focusX=texel?Math.round(x/texel)*texel:x;
+  const focusZ=texel?Math.round(z/texel)*texel:z;
+  sun.position.set(focusX+offsetX,height,focusZ+offsetZ);
+  sun.target.position.set(focusX,0,focusZ);
+  return texel;
+}
+
 export function addGroundCover(scene,terrainHeight,scale,mask,small) {
   const random=(()=>{let seed=90210;return ()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);})();
   const g=new T.BufferGeometry();

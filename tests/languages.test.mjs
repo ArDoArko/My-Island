@@ -42,6 +42,22 @@ test('language selection remains usable if local storage is blocked', () => {
   g.close();
 });
 
+test('compact HUD keeps cameras and resources visible while every secondary action stays accessible', () => {
+  const g = game();
+  const hud = g.document.querySelector('.hud'), menu = g.element('hudMore');
+  assert.equal(hud.querySelectorAll('.hud-view .camera-button').length, 4);
+  assert.equal(hud.querySelectorAll('.hud-stats .p').length, 11);
+  assert.equal(menu.querySelectorAll('.hud-menu button').length, 8);
+  assert.equal(menu.open, false);
+  assert.equal(menu.querySelector('summary').tabIndex, 0, 'The compact menu must remain keyboard reachable');
+  menu.open = true;
+  g.element('workButton').click();
+  assert.equal(g.element('workPanel').style.display, 'block', 'A moved action must still open its original panel');
+  assert.equal(menu.open, false, 'Opening a secondary panel closes the compact menu');
+  for (const id of ['padButton','roomButton','accountButton','newSoloButton','languageButton','workButton','adventureButton','characterButton']) assert(g.element(id));
+  g.close();
+});
+
 for (const [index, code] of languageCodes.entries()) test(code + ': all screens translate without changing existing progress', () => {
   const g = game({ storage: { myIsland09: JSON.stringify(progress) } });
   g.run('startGame()');

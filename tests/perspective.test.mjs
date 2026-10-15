@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cameraPose } from '../island-environment.mjs';
+import * as T from 'three';
+import { cameraPose, dampCameraVector, stabilizeSunShadow } from '../island-environment.mjs';
 import { cameraVector, walkSurface, baseElevation } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { game } from './game-harness.mjs';
@@ -24,6 +25,29 @@ test('forward movement points where first-person camera looks at every heading',
     const down=cameraPose({x:0,z:0,surface:0,yaw,pitch:1});assert(down.target.y<down.position.y);
     const up=cameraPose({x:0,z:0,surface:0,yaw,pitch:-1});assert(up.target.y>up.position.y);
   }
+});
+
+test('third-person damping is frame-rate independent and never overshoots a shoreline height change',()=>{
+  const desired=new T.Vector3(4,3.2,-2),at30=new T.Vector3(0,-.4,0),at60=at30.clone();
+  for(let i=0;i<30;i++)dampCameraVector(at30,desired,1/30,8);
+  let previous=at60.y;
+  for(let i=0;i<60;i++){
+    dampCameraVector(at60,desired,1/60,8);
+    assert(at60.y>=previous&&at60.y<=desired.y,'shoreline smoothing must stay between the old and new heights');
+    previous=at60.y;
+  }
+  assert(at30.distanceTo(at60)<1e-10,'camera response must not depend on refresh rate');
+  assert(at60.distanceTo(desired)<.002,'camera must settle quickly instead of floating behind the player');
+});
+
+test('sun focus stays aligned with shadow texels while following the player',()=>{
+  const sun=new T.DirectionalLight();
+  sun.shadow.camera.left=-16;sun.shadow.camera.right=16;sun.shadow.mapSize.set(2048,2048);
+  const texel=stabilizeSunShadow(sun,12.0001,7.0001);
+  const focus=sun.target.position.clone();stabilizeSunShadow(sun,12.004,7.004);
+  assert.equal(texel,32/2048);
+  assert.equal(sun.target.position.x,focus.x);assert.equal(sun.target.position.z,focus.z);
+  assert.equal(sun.position.x,focus.x-12);assert.equal(sun.position.z,focus.z-8);
 });
 
 function boot(g){const graphics={enabled:true,setEnabled(v){this.enabled=v},setCamera(v){this.cameraMode=v},frame(){},resize(){},orbit(){},vector(x,y){return{x,y}}};g.window.MyIsland3D={create:()=>graphics};g.run('boot3D();startGame()');return graphics;}

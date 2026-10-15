@@ -21,6 +21,13 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const houses=[];scene.traverse(o=>{if(o.name==='village-house')houses.push(o);});assert.equal(houses.length,6);
     assert(houses.reduce((n,o)=>n+o.children.length,0)<100,'facade details were not batched for mobile');
     assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);
+    const treeBatches=[],frondBatches=[],rockBatches=[];scene.traverse(o=>{if(o.name.startsWith('grove-trunks'))treeBatches.push(o);if(o.name.startsWith('grove-fronds'))frondBatches.push(o);if(o.name.startsWith('shore-rocks'))rockBatches.push(o);});
+    assert.equal(treeBatches.length,C.ISLANDS.length);assert.equal(frondBatches.length,C.ISLANDS.length);assert.equal(rockBatches.length,C.ISLANDS.length);
+    assert([...treeBatches,...rockBatches].every(o=>o.frustumCulled&&o.boundingSphere),'separate island scenery must remain eligible for camera and shadow culling');
+    const scales=(batch,limit=20)=>{const matrix=new T.Matrix4(),scale=new T.Vector3(),position=new T.Vector3(),rotation=new T.Quaternion(),values=[];
+      for(let j=0;j<Math.min(batch.count,limit);j++){batch.getMatrixAt(j,matrix);matrix.decompose(position,rotation,scale);values.push(scale.toArray().map(v=>v.toFixed(3)).join(','));}return new Set(values).size;};
+    assert(scales(treeBatches[0])>12,'palms need varied silhouettes rather than repeating modulo sizes');
+    assert(scales(rockBatches[0])>12,'shore rocks need varied proportions rather than repeating modulo sizes');
     assert(scene.getObjectByName('tropical-ocean').material.uniforms.uCoasts.value.length===9);
     for(const d of Object.values(C.docks)){
       const deck=scene.getObjectByName('pier-deck-'+d.id),land=scene.getObjectByName('archipelago-'+d.id);

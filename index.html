@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
 <title>My Island 0.21 — Akcja ratunkowa</title>
-<script defer src="island3d.bundle.js?v=0.21.2"></script>
+<script defer src="island3d.bundle.js?v=0.21.9"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -81,7 +81,8 @@ button:focus-visible{outline:3px solid #ffe087;outline-offset:3px}
 .chapter-card{background:#174655;border:1px solid #49757d;border-radius:14px;padding:18px;margin:12px 0}.chapter-card p{line-height:1.5}.chapter-card .reward{color:#ffdc85}.chapter-goal{background:#113d48;border-left:4px solid #5ce5d3;padding:14px;border-radius:8px;margin-bottom:16px}.chapter-goal p{margin:8px 0}.look-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0;padding:12px;background:#174655;border-radius:12px}.look-swatch{display:inline-block;width:26px;height:26px;border:2px solid #fff5;border-radius:50%;vertical-align:middle;margin-right:10px}.look-row button{min-width:110px}.look-preview{display:flex;justify-content:center;gap:16px;padding:12px}.look-preview span{width:38px;height:38px;border-radius:50%;border:2px solid #fff6}.chapter-objective{font-weight:700;color:#c5ffed}.chapter-list{line-height:1.65}.chapter-card button:disabled{opacity:.65}.panel button{white-space:normal}.panel button:focus-visible{outline:3px solid #7effdf;outline-offset:3px}
 #lookReticle{display:none;position:fixed;z-index:4;top:50%;left:50%;width:5px;height:5px;margin:-2.5px;border-radius:50%;background:#fff9;box-shadow:0 0 2px #132520;pointer-events:none}body[data-view="first"] #lookReticle{display:block}
 .hud{left:12px;width:calc(100% - 24px);gap:5px;justify-content:flex-start}.p,.q{background:#102d2ab8;border-color:#ffffff28;border-radius:7px;box-shadow:0 2px 12px #0002;font-size:13px;backdrop-filter:blur(10px)}.p{padding:6px 9px;min-height:31px}.q{top:108px;max-width:255px;font-size:13px;line-height:1.55}.q small{font-size:12px}.camera-button{min-height:34px}.camera-button:first-child{background:#eedfa8e8;color:#25362d}.ctrl button,.btn,.side,.act{border-color:#ffffff70;box-shadow:0 2px 6px #13251e44}.ctrl button{background:#e8ece3dd;color:#243a30;border-radius:10px}.btn,.side{border-radius:9px;font-size:12px}.help{font-size:12px}.hint{font-size:13px;background:#102d2ad9;border:1px solid #ffffff30}.start{background:linear-gradient(90deg,#0a201b99,#16392525)}.card{background:#102822d9;border-radius:18px;border-color:#ffffff38;backdrop-filter:blur(16px)}.card .mark{font-size:34px}.card .desc{font-size:14px}.card .keys,.card .pad-start{font-size:12px}.panel{background:#102822f5;border-radius:18px}.panel .intro{font-size:14px}
-@media(max-width:700px){.hud{left:8px;width:calc(100% - 16px);gap:3px}.p{font-size:11px;padding:5px 7px;min-height:29px}.camera-button{font-size:12px}.q{top:150px;max-width:210px;font-size:12px}.q small{font-size:11px}.btn,.side{font-size:11px}.hint{font-size:12px;max-width:205px}.card{padding:22px}.card .desc{font-size:14px}}
+.hud-view,.hud-stats{display:flex;align-items:center;gap:4px;flex-wrap:wrap}.hud-stats{padding:3px 5px;background:#102d2acc;border:1px solid #ffffff28;border-radius:9px;box-shadow:0 2px 12px #0002;backdrop-filter:blur(10px)}.hud-stats .p{min-height:27px;padding:4px 6px;background:transparent;border:0;box-shadow:none;backdrop-filter:none}.hud-more{position:relative;margin-left:auto;pointer-events:auto}.hud-more summary{display:flex;align-items:center;justify-content:center;min-width:42px;min-height:34px;padding:6px 10px;list-style:none;cursor:pointer;background:#102d2ae8;border:1px solid #ffffff38;border-radius:8px;box-shadow:0 2px 12px #0002;font-size:18px;font-weight:850}.hud-more summary::-webkit-details-marker{display:none}.hud-more summary:focus-visible{outline:3px solid #ffe087;outline-offset:3px}.hud-more[open] summary{color:#ffe087;border-color:#ffe08788}.hud-menu{position:absolute;right:0;top:calc(100% + 6px);width:min(360px,calc(100vw - 24px));display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;padding:7px;background:#102822f2;border:1px solid #ffffff38;border-radius:11px;box-shadow:0 12px 30px #001e385c;backdrop-filter:blur(14px)}.hud-menu .p{width:100%;min-height:40px;white-space:normal;font-size:12px}.hud-menu .wide{grid-column:1/-1}
+@media(max-width:700px){.hud{left:8px;width:calc(100% - 16px);gap:3px}.p{font-size:11px;padding:5px 7px;min-height:29px}.camera-button{font-size:12px}.hud-view{gap:3px}.hud-stats{order:3;width:100%;gap:1px;padding:2px 3px}.hud-stats .p{flex:1 0 auto;justify-content:center;text-align:center;padding:3px 4px;min-height:24px}.hud-more{margin-left:auto}.hud-menu{width:min(330px,calc(100vw - 16px))}.q{top:126px;max-width:210px;font-size:12px}.q small{font-size:11px}.btn,.side{font-size:11px}.hint{font-size:12px;max-width:205px}.card{padding:22px}.card .desc{font-size:14px}}
 @media(max-height:520px){.q{top:105px;max-width:210px;font-size:12px}.hud{max-width:calc(100% - 16px)}.side{width:68px;height:34px}.base{bottom:216px}.bag{bottom:178px}.build{bottom:140px}.fish{bottom:102px}}
 .start{overflow:auto;padding:16px 0}.card{max-height:calc(100dvh - 32px);overflow:auto}
 .card .campaign-entry{display:block;width:100%;padding:17px;margin:12px 0 7px;background:#edda98;color:#24382d;font-weight:850;border-radius:12px;font-size:18px;border:0}
@@ -117,20 +118,26 @@ body.campaign-active[data-campaign-camera="third"] #lookReticle,body.campaign-ac
  <p class="desc"><span data-i18n="wspólna wyspa · kod pokoju · pad i joystick">wspólna wyspa · kod pokoju · pad i joystick</span></p>
 </div></div>
 <div class="hud">
+ <div class="hud-view">
  <button id="cameraModeButton" class="p camera-button" onclick="switchCamera()" disabled aria-label="Przełącz kamerę" data-i18n-aria-label="Przełącz kamerę">Oczami postaci</button>
  <button id="viewButton" class="p camera-button" onclick="switchView()" disabled aria-label="Przełącz widok wyspy" data-i18n-aria-label="Przełącz widok wyspy">Widok 2D</button><button id="cameraLeft" class="p camera-button" onclick="orbitView(-.25)" disabled aria-label="Obróć kamerę w lewo" data-i18n-aria-label="Obróć kamerę w lewo">↶</button><button id="cameraRight" class="p camera-button" onclick="orbitView(.25)" disabled aria-label="Obróć kamerę w prawo" data-i18n-aria-label="Obróć kamerę w prawo">↷</button>
+ </div>
+ <div class="hud-stats">
  <div class="p">❤️ <b id="hp">100</b></div><div class="p">⚡ <b id="en">100</b></div><div class="p">⭐ <b id="xp">0</b></div>
  <div class="p">🪙 <b id="co">0</b></div><div class="p">🪵 <b id="wo">0</b></div><div class="p">🪨 <b id="st">0</b></div>
  <div class="p">🥥 <b id="fo">0</b></div><div class="p">🐚 <b id="sh">0</b></div><div class="p">🐟 <b id="fi">0</b></div>
  <div class="p"><span data-i18n="🏠 L">🏠 L</span><b id="bl">0</b></div><div class="p">🧭 <b id="zn">Laguna</b></div>
+ </div>
+ <details id="hudMore" class="hud-more"><summary aria-label="Menu">☰</summary><div class="hud-menu">
  <button id="padButton" class="p pad-button" onclick="toggle('controllerPanel',1)" aria-label="Sterowanie padem i joystickiem" data-i18n-aria-label="Sterowanie padem i joystickiem">🎮 PAD</button>
  <button id="roomButton" class="p pad-button" onclick="toggle('roomPanel',1)" aria-label="Pokój online i gracze" data-i18n-aria-label="Pokój online i gracze">👥 ONLINE</button>
  <button id="accountButton" class="p pad-button" onclick="toggle('accountPanel',1)" aria-label="Konto gracza i zapis w chmurze" data-i18n-aria-label="Konto gracza i zapis w chmurze">☁️ KONTO</button>
  <button id="newSoloButton" class="p pad-button" onclick="askNewSoloGame()" aria-label="Nowa gra solo" data-i18n-aria-label="Nowa gra solo"><span data-i18n="↻ NOWA GRA">↻ NOWA GRA</span></button>
  <button id="languageButton" class="p pad-button" onclick="toggle('languagePanel',1)" aria-label="Język gry" data-i18n-aria-label="Język gry">🌐 PL</button>
- <button id="workButton" class="p pad-button" onclick="toggle('workPanel',1)"><span data-i18n="📋 PRACA I ZABAWA">📋 PRACA I ZABAWA</span></button>
+ <button id="workButton" class="p pad-button wide" onclick="toggle('workPanel',1)"><span data-i18n="📋 PRACA I ZABAWA">📋 PRACA I ZABAWA</span></button>
  <button id="adventureButton" class="p pad-button" onclick="toggle('adventurePanel',1)" data-i18n="🧭 PRZYGODY">🧭 PRZYGODY</button>
  <button id="characterButton" class="p pad-button" onclick="toggle('characterPanel',1)" data-i18n="👤 POSTAĆ">👤 POSTAĆ</button>
+ </div></details>
 </div>
 <div id="questBox" class="q">📜 <b id="qt">Wyprawa 0.13</b><br><span id="qx"></span><br><small id="qp"></small></div>
 <canvas id="game" aria-label="Wyspa, postacie i świat gry" data-i18n-aria-label="Wyspa, postacie i świat gry"></canvas>
@@ -304,7 +311,7 @@ body.campaign-active[data-campaign-camera="third"] #lookReticle,body.campaign-ac
  <p class="intro"><span data-i18n="Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.">Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.</span></p>
  <div class="language-options"><button data-language="pl" onclick="setLanguage('pl')">Polski</button><button data-language="en" onclick="setLanguage('en')">English</button><button data-language="nl" onclick="setLanguage('nl')">Nederlands</button><button data-language="de" onclick="setLanguage('de')">Deutsch</button><button data-language="fr" onclick="setLanguage('fr')">Français</button><button data-language="es" onclick="setLanguage('es')">Español</button></div>
 </div>
-<script src="campaign.bundle.js?v=0.21.2"></script>
+<script src="campaign.bundle.js?v=0.21.9"></script>
 <script src="i18n.bundle.js?v=0.21"></script>
 <script src="wildlife.bundle.js?v=0.18"></script>
 <script src="island-play.bundle.js?v=0.18"></script>
@@ -793,7 +800,7 @@ function loop(timestamp=performance.now()){
 requestAnimationFrame(loop);
 function resetInput(){K={};sprint=0;clearPadInput()}
 addEventListener('keydown',e=>{
- if(e.key==='Escape'){if(pad.capture)cancelPadBinding();else if(activePanel)toggle(activePanel,0);else if(campaignMode)toggle('campaignHelp',1);return}if(!play||activePanel)return;
+ if(e.key==='Escape'){if(pad.capture)cancelPadBinding();else if(activePanel)toggle(activePanel,0);else if($('hudMore')?.open)$('hudMore').open=false;else if(campaignMode)toggle('campaignHelp',1);return}if(!play||activePanel)return;
  const k=e.key.length===1?e.key.toLowerCase():e.key;K[k]=1;if(e.key.startsWith('Arrow')||e.key===' ')e.preventDefault();
  if(e.key===' '&&!e.repeat)attack();if(k==='e'&&!e.repeat)interact();if(k==='h'&&!e.repeat){if(campaignMode)campaignCamera();else toggleSpear();}if(e.key==='Shift')sprint=1;
 });
@@ -961,7 +968,7 @@ function updateWorkUI(){
  $('raceStatus').textContent=raceRun?tr('Punkt ')+(raceRun.next+1)+'/4 · '+(raceRun.elapsed/1000).toFixed(1)+' s · '+goalDirection(activityRules.COURSE[raceRun.next]):tr('Tablica startowa: ')+goalDirection(activityRules.BOARD);
  $('raceRecord').textContent=campActivities.bestMs?tr('Rekord: ')+(campActivities.bestMs/1000).toFixed(1)+' s':tr('Ukończ bieg, żeby ustanowić rekord.');
 }
-function toggle(id,on){if(campaignMode&&on&&!['campaignHelp','languagePanel','controllerPanel'].includes(id))return;if(!panels.includes(id)||cloud.resetting)return;if(net.joining&&!net.room&&(id!=='roomPanel'||!on))cancelRoomJoin();for(const name of panels)$(name).style.display='none';activePanel=on?id:null;if(on)$(id).style.display='block';pad.capture=null;focusPadButton(null);resetInput();if(id==='controllerPanel')updatePadUI();if(id==='roomPanel')updateRoomUI();if(on&&padDevice)focusPadMenu();update()}
+function toggle(id,on){if(campaignMode&&on&&!['campaignHelp','languagePanel','controllerPanel'].includes(id))return;if(!panels.includes(id)||cloud.resetting)return;if(net.joining&&!net.room&&(id!=='roomPanel'||!on))cancelRoomJoin();for(const name of panels)$(name).style.display='none';activePanel=on?id:null;if(on){$(id).style.display='block';if($('hudMore'))$('hudMore').open=false}pad.capture=null;focusPadButton(null);resetInput();if(id==='controllerPanel')updatePadUI();if(id==='roomPanel')updateRoomUI();if(on&&padDevice)focusPadMenu();update()}
 function update(){
  if(campaignMode){updateCampaign();return}
  updateCloudUI();updateWorkUI();updateAdventureUI();updateCharacterUI();

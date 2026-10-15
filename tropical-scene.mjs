@@ -107,36 +107,66 @@ export function palmFronds(detail=14) {
   const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(vertices,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(indices);g.computeVertexNormals();return g;
 }
 
+// Stable scenery variation: identical on every load, but without the visible
+// rings and handful of repeating silhouettes produced by modulo-only sizing.
+const sceneryVariation=(seed,salt=0)=>{
+  const value=Math.sin((seed+1)*12.9898+(salt+1)*78.233)*43758.5453;
+  return value-Math.floor(value);
+};
+
 export function decorateIslands(root,islands,{scale,height,surfaces,small=false,clear=()=>false,dense=false}={}) {
-  const positions=[];
-  for(const i of islands)for(let j=0;j<(dense?(i.id==='home'?(small?700:1500):(small?280:650)):(small?22:42));j++){
-    const a=j*2.39996+i.x*.001,r=i.radius*(dense?Math.sqrt((j*.6180339)%1)*.91:.36+(j%7)*.075),x=i.x+Math.sin(a)*r,z=i.z+Math.cos(a)*r;
-    if(clear(i,x,z))continue;
-    if(height(x,z)<.32)continue;
-    positions.push({x:x/scale,z:z/scale,y:height(x,z),a,h:3.8+(j%5)*.42,size:.76+(j%4)*.11});
-  }
   const trunk=new T.CylinderGeometry(.085,.16,1,10,8);trunk.translate(0,.5,0);
   const p=trunk.attributes.position;for(let j=0;j<p.count;j++)p.setX(j,p.getX(j)+p.getY(j)**2*.20);trunk.computeVertexNormals();
   const trunkMaterial=surfaces.surface('wood','#bc9c71',2,.03);
   const leaves=surfaces.surface('leaf','#9cb384',1,.01).clone();leaves.side=T.DoubleSide;
-  const foliage=new T.InstancedMesh(palmFronds(small?9:14),leaves,positions.length);
-  const trees=new T.InstancedMesh(trunk,trunkMaterial,positions.length),dummy=new T.Object3D();
-  trees.name='grove-trunks';foliage.name='grove-fronds';
-  for(let j=0;j<positions.length;j++){
-    const q=positions[j];dummy.position.set(q.x,q.y,q.z);dummy.rotation.set(0,q.a,.035*Math.sin(q.a));dummy.scale.set(q.size,q.h,q.size);dummy.updateMatrix();trees.setMatrixAt(j,dummy.matrix);
-    dummy.position.set(q.x+.20*q.size*Math.cos(q.a),q.y+q.h,q.z-.20*q.size*Math.sin(q.a));dummy.rotation.set(0,q.a,0);dummy.scale.setScalar(q.size);dummy.updateMatrix();foliage.setMatrixAt(j,dummy.matrix);
-    foliage.setColorAt(j,new T.Color().setHSL(.26+(j%5)*.01,.26,.63+(j%3)*.045));
+  const fronds=palmFronds(small?9:14),treeBatches=[],foliageBatches=[],dummy=new T.Object3D();
+  let globalIndex=0;
+  for(const i of islands){
+    const positions=[];
+    for(let j=0;j<(dense?(i.id==='home'?(small?700:1500):(small?280:650)):(small?22:42));j++){
+      const seed=j+i.x*.013+i.z*.017;
+      const a=j*2.39996+i.x*.001+(sceneryVariation(seed,0)-.5)*.72;
+      const radial=dense?Math.min(.93,Math.max(.12,Math.sqrt((j*.6180339)%1)*.91+(sceneryVariation(seed,1)-.5)*.09)):
+        Math.min(.91,.34+(j%7)*.075+(sceneryVariation(seed,1)-.5)*.08);
+      const r=i.radius*radial,x=i.x+Math.sin(a)*r,z=i.z+Math.cos(a)*r;
+      if(clear(i,x,z)||height(x,z)<.32)continue;
+      positions.push({x:x/scale,z:z/scale,y:height(x,z),a,
+        h:3.45+sceneryVariation(seed,2)*2.15,size:.70+sceneryVariation(seed,3)*.43,
+        leanX:(sceneryVariation(seed,4)-.5)*.12,leanZ:(sceneryVariation(seed,5)-.5)*.14,index:globalIndex++});
+    }
+    if(!positions.length)continue;
+    const trees=new T.InstancedMesh(trunk,trunkMaterial,positions.length);
+    const foliage=new T.InstancedMesh(fronds,leaves,positions.length);
+    trees.name=treeBatches.length?'grove-trunks-'+i.id:'grove-trunks';
+    foliage.name=foliageBatches.length?'grove-fronds-'+i.id:'grove-fronds';
+    for(let j=0;j<positions.length;j++){
+      const q=positions[j];dummy.position.set(q.x,q.y,q.z);dummy.rotation.set(q.leanX,q.a,q.leanZ);dummy.scale.set(q.size,q.h,q.size);dummy.updateMatrix();trees.setMatrixAt(j,dummy.matrix);
+      dummy.position.set(q.x+.20*q.size*Math.cos(q.a),q.y+q.h,q.z-.20*q.size*Math.sin(q.a));dummy.rotation.set(q.leanX*.35,q.a+sceneryVariation(q.index,6)*Math.PI*.35,q.leanZ*.35);dummy.scale.setScalar(q.size);dummy.updateMatrix();foliage.setMatrixAt(j,dummy.matrix);
+      foliage.setColorAt(j,new T.Color().setHSL(.245+sceneryVariation(q.index,7)*.065,.22+sceneryVariation(q.index,8)*.13,.59+sceneryVariation(q.index,9)*.12));
+    }
+    for(const b of [trees,foliage]){b.castShadow=b.receiveShadow=true;b.instanceMatrix.needsUpdate=true;b.computeBoundingSphere();root.add(b);}
+    treeBatches.push(trees);foliageBatches.push(foliage);
   }
-  for(const b of [trees,foliage]){b.castShadow=b.receiveShadow=true;root.add(b);}
-  const rocks=new T.InstancedMesh(new T.IcosahedronGeometry(1,1),surfaces.surface('rock','#a9aaa0',2,.08),islands.length*(small?14:24));rocks.name='shore-rocks';
-  let count=0;for(const i of islands)for(let j=0;j<(small?14:24);j++){
-    const a=j*2.399+.6,r=i.radius*(.87+(j%4)*.024),x=i.x+Math.sin(a)*r,z=i.z+Math.cos(a)*r;
-    if(clear(i,x,z))continue;
-    dummy.position.set(x/scale,height(x,z)-.10,z/scale);dummy.rotation.set(.2*j,a,.17*j);
-    dummy.scale.set(.30+(j%4)*.14,.22+(j%3)*.18,.4+(j%3)*.15);dummy.updateMatrix();rocks.setMatrixAt(count++,dummy.matrix);
+  const rockGeometry=new T.IcosahedronGeometry(1,1),rockMaterial=surfaces.surface('rock','#a9aaa0',2,.08),rockBatches=[];
+  for(const i of islands){
+    const transforms=[];
+    for(let j=0;j<(small?14:24);j++){
+      const seed=j+i.x*.019+i.z*.023;
+      const a=j*2.399+.6+(sceneryVariation(seed,10)-.5)*.62;
+      const r=i.radius*(.84+sceneryVariation(seed,11)*.10),x=i.x+Math.sin(a)*r,z=i.z+Math.cos(a)*r;
+      if(clear(i,x,z))continue;
+      transforms.push({x:x/scale,y:height(x,z)-.10,z:z/scale,a,j,seed});
+    }
+    if(!transforms.length)continue;
+    const rocks=new T.InstancedMesh(rockGeometry,rockMaterial,transforms.length);
+    rocks.name=rockBatches.length?'shore-rocks-'+i.id:'shore-rocks';
+    for(let j=0;j<transforms.length;j++){
+      const q=transforms[j];dummy.position.set(q.x,q.y,q.z);dummy.rotation.set(sceneryVariation(q.seed,12)*1.2,q.a,sceneryVariation(q.seed,13)*1.1);
+      dummy.scale.set(.27+sceneryVariation(q.seed,14)*.50,.20+sceneryVariation(q.seed,15)*.43,.31+sceneryVariation(q.seed,16)*.53);dummy.updateMatrix();rocks.setMatrixAt(j,dummy.matrix);
+    }
+    rocks.castShadow=rocks.receiveShadow=true;rocks.instanceMatrix.needsUpdate=true;rocks.computeBoundingSphere();root.add(rocks);rockBatches.push(rocks);
   }
-  rocks.count=count;rocks.castShadow=rocks.receiveShadow=true;root.add(rocks);
-  return {trees,foliage,rocks};
+  return {trees:treeBatches[0],foliage:foliageBatches[0],treeBatches,foliageBatches,rocks:rockBatches[0],rockBatches};
 }
 
 // Colonial facades with shutters, balconies and arcaded ground-floor porches.

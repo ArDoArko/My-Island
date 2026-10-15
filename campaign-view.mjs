@@ -2,7 +2,7 @@ import * as T from 'three';
 import { ISLANDS,VILLAGE,PATHS,market,estateCenter,pathClear,terrainHeight,bounds } from './campaign-world.mjs';
 import { buildMotorboat,seatDriver,HELM } from './campaign-boat.mjs';
 import { createIslandTerrain } from './archipelago-terrain.mjs';
-import { createMaterials, cameraPose } from './island-environment.mjs';
+import { createMaterials, cameraPose, stabilizeSunShadow } from './island-environment.mjs';
 import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
 import { sceneryBlocked } from './campaign-scenery.mjs';
 import { SCALE, docks, points, PEOPLE, ground, goal, nearby } from './campaign.mjs';
@@ -223,7 +223,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       pose.position.y=Math.max(pose.position.y,ground(pose.position.x*SCALE,pose.position.z*SCALE)+.24);
     }
     camera.position.copy(pose.position);camera.lookAt(pose.target);
-    sun.position.set(s.p.x/SCALE-12,25,s.p.z/SCALE-8);sun.target.position.set(s.p.x/SCALE,0,s.p.z/SCALE);
+    stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,{height:25});
     ocean.update(seconds,camera.position);sky.position.copy(camera.position);
     tracer.visible=!!s.shot;
     if(s.shot){
