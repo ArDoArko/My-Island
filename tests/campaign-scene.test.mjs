@@ -60,6 +60,12 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const cave=scene.getObjectByName('cave'),caveFormations=scene.getObjectByName('cave-formations');
     assert.deepEqual(cave.userData.caveDetails,{stalactites:8,stalagmites:8,clearCenter:true});
     assert(caveFormations.isInstancedMesh&&caveFormations.count===16&&caveFormations.boundingSphere,'cave formations must stay in one cullable batch');
+    const evidenceTable=scene.getObjectByName('cave-evidence-table');
+    assert.deepEqual(evidenceTable.userData.evidenceDetails,{legs:4,drawer:true,lantern:true,newspaper:true,hiddenGun:true});
+    assert(evidenceTable.children.length<=4,'cave table and lantern must remain merged by material');
+    assert(evidenceTable.children.some(o=>o.material.emissiveIntensity>1),'cave evidence needs an emissive lantern without another point light');
+    assert.deepEqual(scene.getObjectByName('cave-newspaper').position.toArray(),[0,.83,-2]);
+    assert.deepEqual(scene.getObjectByName('cave-hidden-gun').position.toArray(),[0,.87,-2]);
     const estateInterior=scene.getObjectByName('estate'),estateDetails=scene.getObjectByName('estate-interior-details');
     assert.deepEqual(estateInterior.userData.interiorDetails,{portraits:3,sconces:2,documents:3,deskLamp:true});
     assert(estateDetails.children.length<10,'boss office wall and desk details must remain merged by material');

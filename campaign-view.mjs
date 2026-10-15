@@ -202,21 +202,29 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   }
   caveFormations.castShadow=caveFormations.receiveShadow=true;caveFormations.instanceMatrix.needsUpdate=true;caveFormations.computeBoundingSphere();cave.add(caveFormations);
   cave.userData.caveDetails={stalactites:8,stalagmites:8,clearCenter:true};
-  const table=cube(cave,'#a98961',[0,.75,-2],[2,.12,1.2]);
-  for(const x of [-.75,.75])tube(cave,'#876742',[x,.35,-2],[.065,.7,.065]);
+  const evidenceTable=new T.Group();evidenceTable.name='cave-evidence-table';cave.add(evidenceTable);
+  cube(evidenceTable,'#a98961',[0,.75,-2],[2,.12,1.2]);
+  for(const x of [-.75,.75])for(const z of [-2.45,-1.55])tube(evidenceTable,'#876742',[x,.35,z],[.065,.7,.065]);
+  for(const z of [-2.47,-1.53])cube(evidenceTable,'#876742',[0,.57,z],[1.72,.20,.07]);
+  cube(evidenceTable,'#876742',[0,.56,-1.38],[.72,.27,.08]);ell(evidenceTable,'#394447',[0,.56,-1.32],[.045,.045,.04]);
+  tube(evidenceTable,'#394447',[.72,.86,-2.18],[.17,.10,.17]);
+  const caveLanternMaterial=new T.MeshStandardMaterial({color:'#ffe4a8',emissive:'#ff9f45',emissiveIntensity:1.05,roughness:.28,transparent:true,opacity:.88});
+  const caveLantern=ell(evidenceTable,'#ffe4a8',[.72,1.08,-2.18],[.14,.22,.14]);caveLantern.material=caveLanternMaterial;
+  tube(evidenceTable,'#394447',[.72,1.31,-2.18],[.12,.07,.12]);
+  evidenceTable.userData.evidenceDetails={legs:4,drawer:true,lantern:true,newspaper:true,hiddenGun:true};batchGroup(evidenceTable);
   const paperCanvas=document.createElement('canvas');paperCanvas.width=256;paperCanvas.height=320;
   const pc=paperCanvas.getContext('2d');pc.fillStyle='#ddd5bd';pc.fillRect(0,0,256,320);pc.fillStyle='#3a3b32';pc.font='bold 26px serif';pc.fillText('ISLAND DAILY',18,38);
   pc.fillRect(18,51,220,3);for(let j=0;j<20;j++){pc.fillRect(18,72+j*10,94-(j%4)*6,2);pc.fillRect(128,72+j*10,104-(j%3)*8,2);}
   const paperMap=new T.CanvasTexture(paperCanvas);paperMap.colorSpace=T.SRGBColorSpace;
   const paperMesh=new T.Mesh(new T.PlaneGeometry(.9,1.05),new T.MeshStandardMaterial({map:paperMap,side:T.DoubleSide}));
-  paperMesh.rotation.x=-Math.PI/2;paperMesh.position.set(0,.83,-2);cave.add(paperMesh);
+  paperMesh.name='cave-newspaper';paperMesh.rotation.x=-Math.PI/2;paperMesh.position.set(0,.83,-2);cave.add(paperMesh);
   function pistol(parent){
     const root=new T.Group();parent.add(root);
     cube(root,'#333a3d',[0,0,.06],[.12,.12,.34]);
     const grip=cube(root,'#695646',[0,-.11,-.03],[.10,.23,.13]);grip.rotation.x=-.22;
     cube(root,'#8b9294',[0,.08,.03],[.11,.035,.30]);return root;
   }
-  const hiddenGun=pistol(cave);hiddenGun.position.set(0,.87,-2);hiddenGun.rotation.y=Math.PI/2;
+  const hiddenGun=pistol(cave);hiddenGun.name='cave-hidden-gun';hiddenGun.position.set(0,.87,-2);hiddenGun.rotation.y=Math.PI/2;
   const estate=room('estate',11,15);
   cube(estate,'#816947',[0,.42,-4.6],[2.6,.85,.9]);cube(estate,'#decc9f',[0,.05,1],[3,.025,10]);
   for(let j=0;j<6;j++)cube(estate,'#777a6b',[3.5,.06*j,-4.75+j*.28],[1.7,.12,.65]);
