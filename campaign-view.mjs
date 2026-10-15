@@ -270,9 +270,18 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     const person=makeHuman({shirt:g.id==='boss'?'#43433e':'#526252',skin:'#c29574',hair:'#302e28'},'guard',helpers);
     scene.add(person.root);pistol(person.arms[1].forearm).position.set(0,-.24,.14);guardModels.set(g.id,person);
   }
+  const residentLooks=[
+    {shirt:'#8da4b1',skin:'#c99370',hair:'#302d2a',style:0,scale:1.02},
+    {shirt:'#b78876',skin:'#e1b894',hair:'#6a4938',style:1,scale:.96},
+    {shirt:'#9caa8c',skin:'#b98264',hair:'#2f2927',style:2,scale:1},
+    {shirt:'#c3b487',skin:'#dca984',hair:'#704936',style:1,scale:.72},
+    {shirt:'#92b2b6',skin:'#e4bb96',hair:'#3f302b',style:2,scale:.76}
+  ];
   for(const p of PEOPLE){
-    const person=makeHuman({shirt:['#8da4b1','#b78876','#9caa8c','#c3b487','#92b2b6'][p.id],skin:'#dbb18d',hair:'#544432'},'resident',helpers);
-    if(p.child)person.root.scale.setScalar(.72);scene.add(person.root);prisoners.set(p.id,person);
+    const look=residentLooks[p.id],person=makeHuman(look,'resident',helpers);
+    person.root.name='campaign-prisoner-'+p.id;person.root.scale.setScalar(look.scale);
+    person.hairStyles.forEach((style,index)=>style.name=`campaign-prisoner-${p.id}-hair-${index}`);
+    person.root.userData.residentProfile={child:p.child,style:look.style,scale:look.scale};scene.add(person.root);prisoners.set(p.id,person);
   }
   const handheld=new T.Group();camera.add(handheld);
   pistol(handheld).position.set(.26,-.23,-.48);const hand=ell(handheld,'#ddb08c',[.24,-.32,-.40],[.065,.085,.08]);
