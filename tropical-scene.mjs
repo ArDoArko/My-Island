@@ -234,7 +234,7 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
   }
   for(const b of village)building(b);
   // Paths follow the same height function as feet, including uneven ground.
-  function path(points,width){
+  function path(points,width,curb=false){
     const verts=[],uv=[],indices=[];let distance=0;
     for(let j=0;j<points.length;j++){
       const a=points[Math.max(0,j-1)],b=points[Math.min(points.length-1,j+1)],q=points[j];
@@ -245,17 +245,31 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
     }
     const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(verts,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.setIndex(indices);geo.computeVertexNormals();
     const mesh=new T.Mesh(geo,surfaces.surface('paving','#ded9c9',.75,.045));mesh.name='village-path';mesh.receiveShadow=true;root.add(mesh);
+    if(curb){
+      const curbWidth=Math.max(4,width*.08),box=new T.BoxGeometry(1,1,1);
+      const stones=new T.InstancedMesh(box,surfaces.surface('rock','#dad4c6',1.2,.025),(points.length-1)*2),dummy=new T.Object3D();
+      stones.name='village-curb';let instance=0;
+      for(let j=1;j<points.length;j++){
+        const a=points[j-1],b=points[j],dx=b.x-a.x,dz=b.z-a.z,length=Math.hypot(dx,dz),nx=-dz/length,nz=dx/length;
+        for(const side of [-1,1]){
+          const x=(a.x+b.x)/2+nx*(width/2+curbWidth/2)*side,z=(a.z+b.z)/2+nz*(width/2+curbWidth/2)*side;
+          dummy.position.set(x/scale,height(x,z)+.065,z/scale);dummy.rotation.set(0,Math.atan2(dx,dz),0);
+          dummy.scale.set(curbWidth/scale,.10,length/scale+.025);dummy.updateMatrix();stones.setMatrixAt(instance++,dummy.matrix);
+        }
+      }
+      stones.castShadow=stones.receiveShadow=true;stones.instanceMatrix.needsUpdate=true;stones.computeBoundingSphere();root.add(stones);
+    }
   }
   for(const p of paths||[
-    {points:Array.from({length:31},(_,j)=>({x:385-j*21,z:36+Math.sin(j*.19)*9})),width:55},
-    {points:Array.from({length:15},(_,j)=>({x:23,z:-280+j*39})),width:40}
+    {points:Array.from({length:31},(_,j)=>({x:385-j*21,z:36+Math.sin(j*.19)*9})),width:55,curb:true},
+    {points:Array.from({length:15},(_,j)=>({x:23,z:-280+j*39})),width:40,curb:true}
   ]){
     const samples=[p.points[0]];
     for(let j=1;j<p.points.length;j++){
       const a=p.points[j-1],b=p.points[j],n=Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/30);
       for(let k=1;k<=n;k++)samples.push({x:a.x+(b.x-a.x)*k/n,z:a.z+(b.z-a.z)*k/n});
     }
-    path(samples,p.width);
+    path(samples,p.width,p.curb);
   }
   // Harbor canopy beside the fuel pump. It leaves the interactive pump clear.
   const market=new T.Group();market.name='harbor-market';market.position.set(marketPoint.x/scale,height(marketPoint.x,marketPoint.z),marketPoint.z/scale);root.add(market);

@@ -23,6 +23,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.planters,0),12);
     assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.awnings,0),8);
     assert.equal(houses.filter(o=>o.userData.facadeDetails.balcony).length,2);
+    const curbs=[];scene.traverse(o=>{if(o.name==='village-curb')curbs.push(o);});
+    assert.equal(curbs.length,2,'curbs belong on the two village streets, not the jungle trail');
+    assert(curbs.every(o=>o.isInstancedMesh&&o.count>20&&o.boundingSphere),'curb stones must stay batched and cullable');
     assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);
     const treeBatches=[],frondBatches=[],rockBatches=[];scene.traverse(o=>{if(o.name.startsWith('grove-trunks'))treeBatches.push(o);if(o.name.startsWith('grove-fronds'))frondBatches.push(o);if(o.name.startsWith('shore-rocks'))rockBatches.push(o);});
     assert.equal(treeBatches.length,C.ISLANDS.length);assert.equal(frondBatches.length,C.ISLANDS.length);assert.equal(rockBatches.length,C.ISLANDS.length);

@@ -29,8 +29,8 @@ export const VILLAGE = OLD_VILLAGE.map(b=>({...b,x:b.x+villageAnchor.x,z:b.z+vil
   facing:b.z>60?Math.PI:0}));
 const atVillage=(x,z)=>({x:x+villageAnchor.x,z:z+villageAnchor.z});
 export const PATHS = [
-  {width:55,points:Array.from({length:31},(_,j)=>j===0?{...docks.home.land}:atVillage(385-j*21,36+Math.sin(j*.19)*9))},
-  {width:40,points:Array.from({length:15},(_,j)=>atVillage(23,-280+j*39))},
+  {width:55,curb:true,points:Array.from({length:31},(_,j)=>j===0?{...docks.home.land}:atVillage(385-j*21,36+Math.sin(j*.19)*9))},
+  {width:40,curb:true,points:Array.from({length:15},(_,j)=>atVillage(23,-280+j*39))},
   {width:36,points:[atVillage(-245,40),atVillage(-600,30),{x:ISLAND_BY_ID.home.radius*.35,z:400},{x:800,z:-700},{x:-1800,z:-2400}]}
 ];
 export const market = atVillage(290,-30);
