@@ -268,6 +268,7 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
       stones.castShadow=stones.receiveShadow=true;stones.instanceMatrix.needsUpdate=true;stones.computeBoundingSphere();root.add(stones);
     }
   }
+  const streetLampSites=[];
   for(const p of paths||[
     {points:Array.from({length:31},(_,j)=>({x:385-j*21,z:36+Math.sin(j*.19)*9})),width:55,curb:true},
     {points:Array.from({length:15},(_,j)=>({x:23,z:-280+j*39})),width:40,curb:true}
@@ -278,6 +279,24 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
       for(let k=1;k<=n;k++)samples.push({x:a.x+(b.x-a.x)*k/n,z:a.z+(b.z-a.z)*k/n});
     }
     path(samples,p.width,p.curb);
+    if(p.curb)for(let j=3;j<p.points.length-3;j+=6){
+      const a=p.points[j-1],b=p.points[j+1],q=p.points[j],dx=b.x-a.x,dz=b.z-a.z,n=Math.hypot(dx,dz)||1;
+      const side=Math.floor(j/6)%2?1:-1,offset=p.width/2+9;
+      const x=q.x-dz/n*offset*side,z=q.z+dx/n*offset*side;
+      streetLampSites.push({x:x/scale,y:height(x,z),z:z/scale});
+    }
+  }
+  if(streetLampSites.length){
+    const postGeometry=new T.CylinderGeometry(1,1,1,10),globeGeometry=new T.SphereGeometry(1,12,8),dummy=new T.Object3D();
+    const posts=new T.InstancedMesh(postGeometry,new T.MeshStandardMaterial({color:'#394447',roughness:.62,metalness:.38}),streetLampSites.length);
+    const globes=new T.InstancedMesh(globeGeometry,new T.MeshStandardMaterial({color:'#ffe4a8',emissive:'#ffb85c',emissiveIntensity:.72,roughness:.34}),streetLampSites.length);
+    posts.name='village-lamp-posts';globes.name='village-lamp-globes';
+    for(let j=0;j<streetLampSites.length;j++){
+      const q=streetLampSites[j];dummy.position.set(q.x,q.y+1.35,q.z);dummy.scale.set(.065,2.7,.065);dummy.updateMatrix();posts.setMatrixAt(j,dummy.matrix);
+      dummy.position.set(q.x,q.y+2.76,q.z);dummy.scale.set(.18,.22,.18);dummy.updateMatrix();globes.setMatrixAt(j,dummy.matrix);
+    }
+    posts.castShadow=posts.receiveShadow=true;globes.castShadow=false;globes.receiveShadow=true;
+    for(const mesh of [posts,globes]){mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();root.add(mesh);}
   }
   // Harbor canopy beside the fuel pump. It leaves the interactive pump clear.
   const market=new T.Group();market.name='harbor-market';market.position.set(marketPoint.x/scale,height(marketPoint.x,marketPoint.z),marketPoint.z/scale);root.add(market);
