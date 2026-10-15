@@ -196,13 +196,24 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   for(let j=0;j<6;j++)cube(estate,'#777a6b',[3.5,.06*j,-4.75+j*.28],[1.7,.12,.65]);
   const keyMesh=new T.Mesh(new T.TorusGeometry(.13,.036,8,16),new T.MeshStandardMaterial({color:'#f8ce60',emissive:'#8c6322',emissiveIntensity:.5}));
   keyMesh.position.set(0,.88,-3);estate.add(keyMesh);cube(keyMesh,'#debb63',[0,-.20,0],[.065,.32,.065]);
-  const cellar=room('cellar',11,15),cellBars=[];
+  const cellar=room('cellar',11,15),cellBars=[],cellarStatic=new T.Group();cellarStatic.name='cellar-static';cellar.add(cellarStatic);
   for(const p of PEOPLE){
-    const bars=new T.Group();bars.position.set(p.x/SCALE,0,-1.5);cellar.add(bars);cellBars[p.id]=bars;
+    const bars=new T.Group();bars.name='cell-door-'+p.id;bars.position.set(p.x/SCALE,0,-1.5);cellar.add(bars);cellBars[p.id]=bars;
     for(let j=-2;j<=2;j++)tube(bars,'#475759',[j*.32,1.3,0],[.025,2.6,.025]);
     for(const y of [.1,2.5])cube(bars,'#475759',[0,y,0],[1.65,.055,.055]);
-    cube(cellar,'#a68854',[p.x/SCALE,.18,-4.8],[1.55,.36,.8]);cube(cellar,'#e2dbc7',[p.x/SCALE,.4,-4.8],[1.5,.1,.8]);
+    for(const y of [.45,2.15])tube(bars,'#394447',[-.78,y,.07],[.045,.12,.045]);
+    mesh(bars,geo('cell-padlock',()=>new T.TorusGeometry(.09,.022,6,12)),mat('#a68854'),[.61,1.42,.07]);
+    cube(bars,'#a68854',[.61,1.27,.07],[.18,.20,.08]);
+    const x=p.x/SCALE,blanket=['#738b90','#9b796d'][p.id%2];
+    cube(cellarStatic,'#a98961',[x,.18,-4.8],[1.55,.36,.8]);cube(cellarStatic,'#e2dbc7',[x,.4,-4.8],[1.5,.1,.8]);
+    cube(cellarStatic,blanket,[x,.47,-4.65],[1.42,.045,.48]);
+    cube(cellarStatic,'#d8d2c3',[x,.50,-5.08],[.64,.10,.24]);
   }
+  for(const x of [-3.8,0,3.8]){
+    cube(cellarStatic,'#394447',[x,2.54,-6.28],[.36,.15,.10]);
+    const lamp=ell(cellarStatic,'#ffe4a8',[x,2.34,-6.20],[.15,.20,.11]);lamp.material=lanternMaterial;
+  }
+  cellar.userData.cellarDetails={cells:5,hinges:10,padlocks:5,lamps:3,bedding:5};batchGroup(cellarStatic);
   const self=makeHuman({shirt:'#577c87',skin:'#ddb08c',hair:'#40362f'},'player',helpers);
   self.root.name='campaign-player';scene.add(self.root);const guardModels=new Map(),prisoners=new Map();
   for(const g of getState().guards){

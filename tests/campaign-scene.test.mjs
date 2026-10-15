@@ -47,6 +47,10 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const cave=scene.getObjectByName('cave'),caveFormations=scene.getObjectByName('cave-formations');
     assert.deepEqual(cave.userData.caveDetails,{stalactites:8,stalagmites:8,clearCenter:true});
     assert(caveFormations.isInstancedMesh&&caveFormations.count===16&&caveFormations.boundingSphere,'cave formations must stay in one cullable batch');
+    const cellar=scene.getObjectByName('cellar'),cellarStatic=scene.getObjectByName('cellar-static');
+    assert.deepEqual(cellar.userData.cellarDetails,{cells:5,hinges:10,padlocks:5,lamps:3,bedding:5});
+    assert(cellarStatic.children.length<10,'cell bedding and wall lamps must remain merged by material');
+    assert(Array.from({length:5},(_,id)=>scene.getObjectByName('cell-door-'+id)).every(o=>o?.children.length===11),'each prisoner needs a hinged, locked cell door');
     assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);
     const treeBatches=[],frondBatches=[],rockBatches=[];scene.traverse(o=>{if(o.name.startsWith('grove-trunks'))treeBatches.push(o);if(o.name.startsWith('grove-fronds'))frondBatches.push(o);if(o.name.startsWith('shore-rocks'))rockBatches.push(o);});
     assert.equal(treeBatches.length,C.ISLANDS.length);assert.equal(frondBatches.length,C.ISLANDS.length);assert.equal(rockBatches.length,C.ISLANDS.length);
@@ -89,7 +93,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
     state.interior='cellar';state.boat=false;state.key=state.paper=state.gun=true;
     state.released=C.PEOPLE.map(p=>p.id);state.walking=true;
     state.guards.forEach(g=>g.hp=0);view.frame(2000);
-    assert.equal(scene.getObjectByName('cellar').children.filter(g=>g.isGroup&&g.children.length===7&&g.position.z===-1.5).every(g=>!g.visible),true);
+    assert.equal(Array.from({length:5},(_,id)=>scene.getObjectByName('cell-door-'+id)).every(g=>!g.visible),true);
     assert(Number.isFinite(view.aim()));assert(view.vector(0,-1).x!==undefined);
     const before=camera.position.clone();view.setEnabled(false);state.p.x=80;view.frame(2100);assert(camera.position.equals(before));
   }finally{
