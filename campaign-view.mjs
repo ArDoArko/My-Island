@@ -110,10 +110,23 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const signFace=tube(pump,'#f3dfbe',[0,2.90,.005],[.31,.115,.31]);signFace.rotation.x=Math.PI/2;
   pump.userData.fuelDetails={display:true,hose:true,nozzle:true,marker:true};
   batchGroup(pump);
-  const caveEntrance=new T.Group();caveEntrance.position.set(points.cave.x/SCALE,ground(points.cave.x,points.cave.z),points.cave.z/SCALE);world.add(caveEntrance);
-  for(const x of [-1.6,1.6])ell(caveEntrance,'#92968b',[x,1.5,0],[.7,1.7,1.3]);
-  ell(caveEntrance,'#777a6b',[0,2.9,0],[2.1,.8,1.3]);
+  const caveEntrance=new T.Group();caveEntrance.name='campaign-cave-entrance';caveEntrance.position.set(points.cave.x/SCALE,ground(points.cave.x,points.cave.z),points.cave.z/SCALE);world.add(caveEntrance);
+  const archStones=[
+    [-2,.45,.02,.55,.55,.85,-.12],[-2,1.15,-.02,.58,.7,.95,.08],[-1.9,1.9,.04,.62,.72,.9,-.09],[-1.55,2.55,-.03,.72,.6,.9,.14],
+    [2,.45,-.02,.55,.55,.85,.12],[2,1.15,.03,.58,.7,.95,-.08],[1.9,1.9,-.04,.62,.72,.9,.09],[1.55,2.55,.02,.72,.6,.9,-.14],
+    [-1,2.9,.03,.72,.48,.9,-.1],[-.35,3.05,-.03,.68,.45,.92,.06],[.35,3.05,.02,.68,.45,.92,-.06],[1,2.9,-.02,.72,.48,.9,.1]
+  ];
+  const entranceDummy=new T.Object3D(),rockBatch=new T.InstancedMesh(geo('cave-mouth-rock',()=>new T.SphereGeometry(1,12,8)),mat('#92968b'),archStones.length);
+  rockBatch.name='cave-entrance-rocks';rockBatch.castShadow=true;rockBatch.receiveShadow=true;
+  archStones.forEach(([x,y,z,sx,sy,sz,rz],i)=>{entranceDummy.position.set(x,y,z);entranceDummy.scale.set(sx,sy,sz);entranceDummy.rotation.set(0,0,rz);entranceDummy.updateMatrix();rockBatch.setMatrixAt(i,entranceDummy.matrix);});
+  rockBatch.instanceMatrix.needsUpdate=true;rockBatch.computeBoundingSphere();caveEntrance.add(rockBatch);
   cube(caveEntrance,'#171e19',[0,1.25,-.85],[2.8,2.5,.15]);
+  const torchBatch=new T.InstancedMesh(geo('cave-torch-handle',()=>new T.CylinderGeometry(1,1,1,7)),mat('#4c3525'),2);torchBatch.name='cave-entrance-torches';torchBatch.castShadow=true;
+  const flameMaterial=new T.MeshStandardMaterial({color:'#ffcf75',emissive:'#ff7f32',emissiveIntensity:1.15,roughness:.55});
+  const flameBatch=new T.InstancedMesh(geo('cave-torch-flame',()=>new T.ConeGeometry(1,1,7)),flameMaterial,2);flameBatch.name='cave-entrance-flames';
+  [-1,1].forEach((side,i)=>{entranceDummy.position.set(side*1.18,1.15,.18);entranceDummy.scale.set(.035,.85,.035);entranceDummy.rotation.set(0,0,-side*.15);entranceDummy.updateMatrix();torchBatch.setMatrixAt(i,entranceDummy.matrix);entranceDummy.position.set(side*1.18,1.65,.18);entranceDummy.scale.set(.12,.22,.12);entranceDummy.rotation.set(0,0,side*.08);entranceDummy.updateMatrix();flameBatch.setMatrixAt(i,entranceDummy.matrix);});
+  torchBatch.instanceMatrix.needsUpdate=true;flameBatch.instanceMatrix.needsUpdate=true;torchBatch.computeBoundingSphere();flameBatch.computeBoundingSphere();caveEntrance.add(torchBatch,flameBatch);
+  caveEntrance.userData.entranceDetails={archStones:12,torches:2,clearOpening:true};
   const mansion=new T.Group();mansion.name='guarded-estate';mansion.position.set(estateCenter.x/SCALE,.85,estateCenter.z/SCALE);world.add(mansion);
   cube(mansion,'#e2dbc7',[0,1.55,0],[8,3.1,8]);
   cube(mansion,'#a68854',[0,3.2,0],[8.6,.25,8.6]);

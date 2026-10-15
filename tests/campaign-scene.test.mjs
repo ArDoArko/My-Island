@@ -41,6 +41,12 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const pump=scene.getObjectByName('harbor-fuel-pump');
     assert.deepEqual(pump.userData.fuelDetails,{display:true,hose:true,nozzle:true,marker:true});
     assert(pump.children.length<10,'fuel-pump details must remain merged by material');
+    const caveEntrance=scene.getObjectByName('campaign-cave-entrance');
+    assert.deepEqual(caveEntrance.userData.entranceDetails,{archStones:12,torches:2,clearOpening:true});
+    for(const [name,count] of [['cave-entrance-rocks',12],['cave-entrance-torches',2],['cave-entrance-flames',2]]){
+      const batch=scene.getObjectByName(name);assert(batch.isInstancedMesh,`${name} must be instanced`);assert.equal(batch.count,count);assert(batch.boundingSphere,`${name} must have a culling sphere`);
+    }
+    assert(scene.getObjectByName('cave-entrance-flames').material.emissiveIntensity>1,'cave flames must remain visibly emissive without extra lights');
     const estate=scene.getObjectByName('guarded-estate');
     assert.deepEqual(estate.userData.estateDetails,{planters:2,lanterns:2,crest:true});
     assert(estate.children.length<16,'estate facade and garden details must remain merged by material');
