@@ -266,8 +266,23 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   cellar.userData.cellarDetails={cells:5,hinges:10,padlocks:5,lamps:3,bedding:5};batchGroup(cellarStatic);
   const self=makeHuman({shirt:'#577c87',skin:'#ddb08c',hair:'#40362f'},'player',helpers);
   self.root.name='campaign-player';scene.add(self.root);const guardModels=new Map(),prisoners=new Map();
+  const guardLooks={
+    gate:{shirt:'#526252',skin:'#c29574',hair:'#302e28',style:0},
+    patrol:{shirt:'#59665a',skin:'#a96f55',hair:'#211f1e',style:1},
+    hall:{shirt:'#4b5958',skin:'#d1a17d',hair:'#5b4032',style:2},
+    boss:{shirt:'#34383a',skin:'#b67d60',hair:'#251f1c',style:1}
+  };
   for(const g of getState().guards){
-    const person=makeHuman({shirt:g.id==='boss'?'#43433e':'#526252',skin:'#c29574',hair:'#302e28'},'guard',helpers);
+    const look=guardLooks[g.id],person=makeHuman(look,'guard',helpers);
+    person.root.name='campaign-guard-'+g.id;
+    person.hairStyles.forEach((style,index)=>style.name=`campaign-guard-${g.id}-hair-${index}`);
+    person.root.userData.guardProfile={boss:g.id==='boss',style:look.style};
+    if(g.id==='boss'){
+      const insignia=new T.Group();insignia.name='campaign-boss-insignia';person.hips.add(insignia);
+      for(const side of [-1,1])cube(insignia,'#d2aa58',[side*.20,.56,.02],[.12,.035,.18]);
+      const sash=cube(insignia,'#8f2f2d',[0,.34,.15],[.055,.52,.025]);sash.rotation.z=-.48;
+      person.root.userData.guardProfile.insignia=true;
+    }
     scene.add(person.root);pistol(person.arms[1].forearm).position.set(0,-.24,.14);guardModels.set(g.id,person);
   }
   const residentLooks=[

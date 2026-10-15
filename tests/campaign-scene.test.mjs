@@ -79,6 +79,13 @@ test('real Three.js campaign geometry and both cameras run through every mission
       assert.equal(resident.scale.x,profile.scale);assert.equal(resident.scale.y,profile.scale);assert.equal(resident.scale.z,profile.scale);
       assert.equal([0,1,2].filter(style=>scene.getObjectByName(`campaign-prisoner-${id}-hair-${style}`).visible).join(','),String(profile.style));
     }
+    const guardProfiles={gate:{boss:false,style:0},patrol:{boss:false,style:1},hall:{boss:false,style:2},boss:{boss:true,style:1,insignia:true}};
+    for(const [id,profile] of Object.entries(guardProfiles)){
+      const guard=scene.getObjectByName('campaign-guard-'+id);assert.deepEqual(guard.userData.guardProfile,profile);
+      assert.equal([0,1,2].filter(style=>scene.getObjectByName(`campaign-guard-${id}-hair-${style}`).visible).join(','),String(profile.style));
+    }
+    const bossInsignia=scene.getObjectByName('campaign-boss-insignia');
+    assert(bossInsignia&&bossInsignia.children.length===3,'boss needs two gold shoulder tabs and a red sash');
     assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);
     const treeBatches=[],frondBatches=[],rockBatches=[];scene.traverse(o=>{if(o.name.startsWith('grove-trunks'))treeBatches.push(o);if(o.name.startsWith('grove-fronds'))frondBatches.push(o);if(o.name.startsWith('shore-rocks'))rockBatches.push(o);});
     assert.equal(treeBatches.length,C.ISLANDS.length);assert.equal(frondBatches.length,C.ISLANDS.length);assert.equal(rockBatches.length,C.ISLANDS.length);
