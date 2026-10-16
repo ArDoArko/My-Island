@@ -315,10 +315,11 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   halo.rotation.x=-Math.PI/2;scene.add(halo);
   const tracer=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]),new T.LineBasicMaterial({color:'#ffe8ad'}));scene.add(tracer);
   const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3();
-  let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea;
+  let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
   function placeHuman(person,p,height,heading,walking,seconds){
+    posedCharacters++;
     person.root.position.set(p.x/SCALE,height,p.z/SCALE);person.root.rotation.set(0,0,0);person.rig.rotation.y=heading;
     const phase=seconds*7,step=walking?.24:0;
     for(const leg of person.legs){leg.thigh.rotation.x=Math.sin(phase+(leg.side<0?Math.PI:0))*step;leg.calf.rotation.x=Math.max(0,-Math.sin(phase+(leg.side<0?Math.PI:0)))*step;leg.shoe.rotation.x=-leg.calf.rotation.x*.6;}
@@ -327,7 +328,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   }
   function frame(now) {
     if(!enabled||lost)return;
-    const s=getState(),seconds=now/1000;last=now;surfaces.update();sky.material.uniforms.uTime.value=seconds;
+    const s=getState(),seconds=now/1000;last=now;posedCharacters=0;surfaces.update();sky.material.uniforms.uTime.value=seconds;
     const area=s.interior;
     world.visible=!area;rooms.visible=!!area;
     for(const [id,root] of Object.entries(roomGroups))root.visible=id===area;
@@ -344,14 +345,17 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     paperMesh.visible=!s.paper;hiddenGun.visible=s.paper&&!s.gun;keyMesh.visible=!s.key&&s.guards.find(g=>g.id==='boss').hp===0;
     keyMesh.rotation.y=seconds;cellBars.forEach((b,i)=>b.visible=!s.released.includes(i));
     for(const g of s.guards){
-      const p=guardModels.get(g.id);p.root.visible=g.area===area&&!s.boat&&(!g.area||s.island==='fortress');
+      const p=guardModels.get(g.id),visible=g.area===area&&!s.boat&&(!g.area||s.island==='fortress');p.root.visible=visible;
+      if(!visible)continue;
       placeHuman(p,g,g.area?0:ground(g.x,g.z),Math.atan2(s.p.x-g.x,s.p.z-g.z),g.hp>0&&dist2(g,s.p)<210,seconds);
       if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y+=(g.area?0:.15);p.root.scale.setScalar(.8);}
       else {p.rig.rotation.x=0;p.arms[1].arm.rotation.x=-1.05;p.arms[1].forearm.rotation.x=-.35;}
     }
     for(const p of PEOPLE){
       const model=prisoners.get(p.id),freed=s.released.includes(p.id);
-      model.root.visible=s.boarded?false:freed?(!s.boat&&(area==='estate'||area==='cellar'||s.island==='fortress')):area==='cellar';
+      const visible=s.boarded?false:freed?(!s.boat&&(area==='estate'||area==='cellar'||s.island==='fortress')):area==='cellar';
+      model.root.visible=visible;
+      if(!visible)continue;
       const point=freed?{x:s.p.x-Math.sin(s.heading)*(35+p.id*15)+Math.cos(s.heading)*(p.id%2?16:-16),
         z:s.p.z-Math.cos(s.heading)*(35+p.id*15)-Math.sin(s.heading)*(p.id%2?16:-16)}:p;
       placeHuman(model,point,area?0:ground(point.x,point.z),s.heading,freed&&s.walking,seconds+p.id*.18);
@@ -399,7 +403,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
     stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,
-      palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count))}),
+      palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters}),
     dispose(){renderer.dispose();surfaces.dispose();const gs=new Set(),ms=new Set();scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])ms.add(m);});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());paperMap.dispose();}
   };
 }

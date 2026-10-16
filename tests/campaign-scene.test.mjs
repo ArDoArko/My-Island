@@ -145,6 +145,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
       view.setCamera(mode);
       for(const area of [null,'cave','estate','cellar']){
         state.interior=area;state.boat=!area;state.p=area?{x:0,z:115}:{...C.docks.home};view.frame(1000);view.frame(1017);
+        assert.equal(view.stats().posedCharacters,{null:0,cave:1,estate:1,cellar:6}[area],`hidden character poses still run in ${area||'boat'} mode`);
         assert(camera.isPerspectiveCamera);assert(camera.position.toArray().every(Number.isFinite));
         const rooms=scene.getObjectByName('cellar').parent;
         for(const room of rooms.children)assert.equal(room.visible,room.name===area);
@@ -158,6 +159,8 @@ test('real Three.js campaign geometry and both cameras run through every mission
         }
       }
     }
+    state.interior=null;state.boat=false;state.island='fortress';state.p={...C.docks.fortress};view.frame(1500);
+    assert.equal(view.stats().posedCharacters,3,'fortress exterior should pose only the player and two outdoor guards');
     state.interior='cellar';state.boat=false;state.key=state.paper=state.gun=true;
     state.released=C.PEOPLE.map(p=>p.id);state.walking=true;
     state.guards.forEach(g=>g.hp=0);view.frame(2000);
