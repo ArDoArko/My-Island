@@ -27,6 +27,14 @@ export function terrainHeight(x,z) {
 export function cameraVector(x,y,yaw) {
   return {x:x*Math.cos(yaw)+y*Math.sin(yaw),y:-x*Math.sin(yaw)+y*Math.cos(yaw)};
 }
+export function nearestWithin(objects,point,radius=75){
+  let nearest,best=radius*radius;
+  for(const object of objects||[]){
+    const dx=object.x-point.x,dy=object.y-point.y,distance=dx*dx+dy*dy;
+    if(distance<best){nearest=object;best=distance;}
+  }
+  return nearest;
+}
 export function legPose(y,z) {
   const upper=.43,lower=.43,d=clamp(Math.hypot(y,z),.08,upper+lower-.005);
   return {hip:-Math.atan2(z,-y)-Math.acos(clamp((upper*upper+d*d-lower*lower)/(2*upper*d),-1,1)),knee:Math.PI-Math.acos(clamp((upper*upper+lower*lower-d*d)/(2*upper*lower),-1,1))};
@@ -444,7 +452,7 @@ export function create({canvas,terrain,getState,onLost}) {
     const indoors=frameBase&&Math.abs(s.P.x-frameBase.floor.x)<frameBase.floor.w/2&&Math.abs(s.P.y-frameBase.floor.y)<frameBase.floor.h/2;
     for(const material of cutaway){material.opacity=indoors&&cameraMode==='third'?.23:1;material.depthWrite=!(indoors&&cameraMode==='third');}
     if(flame){flame.scale.y=1+Math.sin(seconds*13)*.18;fireLight.intensity=2.5+Math.sin(seconds*17)*.4;}
-    const nearest=s.objects.filter(o=>Math.hypot(o.x-s.P.x,o.y-s.P.y)<75).sort((a,b)=>Math.hypot(a.x-s.P.x,a.y-s.P.y)-Math.hypot(b.x-s.P.x,b.y-s.P.y))[0];
+    const nearest=nearestWithin(s.objects,s.P);
     marker.visible=!!(s.play&&!s.paused&&nearest);if(nearest)marker.position.set(nearest.x/SCALE,terrainHeight(nearest.x/SCALE,nearest.y/SCALE)+.03,nearest.y/SCALE);
     for(let i=0;i<birds.length;i++){const b=birds[i];b.position.set(19+Math.sin(seconds*.08+i*1.7)*8,7+Math.sin(seconds*.2+i)*.5,12+Math.cos(seconds*.1+i*1.3)*5);b.rotation.y=seconds*.1+i;b.scale.y=1+Math.sin(seconds*7+i)*.5;}
     self.rig.visible=cameraMode!=='first';

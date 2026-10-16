@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, stabilizeSunShadow } from '../island-environment.mjs';
-import { cameraVector, walkSurface, baseElevation } from '../island3d-src.mjs';
+import { cameraVector, walkSurface, baseElevation, nearestWithin } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { game } from './game-harness.mjs';
 
@@ -25,6 +25,15 @@ test('forward movement points where first-person camera looks at every heading',
     const down=cameraPose({x:0,z:0,surface:0,yaw,pitch:1});assert(down.target.y<down.position.y);
     const up=cameraPose({x:0,z:0,surface:0,yaw,pitch:-1});assert(up.target.y>up.position.y);
   }
+});
+
+test('nearest interaction preserves the strict radius and stable distance tie',()=>{
+  const first={id:'first',x:3,y:4},tie={id:'tie',x:-3,y:-4},edge={id:'edge',x:75,y:0};
+  const objects=[edge,first,tie],snapshot=[...objects],inside={id:'inside',x:74.999,y:0};
+  assert.equal(nearestWithin(objects,{x:0,y:0}),first,'an equal-distance tie must keep the first object');
+  assert.deepEqual(objects,snapshot,'finding an interaction must not reorder the world objects');
+  assert.equal(nearestWithin([edge],{x:0,y:0}),undefined,'the exact radius boundary stays excluded');
+  assert.equal(nearestWithin([inside],{x:0,y:0}),inside,'an object just inside the radius stays included');
 });
 
 test('camera pose can reuse its vectors without changing first- or third-person geometry',()=>{

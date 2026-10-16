@@ -374,10 +374,13 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     if(s.boat)seatDriver(self,boat);
     paperMesh.visible=!s.paper;hiddenGun.visible=s.paper&&!s.gun;keyMesh.visible=!s.key&&s.guards.find(g=>g.id==='boss').hp===0;
     keyMesh.rotation.y=seconds;cellBars.forEach((b,i)=>b.visible=!s.released.includes(i));
+    let guardWalking=false;
     for(const g of s.guards){
       const p=guardModels.get(g.id),visible=g.area===area&&!s.boat&&(!g.area||s.island==='fortress');p.root.visible=visible;
       if(!visible)continue;
-      placeHuman(p,g,g.area?0:ground(g.x,g.z),Math.atan2(s.p.x-g.x,s.p.z-g.z),g.hp>0&&dist2(g,s.p)<210,seconds);
+      const dx=g.x-s.p.x,dz=g.z-s.p.z,walking=g.hp>0&&dx*dx+dz*dz<210*210;
+      guardWalking ||= walking;
+      placeHuman(p,g,g.area?0:ground(g.x,g.z),Math.atan2(s.p.x-g.x,s.p.z-g.z),walking,seconds);
       if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y+=(g.area?0:.15);p.root.scale.setScalar(.8);}
       else {p.rig.rotation.x=0;p.arms[1].arm.rotation.x=-1.05;p.arms[1].forearm.rotation.x=-.35;}
     }
@@ -414,7 +417,6 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     camera.position.copy(pose.position);camera.lookAt(pose.target);
     vegetation.update(camera.position);
     stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,{height:25});
-    const guardWalking=s.guards.some(g=>g.area===area&&!s.boat&&(!g.area||s.island==='fortress')&&g.hp>0&&dist2(g,s.p)<210);
     const shadowAnimated=!s.paused&&(s.walking||s.boat||guardWalking);
     const nextShadowSignature=[area||'',s.island,s.boat?1:0,Math.round(s.p.x/20),Math.round(s.p.z/20),Math.round(s.heading*12),
       s.guards.map(g=>g.hp>0?1:0).join(''),s.released.join(','),s.boarded?1:0,shadowAnimated?1:0].join('|');
