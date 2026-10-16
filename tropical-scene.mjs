@@ -8,6 +8,12 @@ float noise21(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
  return mix(mix(hash21(i),hash21(i+vec2(1.,0.)),f.x),mix(hash21(i+vec2(0.,1.)),hash21(i+vec2(1.)),f.x),f.y);}
 float fbm21(vec2 p){float f=0.,a=.5;for(int i=0;i<4;i++){f+=a*noise21(p);p=mat2(.8,-.6,.6,.8)*p*2.07+7.3;a*=.5;}return f;}`;
 
+const skyNoiseGLSL=`
+float hashSky(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noiseSky(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(hashSky(i),hashSky(i+vec2(1.,0.)),f.x),mix(hashSky(i+vec2(0.,1.)),hashSky(i+vec2(1.)),f.x),f.y);}
+float fbmSky(vec2 p){float f=0.,a=.535714;for(int i=0;i<3;i++){f+=a*noiseSky(p);p=mat2(.8,-.6,.6,.8)*p*2.07+7.3;a*=.5;}return f;}`;
+
 // One ocean in both modes. Unequal wave directions and noise break up the old
 // high-frequency stripes; the coast uniforms give each shore its own shallows.
 export function createOcean(coasts,{size=900,segments=72,coastSeeds=[]}={}) {
@@ -56,16 +62,17 @@ export function createOcean(coasts,{size=900,segments=72,coastSeeds=[]}={}) {
 export function createTropicalSky(radius=420) {
   const material=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{uTime:{value:0}},
   vertexShader:'varying vec3 vSky;void main(){vSky=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-  fragmentShader:`uniform float uTime;varying vec3 vSky;${noiseGLSL}
+  fragmentShader:`uniform float uTime;varying vec3 vSky;${skyNoiseGLSL}
   void main(){vec3 dir=normalize(vSky);float h=dir.y;
     vec3 col=mix(vec3(.65,.79,.84),vec3(.095,.34,.59),smoothstep(-.02,.8,h));
-    vec2 p=dir.xz/max(.1,h)*2.3+vec2(uTime*.006,uTime*.0025);float n=fbm21(p);
+    vec2 p=dir.xz/max(.1,h)*2.3+vec2(uTime*.006,uTime*.0025);float n=fbmSky(p);
     float cloud=smoothstep(.52,.70,n)*smoothstep(.025,.20,h);
     col=mix(col,mix(vec3(.62,.69,.71),vec3(.98,.96,.89),smoothstep(.50,.70,n)),cloud);
     float sun=pow(max(dot(dir,normalize(vec3(-.55,.82,-.36))),0.),70.);col+=vec3(.35,.24,.12)*sun;
     gl_FragColor=vec4(col,1.);
     #include <colorspace_fragment>
   }`});
+  material.userData.fragmentNoiseLayers=3;
   const mesh=new T.Mesh(new T.SphereGeometry(radius,32,20),material);
   mesh.name='tropical-sky';mesh.renderOrder=-10;mesh.frustumCulled=false;
   return mesh;

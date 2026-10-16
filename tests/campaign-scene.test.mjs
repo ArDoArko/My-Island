@@ -138,6 +138,8 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(view.stats().terrainTriangles,75208);
     const sky=scene.getObjectByName('tropical-sky');view.frame(4321);
     assert.equal(sky.material.uniforms.uTime.value,4.321,'procedural clouds must drift with campaign time');
+    assert.equal(sky.material.userData.fragmentNoiseLayers,3,'sky clouds must use three noise layers rather than four');
+    assert.match(sky.material.fragmentShader,/for\(int i=0;i<3;i\+\+\)/,'sky FBM must compile exactly three octaves');
     for(const d of Object.values(C.docks)){
       const deck=scene.getObjectByName('pier-deck-'+d.id),land=scene.getObjectByName('archipelago-'+d.id);
       const pilings=scene.getObjectByName('pier-pilings-'+d.id),bollards=scene.getObjectByName('pier-bollards-'+d.id);
