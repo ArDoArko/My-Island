@@ -128,7 +128,8 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const treeBatches=[],frondBatches=[],rockBatches=[];scene.traverse(o=>{if(o.name.startsWith('grove-trunks'))treeBatches.push(o);if(o.name.startsWith('grove-fronds'))frondBatches.push(o);if(o.name.startsWith('shore-rocks'))rockBatches.push(o);});
     assert.equal(treeBatches.length,C.ISLANDS.length*4);assert.equal(frondBatches.length,C.ISLANDS.length*4);assert.equal(rockBatches.length,C.ISLANDS.length);
     assert([...treeBatches,...frondBatches].every(o=>o.userData.cullingRegion?.sector>=1&&o.userData.cullingRegion.sector<=4),'palm batches need spatial culling regions');
-    assert.equal(treeBatches[0].geometry.index.count/3,112,'curved palm trunks must use the reduced six-ring topology');
+    assert.equal(treeBatches[0].userData.lod.high.index.count/3,112,'near curved palm trunks must retain the six-ring topology');
+    assert.equal(treeBatches[0].userData.lod.low.index.count/3,48,'fogged palm trunks must use the three-ring topology');
     assert.equal(frondBatches[0].userData.lod.high.index.count/3,396,'near palm crowns must retain the twelve-step topology');
     assert.equal(frondBatches[0].userData.lod.low.index.count/3,216,'fogged palm crowns must use the seven-step topology');
     const palmCount=treeBatches.reduce((n,o)=>n+o.count,0),palmTriangles=palmCount*(112+396),previousPalmTriangles=palmCount*(180+468);
@@ -139,6 +140,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert(view.stats().lowDetailPalmBatches>0&&view.stats().lowDetailPalmBatches<frondBatches.length,
       'fogged palm sectors must use distant topology while the player vicinity stays detailed');
     assert(view.stats().palmCrownTriangles<1573704,'distant palm LOD must reduce the currently submitted crown triangles');
+    assert(view.stats().palmTrunkTriangles<palmCount*112,'distant palm LOD must reduce the currently submitted trunk triangles');
     assert(Math.max(...treeBatches.map(o=>o.count))<500,'no palm culling region may still span an entire island population');
     assert(palmTriangles/previousPalmTriangles<.79,'palm topology must retain at least a 21% triangle reduction');
     assert([...treeBatches,...rockBatches].every(o=>o.frustumCulled&&o.boundingSphere),'separate island scenery must remain eligible for camera and shadow culling');

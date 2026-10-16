@@ -124,8 +124,12 @@ const sceneryVariation=(seed,salt=0)=>{
 };
 
 export function decorateIslands(root,islands,{scale,height,surfaces,small=false,clear=()=>false,dense=false,lod=false}={}) {
-  const trunk=new T.CylinderGeometry(.085,.16,1,8,6);trunk.translate(0,.5,0);
-  const p=trunk.attributes.position;for(let j=0;j<p.count;j++)p.setX(j,p.getX(j)+p.getY(j)**2*.20);trunk.computeVertexNormals();
+  const palmTrunk=(radialSegments,heightSegments)=>{
+    const geometry=new T.CylinderGeometry(.085,.16,1,radialSegments,heightSegments);geometry.translate(0,.5,0);
+    const p=geometry.attributes.position;for(let j=0;j<p.count;j++)p.setX(j,p.getX(j)+p.getY(j)**2*.20);
+    geometry.computeVertexNormals();return geometry;
+  };
+  const trunk=palmTrunk(8,6),distantTrunk=lod?palmTrunk(6,3):trunk;
   const trunkMaterial=surfaces.surface('wood','#bc9c71',2,.03);
   const leaves=surfaces.surface('leaf','#9cb384',1,.01).clone();leaves.side=T.DoubleSide;
   const fronds=palmFronds(small?9:12),distantFronds=lod?palmFronds(small?6:7):fronds,treeBatches=[],foliageBatches=[],dummy=new T.Object3D();
@@ -159,6 +163,8 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
         foliage.setColorAt(j,new T.Color().setHSL(.245+sceneryVariation(q.index,7)*.065,.22+sceneryVariation(q.index,8)*.13,.59+sceneryVariation(q.index,9)*.12));
       }
       for(const b of [trees,foliage]){b.userData.cullingRegion={island:i.id,sector:sectorIndex+1};b.castShadow=true;b.instanceMatrix.needsUpdate=true;b.computeBoundingSphere();root.add(b);}
+      trees.userData.lod={high:trunk,low:distantTrunk,distance:foliageLodDistance,level:'high',
+        center:trees.boundingSphere.center.clone(),radius:trees.boundingSphere.radius};
       foliage.userData.lod={high:fronds,low:distantFronds,distance:foliageLodDistance,level:'high',
         center:foliage.boundingSphere.center.clone(),radius:foliage.boundingSphere.radius};
       trees.receiveShadow=true;
@@ -188,11 +194,11 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
     rocks.castShadow=rocks.receiveShadow=true;rocks.instanceMatrix.needsUpdate=true;rocks.computeBoundingSphere();root.add(rocks);rockBatches.push(rocks);
   }
   return {trees:treeBatches[0],foliage:foliageBatches[0],treeBatches,foliageBatches,rocks:rockBatches[0],rockBatches,
-    lodGeometries:[fronds,distantFronds],update(cameraPosition){
-      for(const foliage of foliageBatches){
-        const lod=foliage.userData.lod,nearestDistance=Math.max(0,cameraPosition.distanceTo(lod.center)-lod.radius);
+    lodGeometries:[trunk,distantTrunk,fronds,distantFronds],update(cameraPosition){
+      for(const batch of [...treeBatches,...foliageBatches]){
+        const lod=batch.userData.lod,nearestDistance=Math.max(0,cameraPosition.distanceTo(lod.center)-lod.radius);
         const level=nearestDistance<=lod.distance?'high':'low';
-        if(level!==lod.level){foliage.geometry=lod[level];lod.level=level;}
+        if(level!==lod.level){batch.geometry=lod[level];lod.level=level;}
       }
     }};
 }
