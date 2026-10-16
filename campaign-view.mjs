@@ -207,10 +207,13 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   function room(name,w=11,d=15){
     const root=new T.Group();root.name=name;rooms.add(root);roomGroups[name]=root;
     cube(root,name==='cave'?'#777a6b':'#a68854',[0,-.10,1],[w,.2,d]);
-    for(const x of [-w/2,w/2])cube(root,name==='cave'?'#92968b':'#e2dbc7',[x,1.65,1],[.3,3.3,d]);
-    cube(root,name==='cave'?'#92968b':'#e2dbc7',[0,1.65,1-d/2],[w,3.3,.3]);
+    const walls=new T.Group();walls.name=name+'-walls';root.add(walls);
+    for(const x of [-w/2,w/2])cube(walls,name==='cave'?'#92968b':'#e2dbc7',[x,1.65,1],[.3,3.3,d]);
+    cube(walls,name==='cave'?'#92968b':'#e2dbc7',[0,1.65,1-d/2],[w,3.3,.3]);
+    batchGroup(walls);
     cube(root,'#313f38',[0,1.1,d/2-.2],[1.7,2.2,.15]);
     const light=new T.PointLight(name==='cave'?'#ffd9a0':'#ffeccf',22,18,1.6);light.position.set(0,2.7,1);root.add(light);
+    root.userData.shellDetails={sourceMeshes:5,renderMeshes:3};
     return root;
   }
   const cave=room('cave',12,17);
@@ -252,8 +255,10 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   }
   const hiddenGun=pistol(cave);hiddenGun.name='cave-hidden-gun';hiddenGun.position.set(0,.87,-2);hiddenGun.rotation.y=Math.PI/2;
   const estate=room('estate',11,15);
-  cube(estate,'#816947',[0,.42,-4.6],[2.6,.85,.9]);cube(estate,'#decc9f',[0,.05,1],[3,.025,10]);
-  for(let j=0;j<6;j++)cube(estate,'#777a6b',[3.5,.06*j,-4.75+j*.28],[1.7,.12,.65]);
+  const estateFixtures=new T.Group();estateFixtures.name='estate-fixtures';estate.add(estateFixtures);
+  cube(estateFixtures,'#816947',[0,.42,-4.6],[2.6,.85,.9]);cube(estateFixtures,'#decc9f',[0,.05,1],[3,.025,10]);
+  for(let j=0;j<6;j++)cube(estateFixtures,'#777a6b',[3.5,.06*j,-4.75+j*.28],[1.7,.12,.65]);
+  estateFixtures.userData.batchDetails={sourceMeshes:8,renderMeshes:3};batchGroup(estateFixtures);
   const estateStatic=new T.Group();estateStatic.name='estate-interior-details';estate.add(estateStatic);
   const portraitColours=['#6f443d','#40626a','#718052'];
   for(const [j,x] of [-2.7,0,2.7].entries()){

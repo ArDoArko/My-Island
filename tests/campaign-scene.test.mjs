@@ -85,6 +85,14 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.deepEqual(scene.getObjectByName('cave-newspaper').position.toArray(),[0,.83,-2]);
     assert.deepEqual(scene.getObjectByName('cave-hidden-gun').position.toArray(),[0,.87,-2]);
     const estateInterior=scene.getObjectByName('estate'),estateDetails=scene.getObjectByName('estate-interior-details');
+    for(const name of ['cave','estate','cellar']){
+      const interior=scene.getObjectByName(name),walls=scene.getObjectByName(name+'-walls');
+      assert.deepEqual(interior.userData.shellDetails,{sourceMeshes:5,renderMeshes:3});
+      assert.equal(walls.children.length,1,`${name} walls must use one material batch instead of three meshes`);
+    }
+    const estateFixtures=scene.getObjectByName('estate-fixtures');
+    assert.deepEqual(estateFixtures.userData.batchDetails,{sourceMeshes:8,renderMeshes:3});
+    assert.equal(estateFixtures.children.length,3,'estate desk, carpet and six steps must use three material batches instead of eight meshes');
     assert.deepEqual(estateInterior.userData.interiorDetails,{portraits:3,sconces:2,documents:3,deskLamp:true});
     assert(estateDetails.children.length<10,'boss office wall and desk details must remain merged by material');
     const cellar=scene.getObjectByName('cellar'),cellarStatic=scene.getObjectByName('cellar-static');
