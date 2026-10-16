@@ -135,17 +135,22 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
         leanX:(sceneryVariation(seed,4)-.5)*.12,leanZ:(sceneryVariation(seed,5)-.5)*.14,index:globalIndex++});
     }
     if(!positions.length)continue;
-    const trees=new T.InstancedMesh(trunk,trunkMaterial,positions.length);
-    const foliage=new T.InstancedMesh(fronds,leaves,positions.length);
-    trees.name=treeBatches.length?'grove-trunks-'+i.id:'grove-trunks';
-    foliage.name=foliageBatches.length?'grove-fronds-'+i.id:'grove-fronds';
-    for(let j=0;j<positions.length;j++){
-      const q=positions[j];dummy.position.set(q.x,q.y,q.z);dummy.rotation.set(q.leanX,q.a,q.leanZ);dummy.scale.set(q.size,q.h,q.size);dummy.updateMatrix();trees.setMatrixAt(j,dummy.matrix);
-      dummy.position.set(q.x+.20*q.size*Math.cos(q.a),q.y+q.h,q.z-.20*q.size*Math.sin(q.a));dummy.rotation.set(q.leanX*.35,q.a+sceneryVariation(q.index,6)*Math.PI*.35,q.leanZ*.35);dummy.scale.setScalar(q.size);dummy.updateMatrix();foliage.setMatrixAt(j,dummy.matrix);
-      foliage.setColorAt(j,new T.Color().setHSL(.245+sceneryVariation(q.index,7)*.065,.22+sceneryVariation(q.index,8)*.13,.59+sceneryVariation(q.index,9)*.12));
-    }
-    for(const b of [trees,foliage]){b.castShadow=b.receiveShadow=true;b.instanceMatrix.needsUpdate=true;b.computeBoundingSphere();root.add(b);}
-    treeBatches.push(trees);foliageBatches.push(foliage);
+    const sectors=Array.from({length:4},()=>[]);
+    positions.forEach(q=>sectors[(q.x>=i.x/scale?1:0)+(q.z>=i.z/scale?2:0)].push(q));
+    sectors.forEach((sector,sectorIndex)=>{
+      if(!sector.length)return;
+      const trees=new T.InstancedMesh(trunk,trunkMaterial,sector.length);
+      const foliage=new T.InstancedMesh(fronds,leaves,sector.length);
+      trees.name=treeBatches.length?`grove-trunks-${i.id}-${sectorIndex+1}`:'grove-trunks';
+      foliage.name=foliageBatches.length?`grove-fronds-${i.id}-${sectorIndex+1}`:'grove-fronds';
+      for(let j=0;j<sector.length;j++){
+        const q=sector[j];dummy.position.set(q.x,q.y,q.z);dummy.rotation.set(q.leanX,q.a,q.leanZ);dummy.scale.set(q.size,q.h,q.size);dummy.updateMatrix();trees.setMatrixAt(j,dummy.matrix);
+        dummy.position.set(q.x+.20*q.size*Math.cos(q.a),q.y+q.h,q.z-.20*q.size*Math.sin(q.a));dummy.rotation.set(q.leanX*.35,q.a+sceneryVariation(q.index,6)*Math.PI*.35,q.leanZ*.35);dummy.scale.setScalar(q.size);dummy.updateMatrix();foliage.setMatrixAt(j,dummy.matrix);
+        foliage.setColorAt(j,new T.Color().setHSL(.245+sceneryVariation(q.index,7)*.065,.22+sceneryVariation(q.index,8)*.13,.59+sceneryVariation(q.index,9)*.12));
+      }
+      for(const b of [trees,foliage]){b.userData.cullingRegion={island:i.id,sector:sectorIndex+1};b.castShadow=b.receiveShadow=true;b.instanceMatrix.needsUpdate=true;b.computeBoundingSphere();root.add(b);}
+      treeBatches.push(trees);foliageBatches.push(foliage);
+    });
   }
   const rockGeometry=new T.IcosahedronGeometry(1,1),rockMaterial=surfaces.surface('rock','#a9aaa0',2,.08),rockBatches=[];
   for(const i of islands){

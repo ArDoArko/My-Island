@@ -398,7 +398,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     get cameraMode(){return mode},get enabled(){return enabled&&!lost},
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
-    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length}),
+    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,
+      palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count))}),
     dispose(){renderer.dispose();surfaces.dispose();const gs=new Set(),ms=new Set();scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])ms.add(m);});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());paperMap.dispose();}
   };
 }

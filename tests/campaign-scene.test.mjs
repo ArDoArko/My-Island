@@ -112,10 +112,13 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert(bossInsignia&&bossInsignia.children.length===3,'boss needs two gold shoulder tabs and a red sash');
     assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);
     const treeBatches=[],frondBatches=[],rockBatches=[];scene.traverse(o=>{if(o.name.startsWith('grove-trunks'))treeBatches.push(o);if(o.name.startsWith('grove-fronds'))frondBatches.push(o);if(o.name.startsWith('shore-rocks'))rockBatches.push(o);});
-    assert.equal(treeBatches.length,C.ISLANDS.length);assert.equal(frondBatches.length,C.ISLANDS.length);assert.equal(rockBatches.length,C.ISLANDS.length);
+    assert.equal(treeBatches.length,C.ISLANDS.length*4);assert.equal(frondBatches.length,C.ISLANDS.length*4);assert.equal(rockBatches.length,C.ISLANDS.length);
+    assert([...treeBatches,...frondBatches].every(o=>o.userData.cullingRegion?.sector>=1&&o.userData.cullingRegion.sector<=4),'palm batches need spatial culling regions');
     assert.equal(treeBatches[0].geometry.index.count/3,112,'curved palm trunks must use the reduced six-ring topology');
     assert.equal(frondBatches[0].geometry.index.count/3,396,'desktop palm crowns must use the reduced twelve-step topology');
     const palmCount=treeBatches.reduce((n,o)=>n+o.count,0),palmTriangles=palmCount*(112+396),previousPalmTriangles=palmCount*(180+468);
+    assert.equal(palmCount,3974,'spatial culling must preserve every palm');
+    assert(Math.max(...treeBatches.map(o=>o.count))<500,'no palm culling region may still span an entire island population');
     assert(palmTriangles/previousPalmTriangles<.79,'palm topology must retain at least a 21% triangle reduction');
     assert([...treeBatches,...rockBatches].every(o=>o.frustumCulled&&o.boundingSphere),'separate island scenery must remain eligible for camera and shadow culling');
     const scales=(batch,limit=20)=>{const matrix=new T.Matrix4(),scale=new T.Vector3(),position=new T.Vector3(),rotation=new T.Quaternion(),values=[];
@@ -161,6 +164,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(Array.from({length:5},(_,id)=>scene.getObjectByName('cell-door-'+id)).every(g=>!g.visible),true);
     assert(Number.isFinite(view.aim()));assert(view.vector(0,-1).x!==undefined);
     assert.equal(view.stats().cameraBlockers,2,'camera collision must use only the static village and estate blockers');
+    assert.deepEqual({palmBatches:view.stats().palmBatches,largestPalmBatch:view.stats().largestPalmBatch},{palmBatches:24,largestPalmBatch:373});
     const before=camera.position.clone();view.setEnabled(false);state.p.x=80;view.frame(2100);assert(camera.position.equals(before));
   }finally{
     view?.dispose();assert(disposed);dom.window.close();
