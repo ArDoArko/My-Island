@@ -8,11 +8,11 @@ float noise21(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
  return mix(mix(hash21(i),hash21(i+vec2(1.,0.)),f.x),mix(hash21(i+vec2(0.,1.)),hash21(i+vec2(1.)),f.x),f.y);}
 float fbm21(vec2 p){float f=0.,a=.5;for(int i=0;i<4;i++){f+=a*noise21(p);p=mat2(.8,-.6,.6,.8)*p*2.07+7.3;a*=.5;}return f;}`;
 
-const skyNoiseGLSL=`
-float hashSky(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-float noiseSky(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
- return mix(mix(hashSky(i),hashSky(i+vec2(1.,0.)),f.x),mix(hashSky(i+vec2(0.,1.)),hashSky(i+vec2(1.)),f.x),f.y);}
-float fbmSky(vec2 p){float f=0.,a=.535714;for(int i=0;i<3;i++){f+=a*noiseSky(p);p=mat2(.8,-.6,.6,.8)*p*2.07+7.3;a*=.5;}return f;}`;
+const fastNoiseGLSL=`
+float hashFast(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noiseFast(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(hashFast(i),hashFast(i+vec2(1.,0.)),f.x),mix(hashFast(i+vec2(0.,1.)),hashFast(i+vec2(1.)),f.x),f.y);}
+float fbmFast(vec2 p){float f=0.,a=.535714;for(int i=0;i<3;i++){f+=a*noiseFast(p);p=mat2(.8,-.6,.6,.8)*p*2.07+7.3;a*=.5;}return f;}`;
 
 // One ocean in both modes. Unequal wave directions and noise break up the old
 // high-frequency stripes; the coast uniforms give each shore its own shallows.
@@ -62,10 +62,10 @@ export function createOcean(coasts,{size=900,segments=72,coastSeeds=[]}={}) {
 export function createTropicalSky(radius=420) {
   const material=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{uTime:{value:0}},
   vertexShader:'varying vec3 vSky;void main(){vSky=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-  fragmentShader:`uniform float uTime;varying vec3 vSky;${skyNoiseGLSL}
+  fragmentShader:`uniform float uTime;varying vec3 vSky;${fastNoiseGLSL}
   void main(){vec3 dir=normalize(vSky);float h=dir.y;
     vec3 col=mix(vec3(.65,.79,.84),vec3(.095,.34,.59),smoothstep(-.02,.8,h));
-    vec2 p=dir.xz/max(.1,h)*2.3+vec2(uTime*.006,uTime*.0025);float n=fbmSky(p);
+    vec2 p=dir.xz/max(.1,h)*2.3+vec2(uTime*.006,uTime*.0025);float n=fbmFast(p);
     float cloud=smoothstep(.52,.70,n)*smoothstep(.025,.20,h);
     col=mix(col,mix(vec3(.62,.69,.71),vec3(.98,.96,.89),smoothstep(.50,.70,n)),cloud);
     float sun=pow(max(dot(dir,normalize(vec3(-.55,.82,-.36))),0.),70.);col+=vec3(.35,.24,.12)*sun;
@@ -82,15 +82,16 @@ export function createTropicalSky(radius=420) {
 // sample sand rather than tinting a grass photograph yellow.
 export function islandMaterial(surfaces,scale) {
   const m=new T.MeshStandardMaterial({roughness:1,color:'#ffffff',vertexColors:true});
+  m.userData.fragmentNoiseLayers=3;
   m.onBeforeCompile=shader=>{
     Object.assign(shader.uniforms,{uGrass:{value:surfaces.textures.get('grass')},uSand:{value:surfaces.textures.get('sand')},uRock:{value:surfaces.textures.get('rock')}});
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vIslandPosition;varying vec3 vIslandNormal;')
       .replace('#include <begin_vertex>',`#include <begin_vertex>\nvIslandPosition=position;vIslandNormal=normalize(normal*vec3(${scale.toFixed(1)},1.,${scale.toFixed(1)}));`);
     shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
-      varying vec3 vIslandPosition;varying vec3 vIslandNormal;uniform sampler2D uGrass;uniform sampler2D uSand;uniform sampler2D uRock;${noiseGLSL}`)
+      varying vec3 vIslandPosition;varying vec3 vIslandNormal;uniform sampler2D uGrass;uniform sampler2D uSand;uniform sampler2D uRock;${fastNoiseGLSL}`)
       .replace('#include <map_fragment>',`
         vec2 uv=vIslandPosition.xz/${scale.toFixed(1)}*.34;
-        float n=fbm21(uv*.46);vec2 offset=vec2(17.3,8.1);
+        float n=fbmFast(uv*.46);vec2 offset=vec2(17.3,8.1);
         vec3 grass=mix(texture2D(uGrass,uv).rgb,texture2D(uGrass,uv*1.37+offset).rgb,.38);
         vec3 sand=texture2D(uSand,uv*.8).rgb,rock=texture2D(uRock,uv*.62).rgb;
         float beach=1.-smoothstep(.025,.34,vIslandPosition.y);

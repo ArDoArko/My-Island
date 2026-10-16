@@ -135,6 +135,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const terrainMeshes=C.ISLANDS.map(i=>scene.getObjectByName('archipelago-'+i.id));
     assert.deepEqual(terrainMeshes.map(o=>o.userData.terrainSegments),[192,96,80,96,80,88],'terrain density must follow physical island size');
     assert.equal(terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),75208,'adaptive island meshes must remove oversampling');
+    assert(terrainMeshes.every(o=>o.material.userData.fragmentNoiseLayers===3),'every island surface must use the three-layer terrain shader');
     assert.equal(view.stats().terrainTriangles,75208);
     const sky=scene.getObjectByName('tropical-sky');view.frame(4321);
     assert.equal(sky.material.uniforms.uTime.value,4.321,'procedural clouds must drift with campaign time');
