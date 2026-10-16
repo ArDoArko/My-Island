@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, stabilizeSunShadow } from '../island-environment.mjs';
-import { cameraVector, walkSurface, baseElevation, nearestWithin } from '../island3d-src.mjs';
+import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { game } from './game-harness.mjs';
 
@@ -34,6 +34,20 @@ test('nearest interaction preserves the strict radius and stable distance tie',(
   assert.deepEqual(objects,snapshot,'finding an interaction must not reorder the world objects');
   assert.equal(nearestWithin([edge],{x:0,y:0}),undefined,'the exact radius boundary stays excluded');
   assert.equal(nearestWithin([inside],{x:0,y:0}),inside,'an object just inside the radius stays included');
+});
+
+test('world labels keep their pixel cap without traversing unrelated scene objects',()=>{
+  const scene=new T.Scene(),camera=new T.PerspectiveCamera(72,1,.1,200),label=new T.Sprite();
+  label.scale.set(10,2,1);label.position.z=-.2;scene.add(label);
+  for(let i=0;i<100;i++)scene.add(new T.Object3D());
+  const labels=new Set([label]),scratch=new T.Vector3();
+  assert.equal(scaleWorldLabels(labels,camera,1000,scratch),1);
+  const pixels=label.scale.x*camera.projectionMatrix.elements[0]*1000/(2*.2);
+  assert(pixels<=240+1e-9,'a close label must stay within the original 240 pixel cap');
+  label.position.z=-100;
+  scaleWorldLabels(labels,camera,1000,scratch);
+  assert.equal(label.scale.x,10,'a distant label must restore its authored scale');
+  assert.equal(label.userData.signScale.x,10,'the reusable base scale must not be overwritten by capping');
 });
 
 test('camera pose can reuse its vectors without changing first- or third-person geometry',()=>{
