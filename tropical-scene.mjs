@@ -115,11 +115,11 @@ const sceneryVariation=(seed,salt=0)=>{
 };
 
 export function decorateIslands(root,islands,{scale,height,surfaces,small=false,clear=()=>false,dense=false}={}) {
-  const trunk=new T.CylinderGeometry(.085,.16,1,10,8);trunk.translate(0,.5,0);
+  const trunk=new T.CylinderGeometry(.085,.16,1,8,6);trunk.translate(0,.5,0);
   const p=trunk.attributes.position;for(let j=0;j<p.count;j++)p.setX(j,p.getX(j)+p.getY(j)**2*.20);trunk.computeVertexNormals();
   const trunkMaterial=surfaces.surface('wood','#bc9c71',2,.03);
   const leaves=surfaces.surface('leaf','#9cb384',1,.01).clone();leaves.side=T.DoubleSide;
-  const fronds=palmFronds(small?9:14),treeBatches=[],foliageBatches=[],dummy=new T.Object3D();
+  const fronds=palmFronds(small?9:12),treeBatches=[],foliageBatches=[],dummy=new T.Object3D();
   let globalIndex=0;
   for(const i of islands){
     const positions=[];
