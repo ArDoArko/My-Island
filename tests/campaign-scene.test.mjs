@@ -126,6 +126,10 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert(scales(treeBatches[0])>12,'palms need varied silhouettes rather than repeating modulo sizes');
     assert(scales(rockBatches[0])>12,'shore rocks need varied proportions rather than repeating modulo sizes');
     assert(scene.getObjectByName('tropical-ocean').material.uniforms.uCoasts.value.length===9);
+    const terrainMeshes=C.ISLANDS.map(i=>scene.getObjectByName('archipelago-'+i.id));
+    assert.deepEqual(terrainMeshes.map(o=>o.userData.terrainSegments),[192,96,80,96,80,88],'terrain density must follow physical island size');
+    assert.equal(terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),75208,'adaptive island meshes must remove oversampling');
+    assert.equal(view.stats().terrainTriangles,75208);
     const sky=scene.getObjectByName('tropical-sky');view.frame(4321);
     assert.equal(sky.material.uniforms.uTime.value,4.321,'procedural clouds must drift with campaign time');
     for(const d of Object.values(C.docks)){

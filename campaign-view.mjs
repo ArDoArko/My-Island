@@ -58,8 +58,10 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     cache.userData.supplyDetails={crate:true,fuelCan:true,medkit:true,ammoBox:true};batchGroup(cache);return cache;
   };
   scene.add(world,rooms);
+  const terrainBaseSegments=mobile?96:192,terrainReferenceRadius=Math.max(...ISLANDS.map(i=>i.radius)),terrainMeshes=[];
   for(const i of ISLANDS){
-    const land=createIslandTerrain(i,{segments:mobile?96:192});
+    const segments=Math.max(mobile?48:72,Math.round(terrainBaseSegments*i.radius/terrainReferenceRadius/8)*8);
+    const land=createIslandTerrain(i,{segments});land.userData.terrainSegments=segments;terrainMeshes.push(land);
     land.scale.set(1/SCALE,1,1/SCALE);land.position.set(i.x/SCALE,0,i.z/SCALE);
     const p=land.geometry.attributes.position;
     for(let j=0;j<p.count;j++)p.setY(j,terrainHeight(i.x+p.getX(j),i.z+p.getZ(j),i));
@@ -403,7 +405,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
     stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,
-      palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters}),
+      palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,
+      terrainTriangles:terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0)}),
     dispose(){renderer.dispose();surfaces.dispose();const gs=new Set(),ms=new Set();scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])ms.add(m);});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());paperMap.dispose();}
   };
 }
