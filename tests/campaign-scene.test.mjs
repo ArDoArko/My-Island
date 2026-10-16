@@ -106,8 +106,12 @@ test('real Three.js campaign geometry and both cameras run through every mission
     }
     const campaignPeople=['campaign-player',...Object.keys(guardProfiles).map(id=>'campaign-guard-'+id),...residentProfiles.map((_,id)=>'campaign-prisoner-'+id)].map(name=>scene.getObjectByName(name));
     assert.deepEqual(campaignPeople[0].userData.renderProfile,{hairVariants:1,unusedToolMeshes:0});
-    let campaignPersonMeshes=0;campaignPeople.forEach(root=>root.traverse(o=>{if(o.isMesh)campaignPersonMeshes++}));
-    assert.equal(campaignPersonMeshes,522,'campaign-only people must not rebuild 260 unused hair and tool meshes');
+    let campaignPersonMeshes=0,sourcePersonMeshes=0,rigidBatches=0;
+    campaignPeople.forEach(root=>{root.traverse(o=>{if(o.isMesh)campaignPersonMeshes++});sourcePersonMeshes+=root.userData.rigidBatchProfile.sourceMeshes;rigidBatches+=root.userData.rigidBatchProfile.batches});
+    assert.equal(sourcePersonMeshes,507,'campaign-only people must not rebuild 260 unused hair and tool meshes');
+    assert.equal(campaignPersonMeshes,251,'rigid character parts must stay batched inside their animated body groups');
+    assert.equal(rigidBatches,128,'campaign character batching must preserve each articulated body group');
+    assert(campaignPeople.every(root=>root.userData.rigidBatchProfile.animatedShoes===2),'walking shoes must remain independently animated');
     const bossInsignia=scene.getObjectByName('campaign-boss-insignia');
     assert(bossInsignia&&bossInsignia.children.length===3,'boss needs two gold shoulder tabs and a red sash');
     assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);

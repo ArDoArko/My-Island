@@ -42,6 +42,27 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       const o=new T.Mesh(geometry,material);o.castShadow=o.receiveShadow=true;group.add(o);
     }
   };
+  const batchRigidCharacter=(person,prefix)=>{
+    const protectedMeshes=new Set(person.legs.map(leg=>leg.shoe));
+    let sourceMeshes=0,renderMeshes=0,batches=0;
+    person.root.traverse(o=>{if(o.isMesh)sourceMeshes++});
+    const visit=parent=>{
+      for(const child of [...parent.children])if(!child.isMesh)visit(child);
+      const byMaterial=new Map();
+      for(const child of [...parent.children])if(child.isMesh&&!protectedMeshes.has(child)&&!child.isInstancedMesh){
+        if(!byMaterial.has(child.material))byMaterial.set(child.material,[]);byMaterial.get(child.material).push(child);
+      }
+      for(const [material,meshes] of byMaterial)if(meshes.length>1){
+        const geometries=meshes.map(o=>{o.updateMatrix();return o.geometry.clone().applyMatrix4(o.matrix)});
+        const geometry=mergeGeometries(geometries,false);geometries.forEach(g=>g.dispose());
+        const merged=new T.Mesh(geometry,material);merged.name=`${prefix}-rigid-batch-${batches++}`;
+        merged.castShadow=meshes.some(o=>o.castShadow);merged.receiveShadow=meshes.some(o=>o.receiveShadow);
+        meshes.forEach(o=>parent.remove(o));parent.add(merged);
+      }
+    };
+    visit(person.root);person.root.traverse(o=>{if(o.isMesh)renderMeshes++});
+    person.root.userData.rigidBatchProfile={sourceMeshes,renderMeshes,batches,animatedShoes:protectedMeshes.size};
+  };
   const addSupplyCache=(id,x,z)=>{
     const cache=new T.Group();cache.name='campaign-supply-cache-'+id;cache.position.set(x/SCALE,ground(x,z),z/SCALE);world.add(cache);
     cube(cache,'#a98961',[0,.34,0],[1.45,.68,.88]);
@@ -276,7 +297,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     person.hairStyles=[selected];person.hairParts=person.hairParts.filter(o=>selectedHair.has(o));
     person.spear.removeFromParent();person.raft.removeFromParent();Object.values(person.props).forEach(prop=>prop.removeFromParent());
     person.spear=person.raft=null;person.props={};
-    person.root.userData.renderProfile={hairVariants:1,unusedToolMeshes:0};return person;
+    person.root.userData.renderProfile={hairVariants:1,unusedToolMeshes:0};batchRigidCharacter(person,prefix);return person;
   }
   const self=prepareCampaignPerson(makeHuman({shirt:'#577c87',skin:'#ddb08c',hair:'#40362f'},'player',helpers),0,'campaign-player');
   self.root.name='campaign-player';scene.add(self.root);const guardModels=new Map(),prisoners=new Map();
@@ -415,7 +436,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,
       palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,
       terrainTriangles:terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),shadowUpdates}),
-    dispose(){renderer.dispose();surfaces.dispose();const gs=new Set(),ms=new Set();scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])ms.add(m);});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());paperMap.dispose();}
+    dispose(){renderer.dispose();surfaces.dispose();const gs=new Set(geos.values()),ms=new Set(mats.values());scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])ms.add(m);});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());paperMap.dispose();}
   };
 }
 function dist2(a,b){return Math.hypot(a.x-b.x,a.z-b.z);}
