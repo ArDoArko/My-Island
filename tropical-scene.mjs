@@ -149,7 +149,11 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
         dummy.position.set(q.x+.20*q.size*Math.cos(q.a),q.y+q.h,q.z-.20*q.size*Math.sin(q.a));dummy.rotation.set(q.leanX*.35,q.a+sceneryVariation(q.index,6)*Math.PI*.35,q.leanZ*.35);dummy.scale.setScalar(q.size);dummy.updateMatrix();foliage.setMatrixAt(j,dummy.matrix);
         foliage.setColorAt(j,new T.Color().setHSL(.245+sceneryVariation(q.index,7)*.065,.22+sceneryVariation(q.index,8)*.13,.59+sceneryVariation(q.index,9)*.12));
       }
-      for(const b of [trees,foliage]){b.userData.cullingRegion={island:i.id,sector:sectorIndex+1};b.castShadow=b.receiveShadow=true;b.instanceMatrix.needsUpdate=true;b.computeBoundingSphere();root.add(b);}
+      for(const b of [trees,foliage]){b.userData.cullingRegion={island:i.id,sector:sectorIndex+1};b.castShadow=true;b.instanceMatrix.needsUpdate=true;b.computeBoundingSphere();root.add(b);}
+      trees.receiveShadow=true;
+      // The double-sided crowns still cast their full silhouettes on the land,
+      // but do not sample the shadow map across millions of leaf triangles.
+      foliage.receiveShadow=false;
       treeBatches.push(trees);foliageBatches.push(foliage);
     });
   }

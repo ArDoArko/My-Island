@@ -118,6 +118,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(frondBatches[0].geometry.index.count/3,396,'desktop palm crowns must use the reduced twelve-step topology');
     const palmCount=treeBatches.reduce((n,o)=>n+o.count,0),palmTriangles=palmCount*(112+396),previousPalmTriangles=palmCount*(180+468);
     assert.equal(palmCount,3974,'spatial culling must preserve every palm');
+    assert(treeBatches.every(o=>o.castShadow&&o.receiveShadow),'palm trunks must still cast and receive shadows');
+    assert(frondBatches.every(o=>o.castShadow&&!o.receiveShadow),'palm crowns must cast silhouettes without sampling the shadow map');
+    assert.equal(frondBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),1573704,'all palm-crown triangles must skip shadow-map sampling');
     assert(Math.max(...treeBatches.map(o=>o.count))<500,'no palm culling region may still span an entire island population');
     assert(palmTriangles/previousPalmTriangles<.79,'palm topology must retain at least a 21% triangle reduction');
     assert([...treeBatches,...rockBatches].every(o=>o.frustumCulled&&o.boundingSphere),'separate island scenery must remain eligible for camera and shadow culling');
