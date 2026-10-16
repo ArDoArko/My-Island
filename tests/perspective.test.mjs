@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { cameraPose, dampCameraVector, stabilizeSunShadow } from '../island-environment.mjs';
+import { cameraPose, createMaterials, dampCameraVector, stabilizeSunShadow } from '../island-environment.mjs';
 import { cameraVector, walkSurface, baseElevation } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { game } from './game-harness.mjs';
@@ -35,6 +35,22 @@ test('camera pose can reuse its vectors without changing first- or third-person 
     assert.equal(actual,out);assert.equal(actual.position,out.position);assert.equal(actual.target,out.target);
     assert(actual.position.equals(expected.position));assert(actual.target.equals(expected.target));
   }
+});
+
+test('decoded material clones stop scanning after their one required upload pass',()=>{
+  const original=T.TextureLoader.prototype.load;
+  T.TextureLoader.prototype.load=function(url,onLoad){const texture=new T.Texture({width:4,height:4});onLoad?.(texture);return texture;};
+  let materials;
+  try{
+    materials=createMaterials({capabilities:{getMaxAnisotropy:()=>1}});
+    materials.surface('wood','#ffffff',1,.03);materials.surface('grass','#ffffff',1,.03);
+    materials.update();const settled=materials.stats();
+    assert.equal(settled.syncPending,false);assert.equal(settled.syncPasses,1);
+    for(let frame=0;frame<120;frame++)materials.update();
+    assert.equal(materials.stats().syncPasses,1,'settled textures must not scan the material map every frame');
+    materials.surface('sand','#ffffff',1,.03);materials.update();
+    assert.equal(materials.stats().syncPasses,2,'a material created later must still receive its upload pass');
+  }finally{materials?.dispose();T.TextureLoader.prototype.load=original;}
 });
 
 test('third-person damping is frame-rate independent and never overshoots a shoreline height change',()=>{

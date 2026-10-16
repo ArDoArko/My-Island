@@ -18,10 +18,12 @@ export function terrainMask(terrain) {
 }
 export function createMaterials(renderer) {
   const textures = new Map(), materials = new Map();
-  let loaded = 0, failed = 0;
+  const failedNames=new Set();
+  let loaded=0,failed=0,syncPending=true,syncPasses=0;
   const loader = new T.TextureLoader();
   for (const name of names) {
-    const texture = loader.load(ROOT + name + '.webp', () => loaded++, undefined, () => failed++);
+    const texture = loader.load(ROOT + name + '.webp', () => {loaded++;syncPending=true}, undefined, () => {failed++;failedNames.add(name);syncPending=true});
+    texture.userData.materialAssetName=name;
     texture.colorSpace = T.SRGBColorSpace;
     texture.wrapS = texture.wrapT = T.RepeatWrapping;
     texture.anisotropy = Math.min(8,renderer.capabilities.getMaxAnisotropy());
@@ -37,6 +39,7 @@ export function createMaterials(renderer) {
       const image=textures.get(name);
       m.userData.textureSource=image;
       materials.set(key,m);
+      syncPending=true;
     }
     return materials.get(key);
   }
@@ -49,9 +52,16 @@ export function createMaterials(renderer) {
     return null;
   }
   function update() {
-    for(const m of materials.values())if(m.userData.textureSource.image&&m.map.image!==m.userData.textureSource.image){m.map.source=m.userData.textureSource.source;m.map.needsUpdate=true;}
-    // Shared Sources decode asynchronously. Mark each clone once after decode.
-    for(const m of materials.values())if(m.map.image&&!m.userData.uploaded){m.map.needsUpdate=true;m.userData.uploaded=true;}
+    if(!syncPending)return;
+    syncPasses++;let waiting=loaded+failed<names.length;
+    for(const m of materials.values()){
+      const source=m.userData.textureSource;
+      if(source.image&&m.map.image!==source.image){m.map.source=source.source;m.map.needsUpdate=true;}
+      // Shared Sources decode asynchronously. Mark each clone once after decode.
+      if(m.map.image&&!m.userData.uploaded){m.map.needsUpdate=true;m.userData.uploaded=true;}
+      if(!m.userData.uploaded&&!failedNames.has(source.userData.materialAssetName))waiting=true;
+    }
+    syncPending=waiting;
   }
   function ground(mask) {
     mask.colorSpace=T.NoColorSpace;
@@ -79,7 +89,7 @@ export function createMaterials(renderer) {
     };
     return m;
   }
-  return {textures,surface,forColor,ground,update,stats:()=>({loaded,failed,total:names.length}),dispose(){for(const m of materials.values()){m.map.dispose();m.dispose();}for(const t of textures.values())t.dispose();}};
+  return {textures,surface,forColor,ground,update,stats:()=>({loaded,failed,total:names.length,materials:materials.size,syncPending,syncPasses}),dispose(){for(const m of materials.values()){m.map.dispose();m.dispose();}for(const t of textures.values())t.dispose();}};
 }
 
 // The view direction matches WASD, the D-pad and cameraVector in both modes.
