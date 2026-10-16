@@ -88,14 +88,20 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const residentProfiles=[{child:false,style:0,scale:1.02},{child:false,style:1,scale:.96},{child:false,style:2,scale:1},{child:true,style:1,scale:.72},{child:true,style:2,scale:.76}];
     for(const [id,profile] of residentProfiles.entries()){
       const resident=scene.getObjectByName('campaign-prisoner-'+id);assert.deepEqual(resident.userData.residentProfile,profile);
+      assert.deepEqual(resident.userData.renderProfile,{hairVariants:1,unusedToolMeshes:0});
       assert.equal(resident.scale.x,profile.scale);assert.equal(resident.scale.y,profile.scale);assert.equal(resident.scale.z,profile.scale);
-      assert.equal([0,1,2].filter(style=>scene.getObjectByName(`campaign-prisoner-${id}-hair-${style}`).visible).join(','),String(profile.style));
+      assert.equal([0,1,2].filter(style=>scene.getObjectByName(`campaign-prisoner-${id}-hair-${style}`)).join(','),String(profile.style));
     }
     const guardProfiles={gate:{boss:false,style:0},patrol:{boss:false,style:1},hall:{boss:false,style:2},boss:{boss:true,style:1,insignia:true}};
     for(const [id,profile] of Object.entries(guardProfiles)){
       const guard=scene.getObjectByName('campaign-guard-'+id);assert.deepEqual(guard.userData.guardProfile,profile);
-      assert.equal([0,1,2].filter(style=>scene.getObjectByName(`campaign-guard-${id}-hair-${style}`).visible).join(','),String(profile.style));
+      assert.deepEqual(guard.userData.renderProfile,{hairVariants:1,unusedToolMeshes:0});
+      assert.equal([0,1,2].filter(style=>scene.getObjectByName(`campaign-guard-${id}-hair-${style}`)).join(','),String(profile.style));
     }
+    const campaignPeople=['campaign-player',...Object.keys(guardProfiles).map(id=>'campaign-guard-'+id),...residentProfiles.map((_,id)=>'campaign-prisoner-'+id)].map(name=>scene.getObjectByName(name));
+    assert.deepEqual(campaignPeople[0].userData.renderProfile,{hairVariants:1,unusedToolMeshes:0});
+    let campaignPersonMeshes=0;campaignPeople.forEach(root=>root.traverse(o=>{if(o.isMesh)campaignPersonMeshes++}));
+    assert.equal(campaignPersonMeshes,522,'campaign-only people must not rebuild 260 unused hair and tool meshes');
     const bossInsignia=scene.getObjectByName('campaign-boss-insignia');
     assert(bossInsignia&&bossInsignia.children.length===3,'boss needs two gold shoulder tabs and a red sash');
     assert(scene.getObjectByName('grove-trunks').isInstancedMesh);assert(scene.getObjectByName('grove-fronds').isInstancedMesh);
