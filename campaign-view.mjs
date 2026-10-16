@@ -280,6 +280,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     for(const y of [.45,2.15])tube(bars,'#394447',[-.78,y,.07],[.045,.12,.045]);
     mesh(bars,geo('cell-padlock',()=>new T.TorusGeometry(.09,.022,6,12)),mat('#a68854'),[.61,1.42,.07]);
     cube(bars,'#a68854',[.61,1.27,.07],[.18,.20,.08]);
+    batchGroup(bars);
     const x=p.x/SCALE,blanket=['#738b90','#9b796d'][p.id%2];
     cube(cellarStatic,'#a98961',[x,.18,-4.8],[1.55,.36,.8]);cube(cellarStatic,'#e2dbc7',[x,.4,-4.8],[1.5,.1,.8]);
     cube(cellarStatic,blanket,[x,.47,-4.65],[1.42,.045,.48]);

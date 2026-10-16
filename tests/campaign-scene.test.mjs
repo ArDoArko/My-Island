@@ -90,7 +90,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const cellar=scene.getObjectByName('cellar'),cellarStatic=scene.getObjectByName('cellar-static');
     assert.deepEqual(cellar.userData.cellarDetails,{cells:5,hinges:10,padlocks:5,lamps:3,bedding:5});
     assert(cellarStatic.children.length<10,'cell bedding and wall lamps must remain merged by material');
-    assert(Array.from({length:5},(_,id)=>scene.getObjectByName('cell-door-'+id)).every(o=>o?.children.length===11),'each prisoner needs a hinged, locked cell door');
+    const cellDoors=Array.from({length:5},(_,id)=>scene.getObjectByName('cell-door-'+id));
+    assert(cellDoors.every(o=>o?.children.length===3),'each independently opening cell door must merge its bars, hinges and padlock by material');
+    assert.equal(cellDoors.reduce((sum,o)=>sum+o.children.length,0),15,'five cell doors must use 15 meshes instead of 55');
     const residentProfiles=[{child:false,style:0,scale:1.02},{child:false,style:1,scale:.96},{child:false,style:2,scale:1},{child:true,style:1,scale:.72},{child:true,style:2,scale:.76}];
     for(const [id,profile] of residentProfiles.entries()){
       const resident=scene.getObjectByName('campaign-prisoner-'+id);assert.deepEqual(resident.userData.residentProfile,profile);
