@@ -134,13 +134,16 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(frondBatches[0].userData.lod.low.index.count/3,216,'fogged palm crowns must use the seven-step topology');
     const palmCount=treeBatches.reduce((n,o)=>n+o.count,0),palmTriangles=palmCount*(112+396),previousPalmTriangles=palmCount*(180+468);
     assert.equal(palmCount,3974,'spatial culling must preserve every palm');
-    assert(treeBatches.every(o=>o.castShadow&&o.receiveShadow),'palm trunks must still cast and receive shadows');
+    assert(treeBatches.every(o=>o.castShadow),'every palm trunk must still cast its silhouette');
     assert(frondBatches.every(o=>o.castShadow&&!o.receiveShadow),'palm crowns must cast silhouettes without sampling the shadow map');
     assert.equal(frondBatches.reduce((n,o)=>n+o.count*o.userData.lod.high.index.count/3,0),1573704,'near palm topology must preserve every crown');
     assert(view.stats().lowDetailPalmBatches>0&&view.stats().lowDetailPalmBatches<frondBatches.length,
       'fogged palm sectors must use distant topology while the player vicinity stays detailed');
     assert(view.stats().palmCrownTriangles<1573704,'distant palm LOD must reduce the currently submitted crown triangles');
     assert(view.stats().palmTrunkTriangles<palmCount*112,'distant palm LOD must reduce the currently submitted trunk triangles');
+    assert(treeBatches.some(o=>o.userData.lod.level==='high'&&o.receiveShadow),'near palm trunks must still receive local shadows');
+    assert(treeBatches.filter(o=>o.userData.lod.level==='low').every(o=>!o.receiveShadow),'fogged palm trunks must skip shadow-map sampling');
+    assert(view.stats().unshadowedPalmTrunkTriangles>0,'campaign stats must expose the trunk triangles that skip shadow-map sampling');
     assert(Math.max(...treeBatches.map(o=>o.count))<500,'no palm culling region may still span an entire island population');
     assert(palmTriangles/previousPalmTriangles<.79,'palm topology must retain at least a 21% triangle reduction');
     assert([...treeBatches,...rockBatches].every(o=>o.frustumCulled&&o.boundingSphere),'separate island scenery must remain eligible for camera and shadow culling');

@@ -163,7 +163,7 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
         foliage.setColorAt(j,new T.Color().setHSL(.245+sceneryVariation(q.index,7)*.065,.22+sceneryVariation(q.index,8)*.13,.59+sceneryVariation(q.index,9)*.12));
       }
       for(const b of [trees,foliage]){b.userData.cullingRegion={island:i.id,sector:sectorIndex+1};b.castShadow=true;b.instanceMatrix.needsUpdate=true;b.computeBoundingSphere();root.add(b);}
-      trees.userData.lod={high:trunk,low:distantTrunk,distance:foliageLodDistance,level:'high',
+      trees.userData.lod={high:trunk,low:distantTrunk,distance:foliageLodDistance,level:'high',shadowReceiverLod:lod,
         center:trees.boundingSphere.center.clone(),radius:trees.boundingSphere.radius};
       foliage.userData.lod={high:fronds,low:distantFronds,distance:foliageLodDistance,level:'high',
         center:foliage.boundingSphere.center.clone(),radius:foliage.boundingSphere.radius};
@@ -198,7 +198,10 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
       for(const batch of [...treeBatches,...foliageBatches]){
         const lod=batch.userData.lod,nearestDistance=Math.max(0,cameraPosition.distanceTo(lod.center)-lod.radius);
         const level=nearestDistance<=lod.distance?'high':'low';
-        if(level!==lod.level){batch.geometry=lod[level];lod.level=level;}
+        if(level!==lod.level){
+          batch.geometry=lod[level];lod.level=level;
+          if(lod.shadowReceiverLod)batch.receiveShadow=level==='high';
+        }
       }
     }};
 }
