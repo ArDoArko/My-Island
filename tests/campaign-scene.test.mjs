@@ -175,6 +175,13 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert(Number.isFinite(view.aim()));assert(view.vector(0,-1).x!==undefined);
     assert.equal(view.stats().cameraBlockers,2,'camera collision must use only the static village and estate blockers');
     assert.deepEqual({palmBatches:view.stats().palmBatches,largestPalmBatch:view.stats().largestPalmBatch},{palmBatches:24,largestPalmBatch:373});
+    assert.equal(renderer.shadowMap.autoUpdate,false,'the 2048px campaign shadow map must not render unconditionally');
+    state.walking=false;const stationaryShadow=view.stats().shadowUpdates;view.frame(3000);
+    assert.equal(view.stats().shadowUpdates,stationaryShadow+1,'stopping animation must refresh shadows once');
+    view.frame(3010);assert.equal(view.stats().shadowUpdates,stationaryShadow+1,'an unchanged frame must reuse its shadow map');
+    state.walking=true;view.frame(3020);assert.equal(view.stats().shadowUpdates,stationaryShadow+2,'starting movement must refresh shadows immediately');
+    view.frame(3030);assert.equal(view.stats().shadowUpdates,stationaryShadow+2,'moving shadows must be capped below 30 Hz');
+    view.frame(3055);assert.equal(view.stats().shadowUpdates,stationaryShadow+3,'moving shadows must refresh after the 30 Hz interval');
     const before=camera.position.clone();view.setEnabled(false);state.p.x=80;view.frame(2100);assert(camera.position.equals(before));
   }finally{
     view?.dispose();assert(disposed);dom.window.close();

@@ -14,7 +14,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?1.1:1.5));
   renderer.setSize(innerWidth,innerHeight,false);
   renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;
-  renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;
   const scene=new T.Scene(),camera=new T.PerspectiveCamera(68,innerWidth/innerHeight,.04,6000);
   scene.add(camera);scene.background=new T.Color('#b9dbe5');scene.fog=new T.Fog('#b9dbe5',650,2400);
   const hemi=new T.HemisphereLight('#d5ecfa','#566143',2.0),sun=new T.DirectionalLight('#fff2d6',2.8);
@@ -318,6 +318,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const tracer=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]),new T.LineBasicMaterial({color:'#ffe8ad'}));scene.add(tracer);
   const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3();
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0;
+  let shadowSignature='',lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
   function placeHuman(person,p,height,heading,walking,seconds){
@@ -385,6 +386,13 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     }
     camera.position.copy(pose.position);camera.lookAt(pose.target);
     stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,{height:25});
+    const guardWalking=s.guards.some(g=>g.area===area&&!s.boat&&(!g.area||s.island==='fortress')&&g.hp>0&&dist2(g,s.p)<210);
+    const shadowAnimated=!s.paused&&(s.walking||s.boat||guardWalking);
+    const nextShadowSignature=[area||'',s.island,s.boat?1:0,Math.round(s.p.x/20),Math.round(s.p.z/20),Math.round(s.heading*12),
+      s.guards.map(g=>g.hp>0?1:0).join(''),s.released.join(','),s.boarded?1:0,shadowAnimated?1:0].join('|');
+    const updateShadow=nextShadowSignature!==shadowSignature||(shadowAnimated&&now-lastShadowUpdate>=1000/30);
+    renderer.shadowMap.needsUpdate=updateShadow;
+    if(updateShadow){shadowSignature=nextShadowSignature;lastShadowUpdate=now;shadowUpdates++;}
     ocean.update(seconds,camera.position);sky.position.copy(camera.position);
     tracer.visible=!!s.shot;
     if(s.shot){
@@ -406,7 +414,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
     stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,
       palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,
-      terrainTriangles:terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0)}),
+      terrainTriangles:terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),shadowUpdates}),
     dispose(){renderer.dispose();surfaces.dispose();const gs=new Set(),ms=new Set();scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])ms.add(m);});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());paperMap.dispose();}
   };
 }
