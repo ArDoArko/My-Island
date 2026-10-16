@@ -27,6 +27,16 @@ test('forward movement points where first-person camera looks at every heading',
   }
 });
 
+test('camera pose can reuse its vectors without changing first- or third-person geometry',()=>{
+  const out={position:new T.Vector3(),target:new T.Vector3()};
+  for(const mode of ['first','third']){
+    const expected=cameraPose({x:3,z:-4,surface:.7,yaw:1.2,pitch:.18,mode,distance:5.4,bob:.02});
+    const actual=cameraPose({x:3,z:-4,surface:.7,yaw:1.2,pitch:.18,mode,distance:5.4,bob:.02},out);
+    assert.equal(actual,out);assert.equal(actual.position,out.position);assert.equal(actual.target,out.target);
+    assert(actual.position.equals(expected.position));assert(actual.target.equals(expected.target));
+  }
+});
+
 test('third-person damping is frame-rate independent and never overshoots a shoreline height change',()=>{
   const desired=new T.Vector3(4,3.2,-2),at30=new T.Vector3(0,-.4,0),at60=at30.clone();
   for(let i=0;i<30;i++)dampCameraVector(at30,desired,1/30,8);

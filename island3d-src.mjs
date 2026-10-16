@@ -401,6 +401,7 @@ export function create({canvas,terrain,getState,onLost}) {
   const heldTools={};for(const key of ['gather','fish','cook']){const tool=new T.Group();tool.position.set(.29,-.26,-.61);held.add(tool);personTool(key,tool,{cube,tube,ell});heldTools[key]=tool;}
   held.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false;o.frustumCulled=false;}});
   const target=new T.Vector3(),cameraTarget=new T.Vector3(),desired=new T.Vector3(),lastPoint=new T.Vector3();
+  const cameraPoseBuffer={position:desired,target},cameraDirection=new T.Vector3(),cameraRay=new T.Raycaster();
   function orbit(dx,dy=0){if(!enabled||getState().paused)return;yaw+=dx;pitch=clamp(pitch+dy,cameraMode==='first'?-1.12:-.05,cameraMode==='first'?1.12:.75);}
   function setCamera(mode){cameraMode=mode==='third'?'third':'first';pitch=mode==='third'?.22:0;camera.fov=mode==='third'?58:72;camera.updateProjectionMatrix();drag=null;first=true;}
   canvas.addEventListener('pointerdown',e=>{const s=getState();if(!enabled||!s.play||s.paused||e.button>0||drag)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);});
@@ -448,14 +449,14 @@ export function create({canvas,terrain,getState,onLost}) {
     for(let i=0;i<birds.length;i++){const b=birds[i];b.position.set(19+Math.sin(seconds*.08+i*1.7)*8,7+Math.sin(seconds*.2+i)*.5,12+Math.cos(seconds*.1+i*1.3)*5);b.rotation.y=seconds*.1+i;b.scale.y=1+Math.sin(seconds*7+i)*.5;}
     self.rig.visible=cameraMode!=='first';
     const bob=s.moving&&!s.paused?Math.sin(self.phase*2)*.012:0;
-    const pose=cameraPose({x,z,surface:self.root.position.y,yaw,pitch,mode:cameraMode,distance:zoom*(camera.aspect<.85?1.12:1),bob});target.copy(pose.target);desired.copy(pose.position);
+    cameraPose({x,z,surface:self.root.position.y,yaw,pitch,mode:cameraMode,distance:zoom*(camera.aspect<.85?1.12:1),bob},cameraPoseBuffer);
     if(cameraMode==='third'){
       desired.y=Math.max(desired.y,terrainHeight(desired.x,desired.z)+.55);
       // Pull in the camera rather than viewing the character through a wall.
-      const direction=desired.clone().sub(target),distance=direction.length();direction.normalize();
-      const ray=new T.Raycaster(target,direction,.08,distance);
-      const hit=ray.intersectObjects([buildings,stall],true).find(h=>h.object.isMesh&&h.distance>.1);
-      if(hit)desired.copy(target).addScaledVector(direction,Math.max(.35,hit.distance-.15));
+      cameraDirection.subVectors(desired,target);const distance=cameraDirection.length();cameraDirection.normalize();
+      cameraRay.set(target,cameraDirection);cameraRay.near=.08;cameraRay.far=distance;
+      const hit=cameraRay.intersectObjects([buildings,stall],true).find(h=>h.object.isMesh&&h.distance>.1);
+      if(hit)desired.copy(target).addScaledVector(cameraDirection,Math.max(.35,hit.distance-.15));
     }
     // First person follows exactly. Third person damps both the rig and its
     // look target so a shoreline height change cannot snap the viewing angle.

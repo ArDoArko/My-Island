@@ -343,7 +343,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const halo=new T.Mesh(new T.TorusGeometry(.42,.035,8,32),new T.MeshBasicMaterial({color:'#f3d48a'}));
   halo.rotation.x=-Math.PI/2;scene.add(halo);
   const tracer=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]),new T.LineBasicMaterial({color:'#ffe8ad'}));scene.add(tracer);
-  const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3();
+  const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()};
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0;
   let shadowSignature='',lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
@@ -399,7 +399,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     const cameraSurface=s.boat?.02+HELM.eye-1.64:surface;
     const driverOffset=s.boat?HELM.seatZ:0;
     const pose=cameraPose({x:s.p.x/SCALE+Math.sin(s.heading)*driverOffset,z:s.p.z/SCALE+Math.cos(s.heading)*driverOffset,
-      surface:cameraSurface,yaw,pitch,mode,distance:s.boat?7.5:4.6});
+      surface:cameraSurface,yaw,pitch,mode,distance:s.boat?7.5:4.6},cameraPoseBuffer);
     if(area&&mode==='third'){
       pose.position.x=T.MathUtils.clamp(pose.position.x,-5.1,5.1);
       pose.position.z=T.MathUtils.clamp(pose.position.z,-5.0,8.1);

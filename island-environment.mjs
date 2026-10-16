@@ -83,11 +83,14 @@ export function createMaterials(renderer) {
 }
 
 // The view direction matches WASD, the D-pad and cameraVector in both modes.
-export function cameraPose({x,z,surface,yaw,pitch,mode='first',distance=4.8,bob=0}) {
+export function cameraPose({x,z,surface,yaw,pitch,mode='first',distance=4.8,bob=0},out={position:new T.Vector3(),target:new T.Vector3()}) {
   const eye=surface+1.64+bob;
-  if(mode==='first')return {position:new T.Vector3(x,eye,z),target:new T.Vector3(x-Math.sin(yaw)*Math.cos(pitch),eye-Math.sin(pitch),z-Math.cos(yaw)*Math.cos(pitch))};
-  const target=new T.Vector3(x,surface+1.3,z);
-  return {position:new T.Vector3(x+Math.sin(yaw)*Math.cos(pitch)*distance,target.y+.65+Math.sin(pitch)*distance,z+Math.cos(yaw)*Math.cos(pitch)*distance),target};
+  if(mode==='first'){
+    out.position.set(x,eye,z);out.target.set(x-Math.sin(yaw)*Math.cos(pitch),eye-Math.sin(pitch),z-Math.cos(yaw)*Math.cos(pitch));return out;
+  }
+  out.target.set(x,surface+1.3,z);
+  out.position.set(x+Math.sin(yaw)*Math.cos(pitch)*distance,out.target.y+.65+Math.sin(pitch)*distance,z+Math.cos(yaw)*Math.cos(pitch)*distance);
+  return out;
 }
 
 // Exponential damping gives the same camera response at 30, 60 and 120 FPS.
