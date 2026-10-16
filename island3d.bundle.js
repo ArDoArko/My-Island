@@ -3869,7 +3869,7 @@ float fbm21(vec2 p){float f=0.,a=.5;for(int i=0;i<4;i++){f+=a*noise21(p);p=mat2(
     ${fc}
     float wave(vec2 p){return sin(dot(p,vec2(.7,.3))+uTime*.8)*.046+
       sin(dot(p,vec2(-.43,.81))-uTime*.62)*.038+sin(dot(p,vec2(1.36,.67))+uTime*1.12)*.016+
-      (fbm21(p*1.6+vec2(uTime*.09,-uTime*.07))-.5)*.10;}
+      (noise21(p*1.6+vec2(uTime*.09,-uTime*.07))-.5)*.10;}
     void main(){vec2 p=vWater.xz;float eps=.055,h=wave(p);
       vec3 n=normalize(vec3((h-wave(p+vec2(eps,0.)))/eps,1.,(h-wave(p+vec2(0.,eps)))/eps));
       vec3 view=normalize(uEye-vWater);float fresnel=.025+.975*pow(1.-max(dot(n,view),0.),5.);
@@ -3888,7 +3888,7 @@ float fbm21(vec2 p){float f=0.,a=.5;for(int i=0;i<4;i++){f+=a*noise21(p);p=mat2(
       #include <tonemapping_fragment>
       #include <colorspace_fragment>
       #include <fog_fragment>
-    }`}),o=new fn(e,e,t,t);o.rotateX(-Math.PI/2);let a=new rt(o,s);return a.name="tropical-ocean",a.position.y=-.045,{mesh:a,update(c,l){s.uniforms.uTime.value=c,s.uniforms.uEye.value.copy(l)},dispose(){o.dispose(),s.dispose()}}}function Ga(i=420){let e=new an({side:Xt,depthWrite:!1,uniforms:{uTime:{value:0}},vertexShader:"varying vec3 vSky;void main(){vSky=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",fragmentShader:`uniform float uTime;varying vec3 vSky;${fc}
+    }`}),o=new fn(e,e,t,t);o.rotateX(-Math.PI/2),s.userData.fragmentNoiseLayers=7;let a=new rt(o,s);return a.name="tropical-ocean",a.position.y=-.045,{mesh:a,update(c,l){s.uniforms.uTime.value=c,s.uniforms.uEye.value.copy(l)},dispose(){o.dispose(),s.dispose()}}}function Ga(i=420){let e=new an({side:Xt,depthWrite:!1,uniforms:{uTime:{value:0}},vertexShader:"varying vec3 vSky;void main(){vSky=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",fragmentShader:`uniform float uTime;varying vec3 vSky;${fc}
   void main(){vec3 dir=normalize(vSky);float h=dir.y;
     vec3 col=mix(vec3(.65,.79,.84),vec3(.095,.34,.59),smoothstep(-.02,.8,h));
     vec2 p=dir.xz/max(.1,h)*2.3+vec2(uTime*.006,uTime*.0025);float n=fbm21(p);

@@ -26,7 +26,7 @@ export function createOcean(coasts,{size=900,segments=72,coastSeeds=[]}={}) {
     ${noiseGLSL}
     float wave(vec2 p){return sin(dot(p,vec2(.7,.3))+uTime*.8)*.046+
       sin(dot(p,vec2(-.43,.81))-uTime*.62)*.038+sin(dot(p,vec2(1.36,.67))+uTime*1.12)*.016+
-      (fbm21(p*1.6+vec2(uTime*.09,-uTime*.07))-.5)*.10;}
+      (noise21(p*1.6+vec2(uTime*.09,-uTime*.07))-.5)*.10;}
     void main(){vec2 p=vWater.xz;float eps=.055,h=wave(p);
       vec3 n=normalize(vec3((h-wave(p+vec2(eps,0.)))/eps,1.,(h-wave(p+vec2(0.,eps)))/eps));
       vec3 view=normalize(uEye-vWater);float fresnel=.025+.975*pow(1.-max(dot(n,view),0.),5.);
@@ -47,6 +47,7 @@ export function createOcean(coasts,{size=900,segments=72,coastSeeds=[]}={}) {
       #include <fog_fragment>
     }`});
   const geometry=new T.PlaneGeometry(size,size,segments,segments);geometry.rotateX(-Math.PI/2);
+  material.userData.fragmentNoiseLayers=7;
   const mesh=new T.Mesh(geometry,material);mesh.name='tropical-ocean';mesh.position.y=-.045;
   return {mesh,update(seconds,eye){material.uniforms.uTime.value=seconds;material.uniforms.uEye.value.copy(eye)},
     dispose(){geometry.dispose();material.dispose()}};

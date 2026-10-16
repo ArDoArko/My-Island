@@ -125,7 +125,10 @@ test('real Three.js campaign geometry and both cameras run through every mission
       for(let j=0;j<Math.min(batch.count,limit);j++){batch.getMatrixAt(j,matrix);matrix.decompose(position,rotation,scale);values.push(scale.toArray().map(v=>v.toFixed(3)).join(','));}return new Set(values).size;};
     assert(scales(treeBatches[0])>12,'palms need varied silhouettes rather than repeating modulo sizes');
     assert(scales(rockBatches[0])>12,'shore rocks need varied proportions rather than repeating modulo sizes');
-    assert(scene.getObjectByName('tropical-ocean').material.uniforms.uCoasts.value.length===9);
+    const oceanMaterial=scene.getObjectByName('tropical-ocean').material;
+    assert(oceanMaterial.uniforms.uCoasts.value.length===9);
+    assert.equal(oceanMaterial.userData.fragmentNoiseLayers,7,'water normals and colour should use seven noise layers rather than sixteen');
+    assert.equal((oceanMaterial.fragmentShader.match(/fbm21\(/g)||[]).length,2,'ocean shader must keep one runtime FBM call plus its definition');
     const terrainMeshes=C.ISLANDS.map(i=>scene.getObjectByName('archipelago-'+i.id));
     assert.deepEqual(terrainMeshes.map(o=>o.userData.terrainSegments),[192,96,80,96,80,88],'terrain density must follow physical island size');
     assert.equal(terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),75208,'adaptive island meshes must remove oversampling');
