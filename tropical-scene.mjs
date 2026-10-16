@@ -184,6 +184,21 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
       const mesh=new T.Mesh(merged,material);mesh.castShadow=mesh.receiveShadow=true;group.add(mesh);
     }
   }
+  function batchGroups(groups,target){
+    const byMaterial=new Map();let sourceBatches=0;root.updateMatrixWorld(true);target.updateMatrixWorld(true);
+    const toTarget=new T.Matrix4().copy(target.matrixWorld).invert(),transform=new T.Matrix4();
+    for(const group of groups)for(const o of [...group.children])if(o.isMesh){
+      o.updateMatrixWorld(true);transform.multiplyMatrices(toTarget,o.matrixWorld);
+      const geometry=o.geometry.clone().applyMatrix4(transform);
+      if(!byMaterial.has(o.material))byMaterial.set(o.material,[]);byMaterial.get(o.material).push(geometry);
+      sourceBatches++;group.remove(o);o.geometry.dispose();
+    }
+    for(const [material,geometries] of byMaterial){
+      const merged=mergeGeometries(geometries,false);geometries.forEach(g=>g.dispose());merged.computeBoundingSphere();
+      const mesh=new T.Mesh(merged,material);mesh.castShadow=mesh.receiveShadow=true;target.add(mesh);
+    }
+    return {sourceBatches,materialBatches:target.children.length};
+  }
   function building(b,parent=root,coordinates=true,shopIndex=0){
     const g=new T.Group();g.name='village-house';parent.add(g);
     g.position.set(coordinates?b.x/scale:b.x,coordinates?height(b.x,b.z):0,coordinates?b.z/scale:b.z);
@@ -250,6 +265,8 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
     return g;
   }
   village.forEach((b,index)=>building(b,root,true,index));
+  const buildings=new T.Group();buildings.name='village-buildings';root.add(buildings);
+  buildings.userData.batchDetails={sourceHouses:houses.length,...batchGroups(houses,buildings)};
   const laundry=new T.Group();laundry.name='village-overhead-laundry';root.add(laundry);
   const laundryColours=['#bd6f53','#e8d99e','#587e7c','#73868b'];
   const byStreetSide=[...village].sort((a,b)=>a.z-b.z),rowSize=Math.ceil(byStreetSide.length/2);

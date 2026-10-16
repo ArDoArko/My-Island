@@ -19,7 +19,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
     view=createCampaignView({canvas:document.querySelector('canvas'),getState:()=>state,makeHuman:buildHuman,rendererFactory:()=>renderer});
     assert.equal(view.cameraMode,'first');view.frame(0);
     const houses=[];scene.traverse(o=>{if(o.name==='village-house')houses.push(o);});assert.equal(houses.length,6);
-    assert(houses.reduce((n,o)=>n+o.children.length,0)<100,'facade details were not batched for mobile');
+    assert.equal(houses.reduce((n,o)=>n+o.children.length,0),0,'house meshes must move into the street-wide batch');
     assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.planters,0),12);
     assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.awnings,0),8);
     assert.equal(houses.filter(o=>o.userData.facadeDetails.balcony).length,2);
@@ -31,6 +31,11 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.hangingSigns,0),6);
     assert.equal(houses.reduce((n,o)=>n+o.userData.facadeDetails.signMarks,0),12);
     assert(houses.every(o=>o.userData.facadeDetails.signClearance),'street signs must stay above walking height');
+    const villageBuildings=scene.getObjectByName('village-buildings');
+    assert.deepEqual(villageBuildings.userData.batchDetails,{sourceHouses:6,sourceBatches:78,materialBatches:23});
+    assert.equal(villageBuildings.children.length,villageBuildings.userData.batchDetails.materialBatches);
+    assert(villageBuildings.children.every(o=>o.geometry.boundingSphere&&o.frustumCulled),'street-wide facade batches must remain cullable');
+    assert.equal(villageBuildings.children.reduce((n,o)=>n+o.geometry.index.count/3,0),32640,'facade batching must preserve every triangle');
     const curbs=[];scene.traverse(o=>{if(o.name==='village-curb')curbs.push(o);});
     assert.equal(curbs.length,2,'curbs belong on the two village streets, not the jungle trail');
     assert(curbs.every(o=>o.isInstancedMesh&&o.count>20&&o.boundingSphere),'curb stones must stay batched and cullable');
