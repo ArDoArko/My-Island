@@ -196,8 +196,10 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
   return {trees:treeBatches[0],foliage:foliageBatches[0],treeBatches,foliageBatches,rocks:rockBatches[0],rockBatches,
     lodGeometries:[trunk,distantTrunk,fronds,distantFronds],update(cameraPosition){
       for(const batch of [...treeBatches,...foliageBatches]){
-        const lod=batch.userData.lod,nearestDistance=Math.max(0,cameraPosition.distanceTo(lod.center)-lod.radius);
-        const level=nearestDistance<=lod.distance?'high':'low';
+        const lod=batch.userData.lod,highDistance=lod.distance+lod.radius;
+        // Squared distance preserves the exact sphere-to-camera threshold without
+        // taking one square root per palm batch in every rendered frame.
+        const level=cameraPosition.distanceToSquared(lod.center)<=highDistance*highDistance?'high':'low';
         if(level!==lod.level){
           batch.geometry=lod[level];lod.level=level;
           if(lod.shadowReceiverLod)batch.receiveShadow=level==='high';

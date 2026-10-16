@@ -139,6 +139,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(frondBatches.reduce((n,o)=>n+o.count*o.userData.lod.high.index.count/3,0),1573704,'near palm topology must preserve every crown');
     assert(view.stats().lowDetailPalmBatches>0&&view.stats().lowDetailPalmBatches<frondBatches.length,
       'fogged palm sectors must use distant topology while the player vicinity stays detailed');
+    assert.equal(view.stats().palmLodDistanceChecks,48,'LOD must cover every trunk and crown batch without changing spatial coverage');
     assert(view.stats().palmCrownTriangles<1573704,'distant palm LOD must reduce the currently submitted crown triangles');
     assert(view.stats().palmTrunkTriangles<palmCount*112,'distant palm LOD must reduce the currently submitted trunk triangles');
     assert(treeBatches.some(o=>o.userData.lod.level==='high'&&o.receiveShadow),'near palm trunks must still receive local shadows');

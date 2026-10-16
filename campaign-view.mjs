@@ -442,6 +442,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
     stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,
       palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,
+      palmLodDistanceChecks:vegetation.treeBatches.length+vegetation.foliageBatches.length,
       palmTrunkTriangles:vegetation.treeBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
       unshadowedPalmTrunkTriangles:vegetation.treeBatches.filter(o=>!o.receiveShadow).reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
       palmCrownTriangles:vegetation.foliageBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
