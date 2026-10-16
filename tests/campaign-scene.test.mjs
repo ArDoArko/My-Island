@@ -5,6 +5,7 @@ import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
 import { createCampaignView } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
+import { VILLAGE } from '../campaign-world.mjs';
 
 test('real Three.js campaign geometry and both cameras run through every mission area without GPU rendering',()=>{
   const dom=new JSDOM('<canvas></canvas>');
@@ -33,9 +34,14 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert(houses.every(o=>o.userData.facadeDetails.signClearance),'street signs must stay above walking height');
     const villageBuildings=scene.getObjectByName('village-buildings');
     assert.deepEqual(villageBuildings.userData.batchDetails,{sourceHouses:6,sourceBatches:78,materialBatches:23});
+    assert.equal(villageBuildings.userData.cameraBlocker,true,'the merged facades, not the emptied source houses, must block the third-person camera');
     assert.equal(villageBuildings.children.length,villageBuildings.userData.batchDetails.materialBatches);
     assert(villageBuildings.children.every(o=>o.geometry.boundingSphere&&o.frustumCulled),'street-wide facade batches must remain cullable');
     assert.equal(villageBuildings.children.reduce((n,o)=>n+o.geometry.index.count/3,0),32640,'facade batching must preserve every triangle');
+    const frontHouse=VILLAGE[0],facadeRay=new T.Raycaster(
+      new T.Vector3(frontHouse.x/C.SCALE,C.ground(frontHouse.x,frontHouse.z)+1.5,(frontHouse.z+frontHouse.d)/C.SCALE),
+      new T.Vector3(0,0,-1),0,frontHouse.d/C.SCALE*1.5);
+    assert(facadeRay.intersectObject(villageBuildings,true).length,'the camera ray must hit the merged street geometry');
     const curbs=[];scene.traverse(o=>{if(o.name==='village-curb')curbs.push(o);});
     assert.equal(curbs.length,2,'curbs belong on the two village streets, not the jungle trail');
     assert(curbs.every(o=>o.isInstancedMesh&&o.count>20&&o.boundingSphere),'curb stones must stay batched and cullable');
@@ -154,6 +160,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
     state.guards.forEach(g=>g.hp=0);view.frame(2000);
     assert.equal(Array.from({length:5},(_,id)=>scene.getObjectByName('cell-door-'+id)).every(g=>!g.visible),true);
     assert(Number.isFinite(view.aim()));assert(view.vector(0,-1).x!==undefined);
+    assert.equal(view.stats().cameraBlockers,2,'camera collision must use only the static village and estate blockers');
     const before=camera.position.clone();view.setEnabled(false);state.p.x=80;view.frame(2100);assert(camera.position.equals(before));
   }finally{
     view?.dispose();assert(disposed);dom.window.close();

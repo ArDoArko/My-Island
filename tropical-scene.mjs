@@ -267,6 +267,7 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
   village.forEach((b,index)=>building(b,root,true,index));
   const buildings=new T.Group();buildings.name='village-buildings';root.add(buildings);
   buildings.userData.batchDetails={sourceHouses:houses.length,...batchGroups(houses,buildings)};
+  buildings.userData.cameraBlocker=true;
   const laundry=new T.Group();laundry.name='village-overhead-laundry';root.add(laundry);
   const laundryColours=['#bd6f53','#e8d99e','#587e7c','#73868b'];
   const byStreetSide=[...village].sort((a,b)=>a.z-b.z),rowSize=Math.ceil(byStreetSide.length/2);
@@ -360,5 +361,5 @@ export function addVillage(root,{scale,height,surfaces,helpers,village=VILLAGE,p
   }
   market.userData.marketDetails={canopyStripes:6,valances:6,produce:15};
   batch(market);
-  return {building,houses};
+  return {building,houses,buildings};
 }

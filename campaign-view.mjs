@@ -177,6 +177,9 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const crest=tube(mansion,'#d4a957',[0,3.02,4.11],[.38,.10,.38]);crest.rotation.x=Math.PI/2;
   mansion.userData.estateDetails={planters:2,lanterns:2,crest:true};
   batchGroup(mansion);
+  mansion.userData.cameraBlocker=true;
+  const cameraBlockers=[village.buildings,mansion];
+  cameraBlockers.forEach(o=>o.updateWorldMatrix(true,true));
   const roomGroups={};
   function room(name,w=11,d=15){
     const root=new T.Group();root.name=name;rooms.add(root);roomGroups[name]=root;
@@ -368,10 +371,9 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       pose.position.z=T.MathUtils.clamp(pose.position.z,-5.0,8.1);
     }
     if(!area&&mode==='third'){
-      world.updateMatrixWorld(true);
       cameraDirection.subVectors(pose.position,pose.target);const length=cameraDirection.length();cameraDirection.normalize();
       cameraRay.set(pose.target,cameraDirection);cameraRay.far=length;
-      const hit=cameraRay.intersectObjects([...village.houses,mansion],true).find(h=>h.distance>.2);
+      const hit=cameraRay.intersectObjects(cameraBlockers,true).find(h=>h.distance>.2);
       if(hit)pose.position.copy(pose.target).addScaledVector(cameraDirection,Math.max(.35,hit.distance-.22));
       pose.position.y=Math.max(pose.position.y,ground(pose.position.x*SCALE,pose.position.z*SCALE)+.24);
     }
@@ -396,7 +398,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     get cameraMode(){return mode},get enabled(){return enabled&&!lost},
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
-    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode}),
+    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length}),
     dispose(){renderer.dispose();surfaces.dispose();const gs=new Set(),ms=new Set();scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])ms.add(m);});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());paperMap.dispose();}
   };
 }
