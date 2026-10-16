@@ -123,12 +123,13 @@ const sceneryVariation=(seed,salt=0)=>{
   return value-Math.floor(value);
 };
 
-export function decorateIslands(root,islands,{scale,height,surfaces,small=false,clear=()=>false,dense=false}={}) {
+export function decorateIslands(root,islands,{scale,height,surfaces,small=false,clear=()=>false,dense=false,lod=false}={}) {
   const trunk=new T.CylinderGeometry(.085,.16,1,8,6);trunk.translate(0,.5,0);
   const p=trunk.attributes.position;for(let j=0;j<p.count;j++)p.setX(j,p.getX(j)+p.getY(j)**2*.20);trunk.computeVertexNormals();
   const trunkMaterial=surfaces.surface('wood','#bc9c71',2,.03);
   const leaves=surfaces.surface('leaf','#9cb384',1,.01).clone();leaves.side=T.DoubleSide;
-  const fronds=palmFronds(small?9:12),treeBatches=[],foliageBatches=[],dummy=new T.Object3D();
+  const fronds=palmFronds(small?9:12),distantFronds=lod?palmFronds(small?6:7):fronds,treeBatches=[],foliageBatches=[],dummy=new T.Object3D();
+  const foliageLodDistance=650/scale;
   let globalIndex=0;
   for(const i of islands){
     const positions=[];
@@ -158,6 +159,8 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
         foliage.setColorAt(j,new T.Color().setHSL(.245+sceneryVariation(q.index,7)*.065,.22+sceneryVariation(q.index,8)*.13,.59+sceneryVariation(q.index,9)*.12));
       }
       for(const b of [trees,foliage]){b.userData.cullingRegion={island:i.id,sector:sectorIndex+1};b.castShadow=true;b.instanceMatrix.needsUpdate=true;b.computeBoundingSphere();root.add(b);}
+      foliage.userData.lod={high:fronds,low:distantFronds,distance:foliageLodDistance,level:'high',
+        center:foliage.boundingSphere.center.clone(),radius:foliage.boundingSphere.radius};
       trees.receiveShadow=true;
       // The double-sided crowns still cast their full silhouettes on the land,
       // but do not sample the shadow map across millions of leaf triangles.
@@ -184,7 +187,14 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
     }
     rocks.castShadow=rocks.receiveShadow=true;rocks.instanceMatrix.needsUpdate=true;rocks.computeBoundingSphere();root.add(rocks);rockBatches.push(rocks);
   }
-  return {trees:treeBatches[0],foliage:foliageBatches[0],treeBatches,foliageBatches,rocks:rockBatches[0],rockBatches};
+  return {trees:treeBatches[0],foliage:foliageBatches[0],treeBatches,foliageBatches,rocks:rockBatches[0],rockBatches,
+    lodGeometries:[fronds,distantFronds],update(cameraPosition){
+      for(const foliage of foliageBatches){
+        const lod=foliage.userData.lod,nearestDistance=Math.max(0,cameraPosition.distanceTo(lod.center)-lod.radius);
+        const level=nearestDistance<=lod.distance?'high':'low';
+        if(level!==lod.level){foliage.geometry=lod[level];lod.level=level;}
+      }
+    }};
 }
 
 // Colonial facades with shutters, balconies, fabric awnings and planted windows.

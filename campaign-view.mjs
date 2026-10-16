@@ -127,7 +127,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const waterSize=Math.max(bounds.maxX-bounds.minX,bounds.maxZ-bounds.minZ)/SCALE+12000;
   const ocean=createOcean(ISLANDS.map(i=>[i.x/SCALE,i.z/SCALE,i.radius/SCALE,i.radius/SCALE]),{size:waterSize,coastSeeds:ISLANDS.map(i=>i.coastSeed)});world.add(ocean.mesh);
   const sky=createTropicalSky(5000);world.add(sky);
-  const vegetation=decorateIslands(world,ISLANDS,{scale:SCALE,height:terrainHeight,surfaces,small:mobile,dense:true,
+  const vegetation=decorateIslands(world,ISLANDS,{scale:SCALE,height:terrainHeight,surfaces,small:mobile,dense:true,lod:true,
     clear:(i,x,z)=>sceneryBlocked({x,z},i.id,VILLAGE)||(i.id==='home'&&pathClear(x,z))||
       (i.id==='jungle'&&(dist2({x,z},points.cave)<100||dist2({x,z},points.supply)<58))||(i.id==='fortress'&&Math.abs(x-estateCenter.x)<125&&Math.abs(z-estateCenter.z)<155)||
       dist2({x,z},docks[i.id].land)<90});
@@ -412,6 +412,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       pose.position.y=Math.max(pose.position.y,ground(pose.position.x*SCALE,pose.position.z*SCALE)+.24);
     }
     camera.position.copy(pose.position);camera.lookAt(pose.target);
+    vegetation.update(camera.position);
     stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,{height:25});
     const guardWalking=s.guards.some(g=>g.area===area&&!s.boat&&(!g.area||s.island==='fortress')&&g.hp>0&&dist2(g,s.p)<210);
     const shadowAnimated=!s.paused&&(s.walking||s.boat||guardWalking);
@@ -441,8 +442,10 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
     stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,
       palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,
+      palmCrownTriangles:vegetation.foliageBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
+      lowDetailPalmBatches:vegetation.foliageBatches.filter(o=>o.userData.lod.level==='low').length,
       terrainTriangles:terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),shadowUpdates}),
-    dispose(){renderer.dispose();surfaces.dispose();const gs=new Set(geos.values()),ms=new Set(mats.values());scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])ms.add(m);});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());paperMap.dispose();}
+    dispose(){renderer.dispose();surfaces.dispose();const gs=new Set([...geos.values(),...vegetation.lodGeometries]),ms=new Set(mats.values());scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])ms.add(m);});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());paperMap.dispose();}
   };
 }
 function dist2(a,b){return Math.hypot(a.x-b.x,a.z-b.z);}
