@@ -55,6 +55,17 @@ test('rocks, palm trunks and the trade stall block movement while walls allow sl
   const wall={circles:[],rects:[{x:1000,y:1000,w:10,h:500}]},slide=movePlayer({x:940,y:900},{x:1080,y:1060},wall);assert(slide.x<1000);assert(slide.y>1050);
 });
 
+test('static resource revision changes only when rendered resource geometry changes', () => {
+  const g=game();g.run(`startGame();const target=O.find(o=>o.t==='tree'&&distance(o,leon)>200&&distance(o,nela)>200&&distance(o,activityRules.BOARD)>200&&!chapterMarkers().some(p=>distance(o,p)<150));globalThis.revisionTarget=target;P={x:target.x+64,y:target.y}`);
+  const before=g.run('sceneState().resourceRevision'),count=g.run('O.length');
+  g.run('interact()');
+  assert.equal(g.run('sceneState().resourceRevision'),before,'a first hit changes health but not rendered geometry');
+  g.run('interact()');
+  assert.equal(g.run('sceneState().resourceRevision'),before+1,'removing the resource must rebuild static instances once');
+  assert.equal(g.run('O.length'),count-1);
+  g.close();
+});
+
 test('new bases reserve land and NPC access and all four respawns remain outside solid walls', () => {
   const land=(x,y)=>((x-1750)/1540)**2+((y-1300)/970)**2<1;
   const pos=baseSite({x:1500,y:1100},land);assert(pos);

@@ -271,21 +271,27 @@ export function create({canvas,terrain,getState,onLost}) {
     shell:new T.InstancedMesh(new T.SphereGeometry(1,12,6,0,Math.PI),mat('#f1d0b7'),400)
   };
   for(const b of Object.values(batches)){b.count=0;b.castShadow=true;b.receiveShadow=true;b.frustumCulled=false;scene.add(b);}
-  function resources(objects,seconds){
-    const counts={tree:0,leaves:0,rock:0,food:0,shell:0};
-    for(const o of objects){
-      const x=o.x/SCALE,z=o.y/SCALE,y=terrainHeight(x,z),p=o.phase||0;
-      if(o.t==='tree'){
-        const size=.84+.17*Math.sin(o.x*.033+o.y*.027),height=1.35+.28*Math.cos(p);
-        dummy.position.set(x,y,z);dummy.rotation.set(.03*Math.sin(p),p,.04*Math.cos(p));dummy.scale.set(size,height,size);dummy.updateMatrix();batches.tree.setMatrixAt(counts.tree++,dummy.matrix);
-        dummy.position.set(x+.16*size*Math.cos(p),y+4.3*height,z-.16*size*Math.sin(p));dummy.rotation.set(Math.sin(seconds*.7+p)*.025,p,Math.cos(seconds*.6+p)*.025);
-        dummy.scale.set(size,size,size);dummy.updateMatrix();batches.leaves.setMatrixAt(counts.leaves++,dummy.matrix);
-      }else if(batches[o.t]){
-        dummy.position.set(x,y+(o.t==='rock'?.23:o.t==='food'?.13:.025),z);dummy.rotation.set(0,p,0);
-        dummy.scale.set(...(o.t==='rock'?[.34+.18*Math.abs(Math.sin(p)),.3,.4]:o.t==='food'?[.15,.13,.15]:[.12,.04,.14]));dummy.updateMatrix();batches[o.t].setMatrixAt(counts[o.t]++,dummy.matrix);
+  let renderedResourceRevision=-1,resourceLeaves=[],resourceStaticUpdates=0;
+  function resources(objects,seconds,revision){
+    if(revision!==renderedResourceRevision){
+      const counts={tree:0,rock:0,food:0,shell:0};resourceLeaves=[];
+      for(const o of objects){
+        const x=o.x/SCALE,z=o.y/SCALE,y=terrainHeight(x,z),p=o.phase||0;
+        if(o.t==='tree'){
+          const size=.84+.17*Math.sin(o.x*.033+o.y*.027),height=1.35+.28*Math.cos(p);
+          dummy.position.set(x,y,z);dummy.rotation.set(.03*Math.sin(p),p,.04*Math.cos(p));dummy.scale.set(size,height,size);dummy.updateMatrix();batches.tree.setMatrixAt(counts.tree++,dummy.matrix);
+          resourceLeaves.push({x:x+.16*size*Math.cos(p),y:y+4.3*height,z:z-.16*size*Math.sin(p),p,size});
+        }else if(batches[o.t]){
+          dummy.position.set(x,y+(o.t==='rock'?.23:o.t==='food'?.13:.025),z);dummy.rotation.set(0,p,0);
+          dummy.scale.set(...(o.t==='rock'?[.34+.18*Math.abs(Math.sin(p)),.3,.4]:o.t==='food'?[.15,.13,.15]:[.12,.04,.14]));dummy.updateMatrix();batches[o.t].setMatrixAt(counts[o.t]++,dummy.matrix);
+        }
       }
+      for(const key of ['tree','rock','food','shell']){batches[key].count=counts[key];batches[key].instanceMatrix.needsUpdate=true;}
+      renderedResourceRevision=revision;resourceStaticUpdates++;
     }
-    for(const [key,b] of Object.entries(batches)){b.count=counts[key];b.instanceMatrix.needsUpdate=true;}
+    let count=0;
+    for(const leaf of resourceLeaves){dummy.position.set(leaf.x,leaf.y,leaf.z);dummy.rotation.set(Math.sin(seconds*.7+leaf.p)*.025,leaf.p,Math.cos(seconds*.6+leaf.p)*.025);dummy.scale.set(leaf.size,leaf.size,leaf.size);dummy.updateMatrix();batches.leaves.setMatrixAt(count++,dummy.matrix);}
+    batches.leaves.count=count;batches.leaves.instanceMatrix.needsUpdate=true;
   }
 
   const signs=new Set(),signPosition=new T.Vector3();
@@ -443,7 +449,7 @@ export function create({canvas,terrain,getState,onLost}) {
     updateName(guide,s.labels?.nela,'#609991');
     const x=s.P.x/SCALE,z=s.P.y/SCALE;
     materials.update();meadow.update(seconds,frameBase);leafWind.value=seconds;sky.material.uniforms.uTime.value=seconds;
-    resources(s.objects,seconds);updateFish(s.fishes,seconds,s.sea);updateChapters(s.chapterMarkers,seconds);
+    resources(s.objects,seconds,s.resourceRevision);updateFish(s.fishes,seconds,s.sea);updateChapters(s.chapterMarkers,seconds);
     const facing={down:0,up:Math.PI,left:-Math.PI/2,right:Math.PI/2};
     animatePerson(self,s.P,Number.isFinite(s.heading)?s.heading:facing[s.face]||0,s.moving,seconds,step,s.fast?5.25:3,s);
     merchant.root.visible=guide.root.visible=true;
@@ -503,6 +509,6 @@ export function create({canvas,terrain,getState,onLost}) {
   function removePerson(person){scene.remove(person.root);if(person.tag){signs.delete(person.tag);person.tag.material.map.dispose();person.tag.material.dispose();}}
   function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;return enabled;}
   function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();land.dispose();ocean.dispose();sky.geometry.dispose();sky.material.dispose();archipelago.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});map.dispose();meadow.dispose();materials.dispose();leafMat.dispose();for(const b of [...Object.values(batches),...fishBatches]){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
-  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,camera:cameraMode,eye:camera.position.toArray(),materials:materials.stats()})};
+  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,camera:cameraMode,eye:camera.position.toArray(),resourceStaticUpdates,materials:materials.stats()})};
 }
 
