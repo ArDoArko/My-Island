@@ -51,6 +51,12 @@ export function legPose(y,z) {
   const upper=.43,lower=.43,d=clamp(Math.hypot(y,z),.08,upper+lower-.005);
   return {hip:-Math.atan2(z,-y)-Math.acos(clamp((upper*upper+d*d-lower*lower)/(2*upper*d),-1,1)),knee:Math.PI-Math.acos(clamp((upper*upper+lower*lower-d*d)/(2*upper*lower),-1,1))};
 }
+
+export function updateAppearanceKey(person,look={}){
+  const shirt=look.shirt||'#4c9cba',skin=look.skin||'#dda879',hair=look.hair||'#43332b',style=look.style||0;
+  if(person.lookShirt===shirt&&person.lookSkin===skin&&person.lookHair===hair&&person.lookStyle===style)return false;
+  person.lookShirt=shirt;person.lookSkin=skin;person.lookHair=hair;person.lookStyle=style;return true;
+}
 export function baseElevation(layout){
   if(!layout)return 0;
   return Math.max(...[-1,0,1].flatMap(x=>[-1,0,1].map(y=>{const p=layout.point(x*layout.width/2,y*layout.depth/2);return terrainHeight(p.x/SCALE,p.y/SCALE)})));
@@ -318,15 +324,15 @@ export function create({canvas,terrain,getState,onLost}) {
     person.name=name;person.tag=textSprite(name,color);person.root.add(person.tag);
   }
   function updateLook(person,look){
-    if(person.lookKey===JSON.stringify(look))return;person.lookKey=JSON.stringify(look);
-    for(const p of person.shirtParts)p.material=mat(look.shirt||'#4c9cba');for(const p of person.skinParts)p.material=mat(look.skin||'#dda879');for(const p of person.hairParts)p.material=mat(look.hair||'#43332b');
-    person.hairStyles.forEach((g,i)=>g.visible=i===(look.style||0));
+    if(!updateAppearanceKey(person,look))return;
+    for(const p of person.shirtParts)p.material=mat(person.lookShirt);for(const p of person.skinParts)p.material=mat(person.lookSkin);for(const p of person.hairParts)p.material=mat(person.lookHair);
+    person.hairStyles.forEach((g,i)=>g.visible=i===person.lookStyle);
   }
   let frameBase=null,frameElevation=0;
-  function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,state) {
-    const x=point.x/SCALE,z=point.y/SCALE,wet=state.sea(point.x,point.y);
+  function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false) {
+    const x=point.x/SCALE,z=point.y/SCALE,wet=sea(point.x,point.y);
     const surface=wet?0:walkSurface(x,z,frameBase,frameElevation);
-    person.root.position.set(x,surface+(wet?(state.raft?.18:-.95):0),z);
+    person.root.position.set(x,surface+(wet?(raft?.18:-.95):0),z);
     person.yaw+=angleDelta(person.yaw,lookYaw)*Math.min(1,step*12);person.rig.rotation.y=person.yaw;
     const active=isMoving&&speed>.05;person.phase+=active?step*(speed>4?10:7):0;
     const amount=active?(speed>4?.31:.22):0,phase=person.phase;
@@ -342,11 +348,11 @@ export function create({canvas,terrain,getState,onLost}) {
     for(const arm of person.arms){
       arm.arm.rotation.x=active?Math.sin(phase+(arm.side<0?0:Math.PI))*.45:Math.sin(seconds*1.3+arm.side)*.025;
       arm.arm.rotation.z=-arm.side*.07;arm.forearm.rotation.x=active?-.22:-.08;
-      if(wet&&!state.raft){arm.arm.rotation.x=-Math.PI/2+Math.sin(phase+arm.side)*.35;arm.forearm.rotation.x=-.28;}
+      if(wet&&!raft){arm.arm.rotation.x=-Math.PI/2+Math.sin(phase+arm.side)*.35;arm.forearm.rotation.x=-.28;}
     }
-    actionPose(person,state.motion);
-    person.raft.visible=!!(wet&&state.raft);person.raft.rotation.y=person.yaw;person.spear.visible=!!state.spear&&!wet&&!state.motion;
-    if(state.blocked){person.arms[0].arm.rotation.x=-1;person.arms[0].forearm.rotation.x=-1;}
+    actionPose(person,motion);
+    person.raft.visible=!!(wet&&raft);person.raft.rotation.y=person.yaw;person.spear.visible=!!spear&&!wet&&!motion;
+    if(blocked){person.arms[0].arm.rotation.x=-1;person.arms[0].forearm.rotation.x=-1;}
     if(person.tag)person.tag.visible=Math.hypot(x-self.root.position.x,z-self.root.position.z)<13;
     person.lastX=x;person.lastZ=z;
   }
@@ -427,6 +433,7 @@ export function create({canvas,terrain,getState,onLost}) {
   const heldSpear=new T.Group();held.add(heldSpear);const shaft=tube(heldSpear,'#876742',[.32,-.17,-.75],[.014,1.55,.014]);shaft.rotation.x=-.22;
   const tip=ell(heldSpear,'#b3b6ac',[.32,.61,-.91],[.039,.12,.025]);
   const heldTools={};for(const key of ['gather','fish','cook']){const tool=new T.Group();tool.position.set(.29,-.26,-.61);held.add(tool);personTool(key,tool,{cube,tube,ell});heldTools[key]=tool;}
+  const heldToolEntries=Object.entries(heldTools),facing={down:0,up:Math.PI,left:-Math.PI/2,right:Math.PI/2},present=new Set();
   held.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false;o.frustumCulled=false;}});
   const target=new T.Vector3(),cameraTarget=new T.Vector3(),desired=new T.Vector3(),lastPoint=new T.Vector3();
   const cameraPoseBuffer={position:desired,target},cameraDirection=new T.Vector3(),cameraRay=new T.Raycaster();
@@ -450,11 +457,11 @@ export function create({canvas,terrain,getState,onLost}) {
     const x=s.P.x/SCALE,z=s.P.y/SCALE;
     materials.update();meadow.update(seconds,frameBase);leafWind.value=seconds;sky.material.uniforms.uTime.value=seconds;
     resources(s.objects,seconds,s.resourceRevision);updateFish(s.fishes,seconds,s.sea);updateChapters(s.chapterMarkers,seconds);
-    const facing={down:0,up:Math.PI,left:-Math.PI/2,right:Math.PI/2};
-    animatePerson(self,s.P,Number.isFinite(s.heading)?s.heading:facing[s.face]||0,s.moving,seconds,step,s.fast?5.25:3,s);
+    animatePerson(self,s.P,Number.isFinite(s.heading)?s.heading:facing[s.face]||0,s.moving,seconds,step,s.fast?5.25:3,s.sea,s.raft,s.motion,s.spear,s.blocked);
     merchant.root.visible=guide.root.visible=true;
-    for(const [p,point] of [[merchant,s.leon],[guide,s.nela]])animatePerson(p,point,Math.atan2(x-point.x/SCALE,z-point.y/SCALE),false,seconds,step,0,{...s,raft:false,spear:false,blocked:false,motion:null});
-    const present=new Set();
+    animatePerson(merchant,s.leon,Math.atan2(x-s.leon.x/SCALE,z-s.leon.y/SCALE),false,seconds,step,0,s.sea);
+    animatePerson(guide,s.nela,Math.atan2(x-s.nela.x/SCALE,z-s.nela.y/SCALE),false,seconds,step,0,s.sea);
+    present.clear();
     for(const p of s.players){
       if(p.id===s.you)continue;present.add(p.id);let person=people.get(p.id);
       const look=p.appearance?colors(p.appearance):s.looks[p.slot]||{};
@@ -462,7 +469,8 @@ export function create({canvas,terrain,getState,onLost}) {
       updateLook(person,look);
       const dx=person.lastX===null?0:p.point.x/SCALE-person.lastX,dz=person.lastZ===null?0:p.point.y/SCALE-person.lastZ;
       const heading=p.moving&&Math.hypot(dx,dz)>.002?Math.atan2(dx,dz):facing[p.face]||0;
-      animatePerson(person,p.point,heading,p.moving,seconds,step,3,{...s,spear:s.spearOwned&&!p.spearStowed,blocked:p.blocked,motion:p.motion&&p.motion.remaining-(now-p.received)>0?{kind:p.motion.kind,phase:1-(p.motion.remaining-(now-p.received))/(MOTIONS[p.motion.kind]||1000)}:null});
+      const motion=p.motion&&p.motion.remaining-(now-p.received)>0?{kind:p.motion.kind,phase:1-(p.motion.remaining-(now-p.received))/(MOTIONS[p.motion.kind]||1000)}:null;
+      animatePerson(person,p.point,heading,p.moving,seconds,step,3,s.sea,false,motion,s.spearOwned&&!p.spearStowed,p.blocked);
     }
     for(const [id,p] of people)if(!present.has(id)){removePerson(p);people.delete(id);}
     updateLook(self,s.appearance||colors());
@@ -495,9 +503,9 @@ export function create({canvas,terrain,getState,onLost}) {
     camera.lookAt(cameraMode==='first'?target:cameraTarget);lastPoint.copy(self.root.position);
     // Bound on-screen labels in pixels, including at very close talking range.
     scaleWorldLabels(signs,camera,innerWidth,signPosition);
-    const holding=!!s.spear||!!s.motion&&['gather','fish','cook'].includes(s.motion.kind);
+    const holding=!!s.spear||!!s.motion&&(s.motion.kind==='gather'||s.motion.kind==='fish'||s.motion.kind==='cook');
     held.visible=cameraMode==='first'&&s.play&&holding&&!s.sea(s.P.x,s.P.y);
-    heldSpear.visible=!!s.spear&&!s.motion;for(const [key,o] of Object.entries(heldTools))o.visible=s.motion?.kind===key;
+    heldSpear.visible=!!s.spear&&!s.motion;for(const [key,o] of heldToolEntries)o.visible=s.motion?.kind===key;
     held.position.y=bob*.4;held.rotation.x=s.motion?Math.sin(s.motion.phase*Math.PI*2)*.07:0;
     hand.material=mat(s.appearance?.skin||'#dda879');sleeve.material=mat(s.appearance?.shirt||'#4c9cba');
     stabilizeSunShadow(sun,x,z);

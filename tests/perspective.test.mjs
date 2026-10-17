@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, stabilizeSunShadow } from '../island-environment.mjs';
-import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels } from '../island3d-src.mjs';
+import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { game } from './game-harness.mjs';
 
@@ -48,6 +48,13 @@ test('world labels keep their pixel cap without traversing unrelated scene objec
   scaleWorldLabels(labels,camera,1000,scratch);
   assert.equal(label.scale.x,10,'a distant label must restore its authored scale');
   assert.equal(label.userData.signScale.x,10,'the reusable base scale must not be overwritten by capping');
+});
+
+test('unchanged avatar appearance skips per-frame serialization and material work',()=>{
+  const person={};
+  assert.equal(updateAppearanceKey(person,{shirt:'#123456',skin:'#abcdef',hair:'#333333',style:2}),true);
+  assert.equal(updateAppearanceKey(person,{shirt:'#123456',skin:'#abcdef',hair:'#333333',style:2}),false,'an equivalent fresh snapshot must not trigger an update');
+  assert.equal(updateAppearanceKey(person,{shirt:'#123456',skin:'#abcdef',hair:'#333333',style:1}),true,'a real hairstyle change must still update the mesh');
 });
 
 test('camera pose can reuse its vectors without changing first- or third-person geometry',()=>{
