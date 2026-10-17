@@ -58,6 +58,12 @@ test('markers remain reachable when a migrated base occupies a chapter point',()
   }
 });
 
+test('3D scene reuses one expedition marker snapshot per frame',()=>{
+  const g=game();g.run('startGame();startChapter("compass")');
+  const calls=g.run(`(()=>{const original=chapterMarkers;let count=0;chapterMarkers=(...args)=>{count++;return original(...args)};try{sceneState()}finally{chapterMarkers=original}return count})()`);
+  assert.equal(calls,1,'marker geometry and the active trail must share one snapshot');g.close();
+});
+
 test('new menus remain operable by a pad and all six languages while view changes keep expedition progress',()=>{
   const g=game(),pad=controller();g.run('startGame();startChapter("compass");toggle("characterPanel",1)');g.setPads([pad]);g.frame();g.frame();
   g.element('characterPanel').querySelector('button[onclick="cycleLook(\'shirt\')"]').focus();pad.buttons[0]={pressed:true,value:1};g.frame();assert.equal(g.run('myAppearance.shirt'),1,'Pad action changes the focused appearance control');
