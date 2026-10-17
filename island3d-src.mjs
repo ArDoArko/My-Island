@@ -61,6 +61,12 @@ export function baseElevation(layout){
   if(!layout)return 0;
   return Math.max(...[-1,0,1].flatMap(x=>[-1,0,1].map(y=>{const p=layout.point(x*layout.width/2,y*layout.depth/2);return terrainHeight(p.x/SCALE,p.y/SCALE)})));
 }
+export function updateBaseFrame(cache,pos,level){
+  const x=pos?.x??null,y=pos?.y??null,baseLevel=level||0;
+  if(cache.ready&&cache.x===x&&cache.y===y&&cache.level===baseLevel)return false;
+  cache.ready=true;cache.x=x;cache.y=y;cache.level=baseLevel;
+  cache.layout=baseLayout(pos,level);cache.elevation=baseElevation(cache.layout);return true;
+}
 export function walkSurface(x,z,layout,elevation=baseElevation(layout)){
   const y=terrainHeight(x,z);if(!layout)return y;
   const f=layout.floor;if(Math.abs(x*SCALE-f.x)<=f.w/2&&Math.abs(z*SCALE-f.y)<=f.h/2)return Math.max(y,elevation+.16);
@@ -328,7 +334,7 @@ export function create({canvas,terrain,getState,onLost}) {
     for(const p of person.shirtParts)p.material=mat(person.lookShirt);for(const p of person.skinParts)p.material=mat(person.lookSkin);for(const p of person.hairParts)p.material=mat(person.lookHair);
     person.hairStyles.forEach((g,i)=>g.visible=i===person.lookStyle);
   }
-  let frameBase=null,frameElevation=0;
+  let frameBase=null,frameElevation=0;const frameBaseCache={};
   function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false) {
     const x=point.x/SCALE,z=point.y/SCALE,wet=sea(point.x,point.y);
     const surface=wet?0:walkSurface(x,z,frameBase,frameElevation);
@@ -449,7 +455,7 @@ export function create({canvas,terrain,getState,onLost}) {
   function frame(now){
     if(!enabled||lost)return;
     const s=getState(),seconds=now/1000,step=last?clamp((now-last)/1000,0,.06):1/60;last=now;
-    frameBase=baseLayout(s.basePos,s.baseLevel);frameElevation=baseElevation(frameBase);
+    updateBaseFrame(frameBaseCache,s.basePos,s.baseLevel);frameBase=frameBaseCache.layout;frameElevation=frameBaseCache.elevation;
     updateName(boardPerson,s.labels?.board,'#ffe087');if(boardPerson.tag){boardPerson.tag.position.y=1.65;boardPerson.tag.scale.set(1.4,.36,1)}
     trailRoot.visible=!!s.trail;if(s.trail){trailRoot.position.set(s.trail.x/SCALE,terrainHeight(s.trail.x/SCALE,s.trail.y/SCALE),s.trail.y/SCALE);trailBeam.material.opacity=.35+.13*Math.sin(seconds*3);if(trailNumber!==s.trailNumber||trailTag?.userData.text!==(s.trailNumber===4?s.labels?.finish||'4':s.trailNumber?String(s.trailNumber):s.trail.label)){if(trailTag){signs.delete(trailTag);trailRoot.remove(trailTag);trailTag.material.map.dispose();trailTag.material.dispose()}trailNumber=s.trailNumber;trailTag=textSprite(trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label,'#54e4ef');trailTag.userData.text=trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label;trailTag.position.y=1.5;trailTag.scale.set(s.trailNumber?1:2.45,.4,1);trailRoot.add(trailTag)}}
     updateName(merchant,s.labels?.leon,'#b49966');

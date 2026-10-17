@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, stabilizeSunShadow } from '../island-environment.mjs';
-import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey } from '../island3d-src.mjs';
+import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateBaseFrame } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { game } from './game-harness.mjs';
 
@@ -55,6 +55,17 @@ test('unchanged avatar appearance skips per-frame serialization and material wor
   assert.equal(updateAppearanceKey(person,{shirt:'#123456',skin:'#abcdef',hair:'#333333',style:2}),true);
   assert.equal(updateAppearanceKey(person,{shirt:'#123456',skin:'#abcdef',hair:'#333333',style:2}),false,'an equivalent fresh snapshot must not trigger an update');
   assert.equal(updateAppearanceKey(person,{shirt:'#123456',skin:'#abcdef',hair:'#333333',style:1}),true,'a real hairstyle change must still update the mesh');
+});
+
+test('base terrain layout and elevation stay cached until the saved base changes',()=>{
+  const cache={},pos={x:1900,y:1250};
+  assert.equal(updateBaseFrame(cache,pos,3),true);
+  const layout=cache.layout,elevation=cache.elevation;
+  assert.equal(updateBaseFrame(cache,{x:1900,y:1250},3),false,'an equivalent fresh save snapshot must reuse the base frame');
+  assert.equal(cache.layout,layout);assert.equal(cache.elevation,elevation);
+  assert.equal(updateBaseFrame(cache,{x:1901,y:1250},3),true,'moving the base must invalidate the cached terrain frame');
+  assert.notEqual(cache.layout,layout);
+  assert.equal(updateBaseFrame(cache,{x:1901,y:1250},4),true,'upgrading the base must invalidate its layout');
 });
 
 test('camera pose can reuse its vectors without changing first- or third-person geometry',()=>{
