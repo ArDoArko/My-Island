@@ -239,10 +239,11 @@ export function actionPose(person,motion){
   for(const arm of person.arms){arm.arm.rotation.x=arm.side<0?pose.left:pose.right;arm.forearm.rotation.x=-.25;arm.arm.rotation.z=-arm.side*.08+(arm.side>0||motion.kind==='cheer'?pose.wave||0:0);}
 }
 export function fishPose(point,seconds,sea,out={}){
-  const phase=point.phase||0,x=point.x+Math.sin(seconds*.65+phase)*14,y=point.y+Math.cos(seconds*.65+phase)*14;
+  const phase=point.phase||0,angle=seconds*.65+phase,angleSin=Math.sin(angle),angleCos=Math.cos(angle);
+  const x=point.x+angleSin*14,y=point.y+angleCos*14;
   if(!sea(x,y))return null;
   out.x=x/SCALE;out.z=y/SCALE;out.y=.055+Math.sin(seconds*3+phase)*.008;
-  out.yaw=Math.atan2(Math.cos(seconds*.65+phase),-Math.sin(seconds*.65+phase));return out;
+  out.yaw=Math.atan2(angleCos,-angleSin);out.yawSin=angleCos;out.yawCos=-angleSin;return out;
 }
 
 export function create({canvas,terrain,getState,onLost}) {
@@ -390,7 +391,7 @@ export function create({canvas,terrain,getState,onLost}) {
     person.hairStyles.forEach((g,i)=>g.visible=i===person.lookStyle);
   }
   let frameBase=null,frameElevation=0;const frameBaseCache={},avatarFrameCycle={idleHip:0,idleArmSin:0,idleArmCos:0},avatarPoseCycle={yawSin:0,yawCos:1,phaseSin:0,phaseCos:1};
-  const legPoseBuffer={hip:0,knee:0},fishPoseBuffer={x:0,z:0,y:0,yaw:0};
+  const legPoseBuffer={hip:0,knee:0},fishPoseBuffer={x:0,z:0,y:0,yaw:0,yawSin:0,yawCos:1};
   function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false) {
     const x=point.x/SCALE,z=point.y/SCALE,wet=sea(point.x,point.y);
     const surface=wet?0:walkSurface(x,z,frameBase,frameElevation);
@@ -470,7 +471,7 @@ export function create({canvas,terrain,getState,onLost}) {
   const fishBatches=[new T.InstancedMesh(ball(),mat('#adddd0',{roughness:.4}),96),new T.InstancedMesh(new T.ConeGeometry(1,1,3),mat('#668e93'),96),new T.InstancedMesh(new T.ConeGeometry(1,1,3),mat('#779da0'),96)];
   for(const b of fishBatches){b.count=0;b.frustumCulled=false;scene.add(b);}
   function updateFish(list,seconds,sea){let count=0;for(const f of list||[]){const p=fishPose(f,seconds,sea,fishPoseBuffer);if(!p||count>=96)continue;
-    const local=(x,y,z,s,rx=0)=>{dummy.position.set(p.x+Math.sin(p.yaw)*z+Math.cos(p.yaw)*x,p.y+y,p.z+Math.cos(p.yaw)*z-Math.sin(p.yaw)*x);dummy.rotation.set(rx,p.yaw,0);dummy.scale.set(...s);dummy.updateMatrix();};
+    const local=(x,y,z,s,rx=0)=>{dummy.position.set(p.x+p.yawSin*z+p.yawCos*x,p.y+y,p.z+p.yawCos*z-p.yawSin*x);dummy.rotation.set(rx,p.yaw,0);dummy.scale.set(...s);dummy.updateMatrix();};
     local(0,0,0,[.09,.045,.22]);fishBatches[0].setMatrixAt(count,dummy.matrix);local(0,0,-.25,[.095,.12,.025],Math.PI/2);fishBatches[1].setMatrixAt(count,dummy.matrix);local(0,.045,-.02,[.04,.10,.11]);fishBatches[2].setMatrixAt(count,dummy.matrix);count++;
   }for(const b of fishBatches){b.count=count;b.instanceMatrix.needsUpdate=true;}}
   const chapterState={};let chapterRoots=[];

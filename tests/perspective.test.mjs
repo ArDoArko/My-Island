@@ -115,8 +115,9 @@ test('boars share one gait sample across all four alternating legs',()=>{
 test('leg and fish animation update reusable pose buffers',()=>{
   const leg={hip:0,knee:0};assert.equal(legPose(-.78,.22,leg),leg);
   const expectedLeg=legPose(-.78,.22);assert.deepEqual(leg,expectedLeg);
-  const fish={x:0,z:0,y:0,yaw:0},point={x:1750,y:2270,phase:.7},sea=()=>true;
+  const fish={x:0,z:0,y:0,yaw:0,yawSin:0,yawCos:1},point={x:1750,y:2270,phase:.7},sea=()=>true;
   assert.equal(fishPose(point,2.3,sea,fish),fish);assert.deepEqual(fish,fishPose(point,2.3,sea));
+  assert(Math.abs(fish.yawSin-Math.sin(fish.yaw))<1e-12);assert(Math.abs(fish.yawCos-Math.cos(fish.yaw))<1e-12);
   assert.equal(fishPose(point,2.3,()=>false,fish),null,'a fish outside water must remain hidden without replacing its buffer');
 });
 
