@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow } from '../island-environment.mjs';
-import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBuildingState, updateChapterState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { cameraVector, fishPose, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBuildingState, updateChapterState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { game } from './game-harness.mjs';
 
@@ -75,6 +75,14 @@ test('avatar animation shares exact phase and heading samples across each body',
       if(active||swimming)assert(Math.abs(swim-sharedSwim)<1e-12);
     }
   }
+});
+
+test('leg and fish animation update reusable pose buffers',()=>{
+  const leg={hip:0,knee:0};assert.equal(legPose(-.78,.22,leg),leg);
+  const expectedLeg=legPose(-.78,.22);assert.deepEqual(leg,expectedLeg);
+  const fish={x:0,z:0,y:0,yaw:0},point={x:1750,y:2270,phase:.7},sea=()=>true;
+  assert.equal(fishPose(point,2.3,sea,fish),fish);assert.deepEqual(fish,fishPose(point,2.3,sea));
+  assert.equal(fishPose(point,2.3,()=>false,fish),null,'a fish outside water must remain hidden without replacing its buffer');
 });
 
 test('base terrain layout and elevation stay cached until the saved base changes',()=>{

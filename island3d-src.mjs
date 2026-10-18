@@ -63,9 +63,10 @@ export function scaleWorldLabels(labels,camera,width,position=new T.Vector3()){
   }
   return count;
 }
-export function legPose(y,z) {
+export function legPose(y,z,out={}) {
   const upper=.43,lower=.43,d=clamp(Math.hypot(y,z),.08,upper+lower-.005);
-  return {hip:-Math.atan2(z,-y)-Math.acos(clamp((upper*upper+d*d-lower*lower)/(2*upper*d),-1,1)),knee:Math.PI-Math.acos(clamp((upper*upper+lower*lower-d*d)/(2*upper*lower),-1,1))};
+  out.hip=-Math.atan2(z,-y)-Math.acos(clamp((upper*upper+d*d-lower*lower)/(2*upper*d),-1,1));
+  out.knee=Math.PI-Math.acos(clamp((upper*upper+lower*lower-d*d)/(2*upper*lower),-1,1));return out;
 }
 
 export function updateAppearanceKey(person,look={}){
@@ -229,10 +230,11 @@ export function actionPose(person,motion){
   if(!pose)return;
   for(const arm of person.arms){arm.arm.rotation.x=arm.side<0?pose.left:pose.right;arm.forearm.rotation.x=-.25;arm.arm.rotation.z=-arm.side*.08+(arm.side>0||motion.kind==='cheer'?pose.wave||0:0);}
 }
-export function fishPose(point,seconds,sea){
+export function fishPose(point,seconds,sea,out={}){
   const phase=point.phase||0,x=point.x+Math.sin(seconds*.65+phase)*14,y=point.y+Math.cos(seconds*.65+phase)*14;
   if(!sea(x,y))return null;
-  return {x:x/SCALE,z:y/SCALE,y:.055+Math.sin(seconds*3+phase)*.008,yaw:Math.atan2(Math.cos(seconds*.65+phase),-Math.sin(seconds*.65+phase))};
+  out.x=x/SCALE;out.z=y/SCALE;out.y=.055+Math.sin(seconds*3+phase)*.008;
+  out.yaw=Math.atan2(Math.cos(seconds*.65+phase),-Math.sin(seconds*.65+phase));return out;
 }
 
 export function create({canvas,terrain,getState,onLost}) {
@@ -378,6 +380,7 @@ export function create({canvas,terrain,getState,onLost}) {
     person.hairStyles.forEach((g,i)=>g.visible=i===person.lookStyle);
   }
   let frameBase=null,frameElevation=0;const frameBaseCache={},avatarFrameCycle={idleHip:0,idleArmSin:0,idleArmCos:0},avatarPoseCycle={yawSin:0,yawCos:1,phaseSin:0,phaseCos:1};
+  const legPoseBuffer={hip:0,knee:0},fishPoseBuffer={x:0,z:0,y:0,yaw:0};
   function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false) {
     const x=point.x/SCALE,z=point.y/SCALE,wet=sea(point.x,point.y);
     const surface=wet?0:walkSurface(x,z,frameBase,frameElevation);
@@ -393,7 +396,7 @@ export function create({canvas,terrain,getState,onLost}) {
       const sx=x+cycle.yawCos*leg.side*.115+cycle.yawSin*stride;
       const sz=z-cycle.yawSin*leg.side*.115+cycle.yawCos*stride;
       const slope=wet?0:walkSurface(sx,sz,frameBase,frameElevation)-surface;
-      const pose=legPose(-person.hips.position.y+.07+slope+lift,stride);
+      const pose=legPose(-person.hips.position.y+.07+slope+lift,stride,legPoseBuffer);
       leg.thigh.rotation.x=pose.hip;leg.calf.rotation.x=pose.knee;leg.shoe.rotation.x=-pose.hip-pose.knee;
     }
     for(const arm of person.arms){
@@ -456,7 +459,7 @@ export function create({canvas,terrain,getState,onLost}) {
 
   const fishBatches=[new T.InstancedMesh(ball(),mat('#adddd0',{roughness:.4}),96),new T.InstancedMesh(new T.ConeGeometry(1,1,3),mat('#668e93'),96),new T.InstancedMesh(new T.ConeGeometry(1,1,3),mat('#779da0'),96)];
   for(const b of fishBatches){b.count=0;b.frustumCulled=false;scene.add(b);}
-  function updateFish(list,seconds,sea){let count=0;for(const f of list||[]){const p=fishPose(f,seconds,sea);if(!p||count>=96)continue;
+  function updateFish(list,seconds,sea){let count=0;for(const f of list||[]){const p=fishPose(f,seconds,sea,fishPoseBuffer);if(!p||count>=96)continue;
     const local=(x,y,z,s,rx=0)=>{dummy.position.set(p.x+Math.sin(p.yaw)*z+Math.cos(p.yaw)*x,p.y+y,p.z+Math.cos(p.yaw)*z-Math.sin(p.yaw)*x);dummy.rotation.set(rx,p.yaw,0);dummy.scale.set(...s);dummy.updateMatrix();};
     local(0,0,0,[.09,.045,.22]);fishBatches[0].setMatrixAt(count,dummy.matrix);local(0,0,-.25,[.095,.12,.025],Math.PI/2);fishBatches[1].setMatrixAt(count,dummy.matrix);local(0,.045,-.02,[.04,.10,.11]);fishBatches[2].setMatrixAt(count,dummy.matrix);count++;
   }for(const b of fishBatches){b.count=count;b.instanceMatrix.needsUpdate=true;}}
