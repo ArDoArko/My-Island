@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { createCampaignView, updateCampaignShadowState } from '../campaign-view.mjs';
+import { createCampaignView, updateCampaignShadowState, updateEscortPoints } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -16,6 +16,16 @@ test('unchanged campaign shadows reuse primitive state without frame strings',()
   assert.equal(updateCampaignShadowState(cache,state,false),false);
   state.released=[0,3];assert.equal(updateCampaignShadowState(cache,state,false),true,'a released resident change must refresh shadows');
   assert.equal(updateCampaignShadowState(cache,state,true),true,'starting animation must refresh shadows immediately');
+});
+
+test('escort formation updates reusable points around the player',()=>{
+  const points=C.PEOPLE.map(()=>({x:0,z:0})),identities=[...points],player={x:100,z:200};
+  assert.equal(updateEscortPoints(points,C.PEOPLE,player,0),points);
+  assert.deepEqual(points.map(p=>[p.x,p.z]),C.PEOPLE.map(p=>[100+(p.id%2?16:-16),200-(35+p.id*15)]));
+  updateEscortPoints(points,C.PEOPLE,player,Math.PI/2);
+  assert(points.every((point,id)=>point===identities[id]),'formation updates must not allocate replacement points');
+  assert(points.every(point=>Number.isFinite(point.x)&&Number.isFinite(point.z)));
+  assert(Math.abs(points[0].x-65)<1e-9&&Math.abs(points[0].z-216)<1e-9);
 });
 
 test('real Three.js campaign geometry and both cameras run through every mission area without GPU rendering',()=>{

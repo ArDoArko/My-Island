@@ -22,6 +22,16 @@ export function updateCampaignShadowState(cache,state,animated=false){
   return changed;
 }
 
+export function updateEscortPoints(points,people,player,heading){
+  const sin=Math.sin(heading),cos=Math.cos(heading);
+  for(let i=0;i<people.length;i++){
+    const person=people[i],point=points[i],back=35+person.id*15,side=person.id%2?16:-16;
+    point.x=player.x-sin*back+cos*side;
+    point.z=player.z-cos*back-sin*side;
+  }
+  return points;
+}
+
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
   const renderer=rendererFactory({canvas,antialias:true,powerPreference:'high-performance'});
   const mobile=innerWidth<=700;
@@ -322,6 +332,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   }
   const self=prepareCampaignPerson(makeHuman({shirt:'#577c87',skin:'#ddb08c',hair:'#40362f'},'player',helpers),0,'campaign-player');
   self.root.name='campaign-player';scene.add(self.root);const guardModels=new Map(),prisoners=new Map();
+  const releasedMask=new Uint8Array(PEOPLE.length),escortPoints=PEOPLE.map(()=>({x:0,z:0}));
   const guardLooks={
     gate:{shirt:'#526252',skin:'#c29574',hair:'#302e28',style:0},
     patrol:{shirt:'#59665a',skin:'#a96f55',hair:'#211f1e',style:1},
@@ -388,7 +399,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     boat.rotation.z=s.boat?Math.sin(seconds*2)*.015:0;wake.visible=s.boat&&s.walking;
     if(s.boat)seatDriver(self,boat);
     paperMesh.visible=!s.paper;hiddenGun.visible=s.paper&&!s.gun;keyMesh.visible=!s.key&&s.guards.find(g=>g.id==='boss').hp===0;
-    keyMesh.rotation.y=seconds;cellBars.forEach((b,i)=>b.visible=!s.released.includes(i));
+    keyMesh.rotation.y=seconds;releasedMask.fill(0);for(const id of s.released)releasedMask[id]=1;
+    cellBars.forEach((b,i)=>b.visible=!releasedMask[i]);
     let guardWalking=false;
     for(const g of s.guards){
       const p=guardModels.get(g.id),visible=g.area===area&&!s.boat&&(!g.area||s.island==='fortress');p.root.visible=visible;
@@ -399,13 +411,14 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y+=(g.area?0:.15);p.root.scale.setScalar(.8);}
       else {p.rig.rotation.x=0;p.arms[1].arm.rotation.x=-1.05;p.arms[1].forearm.rotation.x=-.35;}
     }
+    const escortVisible=s.released.length&&!s.boarded&&!s.boat&&(area==='estate'||area==='cellar'||s.island==='fortress');
+    if(escortVisible)updateEscortPoints(escortPoints,PEOPLE,s.p,s.heading);
     for(const p of PEOPLE){
-      const model=prisoners.get(p.id),freed=s.released.includes(p.id);
+      const model=prisoners.get(p.id),freed=!!releasedMask[p.id];
       const visible=s.boarded?false:freed?(!s.boat&&(area==='estate'||area==='cellar'||s.island==='fortress')):area==='cellar';
       model.root.visible=visible;
       if(!visible)continue;
-      const point=freed?{x:s.p.x-Math.sin(s.heading)*(35+p.id*15)+Math.cos(s.heading)*(p.id%2?16:-16),
-        z:s.p.z-Math.cos(s.heading)*(35+p.id*15)-Math.sin(s.heading)*(p.id%2?16:-16)}:p;
+      const point=freed?escortPoints[p.id]:p;
       placeHuman(model,point,area?0:ground(point.x,point.z),s.heading,freed&&s.walking,seconds+p.id*.18);
     }
     const g=goal(s).target,n=nearby(s),mark=n||g;
