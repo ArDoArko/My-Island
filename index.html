@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
 <title>My Island 0.21 — Akcja ratunkowa</title>
-<script defer src="island3d.bundle.js?v=0.21.76"></script>
+<script defer src="island3d.bundle.js?v=0.21.77"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -311,7 +311,7 @@ body.campaign-active[data-campaign-camera="third"] #lookReticle,body.campaign-ac
  <p class="intro"><span data-i18n="Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.">Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.</span></p>
  <div class="language-options"><button data-language="pl" onclick="setLanguage('pl')">Polski</button><button data-language="en" onclick="setLanguage('en')">English</button><button data-language="nl" onclick="setLanguage('nl')">Nederlands</button><button data-language="de" onclick="setLanguage('de')">Deutsch</button><button data-language="fr" onclick="setLanguage('fr')">Français</button><button data-language="es" onclick="setLanguage('es')">Español</button></div>
 </div>
-<script src="campaign.bundle.js?v=0.21.76"></script>
+<script src="campaign.bundle.js?v=0.21.77"></script>
 <script src="i18n.bundle.js?v=0.21"></script>
 <script src="wildlife.bundle.js?v=0.18"></script>
 <script src="island-play.bundle.js?v=0.18"></script>
@@ -360,6 +360,7 @@ function ellipseInside(x,y,cx,cy,rx,ry){return ((x-cx)/rx)**2+((y-cy)/ry)**2<1}
 function mainLand(x,y){return ellipseInside(x,y,1750,1300,1540,970)||ellipseInside(x,y,3380,500,520,310)}
 function island2(x,y){return ellipseInside(x,y,4100,2400,390,290)}
 function sea(x,y){return !mainLand(x,y)&&!island2(x,y)}
+const isLand=(x,y)=>!sea(x,y);
 function deep(x,y){return sea(x,y)&&x>3500&&y>1150}
 function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
 function safeZone(x,y){return activityRules.inBase({x,y},basePos,baseLevel,70)}
@@ -492,7 +493,7 @@ function drawRaft(x,y){
  X.strokeStyle='#74684b';X.lineWidth=3;X.beginPath();X.moveTo(-34,0);X.lineTo(34,0);X.moveTo(-34,15);X.lineTo(34,15);X.stroke();
  X.strokeStyle='#b6a77b';X.lineWidth=3;X.beginPath();X.moveTo(25,-12);X.lineTo(49+Math.sin(walkPhase)*4,28);X.stroke();ellipse(X,49+Math.sin(walkPhase)*4,27,5,10,'#b6a77b');X.restore();
 }
-function firePosition(){return activityRules.firePosition(basePos,baseLevel,(x,y)=>!sea(x,y))}
+function firePosition(){return activityRules.firePosition(basePos,baseLevel,isLand)}
 function drawFire(x,y){
  X.save();X.translate(x,y);const glow=X.createRadialGradient(0,-4,1,0,0,68);glow.addColorStop(0,'#ffb94745');glow.addColorStop(1,'#ffb94700');ellipse(X,0,0,68,38,glow);
  for(let i=0;i<7;i++){const a=i*6.28/7;ellipse(X,Math.cos(a)*18,Math.sin(a)*9,5,4,'#80928b')}
@@ -515,7 +516,7 @@ function drawBase(){
 }
 function drawActivities(){
  const p=activityRules.BOARD;if(visible(p.x,p.y)){rounded(X,p.x-40,p.y-42,80,30,5,'#234f58');label(p.x,p.y-55,tr('PRACA I ZABAWA'));X.font='22px system-ui';X.textAlign='center';X.fillText('📋 🏁',p.x,p.y-20)}
- const g=activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y));if(g&&campActivities.completed>=3){rounded(X,g.x-52,g.y-38,104,76,7,'#785b3a');for(let i=0;i<6;i++){const x=g.x-32+(i%3)*32,y=g.y-18+Math.floor(i/3)*36;ellipse(X,x,y,10,12,'#619a47');if(campActivities.gardenClaimed<campActivities.completed)ellipse(X,x+4,y-2,5,5,'#dcc873')}label(g.x,g.y-52,tr('OGRÓDEK'))}
+ const g=activityRules.gardenPosition(basePos,baseLevel,isLand);if(g&&campActivities.completed>=3){rounded(X,g.x-52,g.y-38,104,76,7,'#785b3a');for(let i=0;i<6;i++){const x=g.x-32+(i%3)*32,y=g.y-18+Math.floor(i/3)*36;ellipse(X,x,y,10,12,'#619a47');if(campActivities.gardenClaimed<campActivities.completed)ellipse(X,x+4,y-2,5,5,'#dcc873')}label(g.x,g.y-52,tr('OGRÓDEK'))}
  if(raceRun){const target=activityRules.COURSE[raceRun.next];X.strokeStyle='#30c6e3';X.lineWidth=4;X.beginPath();X.arc(target.x,target.y,80,0,Math.PI*2);X.stroke();label(target.x,target.y-95,raceRun.next===3?tr('META'):String(raceRun.next+1))}
 }
 function drawChapters(){
@@ -841,7 +842,7 @@ function interact(){
  const chapterTarget=nearChapter();if(chapterTarget)return chapterInteract(chapterTarget.id);
  if(net.room){let target=null,d=75;for(const o of O){const q=distance(P,o);if(q<d){d=q;target=o}}return roomAction({kind:'interact',...(target?{target:target.id}:{})})}
  if(distance(P,activityRules.BOARD)<95)return toggle('workPanel',1);
- const garden=activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y));if(campActivities.completed>=3&&garden&&distance(P,garden)<95)return collectGarden();
+ const garden=activityRules.gardenPosition(basePos,baseLevel,isLand);if(campActivities.completed>=3&&garden&&distance(P,garden)<95)return collectGarden();
  if(distance(P,leon)<110)return toggle('shop',1);
  if(distance(P,nela)<110){
   if(treasure&&!returned){returned=1;coins+=250;xpv+=300;save();say(tr('Nela: Skarb odnaleziony! +250 monet, +300 XP.'))}return toggle('nelaPanel',1);
@@ -928,7 +929,7 @@ function remoteMotion(p){return p?.motion&&p.motion.remaining-Math.max(0,time-p.
 function cycleLook(key){if(!play||!soloReady())return;const max={shirt:6,skin:4,hair:4,style:3}[key];if(!max)return;myAppearance[key]=(myAppearance[key]+1)%max;appearancePreference={...myAppearance};try{localStorage.setItem('myIslandAppearanceV1',JSON.stringify(myAppearance))}catch(e){}if(net.room)syncRoom();else save();update();$('appearanceStatus').textContent=tr('Wygląd zapisany.');}
 function emote(kind){if(!play||!['wave','cheer'].includes(kind))return;if(net.room)return roomAction({kind:'emote',mode:kind});toggle('characterPanel',0);animateAction(kind);say(tr(kind==='wave'?'Machasz do znajomych.':'Cieszysz się z przygody!'));}
 function updateCharacterUI(){const look=characterRules.colors(myAppearance);for(const key of ['shirt','skin','hair']){$(key+'Preview').style.background=look[key];$(key+'Swatch').style.background=look[key];$(key+'Value').textContent=(myAppearance[key]+1)+'/'+({shirt:6,skin:4,hair:4}[key]);}$('hairStyle').textContent=tr(characterRules.STYLES[myAppearance.style]);}
-function chapterMarkers(){return chapterRules.markers(chapterState,gameState(),(x,y)=>!sea(x,y))}
+function chapterMarkers(){return chapterRules.markers(chapterState,gameState(),isLand)}
 function chapterGoal(all=chapterMarkers()){
  const order=chapterState.active==='compass'&&chapterState.compass.stage===2?chapterRules.RUNES[chapterState.compass.runes]?.id:null;if(order)return all.find(p=>p.id===order);
  let nearest,best=Infinity;for(const p of all){if(p.done)continue;const dx=P.x-p.x,dy=P.y-p.y,d=dx*dx+dy*dy;if(d<best){best=d;nearest=p}}return nearest;
@@ -957,8 +958,8 @@ function workAction(mode,item){
  else if(mode==='deliver'){const bank=gameState();if(!activityRules.deliverWork(campActivities,bank,P))return say(tr('Zbierz wymagane zasoby po przyjęciu zlecenia i podejdź do odbiorcy.'));applyBank(bank);say(tr('Zlecenie wykonane! Zapłata i XP są w plecaku.'))}
  else return;save();update();
 }
-function nearGarden(){const p=activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y));return p&&distance(P,p)<100}
-function collectGarden(){if(net.room)return roomAction({kind:'garden'});const bank=gameState();if(!activityRules.harvestGarden(campActivities,bank,P,(x,y)=>!sea(x,y)))return say(tr('Ogródek daje plony po ukończeniu kolejnego zlecenia. Podejdź do niego.'));applyBank(bank);save();update();say(tr('Zebrano 2 kokosy z ogródka.'))}
+function nearGarden(){const p=activityRules.gardenPosition(basePos,baseLevel,isLand);return p&&distance(P,p)<100}
+function collectGarden(){if(net.room)return roomAction({kind:'garden'});const bank=gameState();if(!activityRules.harvestGarden(campActivities,bank,P,isLand))return say(tr('Ogródek daje plony po ukończeniu kolejnego zlecenia. Podejdź do niego.'));applyBank(bank);save();update();say(tr('Zebrano 2 kokosy z ogródka.'))}
 function startRace(){if(net.room)return roomAction({kind:'race',mode:'start'});if(raceRun)return;if(distance(P,activityRules.BOARD)>=110)return say(tr('Podejdź do tablicy zleceń, żeby rozpocząć bieg.'));raceRun={next:0,elapsed:0};toggle('workPanel',0);say(tr('Bieg rozpoczęty! Odwiedź punkty po kolei.'))}
 function cancelRace(){if(net.room)return roomAction({kind:'race',mode:'cancel'});raceRun=null;update();say(tr('Bieg zakończony bez wyniku.'))}
 function updateWorkUI(){
@@ -1269,7 +1270,14 @@ function campaignFrame(timestamp,dt){
  }
 }
 addEventListener('resize',()=>{if(campaignMode)resizeCampaign()});
-function sceneState(){const markers=chapterMarkers(),goal=raceRun?null:chapterGoal(markers);return {appearance:characterRules.colors(myAppearance),motion:currentMotion(),fishes:F,chapterMarkers:markers.map(p=>({...p,label:tr(p.label)})),labels:{leon:tr('LEON · HANDEL'),nela:tr('NELA · ZADANIA'),board:tr('PRACA I ZABAWA'),finish:tr('META')},P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear:hasEquippedSpear(),spearOwned:!!spear,activities:campActivities,garden:activityRules.gardenPosition(basePos,baseLevel,(x,y)=>!sea(x,y)),board:activityRules.BOARD,trail:raceRun?activityRules.COURSE[raceRun.next]:(goal?{...goal,label:tr(goal.label)}:null),trailNumber:raceRun?raceRun.next+1:0,objects:O,resourceRevision,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):[]}}
+const sceneAppearance={},sceneLabels={},emptyScenePlayers=[];
+function sceneState(){
+ const markers=chapterMarkers();for(const marker of markers)marker.label=tr(marker.label);
+ const goal=raceRun?null:chapterGoal(markers);
+ characterRules.colorsInto(sceneAppearance,myAppearance);
+ sceneLabels.leon=tr('LEON · HANDEL');sceneLabels.nela=tr('NELA · ZADANIA');sceneLabels.board=tr('PRACA I ZABAWA');sceneLabels.finish=tr('META');
+ return {appearance:sceneAppearance,motion:currentMotion(),fishes:F,chapterMarkers:markers,labels:sceneLabels,P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear:hasEquippedSpear(),spearOwned:!!spear,activities:campActivities,garden:activityRules.gardenPosition(basePos,baseLevel,isLand),board:activityRules.BOARD,trail:raceRun?activityRules.COURSE[raceRun.next]:goal,trailNumber:raceRun?raceRun.next+1:0,objects:O,resourceRevision,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):emptyScenePlayers}
+}
 function updateView(){const active=!!islandView?.enabled;$('world3d').style.display=active?'block':'none';C.style.display=active?'none':'block';document.body.dataset.view=active?preferredCamera:'2d';$('viewButton').textContent=active?tr('Widok 3D'):tr('Widok 2D');$('viewButton').setAttribute('aria-pressed',String(active));$('cameraLeft').disabled=$('cameraRight').disabled=!active;$('cameraModeButton').disabled=!active;$('cameraModeButton').textContent=tr(preferredCamera==='first'?'Oczami postaci':'Zza postaci');$('cameraModeButton').setAttribute('aria-pressed',String(preferredCamera==='first'));$('viewHelp').textContent=active?tr('WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera'):tr('WASD / strzałki · E działaj · Shift sprint · spacja atak')}
 function switchView(){if(!islandView)return;preferredView=islandView.enabled?'2d':'3d';islandView.setEnabled(preferredView==='3d');viewHeading=null;resetInput();try{localStorage.setItem('myIslandViewV1',preferredView)}catch(e){}updateView()}
 function switchCamera(){if(!islandView?.enabled)return;preferredCamera=preferredCamera==='first'?'third':'first';islandView.setCamera?.(preferredCamera);viewHeading=null;resetInput();try{localStorage.setItem('myIslandCameraV1',preferredCamera)}catch(e){}updateView()}

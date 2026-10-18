@@ -63,6 +63,14 @@ test('3D scene reuses one expedition marker snapshot per frame',()=>{
   const calls=g.run(`(()=>{const original=chapterMarkers;let count=0;chapterMarkers=(...args)=>{count++;return original(...args)};try{sceneState()}finally{chapterMarkers=original}return count})()`);
   assert.equal(calls,1,'marker geometry and the active trail must share one snapshot');g.close();
 });
+test('3D scene reuses stable presentation buffers between frames',()=>{
+  const g=game(),first=g.run('sceneState()'),second=g.run('sceneState()');
+  assert.equal(first.appearance,second.appearance);
+  assert.equal(first.labels,second.labels);
+  assert.equal(first.players,second.players);
+  assert.equal(g.run('sceneState().labels.leon'), 'LEON · HANDEL');
+  g.close();
+});
 
 test('remote avatar appearance and motion reuse their frame buffers',()=>{
   const look={},same=colorsInto(look,{shirt:4,skin:2,hair:3,style:1});
