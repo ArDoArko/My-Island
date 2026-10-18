@@ -6,7 +6,7 @@ import { createIslandTerrain } from './archipelago-terrain.mjs';
 import { createMaterials, cameraPose, intersectRaycastInto, stabilizeSunShadow } from './island-environment.mjs';
 import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
 import { sceneryBlocked } from './campaign-scenery.mjs';
-import { SCALE, docks, points, PEOPLE, ground, goal, nearby } from './campaign.mjs';
+import { SCALE, docks, points, PEOPLE, ground, goal, goalInto, candidatesInto, selectNearby } from './campaign.mjs';
 
 export function updateCampaignShadowState(cache,state,animated=false){
   const area=state.interior||'',boat=!!state.boat,x=Math.round(state.p.x/20),z=Math.round(state.p.z/20),
@@ -377,6 +377,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const tracer=new T.Line(new T.BufferGeometry().setAttribute('position',tracerPosition),new T.LineBasicMaterial({color:'#ffe8ad'}));tracer.frustumCulled=false;scene.add(tracer);
   const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()},cameraHits=[];
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
+  const goalState={},nearbyCandidates=[];
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0;
   const shadowState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
@@ -428,7 +429,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       const point=freed?escortPoints[p.id]:p;
       placeHuman(model,point,area?0:ground(point.x,point.z),s.heading,freed&&s.walking,seconds+p.id*.18);
     }
-    const g=goal(s).target,n=nearby(s),mark=n||g;
+    const g=goalInto(goalState,s).target,n=selectNearby(candidatesInto(nearbyCandidates,s),s.p),mark=n||g;
     halo.visible=!!mark;
     if(mark)halo.position.set(mark.x/SCALE,(area?0:ground(mark.x,mark.z))+.08,mark.z/SCALE);
     halo.scale.setScalar(1+Math.sin(seconds*3)*.10);

@@ -12,6 +12,7 @@ export const dist = (a,b) => Math.hypot(a.x-b.x,a.z-b.z);
 const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
 const dockList=Object.values(docks);
 export const PEOPLE = Array.from({length:5},(_,id)=>({id,x:(id-2)*38,z:-80,child:id>2}));
+const cellIds=PEOPLE.map(p=>'cell-'+p.id),dockIds=Object.fromEntries(dockList.map(d=>[d.id,'dock-'+d.id]));
 export function fresh() {
   return {version:VERSION,worldVersion:WORLD_VERSION,p:{x:docks.home.x+180,z:docks.home.z+70},heading:Math.PI,
     boat:true,boatAt:'home',interior:null,island:'home',fuel:12,hp:100,ammo:0,
@@ -149,30 +150,34 @@ function closestDock(s) {
   for(const dock of dockList){const dx=dock.x-s.p.x,dz=dock.z-s.p.z,distance=dx*dx+dz*dz;if(distance<bestDistance){best=dock;bestDistance=distance;}}
   return best;
 }
-export function candidates(s) {
-  if(s.interior==='cave')return [
-    {id:'paper',...points.paper,label:s.paper?(s.gun?'supplies':'take-gun'):'move-paper'},
-    {id:'cave-exit',...points.caveExit,label:'leave-cave'}
-  ];
-  if(s.interior==='estate')return [
-    {id:'key',...points.key,label:'take-key'},
-    {id:'stairs',...points.stairs,label:'cellar'},
-    {id:'estate-exit',...points.estateExit,label:'leave-estate'}
-  ];
-  if(s.interior==='cellar')return [
-    ...PEOPLE.filter(p=>!s.released.includes(p.id)).map(p=>({...p,id:'cell-'+p.id,label:'free-person'})),
-    {id:'cellar-exit',...points.cellarExit,label:'upstairs'}
-  ];
-  if(s.boat){const d=closestDock(s);return d?[{...d,id:'dock-'+d.id,label:'dock'}]:[];}
-  const d=docks[s.island],out=[{...d.shore,id:'boat',label:s.released.length===5&&!s.boarded?'board-group':'boat'}];
-  if(s.island==='home')out.push({id:'pump',...points.pump,label:'refuel'});
-  if(s.island==='jungle')out.push({id:'cave',...points.cave,label:'enter-cave'},{id:'supply',...points.supply,label:'supplies'});
-  if(s.island==='fortress')out.push({id:'estate',...points.estate,label:'enter-estate'});
-  if(['highlands','smugglers','paradise'].includes(s.island)){
-    const i=ISLAND_BY_ID[s.island];out.push({id:'supplies',x:i.x,z:i.z,label:'supplies'});
-  }
-  return out;
+function candidateInto(out,index,id,point,label){
+  const candidate=out[index]||(out[index]={});Object.assign(candidate,point);candidate.id=id;candidate.label=label;return index+1;
 }
+export function candidatesInto(out,s) {
+  let count=0;
+  if(s.interior==='cave'){
+    count=candidateInto(out,count,'paper',points.paper,s.paper?(s.gun?'supplies':'take-gun'):'move-paper');
+    count=candidateInto(out,count,'cave-exit',points.caveExit,'leave-cave');out.length=count;return out;
+  }
+  if(s.interior==='estate'){
+    count=candidateInto(out,count,'key',points.key,'take-key');count=candidateInto(out,count,'stairs',points.stairs,'cellar');
+    count=candidateInto(out,count,'estate-exit',points.estateExit,'leave-estate');out.length=count;return out;
+  }
+  if(s.interior==='cellar'){
+    for(const p of PEOPLE)if(!s.released.includes(p.id))count=candidateInto(out,count,cellIds[p.id],p,'free-person');
+    count=candidateInto(out,count,'cellar-exit',points.cellarExit,'upstairs');out.length=count;return out;
+  }
+  if(s.boat){const d=closestDock(s);if(d)count=candidateInto(out,count,dockIds[d.id],d,'dock');out.length=count;return out;}
+  const d=docks[s.island];count=candidateInto(out,count,'boat',d.shore,s.released.length===5&&!s.boarded?'board-group':'boat');
+  if(s.island==='home')count=candidateInto(out,count,'pump',points.pump,'refuel');
+  if(s.island==='jungle'){count=candidateInto(out,count,'cave',points.cave,'enter-cave');count=candidateInto(out,count,'supply',points.supply,'supplies');}
+  if(s.island==='fortress')count=candidateInto(out,count,'estate',points.estate,'enter-estate');
+  if(['highlands','smugglers','paradise'].includes(s.island)){
+    const i=ISLAND_BY_ID[s.island];count=candidateInto(out,count,'supplies',i,'supplies');
+  }
+  out.length=count;return out;
+}
+export function candidates(s) {return candidatesInto([],s);}
 export function selectNearby(list,position) {
   let best=null,bestDistance=Infinity;
   for(const point of list){
@@ -228,36 +233,36 @@ export function interact(s) {
   }
   return true;
 }
-function objective(s) {
-  if(s.complete)return {key:'complete',target:null};
-  if(!s.docked)return {key:'dock-goal',target:docks.home};
-  if(!s.tanked)return {key:'fuel-goal',target:s.boat?docks.home:points.pump};
+function objectiveInto(out,s) {
+  if(s.complete){out.key='complete';out.target=null;return out;}
+  if(!s.docked){out.key='dock-goal';out.target=docks.home;return out;}
+  if(!s.tanked){out.key='fuel-goal';out.target=s.boat?docks.home:points.pump;return out;}
   if(!s.gun){
-    if(s.interior==='cave')return {key:s.paper?'gun-goal':'paper-goal',target:points.paper};
-    return {key:'cave-goal',target:s.boat?docks.jungle:s.island==='jungle'?points.cave:docks[s.island].shore};
+    if(s.interior==='cave'){out.key=s.paper?'gun-goal':'paper-goal';out.target=points.paper;return out;}
+    out.key='cave-goal';out.target=s.boat?docks.jungle:s.island==='jungle'?points.cave:docks[s.island].shore;return out;
   }
-  if(s.interior==='cave')return {key:'exit-cave-goal',target:points.caveExit};
+  if(s.interior==='cave'){out.key='exit-cave-goal';out.target=points.caveExit;return out;}
   if(!s.key){
     if(s.interior==='estate'){
       const boss=s.guards.find(g=>g.id==='boss');
-      return {key:boss.hp>0?'boss-goal':'key-goal',target:boss.hp>0?boss:points.key};
+      out.key=boss.hp>0?'boss-goal':'key-goal';out.target=boss.hp>0?boss:points.key;return out;
     }
-    return {key:'estate-goal',target:s.boat?docks.fortress:s.island==='fortress'?points.estate:docks[s.island].shore};
+    out.key='estate-goal';out.target=s.boat?docks.fortress:s.island==='fortress'?points.estate:docks[s.island].shore;return out;
   }
   if(s.released.length<5){
-    return s.interior==='cellar'?{key:'people-goal',target:PEOPLE.find(p=>!s.released.includes(p.id))}:
-      {key:'cellar-goal',target:s.interior==='estate'?points.stairs:s.boat?docks.fortress:points.estate};
+    out.key=s.interior==='cellar'?'people-goal':'cellar-goal';out.target=s.interior==='cellar'?PEOPLE.find(p=>!s.released.includes(p.id)):
+      s.interior==='estate'?points.stairs:s.boat?docks.fortress:points.estate;return out;
   }
-  if(s.interior)return {key:'escort-goal',target:s.interior==='cellar'?points.cellarExit:points.estateExit};
-  if(!s.boarded)return {key:'boat-goal',target:docks.fortress.shore};
-  return {key:'home-goal',target:s.boat?docks.home:s.island==='home'?docks.home.shore:docks[s.island].shore};
+  if(s.interior){out.key='escort-goal';out.target=s.interior==='cellar'?points.cellarExit:points.estateExit;return out;}
+  if(!s.boarded){out.key='boat-goal';out.target=docks.fortress.shore;return out;}
+  out.key='home-goal';out.target=s.boat?docks.home:s.island==='home'?docks.home.shore:docks[s.island].shore;return out;
 }
-export function goal(s) {
-  const result=objective(s);
-  if(s.boat||s.interior||!result.target)return result;
+export function goalInto(out,s) {
+  objectiveInto(out,s);
+  if(s.boat||s.interior||!out.target)return out;
   const dock=docks[s.island],onPier=!!pierAt(s.p.x,s.p.z,s.island);
-  if(result.target===dock.shore){
-    if(!onPier&&dist(s.p,dock.land)>65)return {...result,target:dock.land};
-  }else if(onPier&&dist(s.p,dock.land)>45)return {...result,target:dock.land};
-  return result;
+  if(out.target===dock.shore){if(!onPier&&dist(s.p,dock.land)>65)out.target=dock.land;}
+  else if(onPier&&dist(s.p,dock.land)>45)out.target=dock.land;
+  return out;
 }
+export function goal(s) {return goalInto({},s);}

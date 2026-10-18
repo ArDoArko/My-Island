@@ -30,6 +30,16 @@ test('campaign interaction selection stays linear, strict and stable on ties',()
   assert.equal(C.selectNearby([{id:'dock-home',x:125,z:0}],position),null,'the docking radius stays strict');
 });
 
+test('3D campaign targets reuse candidate and objective buffers',()=>{
+  const s=C.fresh(),candidates=[],goal={};s.interior='cave';
+  assert.equal(C.candidatesInto(candidates,s),candidates);const first=candidates[0];
+  assert.equal(C.candidatesInto(candidates,s),candidates);assert.equal(candidates[0],first);
+  assert.equal(C.goalInto(goal,s),goal);assert.equal(goal.key,'dock-goal');
+  s.docked=true;s.tanked=true;s.gun=true;s.key=true;s.boat=false;s.interior='cellar';s.released=[];s.p={x:0,z:-80};
+  C.candidatesInto(candidates,s);assert.equal(candidates.length,6);assert.equal(candidates[0],first);assert.equal(candidates[0].id,'cell-0');
+  assert.equal(C.goalInto(goal,s),goal);assert.equal(goal.key,'people-goal');assert.equal(goal.target,C.PEOPLE[0]);
+});
+
 test('entire physical rescue route, combat, five cells and boat evacuation survive reloads',()=>{
   let s=C.fresh();assert.equal(C.goal(s).key,'dock-goal');
   actAt(s,C.docks.home);assert(!s.boat);travel(s,C.docks.home.land);actAt(s,C.points.pump);
