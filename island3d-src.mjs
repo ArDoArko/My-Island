@@ -67,6 +67,14 @@ export function updateBaseFrame(cache,pos,level){
   cache.ready=true;cache.x=x;cache.y=y;cache.level=baseLevel;
   cache.layout=baseLayout(pos,level);cache.elevation=baseElevation(cache.layout);return true;
 }
+export function updateBuildingState(cache,state={}){
+  const activities=state.activities||{},completed=activities.completed||0,baseX=state.basePos?.x??null,baseY=state.basePos?.y??null;
+  const level=state.baseLevel??null,campfire=state.campfire??null,fireX=state.fire?.x??null,fireY=state.fire?.y??null;
+  const first=completed>=1,garden=completed>=3,flag=completed>=6,ready=garden&&activities.gardenClaimed<completed,raceWon=activities.raceWon??null;
+  if(cache.ready&&cache.level===level&&cache.baseX===baseX&&cache.baseY===baseY&&cache.campfire===campfire&&cache.fireX===fireX&&cache.fireY===fireY&&cache.first===first&&cache.garden===garden&&cache.flag===flag&&cache.harvest===ready&&cache.raceWon===raceWon)return false;
+  cache.ready=true;cache.level=level;cache.baseX=baseX;cache.baseY=baseY;cache.campfire=campfire;cache.fireX=fireX;cache.fireY=fireY;
+  cache.first=first;cache.garden=garden;cache.flag=flag;cache.harvest=ready;cache.raceWon=raceWon;return true;
+}
 export function walkSurface(x,z,layout,elevation=baseElevation(layout)){
   const y=terrainHeight(x,z);if(!layout)return y;
   const f=layout.floor;if(Math.abs(x*SCALE-f.x)<=f.w/2&&Math.abs(z*SCALE-f.y)<=f.h/2)return Math.max(y,elevation+.16);
@@ -383,10 +391,10 @@ export function create({canvas,terrain,getState,onLost}) {
   const trailRing=new T.Mesh(new T.RingGeometry(.93,1.06,40),new T.MeshBasicMaterial({color:'#54e4ef',transparent:true,opacity:.85,side:T.DoubleSide,depthWrite:false}));trailRing.rotation.x=-Math.PI/2;trailRing.position.y=.04;trailRoot.add(trailRing);
   const trailBeam=mesh(trailRoot,new T.CylinderGeometry(.035,.035,1,8),new T.MeshBasicMaterial({color:'#76eff7',transparent:true,opacity:.5}),[0,1.25,0],[1,2.5,1],false);
   let trailTag=null,trailNumber=0;
-  let buildingsKey='',buildings=new T.Group(),fireLight=null,flame=null,cutaway=[];scene.add(buildings);
+  const buildingsState={};let buildings=new T.Group(),fireLight=null,flame=null,cutaway=[];scene.add(buildings);
   function updateBuildings(s){
     const n=s.activities?.completed||0,ready=n>=3&&s.activities.gardenClaimed<n;
-    const key=JSON.stringify([s.baseLevel,s.basePos,s.campfire,s.fire,n>=1,n>=3,n>=6,ready,s.activities?.raceWon]);if(key===buildingsKey)return;buildingsKey=key;
+    if(!updateBuildingState(buildingsState,s))return;
     if(flame){flame.geometry.dispose();flame.material.dispose();}for(const m of cutaway)m.dispose();cutaway=[];scene.remove(buildings);buildings=new T.Group();scene.add(buildings);flame=null;fireLight=null;
     if(s.basePos&&s.baseLevel){
       const b=frameBase,hut=detailBase(buildBase(b,frameElevation,{cube,tube}),b,{cube,tube},materials);buildings.add(hut);

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, stabilizeSunShadow } from '../island-environment.mjs';
-import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateBaseFrame } from '../island3d-src.mjs';
+import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateBaseFrame, updateBuildingState } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { game } from './game-harness.mjs';
 
@@ -66,6 +66,15 @@ test('base terrain layout and elevation stay cached until the saved base changes
   assert.equal(updateBaseFrame(cache,{x:1901,y:1250},3),true,'moving the base must invalidate the cached terrain frame');
   assert.notEqual(cache.layout,layout);
   assert.equal(updateBaseFrame(cache,{x:1901,y:1250},4),true,'upgrading the base must invalidate its layout');
+});
+
+test('unchanged building snapshots skip per-frame JSON allocation and rebuilds',()=>{
+  const cache={},snapshot={baseLevel:2,basePos:{x:1900,y:1250},campfire:1,fire:{x:1750,y:1400},activities:{completed:3,gardenClaimed:2,raceWon:0}};
+  assert.equal(updateBuildingState(cache,snapshot),true);
+  assert.equal(updateBuildingState(cache,{...snapshot,basePos:{x:1900,y:1250},fire:{x:1750,y:1400},activities:{...snapshot.activities}}),false,'equivalent fresh scene snapshots must not rebuild static meshes');
+  assert.equal(updateBuildingState(cache,{...snapshot,fire:{x:1751,y:1400}}),true,'moving the fire must rebuild its mesh');
+  assert.equal(updateBuildingState(cache,{...snapshot,activities:{completed:6,gardenClaimed:2,raceWon:0}}),true,'crossing a visible work threshold must rebuild the base');
+  assert.equal(updateBuildingState(cache,{...snapshot,activities:{completed:3,gardenClaimed:3,raceWon:0}}),true,'claiming the garden must remove its harvest mesh');
 });
 
 test('camera pose can reuse its vectors without changing first- or third-person geometry',()=>{
