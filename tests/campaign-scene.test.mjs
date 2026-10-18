@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { createCampaignView, updateCampaignShadowState, updateEscortPoints, updateLineSegment } from '../campaign-view.mjs';
+import { createCampaignView, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -32,6 +32,21 @@ test('shot tracer updates one reusable GPU position buffer',()=>{
   const position=new T.Float32BufferAttribute(new Float32Array(6),3),version=position.version;
   assert.equal(updateLineSegment(position,{x:40,z:-20},{x:-60,z:80},1.35,20),position);
   assert.equal(position.version,version+1);assert.deepEqual(Array.from(position.array),[2,1.350000023841858,-1,-3,1.350000023841858,4]);
+});
+
+test('campaign walk cycle shares exact trigonometric samples across each body',()=>{
+  const cycle={};
+  for(const walking of [false,true])for(const seconds of [0,.13,1.2]){
+    assert.equal(updateCampaignWalkCycle(cycle,seconds,walking),cycle);
+    const phase=seconds*7,step=walking?.24:0;
+    assert.equal(cycle.swing,Math.sin(phase));assert.equal(cycle.step,step);assert.equal(cycle.bounce,walking?Math.cos(phase*2):0);
+    for(const side of [-1,1]){
+      const oldLeg=Math.sin(phase+(side<0?Math.PI:0))*step,newLeg=(side<0?-cycle.swing:cycle.swing)*step;
+      const oldArm=walking?Math.sin(phase+(side<0?0:Math.PI))*.25:0,newArm=walking?(side<0?cycle.swing:-cycle.swing)*.25:0;
+      assert(Math.abs(oldLeg-newLeg)<1e-12);assert(Math.abs(oldArm-newArm)<1e-12);
+      assert(Math.abs(Math.max(0,-oldLeg)-Math.max(0,-newLeg))<1e-12);
+    }
+  }
 });
 
 test('real Three.js campaign geometry and both cameras run through every mission area without GPU rendering',()=>{

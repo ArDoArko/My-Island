@@ -37,6 +37,12 @@ export function updateLineSegment(position,a,b,y,scale=SCALE){
   return position;
 }
 
+export function updateCampaignWalkCycle(out,seconds,walking){
+  const phase=seconds*7;
+  out.swing=Math.sin(phase);out.step=walking?.24:0;out.bounce=walking?Math.cos(phase*2):0;
+  return out;
+}
+
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
   const renderer=rendererFactory({canvas,antialias:true,powerPreference:'high-performance'});
   const mobile=innerWidth<=700;
@@ -337,7 +343,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   }
   const self=prepareCampaignPerson(makeHuman({shirt:'#577c87',skin:'#ddb08c',hair:'#40362f'},'player',helpers),0,'campaign-player');
   self.root.name='campaign-player';scene.add(self.root);const guardModels=new Map(),prisoners=new Map();
-  const releasedMask=new Uint8Array(PEOPLE.length),escortPoints=PEOPLE.map(()=>({x:0,z:0}));
+  const releasedMask=new Uint8Array(PEOPLE.length),escortPoints=PEOPLE.map(()=>({x:0,z:0})),walkCycle={swing:0,step:0,bounce:0};
   const guardLooks={
     gate:{shirt:'#526252',skin:'#c29574',hair:'#302e28',style:0},
     patrol:{shirt:'#59665a',skin:'#a96f55',hair:'#211f1e',style:1},
@@ -385,10 +391,10 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   function placeHuman(person,p,height,heading,walking,seconds){
     posedCharacters++;
     person.root.position.set(p.x/SCALE,height,p.z/SCALE);person.root.rotation.set(0,0,0);person.rig.rotation.y=heading;
-    const phase=seconds*7,step=walking?.24:0;
-    for(const leg of person.legs){leg.thigh.rotation.x=Math.sin(phase+(leg.side<0?Math.PI:0))*step;leg.calf.rotation.x=Math.max(0,-Math.sin(phase+(leg.side<0?Math.PI:0)))*step;leg.shoe.rotation.x=-leg.calf.rotation.x*.6;}
-    for(const a of person.arms){a.arm.rotation.x=walking?Math.sin(phase+(a.side<0?0:Math.PI))*.25:0;a.arm.rotation.z=0;a.forearm.rotation.x=-.18;}
-    person.hips.position.y=.87+(walking?Math.cos(phase*2)*.009:0);
+    const cycle=updateCampaignWalkCycle(walkCycle,seconds,walking);
+    for(const leg of person.legs){const swing=(leg.side<0?-cycle.swing:cycle.swing)*cycle.step;leg.thigh.rotation.x=swing;leg.calf.rotation.x=Math.max(0,-swing);leg.shoe.rotation.x=-leg.calf.rotation.x*.6;}
+    for(const a of person.arms){a.arm.rotation.x=walking?(a.side<0?cycle.swing:-cycle.swing)*.25:0;a.arm.rotation.z=0;a.forearm.rotation.x=-.18;}
+    person.hips.position.y=.87+cycle.bounce*.009;
   }
   function frame(now) {
     if(!enabled||lost)return;
