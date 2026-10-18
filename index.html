@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
 <title>My Island 0.21 — Akcja ratunkowa</title>
-<script defer src="island3d.bundle.js?v=0.21.80"></script>
+<script defer src="island3d.bundle.js?v=0.21.81"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -311,7 +311,7 @@ body.campaign-active[data-campaign-camera="third"] #lookReticle,body.campaign-ac
  <p class="intro"><span data-i18n="Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.">Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.</span></p>
  <div class="language-options"><button data-language="pl" onclick="setLanguage('pl')">Polski</button><button data-language="en" onclick="setLanguage('en')">English</button><button data-language="nl" onclick="setLanguage('nl')">Nederlands</button><button data-language="de" onclick="setLanguage('de')">Deutsch</button><button data-language="fr" onclick="setLanguage('fr')">Français</button><button data-language="es" onclick="setLanguage('es')">Español</button></div>
 </div>
-<script src="campaign.bundle.js?v=0.21.80"></script>
+<script src="campaign.bundle.js?v=0.21.81"></script>
 <script src="i18n.bundle.js?v=0.21"></script>
 <script src="wildlife.bundle.js?v=0.18"></script>
 <script src="island-play.bundle.js?v=0.18"></script>
@@ -1279,6 +1279,20 @@ function campaignFrame(timestamp,dt){
 }
 addEventListener('resize',()=>{if(campaignMode)resizeCampaign()});
 const sceneAppearance={},sceneLabels={},emptyScenePlayers=[],scenePlayerBuffer=[],sceneSnapshot={},sceneMotion={kind:null,phase:0};
+const sceneChapterCache={ready:false,markers:[]};
+function sceneChapterMarkers(){
+ const c=chapterState.compass,b=chapterState.beacons,language=MyIslandI18n.current(),baseX=basePos?.x??null,baseY=basePos?.y??null;
+ const same=sceneChapterCache.ready&&sceneChapterCache.active===chapterState.active&&sceneChapterCache.compassStage===c.stage&&sceneChapterCache.compassRunes===c.runes&&
+  sceneChapterCache.foundLength===c.found.length&&sceneChapterCache.found0===c.found[0]&&sceneChapterCache.found1===c.found[1]&&sceneChapterCache.found2===c.found[2]&&
+  sceneChapterCache.beaconStage===b.stage&&sceneChapterCache.litLength===b.lit.length&&sceneChapterCache.lit0===b.lit[0]&&sceneChapterCache.lit1===b.lit[1]&&sceneChapterCache.lit2===b.lit[2]&&
+  sceneChapterCache.baseX===baseX&&sceneChapterCache.baseY===baseY&&sceneChapterCache.baseLevel===baseLevel&&sceneChapterCache.language===language;
+ if(same)return sceneChapterCache.markers;
+ sceneChapterCache.ready=true;sceneChapterCache.active=chapterState.active;sceneChapterCache.compassStage=c.stage;sceneChapterCache.compassRunes=c.runes;
+ sceneChapterCache.foundLength=c.found.length;sceneChapterCache.found0=c.found[0];sceneChapterCache.found1=c.found[1];sceneChapterCache.found2=c.found[2];
+ sceneChapterCache.beaconStage=b.stage;sceneChapterCache.litLength=b.lit.length;sceneChapterCache.lit0=b.lit[0];sceneChapterCache.lit1=b.lit[1];sceneChapterCache.lit2=b.lit[2];
+ sceneChapterCache.baseX=baseX;sceneChapterCache.baseY=baseY;sceneChapterCache.baseLevel=baseLevel;sceneChapterCache.language=language;
+ const markers=chapterMarkers();for(const marker of markers)marker.label=tr(marker.label);sceneChapterCache.markers=markers;return markers;
+}
 function scenePlayers(){
  scenePlayerBuffer.length=net.players.length;
  for(let i=0;i<net.players.length;i++){
@@ -1288,7 +1302,7 @@ function scenePlayers(){
  return scenePlayerBuffer;
 }
 function sceneState(){
- const markers=chapterMarkers();for(const marker of markers)marker.label=tr(marker.label);
+ const markers=sceneChapterMarkers();
  const goal=raceRun?null:chapterGoal(markers);
  characterRules.colorsInto(sceneAppearance,myAppearance);
  sceneLabels.leon=tr('LEON · HANDEL');sceneLabels.nela=tr('NELA · ZADANIA');sceneLabels.board=tr('PRACA I ZABAWA');sceneLabels.finish=tr('META');

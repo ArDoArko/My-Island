@@ -63,6 +63,14 @@ test('3D scene reuses one expedition marker snapshot per frame',()=>{
   const calls=g.run(`(()=>{const original=chapterMarkers;let count=0;chapterMarkers=(...args)=>{count++;return original(...args)};try{sceneState()}finally{chapterMarkers=original}return count})()`);
   assert.equal(calls,1,'marker geometry and the active trail must share one snapshot');g.close();
 });
+test('3D scene caches expedition geometry until mission, base or language changes',()=>{
+  const g=game();g.run('startGame();startChapter("compass")');
+  assert.equal(g.run('(()=>{const a=sceneState().chapterMarkers,b=sceneState().chapterMarkers;return a===b})()'),true);
+  assert.equal(g.run('(()=>{const a=sceneState().chapterMarkers;chapterState.compass.found.push("west");const b=sceneState().chapterMarkers;return a!==b&&b.length===2})()'),true);
+  assert.equal(g.run('(()=>{const a=sceneState().chapterMarkers;basePos={x:900,y:1350};baseLevel=3;const b=sceneState().chapterMarkers;return a!==b})()'),true);
+  assert.equal(g.run('(()=>{const a=sceneState().chapterMarkers;MyIslandI18n.set("en",document);const b=sceneState().chapterMarkers;return a!==b})()'),true);
+  g.close();
+});
 test('3D scene reuses stable presentation buffers between frames',()=>{
   const g=game(),first=g.run('sceneState()'),second=g.run('sceneState()');
   assert.equal(first,second);
