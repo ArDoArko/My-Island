@@ -2,8 +2,12 @@ export const SHIRTS=['#4c9cba','#df8168','#9974c7','#76b677','#e3b04c','#df71a7'
 export const SKINS=['#e3b185','#be895f','#efc69d','#a67152'];
 export const HAIRS=['#463b32','#24282b','#99673b','#c9a465'];
 export const STYLES=['Krótkie włosy','Kucyk','Kręcone włosy'];
+const appearanceIndex=(value,key,max)=>Number.isInteger(value?.[key])&&value[key]>=0&&value[key]<max?value[key]:0;
 export function appearance(value){const out={shirt:0,skin:0,hair:0,style:0};for(const [key,max] of [['shirt',6],['skin',4],['hair',4],['style',3]])if(Number.isInteger(value?.[key])&&value[key]>=0&&value[key]<max)out[key]=value[key];return out}
-export function colors(value){const a=appearance(value);return {shirt:SHIRTS[a.shirt],skin:SKINS[a.skin],hair:HAIRS[a.hair],style:a.style}}
+export function colorsInto(out,value){
+  out.shirt=SHIRTS[appearanceIndex(value,'shirt',6)];out.skin=SKINS[appearanceIndex(value,'skin',4)];out.hair=HAIRS[appearanceIndex(value,'hair',4)];out.style=appearanceIndex(value,'style',3);return out;
+}
+export function colors(value){return colorsInto({},value)}
 export const MOTIONS={gather:1000,fish:1500,cook:1200,wave:2000,cheer:2000};
 export function motionPose(kind,phase){
   const swing=Math.sin(phase*Math.PI*4);

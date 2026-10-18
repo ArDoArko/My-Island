@@ -1,6 +1,6 @@
 import * as T from 'three';
 import { BOARD, baseLayout } from './island-play.mjs';
-import { colors, motionPose, MOTIONS } from './character.mjs';
+import { colors, colorsInto, motionPose, MOTIONS } from './character.mjs';
 import { createMaterials, cameraPose, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, addGroundCover, detailBase, terrainMask } from './island-environment.mjs';
 import { createArchipelagoGroup, islandElevation } from './archipelago-terrain.mjs';
 import { ISLANDS, getIslandAt } from './archipelago-layout.mjs';
@@ -16,6 +16,7 @@ const coasts = [[1750,1300,1540,970],[3380,500,520,310],[4100,2400,390,290]];
 const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
 const smooth = v => { v=clamp(v,0,1);return v*v*(3-2*v); };
 const angleDelta = (a,b) => Math.atan2(Math.sin(b-a),Math.cos(b-a));
+const emptyLook=Object.freeze({});
 export function terrainHeight(x,z) {
   const px=x*SCALE,pz=z*SCALE;
   let edge=-1;
@@ -34,6 +35,11 @@ export function nearestWithin(objects,point,radius=75){
     if(distance<best){nearest=object;best=distance;}
   }
   return nearest;
+}
+export function updateRemoteMotion(out,motion,received,now){
+  const remaining=motion&&motion.remaining-(now-received);
+  if(!(remaining>0))return null;
+  out.kind=motion.kind;out.phase=1-remaining/(MOTIONS[motion.kind]||1000);return out;
 }
 export function scaleWorldLabels(labels,camera,width,position=new T.Vector3()){
   const cap=Math.min(240,width*.52),projection=camera.projectionMatrix.elements[0]*width/2;
@@ -499,13 +505,14 @@ export function create({canvas,terrain,getState,onLost}) {
     animatePerson(guide,s.nela,Math.atan2(x-s.nela.x/SCALE,z-s.nela.y/SCALE),false,seconds,step,0,s.sea);
     present.clear();
     for(const p of s.players){
-      if(p.id===s.you)continue;present.add(p.id);let person=people.get(p.id);
-      const look=p.appearance?colors(p.appearance):s.looks[p.slot]||{};
-      if(!person||person.name!==p.name){if(person)removePerson(person);person=human(look,'player',p.name);people.set(p.id,person);}
+      if(p.id===s.you)continue;present.add(p.id);let person=people.get(p.id),look;
+      const fallback=s.looks[p.slot]||emptyLook;
+      if(!person||person.name!==p.name){look=p.appearance?colors(p.appearance):fallback;if(person)removePerson(person);person=human(look,'player',p.name);person.remoteLook={...look};person.remoteMotion={kind:null,phase:0};people.set(p.id,person);}
+      else look=p.appearance?colorsInto(person.remoteLook,p.appearance):fallback;
       updateLook(person,look);
       const dx=person.lastX===null?0:p.point.x/SCALE-person.lastX,dz=person.lastZ===null?0:p.point.y/SCALE-person.lastZ;
       const heading=p.moving&&Math.hypot(dx,dz)>.002?Math.atan2(dx,dz):facing[p.face]||0;
-      const motion=p.motion&&p.motion.remaining-(now-p.received)>0?{kind:p.motion.kind,phase:1-(p.motion.remaining-(now-p.received))/(MOTIONS[p.motion.kind]||1000)}:null;
+      const motion=updateRemoteMotion(person.remoteMotion,p.motion,p.received,now);
       animatePerson(person,p.point,heading,p.moving,seconds,step,3,s.sea,false,motion,s.spearOwned&&!p.spearStowed,p.blocked);
     }
     for(const [id,p] of people)if(!present.has(id)){removePerson(p);people.delete(id);}

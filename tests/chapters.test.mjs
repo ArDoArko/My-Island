@@ -4,8 +4,8 @@ import {readFileSync} from 'node:fs';
 import {Box3} from 'three';
 import {game,controller} from './game-harness.mjs';
 import {freshAdventures,adventureAction,markers,FRAGMENTS,RUNES,SIGNALS,CHAPTERS,objective,COMPASS_CHEST} from '../expeditions.mjs';
-import {colors,appearance,STYLES,MOTIONS} from '../character.mjs';
-import {buildHuman,actionPose,fishPose,SCALE} from '../island3d-src.mjs';
+import {colors,colorsInto,appearance,STYLES,MOTIONS} from '../character.mjs';
+import {buildHuman,actionPose,fishPose,updateRemoteMotion,SCALE} from '../island3d-src.mjs';
 import {sceneSolids,freePoint,baseLayout} from '../island-play.mjs';
 
 const plain=x=>JSON.parse(JSON.stringify(x));
@@ -62,6 +62,16 @@ test('3D scene reuses one expedition marker snapshot per frame',()=>{
   const g=game();g.run('startGame();startChapter("compass")');
   const calls=g.run(`(()=>{const original=chapterMarkers;let count=0;chapterMarkers=(...args)=>{count++;return original(...args)};try{sceneState()}finally{chapterMarkers=original}return count})()`);
   assert.equal(calls,1,'marker geometry and the active trail must share one snapshot');g.close();
+});
+
+test('remote avatar appearance and motion reuse their frame buffers',()=>{
+  const look={},same=colorsInto(look,{shirt:4,skin:2,hair:3,style:1});
+  assert.equal(same,look);assert.deepEqual(look,colors({shirt:4,skin:2,hair:3,style:1}));
+  assert.equal(colorsInto(look,{shirt:99,skin:-1,hair:2.5,style:'bad'}),look);assert.deepEqual(look,colors());
+  const motion={};
+  assert.equal(updateRemoteMotion(motion,{kind:'wave',remaining:2000},1000,1500),motion);
+  assert.equal(motion.kind,'wave');assert.equal(motion.phase,.25);
+  assert.equal(updateRemoteMotion(motion,{kind:'wave',remaining:2000},1000,3000),null);
 });
 
 test('new menus remain operable by a pad and all six languages while view changes keep expedition progress',()=>{
