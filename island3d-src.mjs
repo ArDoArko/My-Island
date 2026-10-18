@@ -17,6 +17,7 @@ const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
 const smooth = v => { v=clamp(v,0,1);return v*v*(3-2*v); };
 const angleDelta = (a,b) => Math.atan2(Math.sin(b-a),Math.cos(b-a));
 const emptyLook=Object.freeze({});
+const SIDE_COS=Math.cos(1),SIDE_SIN=Math.sin(1);
 export function terrainHeight(x,z) {
   const px=x*SCALE,pz=z*SCALE;
   let edge=-1;
@@ -40,6 +41,15 @@ export function updateRemoteMotion(out,motion,received,now){
   const remaining=motion&&motion.remaining-(now-received);
   if(!(remaining>0))return null;
   out.kind=motion.kind;out.phase=1-remaining/(MOTIONS[motion.kind]||1000);return out;
+}
+export function updateAvatarFrameCycle(out,seconds){
+  const armPhase=seconds*1.3;
+  out.idleHip=Math.sin(seconds*1.7);out.idleArmSin=Math.sin(armPhase);out.idleArmCos=Math.cos(armPhase);return out;
+}
+export function updateAvatarPoseCycle(out,phase,yaw,active,swimming,frame){
+  out.yawSin=Math.sin(yaw);out.yawCos=Math.cos(yaw);
+  if(active||swimming){out.phaseSin=Math.sin(phase);out.phaseCos=Math.cos(phase);}else out.phaseSin=out.phaseCos=0;
+  out.hips=(active?.90:.92)+(active?Math.cos(phase*2)*.012:frame.idleHip*.004);return out;
 }
 export function scaleWorldLabels(labels,camera,width,position=new T.Vector3()){
   const cap=Math.min(240,width*.52),projection=camera.projectionMatrix.elements[0]*width/2;
@@ -367,27 +377,29 @@ export function create({canvas,terrain,getState,onLost}) {
     for(const p of person.shirtParts)p.material=mat(person.lookShirt);for(const p of person.skinParts)p.material=mat(person.lookSkin);for(const p of person.hairParts)p.material=mat(person.lookHair);
     person.hairStyles.forEach((g,i)=>g.visible=i===person.lookStyle);
   }
-  let frameBase=null,frameElevation=0;const frameBaseCache={};
+  let frameBase=null,frameElevation=0;const frameBaseCache={},avatarFrameCycle={idleHip:0,idleArmSin:0,idleArmCos:0},avatarPoseCycle={yawSin:0,yawCos:1,phaseSin:0,phaseCos:1};
   function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false) {
     const x=point.x/SCALE,z=point.y/SCALE,wet=sea(point.x,point.y);
     const surface=wet?0:walkSurface(x,z,frameBase,frameElevation);
     person.root.position.set(x,surface+(wet?(raft?.18:-.95):0),z);
     person.yaw+=angleDelta(person.yaw,lookYaw)*Math.min(1,step*12);person.rig.rotation.y=person.yaw;
     const active=isMoving&&speed>.05;person.phase+=active?step*(speed>4?10:7):0;
-    const amount=active?(speed>4?.31:.22):0,phase=person.phase;
-    person.hips.position.y=(active?.90:.92)+(active?Math.cos(phase*2)*.012:Math.sin(seconds*1.7)*.004);
+    const amount=active?(speed>4?.31:.22):0,phase=person.phase,swimming=wet&&!raft;
+    const cycle=updateAvatarPoseCycle(avatarPoseCycle,phase,person.yaw,active,swimming,avatarFrameCycle);
+    person.hips.position.y=cycle.hips;
     for(const leg of person.legs){
-      const p=phase+(leg.side<0?Math.PI:0),stride=Math.sin(p)*amount,lift=active?Math.max(0,Math.cos(p))*.105:0;
-      const sx=x+Math.cos(person.yaw)*leg.side*.115+Math.sin(person.yaw)*stride;
-      const sz=z-Math.sin(person.yaw)*leg.side*.115+Math.cos(person.yaw)*stride;
+      const phaseSin=leg.side<0?-cycle.phaseSin:cycle.phaseSin,phaseCos=leg.side<0?-cycle.phaseCos:cycle.phaseCos;
+      const stride=phaseSin*amount,lift=active?Math.max(0,phaseCos)*.105:0;
+      const sx=x+cycle.yawCos*leg.side*.115+cycle.yawSin*stride;
+      const sz=z-cycle.yawSin*leg.side*.115+cycle.yawCos*stride;
       const slope=wet?0:walkSurface(sx,sz,frameBase,frameElevation)-surface;
       const pose=legPose(-person.hips.position.y+.07+slope+lift,stride);
       leg.thigh.rotation.x=pose.hip;leg.calf.rotation.x=pose.knee;leg.shoe.rotation.x=-pose.hip-pose.knee;
     }
     for(const arm of person.arms){
-      arm.arm.rotation.x=active?Math.sin(phase+(arm.side<0?0:Math.PI))*.45:Math.sin(seconds*1.3+arm.side)*.025;
+      arm.arm.rotation.x=active?(arm.side<0?cycle.phaseSin:-cycle.phaseSin)*.45:(avatarFrameCycle.idleArmSin*SIDE_COS+avatarFrameCycle.idleArmCos*arm.side*SIDE_SIN)*.025;
       arm.arm.rotation.z=-arm.side*.07;arm.forearm.rotation.x=active?-.22:-.08;
-      if(wet&&!raft){arm.arm.rotation.x=-Math.PI/2+Math.sin(phase+arm.side)*.35;arm.forearm.rotation.x=-.28;}
+      if(swimming){arm.arm.rotation.x=-Math.PI/2+(cycle.phaseSin*SIDE_COS+cycle.phaseCos*arm.side*SIDE_SIN)*.35;arm.forearm.rotation.x=-.28;}
     }
     actionPose(person,motion);
     person.raft.visible=!!(wet&&raft);person.raft.rotation.y=person.yaw;person.spear.visible=!!spear&&!wet&&!motion;
@@ -490,7 +502,7 @@ export function create({canvas,terrain,getState,onLost}) {
   function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
   function frame(now){
     if(!enabled||lost)return;
-    const s=getState(),seconds=now/1000,step=last?clamp((now-last)/1000,0,.06):1/60;last=now;
+    const s=getState(),seconds=now/1000,step=last?clamp((now-last)/1000,0,.06):1/60;last=now;updateAvatarFrameCycle(avatarFrameCycle,seconds);
     updateBaseFrame(frameBaseCache,s.basePos,s.baseLevel);frameBase=frameBaseCache.layout;frameElevation=frameBaseCache.elevation;
     updateName(boardPerson,s.labels?.board,'#ffe087');if(boardPerson.tag){boardPerson.tag.position.y=1.65;boardPerson.tag.scale.set(1.4,.36,1)}
     trailRoot.visible=!!s.trail;if(s.trail){if(updateTerrainAnchor(trailAnchor,s.trail))trailRoot.position.set(trailAnchor.x,trailAnchor.y,trailAnchor.z);trailBeam.material.opacity=.35+.13*Math.sin(seconds*3);if(trailNumber!==s.trailNumber||trailTag?.userData.text!==(s.trailNumber===4?s.labels?.finish||'4':s.trailNumber?String(s.trailNumber):s.trail.label)){if(trailTag){signs.delete(trailTag);trailRoot.remove(trailTag);trailTag.material.map.dispose();trailTag.material.dispose()}trailNumber=s.trailNumber;trailTag=textSprite(trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label,'#54e4ef');trailTag.userData.text=trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label;trailTag.position.y=1.5;trailTag.scale.set(s.trailNumber?1:2.45,.4,1);trailRoot.add(trailTag)}}

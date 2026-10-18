@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow } from '../island-environment.mjs';
-import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateBaseFrame, updateBuildingState, updateChapterState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBuildingState, updateChapterState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { game } from './game-harness.mjs';
 
@@ -55,6 +55,26 @@ test('unchanged avatar appearance skips per-frame serialization and material wor
   assert.equal(updateAppearanceKey(person,{shirt:'#123456',skin:'#abcdef',hair:'#333333',style:2}),true);
   assert.equal(updateAppearanceKey(person,{shirt:'#123456',skin:'#abcdef',hair:'#333333',style:2}),false,'an equivalent fresh snapshot must not trigger an update');
   assert.equal(updateAppearanceKey(person,{shirt:'#123456',skin:'#abcdef',hair:'#333333',style:1}),true,'a real hairstyle change must still update the mesh');
+});
+
+test('avatar animation shares exact phase and heading samples across each body',()=>{
+  const frame={},cycle={};
+  for(const seconds of [0,.37,2.1])for(const active of [false,true])for(const swimming of [false,true]){
+    updateAvatarFrameCycle(frame,seconds);const phase=seconds*7+.23,yaw=seconds*.4-.7;
+    assert.equal(updateAvatarPoseCycle(cycle,phase,yaw,active,swimming,frame),cycle);
+    assert(Math.abs(cycle.hips-((active?.90:.92)+(active?Math.cos(phase*2)*.012:Math.sin(seconds*1.7)*.004)))<1e-12);
+    assert.equal(cycle.yawSin,Math.sin(yaw));assert.equal(cycle.yawCos,Math.cos(yaw));
+    for(const side of [-1,1]){
+      const expectedSin=(active||swimming)?Math.sin(phase+(side<0?Math.PI:0)):0;
+      const expectedCos=(active||swimming)?Math.cos(phase+(side<0?Math.PI:0)):0;
+      assert(Math.abs((side<0?-cycle.phaseSin:cycle.phaseSin)-expectedSin)<1e-12);
+      assert(Math.abs((side<0?-cycle.phaseCos:cycle.phaseCos)-expectedCos)<1e-12);
+      const idle=Math.sin(seconds*1.3+side),shared=frame.idleArmSin*Math.cos(1)+frame.idleArmCos*side*Math.sin(1);
+      assert(Math.abs(idle-shared)<1e-12);
+      const swim=Math.sin(phase+side),sharedSwim=cycle.phaseSin*Math.cos(1)+cycle.phaseCos*side*Math.sin(1);
+      if(active||swimming)assert(Math.abs(swim-sharedSwim)<1e-12);
+    }
+  }
 });
 
 test('base terrain layout and elevation stay cached until the saved base changes',()=>{
