@@ -4,6 +4,7 @@ import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow } from '../island-environment.mjs';
 import { cameraVector, fishPose, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBuildingState, updateChapterState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
+import { updateSceneryLod } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
 
 test('eye-level camera follows real ground, ramp, floor and swimming height',()=>{
@@ -48,6 +49,18 @@ test('world labels keep their pixel cap without traversing unrelated scene objec
   scaleWorldLabels(labels,camera,1000,scratch);
   assert.equal(label.scale.x,10,'a distant label must restore its authored scale');
   assert.equal(label.userData.signScale.x,10,'the reusable base scale must not be overwritten by capping');
+});
+
+test('scenery LOD updates existing trunk and crown batches without joining them',()=>{
+  const high={id:'high'},low={id:'low'},center=new T.Vector3(),camera=new T.Vector3(3,0,0);
+  const trunk={geometry:high,receiveShadow:true,userData:{lod:{high,low,center,distance:1,radius:1,level:'high',shadowReceiverLod:true}}};
+  const crown={geometry:high,receiveShadow:false,userData:{lod:{high,low,center,distance:1,radius:1,level:'high'}}};
+  const trunks=[trunk],crowns=[crown];
+  assert.equal(updateSceneryLod(trunks,camera),undefined);updateSceneryLod(crowns,camera);
+  assert.equal(trunk.geometry,low);assert.equal(crown.geometry,low);assert.equal(trunk.receiveShadow,false);assert.equal(crown.receiveShadow,false);
+  camera.set(0,0,0);updateSceneryLod(trunks,camera);updateSceneryLod(crowns,camera);
+  assert.equal(trunk.geometry,high);assert.equal(crown.geometry,high);assert.equal(trunk.receiveShadow,true);
+  assert.equal(trunks[0],trunk);assert.equal(crowns[0],crown,'LOD updates must preserve the authored batch arrays');
 });
 
 test('unchanged avatar appearance skips per-frame serialization and material work',()=>{

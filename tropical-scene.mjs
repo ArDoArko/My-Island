@@ -123,6 +123,19 @@ const sceneryVariation=(seed,salt=0)=>{
   return value-Math.floor(value);
 };
 
+export function updateSceneryLod(batches,cameraPosition){
+  for(const batch of batches){
+    const lod=batch.userData.lod,highDistance=lod.distance+lod.radius;
+    // Squared distance preserves the exact sphere-to-camera threshold without
+    // taking one square root per scenery batch in every rendered frame.
+    const level=cameraPosition.distanceToSquared(lod.center)<=highDistance*highDistance?'high':'low';
+    if(level!==lod.level){
+      batch.geometry=lod[level];lod.level=level;
+      if(lod.shadowReceiverLod)batch.receiveShadow=level==='high';
+    }
+  }
+}
+
 export function decorateIslands(root,islands,{scale,height,surfaces,small=false,clear=()=>false,dense=false,lod=false}={}) {
   const palmTrunk=(radialSegments,heightSegments)=>{
     const geometry=new T.CylinderGeometry(.085,.16,1,radialSegments,heightSegments);geometry.translate(0,.5,0);
@@ -195,16 +208,8 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
   }
   return {trees:treeBatches[0],foliage:foliageBatches[0],treeBatches,foliageBatches,rocks:rockBatches[0],rockBatches,
     lodGeometries:[trunk,distantTrunk,fronds,distantFronds],update(cameraPosition){
-      for(const batch of [...treeBatches,...foliageBatches]){
-        const lod=batch.userData.lod,highDistance=lod.distance+lod.radius;
-        // Squared distance preserves the exact sphere-to-camera threshold without
-        // taking one square root per palm batch in every rendered frame.
-        const level=cameraPosition.distanceToSquared(lod.center)<=highDistance*highDistance?'high':'low';
-        if(level!==lod.level){
-          batch.geometry=lod[level];lod.level=level;
-          if(lod.shadowReceiverLod)batch.receiveShadow=level==='high';
-        }
-      }
+      updateSceneryLod(treeBatches,cameraPosition);
+      updateSceneryLod(foliageBatches,cameraPosition);
     }};
 }
 
