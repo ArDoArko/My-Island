@@ -8,6 +8,11 @@ import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVil
 import { sceneryBlocked } from './campaign-scenery.mjs';
 import { SCALE, docks, points, PEOPLE, ground, goal, goalInto, candidatesInto, selectNearby } from './campaign.mjs';
 
+export function attachSceneChild(parent,child){
+  if(child.parent===parent)return false;
+  parent.add(child);return true;
+}
+
 export function updateCampaignShadowState(cache,state,animated=false){
   const area=state.interior||'',boat=!!state.boat,x=Math.round(state.p.x/20),z=Math.round(state.p.z/20),
     heading=Math.round(state.heading*12),boarded=!!state.boarded,guards=state.guards||[],released=state.released||[];
@@ -406,17 +411,18 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     hemi.intensity=area?.65:2.0;sun.intensity=area?.15:2.8;
     const surface=area?0:ground(s.p.x,s.p.z);
     self.root.visible=!s.boat||mode==='third';
-    if(!s.boat){scene.add(self.root);placeHuman(self,s.p,surface,s.heading,s.walking,seconds);}
+    if(!s.boat){attachSceneChild(scene,self.root);placeHuman(self,s.p,surface,s.heading,s.walking,seconds);}
     self.rig.visible=mode==='third';
     boat.position.set((s.boat?s.p.x:docks[s.boatAt].x)/SCALE,.02,(s.boat?s.p.z:docks[s.boatAt].z)/SCALE);
     boat.rotation.y=s.boat?s.heading:Math.atan2(docks[s.boatAt].ux,docks[s.boatAt].uz);
     boat.rotation.z=s.boat?Math.sin(seconds*2)*.015:0;wake.visible=s.boat&&s.walking;
     if(s.boat)seatDriver(self,boat);
-    paperMesh.visible=!s.paper;hiddenGun.visible=s.paper&&!s.gun;keyMesh.visible=!s.key&&s.guards.find(g=>g.id==='boss').hp===0;
+    paperMesh.visible=!s.paper;hiddenGun.visible=s.paper&&!s.gun;
     keyMesh.rotation.y=seconds;releasedMask.fill(0);for(const id of s.released)releasedMask[id]=1;
-    cellBars.forEach((b,i)=>b.visible=!releasedMask[i]);
-    let guardWalking=false;
+    for(let i=0;i<cellBars.length;i++)cellBars[i].visible=!releasedMask[i];
+    let guardWalking=false,bossDefeated=false;
     for(const g of s.guards){
+      if(g.id==='boss')bossDefeated=g.hp<=0;
       const p=guardModels.get(g.id),visible=g.area===area&&!s.boat&&(!g.area||s.island==='fortress');p.root.visible=visible;
       if(!visible)continue;
       const dx=g.x-s.p.x,dz=g.z-s.p.z,walking=g.hp>0&&dx*dx+dz*dz<210*210;
@@ -425,6 +431,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y+=(g.area?0:.15);p.root.scale.setScalar(.8);}
       else {p.rig.rotation.x=0;p.arms[1].arm.rotation.x=-1.05;p.arms[1].forearm.rotation.x=-.35;}
     }
+    keyMesh.visible=!s.key&&bossDefeated;
     const escortVisible=s.released.length&&!s.boarded&&!s.boat&&(area==='estate'||area==='cellar'||s.island==='fortress');
     if(escortVisible)updateEscortPoints(escortPoints,PEOPLE,s.p,s.heading);
     for(const p of PEOPLE){

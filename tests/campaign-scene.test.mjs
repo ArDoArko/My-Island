@@ -3,9 +3,20 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { createCampaignView, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment } from '../campaign-view.mjs';
+import { attachSceneChild, createCampaignView, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
+
+test('campaign player reparents only when changing between boat and land',()=>{
+  const scene=new T.Group(),boat=new T.Group(),player=new T.Group(),sentinel=new T.Group();
+  scene.add(player);scene.add(sentinel);
+  assert.equal(attachSceneChild(scene,player),false,'an on-foot frame must not churn the scene hierarchy');
+  assert.deepEqual(scene.children,[player,sentinel]);
+  boat.add(player);
+  assert.equal(attachSceneChild(scene,player),true,'disembarking must restore the player to the scene');
+  assert.equal(player.parent,scene);assert.deepEqual(scene.children,[sentinel,player]);
+  assert.equal(attachSceneChild(scene,player),false,'subsequent on-foot frames must reuse the parent');
+});
 
 test('unchanged campaign shadows reuse primitive state without frame strings',()=>{
   const cache={},state={interior:null,island:'home',boat:false,p:{x:120,z:-80},heading:.3,boarded:false,
