@@ -32,6 +32,11 @@ export function updateEscortPoints(points,people,player,heading){
   return points;
 }
 
+export function updateLineSegment(position,a,b,y,scale=SCALE){
+  position.setXYZ(0,a.x/scale,y,a.z/scale);position.setXYZ(1,b.x/scale,y,b.z/scale);position.needsUpdate=true;
+  return position;
+}
+
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
   const renderer=rendererFactory({canvas,antialias:true,powerPreference:'high-performance'});
   const mobile=innerWidth<=700;
@@ -368,8 +373,10 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const sleeve=tube(handheld,'#577c87',[.22,-.40,-.30],[.085,.24,.085]);sleeve.rotation.x=-.5;
   const halo=new T.Mesh(new T.TorusGeometry(.42,.035,8,32),new T.MeshBasicMaterial({color:'#f3d48a'}));
   halo.rotation.x=-Math.PI/2;scene.add(halo);
-  const tracer=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]),new T.LineBasicMaterial({color:'#ffe8ad'}));scene.add(tracer);
+  const tracerPosition=new T.Float32BufferAttribute(new Float32Array(6),3);
+  const tracer=new T.Line(new T.BufferGeometry().setAttribute('position',tracerPosition),new T.LineBasicMaterial({color:'#ffe8ad'}));tracer.frustumCulled=false;scene.add(tracer);
   const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()};
+  const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0;
   const shadowState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
@@ -429,8 +436,9 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     handheld.position.z=s.shot?.025:0;
     const cameraSurface=s.boat?.02+HELM.eye-1.64:surface;
     const driverOffset=s.boat?HELM.seatZ:0;
-    const pose=cameraPose({x:s.p.x/SCALE+Math.sin(s.heading)*driverOffset,z:s.p.z/SCALE+Math.cos(s.heading)*driverOffset,
-      surface:cameraSurface,yaw,pitch,mode,distance:s.boat?7.5:4.6},cameraPoseBuffer);
+    cameraPoseState.x=s.p.x/SCALE+Math.sin(s.heading)*driverOffset;cameraPoseState.z=s.p.z/SCALE+Math.cos(s.heading)*driverOffset;
+    cameraPoseState.surface=cameraSurface;cameraPoseState.yaw=yaw;cameraPoseState.pitch=pitch;cameraPoseState.mode=mode;cameraPoseState.distance=s.boat?7.5:4.6;
+    const pose=cameraPose(cameraPoseState,cameraPoseBuffer);
     if(area&&mode==='third'){
       pose.position.x=T.MathUtils.clamp(pose.position.x,-5.1,5.1);
       pose.position.z=T.MathUtils.clamp(pose.position.z,-5.0,8.1);
@@ -438,13 +446,13 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     if(!area&&mode==='third'){
       cameraDirection.subVectors(pose.position,pose.target);const length=cameraDirection.length();cameraDirection.normalize();
       cameraRay.set(pose.target,cameraDirection);cameraRay.far=length;
-      const hit=cameraRay.intersectObjects(cameraBlockers,true).find(h=>h.distance>.2);
+      const hit=cameraRay.intersectObjects(cameraBlockers,true).find(cameraHit);
       if(hit)pose.position.copy(pose.target).addScaledVector(cameraDirection,Math.max(.35,hit.distance-.22));
       pose.position.y=Math.max(pose.position.y,ground(pose.position.x*SCALE,pose.position.z*SCALE)+.24);
     }
     camera.position.copy(pose.position);camera.lookAt(pose.target);
     vegetation.update(camera.position);
-    stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,{height:25});
+    stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,shadowOptions);
     const shadowAnimated=!s.paused&&(s.walking||s.boat||guardWalking);
     const updateShadow=updateCampaignShadowState(shadowState,s,shadowAnimated)||(shadowAnimated&&now-lastShadowUpdate>=1000/30);
     renderer.shadowMap.needsUpdate=updateShadow;
@@ -452,8 +460,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     ocean.update(seconds,camera.position);sky.position.copy(camera.position);
     tracer.visible=!!s.shot;
     if(s.shot){
-      const y=surface+1.35,a=s.shot.from,b=s.shot.to;
-      tracer.geometry.setFromPoints([new T.Vector3(a.x/SCALE,y,a.z/SCALE),new T.Vector3(b.x/SCALE,y,b.z/SCALE)]);
+      updateLineSegment(tracerPosition,s.shot.from,s.shot.to,surface+1.35);
     }
     if(oldArea!==area){oldArea=area;if(area)yaw=0;else if(g)yaw=Math.atan2(s.p.x-g.x,s.p.z-g.z);}
     renderer.render(scene,camera);

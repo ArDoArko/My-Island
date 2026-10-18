@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { createCampaignView, updateCampaignShadowState, updateEscortPoints } from '../campaign-view.mjs';
+import { createCampaignView, updateCampaignShadowState, updateEscortPoints, updateLineSegment } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -26,6 +26,12 @@ test('escort formation updates reusable points around the player',()=>{
   assert(points.every((point,id)=>point===identities[id]),'formation updates must not allocate replacement points');
   assert(points.every(point=>Number.isFinite(point.x)&&Number.isFinite(point.z)));
   assert(Math.abs(points[0].x-65)<1e-9&&Math.abs(points[0].z-216)<1e-9);
+});
+
+test('shot tracer updates one reusable GPU position buffer',()=>{
+  const position=new T.Float32BufferAttribute(new Float32Array(6),3),version=position.version;
+  assert.equal(updateLineSegment(position,{x:40,z:-20},{x:-60,z:80},1.35,20),position);
+  assert.equal(position.version,version+1);assert.deepEqual(Array.from(position.array),[2,1.350000023841858,-1,-3,1.350000023841858,4]);
 });
 
 test('real Three.js campaign geometry and both cameras run through every mission area without GPU rendering',()=>{

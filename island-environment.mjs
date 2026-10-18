@@ -111,7 +111,9 @@ export function dampCameraVector(current,desired,step,response) {
 
 // Keep the directional-light projection aligned with its shadow texels. Without
 // this, sub-pixel player movement makes otherwise static shadow edges shimmer.
-export function stabilizeSunShadow(sun,x,z,{height=18,offsetX=-12,offsetZ=-8}={}) {
+const DEFAULT_SHADOW_OPTIONS={};
+
+export function stabilizeSunShadow(sun,x,z,{height=18,offsetX=-12,offsetZ=-8}=DEFAULT_SHADOW_OPTIONS) {
   const span=Math.abs(sun.shadow.camera.right-sun.shadow.camera.left);
   const resolution=sun.shadow.mapSize.width;
   const texel=span>0&&resolution>0?span/resolution:0;
