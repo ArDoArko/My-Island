@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow } from '../island-environment.mjs';
-import { cameraVector, fishPose, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBuildingState, updateChapterState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { cameraVector, fishPose, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBuildingState, updateChapterState, updateLeafWindCycle, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -86,6 +86,20 @@ test('avatar animation shares exact phase and heading samples across each body',
       assert(Math.abs(idle-shared)<1e-12);
       const swim=Math.sin(phase+side),sharedSwim=cycle.phaseSin*Math.cos(1)+cycle.phaseCos*side*Math.sin(1);
       if(active||swimming)assert(Math.abs(swim-sharedSwim)<1e-12);
+    }
+  }
+});
+
+test('resource palms share exact wind samples across every phase',()=>{
+  const cycle={};
+  for(const seconds of [0,.37,4.9]){
+    assert.equal(updateLeafWindCycle(cycle,seconds),cycle);
+    for(const phase of [0,.31,2.8,6.1]){
+      const phaseSin=Math.sin(phase),phaseCos=Math.cos(phase);
+      const x=cycle.xSin*phaseCos+cycle.xCos*phaseSin;
+      const z=cycle.zCos*phaseCos-cycle.zSin*phaseSin;
+      assert(Math.abs(x-Math.sin(seconds*.7+phase))<1e-12);
+      assert(Math.abs(z-Math.cos(seconds*.6+phase))<1e-12);
     }
   }
 });
