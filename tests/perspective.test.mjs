@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow } from '../island-environment.mjs';
-import { cameraVector, fishPose, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBuildingState, updateChapterState, updateLeafWindCycle, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { cameraVector, fishPose, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarGait, updateBuildingState, updateChapterState, updateLeafWindCycle, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -101,6 +101,14 @@ test('resource palms share exact wind samples across every phase',()=>{
       assert(Math.abs(x-Math.sin(seconds*.7+phase))<1e-12);
       assert(Math.abs(z-Math.cos(seconds*.6+phase))<1e-12);
     }
+  }
+});
+
+test('boars share one gait sample across all four alternating legs',()=>{
+  const gait=[0,0,0,0];
+  for(const seconds of [0,.37,2.1]){
+    assert.equal(updateBoarGait(gait,seconds),gait);
+    for(let leg=0;leg<4;leg++)assert(Math.abs(gait[leg]-Math.sin(seconds*6+leg*Math.PI)*.15)<1e-12);
   }
 });
 

@@ -50,6 +50,10 @@ export function updateLeafWindCycle(out,seconds){
   const x=seconds*.7,z=seconds*.6;
   out.xSin=Math.sin(x);out.xCos=Math.cos(x);out.zSin=Math.sin(z);out.zCos=Math.cos(z);return out;
 }
+export function updateBoarGait(out,seconds){
+  const swing=Math.sin(seconds*6)*.15;
+  out[0]=swing;out[1]=-swing;out[2]=swing;out[3]=-swing;return out;
+}
 export function updateAvatarPoseCycle(out,phase,yaw,active,swimming,frame){
   out.yawSin=Math.sin(yaw);out.yawCos=Math.cos(yaw);
   if(active||swimming){out.phaseSin=Math.sin(phase);out.phaseCos=Math.cos(phase);}else out.phaseSin=out.phaseCos=0;
@@ -459,9 +463,9 @@ export function create({canvas,terrain,getState,onLost}) {
       fireLight=new T.PointLight('#ffa145',2.5,4);fireLight.position.y=.5;f.add(fireLight);
     }
   }
-  const boars=[];
+  const boars=[],boarGait=[0,0,0,0];
   function newBoar(){const root=new T.Group();scene.add(root);ell(root,'#765745',[0,.29,0],[.24,.25,.43]);ell(root,'#765745',[0,.3,.4],[.19,.18,.2]);ell(root,'#ae8b68',[0,.26,.58],[.11,.065,.065]);for(const side of [-1,1]){const ear=mesh(root,new T.ConeGeometry(.08,.17,3),mat('#644937'),[side*.13,.47,.43]);ear.rotation.z=side*.45;}const legs=[];for(const x of [-.17,.17])for(const z of [-.27,.24])legs.push(tube(root,'#5e493b',[x,.105,z],[.037,.2,.037]));return {root,legs,lastX:null,lastZ:null};}
-  function updateBoars(list,seconds){while(boars.length<list.length)boars.push(newBoar());for(let i=0;i<boars.length;i++){const b=boars[i],e=list[i];b.root.visible=!!e;if(!e){b.lastX=b.lastZ=null;continue}const x=e.x/SCALE,z=e.y/SCALE,dx=b.lastX===null?0:x-b.lastX,dz=b.lastZ===null?0:z-b.lastZ,walking=Math.hypot(dx,dz)>.0001;b.root.position.set(x,terrainHeight(x,z),z);if(walking)b.root.rotation.y=Math.atan2(dx,dz);for(let j=0;j<4;j++)b.legs[j].rotation.x=walking?Math.sin(seconds*6+j*Math.PI)*.15:0;b.lastX=x;b.lastZ=z;}}
+  function updateBoars(list,seconds){while(boars.length<list.length)boars.push(newBoar());let gaitReady=false;for(let i=0;i<boars.length;i++){const b=boars[i],e=list[i];b.root.visible=!!e;if(!e){b.lastX=b.lastZ=null;continue}const x=e.x/SCALE,z=e.y/SCALE,dx=b.lastX===null?0:x-b.lastX,dz=b.lastZ===null?0:z-b.lastZ,walking=Math.hypot(dx,dz)>.0001;b.root.position.set(x,terrainHeight(x,z),z);if(walking){b.root.rotation.y=Math.atan2(dx,dz);if(!gaitReady){updateBoarGait(boarGait,seconds);gaitReady=true;}}for(let j=0;j<4;j++)b.legs[j].rotation.x=walking?boarGait[j]:0;b.lastX=x;b.lastZ=z;}}
 
   const fishBatches=[new T.InstancedMesh(ball(),mat('#adddd0',{roughness:.4}),96),new T.InstancedMesh(new T.ConeGeometry(1,1,3),mat('#668e93'),96),new T.InstancedMesh(new T.ConeGeometry(1,1,3),mat('#779da0'),96)];
   for(const b of fishBatches){b.count=0;b.frustumCulled=false;scene.add(b);}
