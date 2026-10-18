@@ -65,6 +65,7 @@ test('3D scene reuses one expedition marker snapshot per frame',()=>{
 });
 test('3D scene reuses stable presentation buffers between frames',()=>{
   const g=game(),first=g.run('sceneState()'),second=g.run('sceneState()');
+  assert.equal(first,second);
   assert.equal(first.appearance,second.appearance);
   assert.equal(first.labels,second.labels);
   assert.equal(first.players,second.players);
@@ -74,11 +75,18 @@ test('3D scene reuses stable presentation buffers between frames',()=>{
 test('unchanged base reuses its garden and fire positions between frames',()=>{
   const g=game();g.run('basePos={x:1500,y:1100};baseLevel=3');
   const first=g.run('sceneState()'),second=g.run('sceneState()');
+  const firstGarden=first.garden,firstFire=first.fire;
   assert(first.garden&&first.fire);
   assert.equal(first.garden,second.garden);assert.equal(first.fire,second.fire);
   g.run('basePos={x:1540,y:1120}');const moved=g.run('sceneState()');
-  assert.notEqual(moved.garden,first.garden);assert.notEqual(moved.fire,first.fire);
+  assert.notEqual(moved.garden,firstGarden);assert.notEqual(moved.fire,firstFire);
   assert.equal(g.run('sceneState().garden'),moved.garden);assert.equal(g.run('sceneState().fire'),moved.fire);
+  g.close();
+});
+test('3D scene reuses the local action motion buffer',()=>{
+  const g=game();g.run('ownMotion={kind:"wave",at:performance.now(),duration:1000}');
+  const first=g.run('sceneState().motion'),second=g.run('sceneState().motion');
+  assert(first);assert.equal(first,second);assert.equal(second.kind,'wave');assert(second.phase>=0&&second.phase<1);
   g.close();
 });
 test('3D multiplayer reuses player and interpolation buffers between frames',()=>{

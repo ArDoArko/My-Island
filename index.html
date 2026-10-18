@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
 <title>My Island 0.21 — Akcja ratunkowa</title>
-<script defer src="island3d.bundle.js?v=0.21.79"></script>
+<script defer src="island3d.bundle.js?v=0.21.80"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -311,7 +311,7 @@ body.campaign-active[data-campaign-camera="third"] #lookReticle,body.campaign-ac
  <p class="intro"><span data-i18n="Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.">Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.</span></p>
  <div class="language-options"><button data-language="pl" onclick="setLanguage('pl')">Polski</button><button data-language="en" onclick="setLanguage('en')">English</button><button data-language="nl" onclick="setLanguage('nl')">Nederlands</button><button data-language="de" onclick="setLanguage('de')">Deutsch</button><button data-language="fr" onclick="setLanguage('fr')">Français</button><button data-language="es" onclick="setLanguage('es')">Español</button></div>
 </div>
-<script src="campaign.bundle.js?v=0.21.79"></script>
+<script src="campaign.bundle.js?v=0.21.80"></script>
 <script src="i18n.bundle.js?v=0.21"></script>
 <script src="wildlife.bundle.js?v=0.18"></script>
 <script src="island-play.bundle.js?v=0.18"></script>
@@ -932,7 +932,7 @@ function prepareBasePlot(){
 }
 function playerLook(p){return p?.appearance?characterRules.colors(p.appearance):p?playerLooks[p.slot]||playerLooks[0]:characterRules.colors(myAppearance)}
 function animateAction(kind){ownMotion={kind,at:performance.now(),duration:characterRules.MOTIONS[kind]||1000};}
-function currentMotion(){if(!ownMotion)return null;const elapsed=Math.max(0,performance.now()-ownMotion.at);if(elapsed>=ownMotion.duration)return null;return {kind:ownMotion.kind,phase:elapsed/ownMotion.duration};}
+function currentMotion(target=null){if(!ownMotion)return null;const elapsed=Math.max(0,performance.now()-ownMotion.at);if(elapsed>=ownMotion.duration)return null;const motion=target||{};motion.kind=ownMotion.kind;motion.phase=elapsed/ownMotion.duration;return motion;}
 function remoteMotion(p){return p?.motion&&p.motion.remaining-Math.max(0,time-p.received)>0?{kind:p.motion.kind,phase:Math.min(1,1-(p.motion.remaining-Math.max(0,time-p.received))/(characterRules.MOTIONS[p.motion.kind]||1000))}:null;}
 function cycleLook(key){if(!play||!soloReady())return;const max={shirt:6,skin:4,hair:4,style:3}[key];if(!max)return;myAppearance[key]=(myAppearance[key]+1)%max;appearancePreference={...myAppearance};try{localStorage.setItem('myIslandAppearanceV1',JSON.stringify(myAppearance))}catch(e){}if(net.room)syncRoom();else save();update();$('appearanceStatus').textContent=tr('Wygląd zapisany.');}
 function emote(kind){if(!play||!['wave','cheer'].includes(kind))return;if(net.room)return roomAction({kind:'emote',mode:kind});toggle('characterPanel',0);animateAction(kind);say(tr(kind==='wave'?'Machasz do znajomych.':'Cieszysz się z przygody!'));}
@@ -1278,7 +1278,7 @@ function campaignFrame(timestamp,dt){
  }
 }
 addEventListener('resize',()=>{if(campaignMode)resizeCampaign()});
-const sceneAppearance={},sceneLabels={},emptyScenePlayers=[],scenePlayerBuffer=[];
+const sceneAppearance={},sceneLabels={},emptyScenePlayers=[],scenePlayerBuffer=[],sceneSnapshot={},sceneMotion={kind:null,phase:0};
 function scenePlayers(){
  scenePlayerBuffer.length=net.players.length;
  for(let i=0;i<net.players.length;i++){
@@ -1292,7 +1292,14 @@ function sceneState(){
  const goal=raceRun?null:chapterGoal(markers);
  characterRules.colorsInto(sceneAppearance,myAppearance);
  sceneLabels.leon=tr('LEON · HANDEL');sceneLabels.nela=tr('NELA · ZADANIA');sceneLabels.board=tr('PRACA I ZABAWA');sceneLabels.finish=tr('META');
- return {appearance:sceneAppearance,motion:currentMotion(),fishes:F,chapterMarkers:markers,labels:sceneLabels,P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear:hasEquippedSpear(),spearOwned:!!spear,activities:campActivities,garden:gardenPosition(),board:activityRules.BOARD,trail:raceRun?activityRules.COURSE[raceRun.next]:goal,trailNumber:raceRun?raceRun.next+1:0,objects:O,resourceRevision,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?scenePlayers():emptyScenePlayers}
+ sceneSnapshot.appearance=sceneAppearance;sceneSnapshot.motion=currentMotion(sceneMotion);sceneSnapshot.fishes=F;sceneSnapshot.chapterMarkers=markers;sceneSnapshot.labels=sceneLabels;
+ sceneSnapshot.P=P;sceneSnapshot.face=face;sceneSnapshot.heading=viewHeading;sceneSnapshot.moving=moving;sceneSnapshot.play=play;
+ sceneSnapshot.paused=!!activePanel||!soloReady()||!inputFocused||document.hidden;sceneSnapshot.fast=(sprint||pad.sprinting)&&energy>0;sceneSnapshot.blocked=!!(blocking||pad.blocking);
+ sceneSnapshot.raft=raft;sceneSnapshot.spear=hasEquippedSpear();sceneSnapshot.spearOwned=!!spear;sceneSnapshot.activities=campActivities;sceneSnapshot.garden=gardenPosition();sceneSnapshot.board=activityRules.BOARD;
+ sceneSnapshot.trail=raceRun?activityRules.COURSE[raceRun.next]:goal;sceneSnapshot.trailNumber=raceRun?raceRun.next+1:0;sceneSnapshot.objects=O;sceneSnapshot.resourceRevision=resourceRevision;
+ sceneSnapshot.enemies=E;sceneSnapshot.leon=leon;sceneSnapshot.nela=nela;sceneSnapshot.chest=chest;sceneSnapshot.treasure=treasure;sceneSnapshot.baseLevel=baseLevel;sceneSnapshot.basePos=basePos;
+ sceneSnapshot.campfire=campfire;sceneSnapshot.fire=firePosition();sceneSnapshot.sea=sea;sceneSnapshot.looks=playerLooks;sceneSnapshot.you=net.you;sceneSnapshot.players=net.room?scenePlayers():emptyScenePlayers;
+ return sceneSnapshot
 }
 function updateView(){const active=!!islandView?.enabled;$('world3d').style.display=active?'block':'none';C.style.display=active?'none':'block';document.body.dataset.view=active?preferredCamera:'2d';$('viewButton').textContent=active?tr('Widok 3D'):tr('Widok 2D');$('viewButton').setAttribute('aria-pressed',String(active));$('cameraLeft').disabled=$('cameraRight').disabled=!active;$('cameraModeButton').disabled=!active;$('cameraModeButton').textContent=tr(preferredCamera==='first'?'Oczami postaci':'Zza postaci');$('cameraModeButton').setAttribute('aria-pressed',String(preferredCamera==='first'));$('viewHelp').textContent=active?tr('WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera'):tr('WASD / strzałki · E działaj · Shift sprint · spacja atak')}
 function switchView(){if(!islandView)return;preferredView=islandView.enabled?'2d':'3d';islandView.setEnabled(preferredView==='3d');viewHeading=null;resetInput();try{localStorage.setItem('myIslandViewV1',preferredView)}catch(e){}updateView()}
