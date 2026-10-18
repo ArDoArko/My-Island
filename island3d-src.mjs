@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { BOARD, baseLayout } from './island-play.mjs';
 import { colors, motionPose, MOTIONS } from './character.mjs';
-import { createMaterials, cameraPose, dampCameraVector, stabilizeSunShadow, addGroundCover, detailBase, terrainMask } from './island-environment.mjs';
+import { createMaterials, cameraPose, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, addGroundCover, detailBase, terrainMask } from './island-environment.mjs';
 import { createArchipelagoGroup, islandElevation } from './archipelago-terrain.mjs';
 import { ISLANDS, getIslandAt } from './archipelago-layout.mjs';
 import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
@@ -471,7 +471,7 @@ export function create({canvas,terrain,getState,onLost}) {
   held.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false;o.frustumCulled=false;}});
   const target=new T.Vector3(),cameraTarget=new T.Vector3(),desired=new T.Vector3(),lastPoint=new T.Vector3();
   const cameraPoseBuffer={position:desired,target},cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.8,bob:0};
-  const cameraDirection=new T.Vector3(),cameraRay=new T.Raycaster(),cameraObstacles=[buildings,stall];
+  const cameraDirection=new T.Vector3(),cameraRay=new T.Raycaster(),cameraObstacles=[buildings,stall],cameraHits=[];
   const cameraHit=hit=>hit.object.isMesh&&hit.distance>.1;
   function orbit(dx,dy=0){if(!enabled||getState().paused)return;yaw+=dx;pitch=clamp(pitch+dy,cameraMode==='first'?-1.12:-.05,cameraMode==='first'?1.12:.75);}
   function setCamera(mode){cameraMode=mode==='third'?'third':'first';pitch=mode==='third'?.22:0;camera.fov=mode==='third'?58:72;camera.updateProjectionMatrix();drag=null;first=true;}
@@ -529,7 +529,7 @@ export function create({canvas,terrain,getState,onLost}) {
       // Pull in the camera rather than viewing the character through a wall.
       cameraDirection.subVectors(desired,target);const distance=cameraDirection.length();cameraDirection.normalize();
       cameraRay.set(target,cameraDirection);cameraRay.near=.08;cameraRay.far=distance;
-      const hit=cameraRay.intersectObjects(cameraObstacles,true).find(cameraHit);
+      const hit=intersectRaycastInto(cameraRay,cameraObstacles,true,cameraHits).find(cameraHit);
       if(hit)desired.copy(target).addScaledVector(cameraDirection,Math.max(.35,hit.distance-.15));
     }
     // First person follows exactly. Third person damps both the rig and its

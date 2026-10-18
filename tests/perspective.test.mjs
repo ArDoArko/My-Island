@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { cameraPose, createMaterials, dampCameraVector, stabilizeSunShadow } from '../island-environment.mjs';
+import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow } from '../island-environment.mjs';
 import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateBaseFrame, updateBuildingState, updateChapterState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { game } from './game-harness.mjs';
@@ -133,6 +133,14 @@ test('third-person damping is frame-rate independent and never overshoots a shor
   }
   assert(at30.distanceTo(at60)<1e-10,'camera response must not depend on refresh rate');
   assert(at60.distanceTo(desired)<.002,'camera must settle quickly instead of floating behind the player');
+});
+
+test('camera raycasts reuse and clear their result array',()=>{
+  const raycaster=new T.Raycaster(new T.Vector3(0,0,3),new T.Vector3(0,0,-1)),mesh=new T.Mesh(new T.BoxGeometry(),new T.MeshBasicMaterial());
+  mesh.updateMatrixWorld(true);const hits=[{stale:true}],identity=hits;
+  assert.equal(intersectRaycastInto(raycaster,[mesh],false,hits),identity);assert(hits.length>0);assert(hits.every(hit=>!hit.stale));
+  assert.equal(intersectRaycastInto(raycaster,[],false,hits),identity);assert.equal(hits.length,0);
+  mesh.geometry.dispose();mesh.material.dispose();
 });
 
 test('sun focus stays aligned with shadow texels while following the player',()=>{

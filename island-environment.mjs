@@ -109,6 +109,10 @@ export function dampCameraVector(current,desired,step,response) {
   return current.lerp(desired,1-Math.exp(-step*response));
 }
 
+export function intersectRaycastInto(raycaster,objects,recursive,target){
+  target.length=0;raycaster.intersectObjects(objects,recursive,target);return target;
+}
+
 // Keep the directional-light projection aligned with its shadow texels. Without
 // this, sub-pixel player movement makes otherwise static shadow edges shimmer.
 const DEFAULT_SHADOW_OPTIONS={};

@@ -3,7 +3,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ISLANDS,VILLAGE,PATHS,market,estateCenter,pathClear,terrainHeight,bounds } from './campaign-world.mjs';
 import { buildMotorboat,seatDriver,HELM } from './campaign-boat.mjs';
 import { createIslandTerrain } from './archipelago-terrain.mjs';
-import { createMaterials, cameraPose, stabilizeSunShadow } from './island-environment.mjs';
+import { createMaterials, cameraPose, intersectRaycastInto, stabilizeSunShadow } from './island-environment.mjs';
 import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
 import { sceneryBlocked } from './campaign-scenery.mjs';
 import { SCALE, docks, points, PEOPLE, ground, goal, nearby } from './campaign.mjs';
@@ -375,7 +375,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   halo.rotation.x=-Math.PI/2;scene.add(halo);
   const tracerPosition=new T.Float32BufferAttribute(new Float32Array(6),3);
   const tracer=new T.Line(new T.BufferGeometry().setAttribute('position',tracerPosition),new T.LineBasicMaterial({color:'#ffe8ad'}));tracer.frustumCulled=false;scene.add(tracer);
-  const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()};
+  const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()},cameraHits=[];
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0;
   const shadowState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
@@ -446,7 +446,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     if(!area&&mode==='third'){
       cameraDirection.subVectors(pose.position,pose.target);const length=cameraDirection.length();cameraDirection.normalize();
       cameraRay.set(pose.target,cameraDirection);cameraRay.far=length;
-      const hit=cameraRay.intersectObjects(cameraBlockers,true).find(cameraHit);
+      const hit=intersectRaycastInto(cameraRay,cameraBlockers,true,cameraHits).find(cameraHit);
       if(hit)pose.position.copy(pose.target).addScaledVector(cameraDirection,Math.max(.35,hit.distance-.22));
       pose.position.y=Math.max(pose.position.y,ground(pose.position.x*SCALE,pose.position.z*SCALE)+.24);
     }
