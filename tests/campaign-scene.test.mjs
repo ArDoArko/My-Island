@@ -3,9 +3,20 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { createCampaignView } from '../campaign-view.mjs';
+import { createCampaignView, updateCampaignShadowState } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
+
+test('unchanged campaign shadows reuse primitive state without frame strings',()=>{
+  const cache={},state={interior:null,island:'home',boat:false,p:{x:120,z:-80},heading:.3,boarded:false,
+    guards:[{id:'gate',hp:100},{id:'boss',hp:0}],released:[0,2]};
+  assert.equal(updateCampaignShadowState(cache,state,false),true);
+  assert.equal(updateCampaignShadowState(cache,state,false),false,'an unchanged fresh frame must reuse the shadow state');
+  state.guards[0].hp=0;assert.equal(updateCampaignShadowState(cache,state,false),true,'a guard pose change must refresh shadows');
+  assert.equal(updateCampaignShadowState(cache,state,false),false);
+  state.released=[0,3];assert.equal(updateCampaignShadowState(cache,state,false),true,'a released resident change must refresh shadows');
+  assert.equal(updateCampaignShadowState(cache,state,true),true,'starting animation must refresh shadows immediately');
+});
 
 test('real Three.js campaign geometry and both cameras run through every mission area without GPU rendering',()=>{
   const dom=new JSDOM('<canvas></canvas>');

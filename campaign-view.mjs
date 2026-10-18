@@ -8,6 +8,20 @@ import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVil
 import { sceneryBlocked } from './campaign-scenery.mjs';
 import { SCALE, docks, points, PEOPLE, ground, goal, nearby } from './campaign.mjs';
 
+export function updateCampaignShadowState(cache,state,animated=false){
+  const area=state.interior||'',boat=!!state.boat,x=Math.round(state.p.x/20),z=Math.round(state.p.z/20),
+    heading=Math.round(state.heading*12),boarded=!!state.boarded,guards=state.guards||[],released=state.released||[];
+  let changed=!cache.ready||cache.area!==area||cache.island!==state.island||cache.boat!==boat||cache.x!==x||cache.z!==z||
+    cache.heading!==heading||cache.boarded!==boarded||cache.animated!==animated||cache.guardCount!==guards.length||cache.releasedCount!==released.length;
+  const guardState=cache.guards||(cache.guards=[]),releasedState=cache.released||(cache.released=[]);
+  for(let i=0;i<guards.length;i++){const alive=guards[i].hp>0;if(guardState[i]!==alive)changed=true;guardState[i]=alive;}
+  for(let i=0;i<released.length;i++){if(releasedState[i]!==released[i])changed=true;releasedState[i]=released[i];}
+  guardState.length=guards.length;releasedState.length=released.length;
+  cache.ready=true;cache.area=area;cache.island=state.island;cache.boat=boat;cache.x=x;cache.z=z;cache.heading=heading;
+  cache.boarded=boarded;cache.animated=animated;cache.guardCount=guards.length;cache.releasedCount=released.length;
+  return changed;
+}
+
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
   const renderer=rendererFactory({canvas,antialias:true,powerPreference:'high-performance'});
   const mobile=innerWidth<=700;
@@ -278,6 +292,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const keyMesh=new T.Mesh(new T.TorusGeometry(.13,.036,8,16),new T.MeshStandardMaterial({color:'#f8ce60',emissive:'#8c6322',emissiveIntensity:.5}));
   keyMesh.position.set(0,.88,-3);estate.add(keyMesh);cube(keyMesh,'#debb63',[0,-.20,0],[.065,.32,.065]);
   const cellar=room('cellar',11,15),cellBars=[],cellarStatic=new T.Group();cellarStatic.name='cellar-static';cellar.add(cellarStatic);
+  const roomEntries=Object.entries(roomGroups);
   for(const p of PEOPLE){
     const bars=new T.Group();bars.name='cell-door-'+p.id;bars.position.set(p.x/SCALE,0,-1.5);cellar.add(bars);cellBars[p.id]=bars;
     for(let j=-2;j<=2;j++)tube(bars,'#475759',[j*.32,1.3,0],[.025,2.6,.025]);
@@ -345,7 +360,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const tracer=new T.Line(new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]),new T.LineBasicMaterial({color:'#ffe8ad'}));scene.add(tracer);
   const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()};
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0;
-  let shadowSignature='',lastShadowUpdate=-Infinity,shadowUpdates=0;
+  const shadowState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
   function placeHuman(person,p,height,heading,walking,seconds){
@@ -361,7 +376,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     const s=getState(),seconds=now/1000;last=now;posedCharacters=0;surfaces.update();sky.material.uniforms.uTime.value=seconds;
     const area=s.interior;
     world.visible=!area;rooms.visible=!!area;
-    for(const [id,root] of Object.entries(roomGroups))root.visible=id===area;
+    for(const [id,root] of roomEntries)root.visible=id===area;
     scene.background.set(area?'#202c29':'#b9dbe5');scene.fog.color.copy(scene.background);
     hemi.intensity=area?.65:2.0;sun.intensity=area?.15:2.8;
     const surface=area?0:ground(s.p.x,s.p.z);
@@ -418,11 +433,9 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     vegetation.update(camera.position);
     stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,{height:25});
     const shadowAnimated=!s.paused&&(s.walking||s.boat||guardWalking);
-    const nextShadowSignature=[area||'',s.island,s.boat?1:0,Math.round(s.p.x/20),Math.round(s.p.z/20),Math.round(s.heading*12),
-      s.guards.map(g=>g.hp>0?1:0).join(''),s.released.join(','),s.boarded?1:0,shadowAnimated?1:0].join('|');
-    const updateShadow=nextShadowSignature!==shadowSignature||(shadowAnimated&&now-lastShadowUpdate>=1000/30);
+    const updateShadow=updateCampaignShadowState(shadowState,s,shadowAnimated)||(shadowAnimated&&now-lastShadowUpdate>=1000/30);
     renderer.shadowMap.needsUpdate=updateShadow;
-    if(updateShadow){shadowSignature=nextShadowSignature;lastShadowUpdate=now;shadowUpdates++;}
+    if(updateShadow){lastShadowUpdate=now;shadowUpdates++;}
     ocean.update(seconds,camera.position);sky.position.copy(camera.position);
     tracer.visible=!!s.shot;
     if(s.shot){
