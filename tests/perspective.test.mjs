@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow } from '../island-environment.mjs';
-import { cameraVector, fishPose, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarGait, updateBuildingState, updateChapterState, updateLeafWindCycle, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { cameraVector, fishPose, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateLeafWindCycle, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -119,6 +119,14 @@ test('leg and fish animation update reusable pose buffers',()=>{
   assert.equal(fishPose(point,2.3,sea,fish),fish);assert.deepEqual(fish,fishPose(point,2.3,sea));
   assert(Math.abs(fish.yawSin-Math.sin(fish.yaw))<1e-12);assert(Math.abs(fish.yawCos-Math.cos(fish.yaw))<1e-12);
   assert.equal(fishPose(point,2.3,()=>false,fish),null,'a fish outside water must remain hidden without replacing its buffer');
+});
+
+test('fish parts update one reusable transform without scale arrays',()=>{
+  const part=new T.Object3D(),pose={x:3,y:.06,z:5,yaw:.7,yawSin:Math.sin(.7),yawCos:Math.cos(.7)};
+  assert.equal(updateFishPart(part,pose,.04,.045,-.2,.09,.1,.22,Math.PI/2),part);
+  assert(Math.abs(part.position.x-(pose.x+pose.yawSin*-.2+pose.yawCos*.04))<1e-12);
+  assert(Math.abs(part.position.z-(pose.z+pose.yawCos*-.2-pose.yawSin*.04))<1e-12);
+  assert.deepEqual(part.scale.toArray(),[.09,.1,.22]);assert.deepEqual(part.rotation.toArray().slice(0,3),[Math.PI/2,.7,0]);
 });
 
 test('base terrain layout and elevation stay cached until the saved base changes',()=>{
