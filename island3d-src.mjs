@@ -75,6 +75,19 @@ export function updateBuildingState(cache,state={}){
   cache.ready=true;cache.level=level;cache.baseX=baseX;cache.baseY=baseY;cache.campfire=campfire;cache.fireX=fireX;cache.fireY=fireY;
   cache.first=first;cache.garden=garden;cache.flag=flag;cache.harvest=ready;cache.raceWon=raceWon;return true;
 }
+export function updateChapterState(cache,list=[]){
+  const values=cache.values||(cache.values=[]);let changed=!cache.ready||cache.count!==list.length,offset=0;
+  for(const point of list){
+    const type=point.type??null,x=point.x??null,y=point.y??null,done=!!point.done,symbol=point.symbol??null,label=point.label??null;
+    if(values[offset]!==type)changed=true;values[offset++]=type;
+    if(values[offset]!==x)changed=true;values[offset++]=x;
+    if(values[offset]!==y)changed=true;values[offset++]=y;
+    if(values[offset]!==done)changed=true;values[offset++]=done;
+    if(values[offset]!==symbol)changed=true;values[offset++]=symbol;
+    if(values[offset]!==label)changed=true;values[offset++]=label;
+  }
+  values.length=offset;cache.ready=true;cache.count=list.length;return changed;
+}
 export function walkSurface(x,z,layout,elevation=baseElevation(layout)){
   const y=terrainHeight(x,z);if(!layout)return y;
   const f=layout.floor;if(Math.abs(x*SCALE-f.x)<=f.w/2&&Math.abs(z*SCALE-f.y)<=f.h/2)return Math.max(y,elevation+.16);
@@ -422,9 +435,9 @@ export function create({canvas,terrain,getState,onLost}) {
     const local=(x,y,z,s,rx=0)=>{dummy.position.set(p.x+Math.sin(p.yaw)*z+Math.cos(p.yaw)*x,p.y+y,p.z+Math.cos(p.yaw)*z-Math.sin(p.yaw)*x);dummy.rotation.set(rx,p.yaw,0);dummy.scale.set(...s);dummy.updateMatrix();};
     local(0,0,0,[.09,.045,.22]);fishBatches[0].setMatrixAt(count,dummy.matrix);local(0,0,-.25,[.095,.12,.025],Math.PI/2);fishBatches[1].setMatrixAt(count,dummy.matrix);local(0,.045,-.02,[.04,.10,.11]);fishBatches[2].setMatrixAt(count,dummy.matrix);count++;
   }for(const b of fishBatches){b.count=count;b.instanceMatrix.needsUpdate=true;}}
-  let chapterKey='',chapterRoots=[];
+  const chapterState={};let chapterRoots=[];
   function updateChapters(list,seconds){
-    const key=JSON.stringify(list);if(key!==chapterKey){chapterKey=key;for(const root of chapterRoots){scene.remove(root);root.traverse(o=>{if(o.isSprite){signs.delete(o);o.material.map.dispose();o.material.dispose();}if(o.userData.privateGeometry)o.geometry.dispose();});}chapterRoots=[];
+    if(updateChapterState(chapterState,list)){for(const root of chapterRoots){scene.remove(root);root.traverse(o=>{if(o.isSprite){signs.delete(o);o.material.map.dispose();o.material.dispose();}if(o.userData.privateGeometry)o.geometry.dispose();});}chapterRoots=[];
       for(const point of list||[]){if(point.type==='return')continue;const root=new T.Group();root.position.set(point.x/SCALE,terrainHeight(point.x/SCALE,point.y/SCALE),point.y/SCALE);scene.add(root);chapterRoots.push(root);
         const ring=new T.Mesh(new T.RingGeometry(.4,.46,28),mat(point.done?'#6d9c89':'#8cebd5',{side:T.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=.03;ring.userData.privateGeometry=true;root.add(ring);
         if(point.type==='fragment'){cube(root,'#e1c587',[0,.38,0],[.37,.45,.06]);cube(root,'#a68752',[0,.18,-.035],[.035,.42,.035]);cube(root,'#826b4d',[0,.4,.035],[.19,.022,.02]);}
