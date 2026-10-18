@@ -21,6 +21,15 @@ function travel(s,target,{fight=false}={}){
 function actAt(s,p){travel(s,p);assert(C.interact(s));}
 function reload(s){return C.restore(C.snapshot(s));}
 
+test('campaign interaction selection stays linear, strict and stable on ties',()=>{
+  const position={x:0,z:0},first={id:'pump',x:30,z:40},tie={id:'supply',x:-30,z:-40};
+  assert.equal(C.selectNearby([first,tie],position),first,'equal distances must preserve candidate order');
+  assert.equal(C.selectNearby([{id:'pump',x:65,z:0}],position),null,'the normal interaction radius stays strict');
+  assert.equal(C.selectNearby([{id:'cell-0',x:84.9,z:0}],position)?.id,'cell-0');
+  assert.equal(C.selectNearby([{id:'dock-home',x:124.9,z:0}],position)?.id,'dock-home');
+  assert.equal(C.selectNearby([{id:'dock-home',x:125,z:0}],position),null,'the docking radius stays strict');
+});
+
 test('entire physical rescue route, combat, five cells and boat evacuation survive reloads',()=>{
   let s=C.fresh();assert.equal(C.goal(s).key,'dock-goal');
   actAt(s,C.docks.home);assert(!s.boat);travel(s,C.docks.home.land);actAt(s,C.points.pump);

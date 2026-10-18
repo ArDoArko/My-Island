@@ -10,6 +10,7 @@ export const VERSION = 1;
 export const SAVE_KEY = 'myIslandCampaignV1';
 export const dist = (a,b) => Math.hypot(a.x-b.x,a.z-b.z);
 const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+const dockList=Object.values(docks);
 export const PEOPLE = Array.from({length:5},(_,id)=>({id,x:(id-2)*38,z:-80,child:id>2}));
 export function fresh() {
   return {version:VERSION,worldVersion:WORLD_VERSION,p:{x:docks.home.x+180,z:docks.home.z+70},heading:Math.PI,
@@ -143,7 +144,11 @@ export function shoot(s,yaw=s.heading) {
   s.shot={at:s.elapsed,from:{...s.p},to:g?{x:g.x,z:g.z}:{x:s.p.x+dx*200,z:s.p.z+dz*200}};
   return true;
 }
-function closestDock(s) {return Object.values(docks).filter(d=>dist(d,s.p)<125).sort((a,b)=>dist(a,s.p)-dist(b,s.p))[0];}
+function closestDock(s) {
+  let best=null,bestDistance=125*125;
+  for(const dock of dockList){const dx=dock.x-s.p.x,dz=dock.z-s.p.z,distance=dx*dx+dz*dz;if(distance<bestDistance){best=dock;bestDistance=distance;}}
+  return best;
+}
 export function candidates(s) {
   if(s.interior==='cave')return [
     {id:'paper',...points.paper,label:s.paper?(s.gun?'supplies':'take-gun'):'move-paper'},
@@ -168,10 +173,16 @@ export function candidates(s) {
   }
   return out;
 }
-export function nearby(s) {
-  return candidates(s).filter(p=>dist(p,s.p)<(p.id.startsWith('cell-')?85:p.id.startsWith('dock-')?125:65))
-    .sort((a,b)=>dist(a,s.p)-dist(b,s.p))[0]||null;
+export function selectNearby(list,position) {
+  let best=null,bestDistance=Infinity;
+  for(const point of list){
+    const limit=point.id.startsWith('cell-')?85:point.id.startsWith('dock-')?125:65,
+      dx=point.x-position.x,dz=point.z-position.z,distance=dx*dx+dz*dz;
+    if(distance<limit*limit&&distance<bestDistance){best=point;bestDistance=distance;}
+  }
+  return best;
 }
+export function nearby(s) {return selectNearby(candidates(s),s.p);}
 export function interact(s) {
   const target=nearby(s);if(!target){s.notice='closer';return false;}
   const id=target.id;
