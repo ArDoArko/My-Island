@@ -71,6 +71,16 @@ test('3D scene reuses stable presentation buffers between frames',()=>{
   assert.equal(g.run('sceneState().labels.leon'), 'LEON · HANDEL');
   g.close();
 });
+test('unchanged base reuses its garden and fire positions between frames',()=>{
+  const g=game();g.run('basePos={x:1500,y:1100};baseLevel=3');
+  const first=g.run('sceneState()'),second=g.run('sceneState()');
+  assert(first.garden&&first.fire);
+  assert.equal(first.garden,second.garden);assert.equal(first.fire,second.fire);
+  g.run('basePos={x:1540,y:1120}');const moved=g.run('sceneState()');
+  assert.notEqual(moved.garden,first.garden);assert.notEqual(moved.fire,first.fire);
+  assert.equal(g.run('sceneState().garden'),moved.garden);assert.equal(g.run('sceneState().fire'),moved.fire);
+  g.close();
+});
 
 test('remote avatar appearance and motion reuse their frame buffers',()=>{
   const look={},same=colorsInto(look,{shirt:4,skin:2,hair:3,style:1});

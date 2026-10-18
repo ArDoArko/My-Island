@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#073d4b">
 <title>My Island 0.21 — Akcja ratunkowa</title>
-<script defer src="island3d.bundle.js?v=0.21.77"></script>
+<script defer src="island3d.bundle.js?v=0.21.78"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;overflow:hidden;background:#1387a2;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
@@ -311,7 +311,7 @@ body.campaign-active[data-campaign-camera="third"] #lookReticle,body.campaign-ac
  <p class="intro"><span data-i18n="Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.">Wybierz język dla tego urządzenia. Twoja wyspa i zasoby pozostają zachowane.</span></p>
  <div class="language-options"><button data-language="pl" onclick="setLanguage('pl')">Polski</button><button data-language="en" onclick="setLanguage('en')">English</button><button data-language="nl" onclick="setLanguage('nl')">Nederlands</button><button data-language="de" onclick="setLanguage('de')">Deutsch</button><button data-language="fr" onclick="setLanguage('fr')">Français</button><button data-language="es" onclick="setLanguage('es')">Español</button></div>
 </div>
-<script src="campaign.bundle.js?v=0.21.77"></script>
+<script src="campaign.bundle.js?v=0.21.78"></script>
 <script src="i18n.bundle.js?v=0.21"></script>
 <script src="wildlife.bundle.js?v=0.18"></script>
 <script src="island-play.bundle.js?v=0.18"></script>
@@ -493,7 +493,15 @@ function drawRaft(x,y){
  X.strokeStyle='#74684b';X.lineWidth=3;X.beginPath();X.moveTo(-34,0);X.lineTo(34,0);X.moveTo(-34,15);X.lineTo(34,15);X.stroke();
  X.strokeStyle='#b6a77b';X.lineWidth=3;X.beginPath();X.moveTo(25,-12);X.lineTo(49+Math.sin(walkPhase)*4,28);X.stroke();ellipse(X,49+Math.sin(walkPhase)*4,27,5,10,'#b6a77b');X.restore();
 }
-function firePosition(){return activityRules.firePosition(basePos,baseLevel,isLand)}
+const campPositionCache={base:null,x:NaN,y:NaN,level:-1,fire:null,garden:null};
+function campPositions(){
+ const x=basePos?.x,y=basePos?.y;
+ if(campPositionCache.base===basePos&&campPositionCache.x===x&&campPositionCache.y===y&&campPositionCache.level===baseLevel)return campPositionCache;
+ campPositionCache.base=basePos;campPositionCache.x=x;campPositionCache.y=y;campPositionCache.level=baseLevel;
+ campPositionCache.fire=activityRules.firePosition(basePos,baseLevel,isLand);campPositionCache.garden=activityRules.gardenPosition(basePos,baseLevel,isLand);return campPositionCache;
+}
+function firePosition(){return campPositions().fire}
+function gardenPosition(){return campPositions().garden}
 function drawFire(x,y){
  X.save();X.translate(x,y);const glow=X.createRadialGradient(0,-4,1,0,0,68);glow.addColorStop(0,'#ffb94745');glow.addColorStop(1,'#ffb94700');ellipse(X,0,0,68,38,glow);
  for(let i=0;i<7;i++){const a=i*6.28/7;ellipse(X,Math.cos(a)*18,Math.sin(a)*9,5,4,'#80928b')}
@@ -516,7 +524,7 @@ function drawBase(){
 }
 function drawActivities(){
  const p=activityRules.BOARD;if(visible(p.x,p.y)){rounded(X,p.x-40,p.y-42,80,30,5,'#234f58');label(p.x,p.y-55,tr('PRACA I ZABAWA'));X.font='22px system-ui';X.textAlign='center';X.fillText('📋 🏁',p.x,p.y-20)}
- const g=activityRules.gardenPosition(basePos,baseLevel,isLand);if(g&&campActivities.completed>=3){rounded(X,g.x-52,g.y-38,104,76,7,'#785b3a');for(let i=0;i<6;i++){const x=g.x-32+(i%3)*32,y=g.y-18+Math.floor(i/3)*36;ellipse(X,x,y,10,12,'#619a47');if(campActivities.gardenClaimed<campActivities.completed)ellipse(X,x+4,y-2,5,5,'#dcc873')}label(g.x,g.y-52,tr('OGRÓDEK'))}
+ const g=gardenPosition();if(g&&campActivities.completed>=3){rounded(X,g.x-52,g.y-38,104,76,7,'#785b3a');for(let i=0;i<6;i++){const x=g.x-32+(i%3)*32,y=g.y-18+Math.floor(i/3)*36;ellipse(X,x,y,10,12,'#619a47');if(campActivities.gardenClaimed<campActivities.completed)ellipse(X,x+4,y-2,5,5,'#dcc873')}label(g.x,g.y-52,tr('OGRÓDEK'))}
  if(raceRun){const target=activityRules.COURSE[raceRun.next];X.strokeStyle='#30c6e3';X.lineWidth=4;X.beginPath();X.arc(target.x,target.y,80,0,Math.PI*2);X.stroke();label(target.x,target.y-95,raceRun.next===3?tr('META'):String(raceRun.next+1))}
 }
 function drawChapters(){
@@ -842,7 +850,7 @@ function interact(){
  const chapterTarget=nearChapter();if(chapterTarget)return chapterInteract(chapterTarget.id);
  if(net.room){let target=null,d=75;for(const o of O){const q=distance(P,o);if(q<d){d=q;target=o}}return roomAction({kind:'interact',...(target?{target:target.id}:{})})}
  if(distance(P,activityRules.BOARD)<95)return toggle('workPanel',1);
- const garden=activityRules.gardenPosition(basePos,baseLevel,isLand);if(campActivities.completed>=3&&garden&&distance(P,garden)<95)return collectGarden();
+ const garden=gardenPosition();if(campActivities.completed>=3&&garden&&distance(P,garden)<95)return collectGarden();
  if(distance(P,leon)<110)return toggle('shop',1);
  if(distance(P,nela)<110){
   if(treasure&&!returned){returned=1;coins+=250;xpv+=300;save();say(tr('Nela: Skarb odnaleziony! +250 monet, +300 XP.'))}return toggle('nelaPanel',1);
@@ -958,7 +966,7 @@ function workAction(mode,item){
  else if(mode==='deliver'){const bank=gameState();if(!activityRules.deliverWork(campActivities,bank,P))return say(tr('Zbierz wymagane zasoby po przyjęciu zlecenia i podejdź do odbiorcy.'));applyBank(bank);say(tr('Zlecenie wykonane! Zapłata i XP są w plecaku.'))}
  else return;save();update();
 }
-function nearGarden(){const p=activityRules.gardenPosition(basePos,baseLevel,isLand);return p&&distance(P,p)<100}
+function nearGarden(){const p=gardenPosition();return p&&distance(P,p)<100}
 function collectGarden(){if(net.room)return roomAction({kind:'garden'});const bank=gameState();if(!activityRules.harvestGarden(campActivities,bank,P,isLand))return say(tr('Ogródek daje plony po ukończeniu kolejnego zlecenia. Podejdź do niego.'));applyBank(bank);save();update();say(tr('Zebrano 2 kokosy z ogródka.'))}
 function startRace(){if(net.room)return roomAction({kind:'race',mode:'start'});if(raceRun)return;if(distance(P,activityRules.BOARD)>=110)return say(tr('Podejdź do tablicy zleceń, żeby rozpocząć bieg.'));raceRun={next:0,elapsed:0};toggle('workPanel',0);say(tr('Bieg rozpoczęty! Odwiedź punkty po kolei.'))}
 function cancelRace(){if(net.room)return roomAction({kind:'race',mode:'cancel'});raceRun=null;update();say(tr('Bieg zakończony bez wyniku.'))}
@@ -1276,7 +1284,7 @@ function sceneState(){
  const goal=raceRun?null:chapterGoal(markers);
  characterRules.colorsInto(sceneAppearance,myAppearance);
  sceneLabels.leon=tr('LEON · HANDEL');sceneLabels.nela=tr('NELA · ZADANIA');sceneLabels.board=tr('PRACA I ZABAWA');sceneLabels.finish=tr('META');
- return {appearance:sceneAppearance,motion:currentMotion(),fishes:F,chapterMarkers:markers,labels:sceneLabels,P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear:hasEquippedSpear(),spearOwned:!!spear,activities:campActivities,garden:activityRules.gardenPosition(basePos,baseLevel,isLand),board:activityRules.BOARD,trail:raceRun?activityRules.COURSE[raceRun.next]:goal,trailNumber:raceRun?raceRun.next+1:0,objects:O,resourceRevision,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):emptyScenePlayers}
+ return {appearance:sceneAppearance,motion:currentMotion(),fishes:F,chapterMarkers:markers,labels:sceneLabels,P,face,heading:viewHeading,moving,play,paused:!!activePanel||!soloReady()||!inputFocused||document.hidden,fast:(sprint||pad.sprinting)&&energy>0,blocked:!!(blocking||pad.blocking),raft,spear:hasEquippedSpear(),spearOwned:!!spear,activities:campActivities,garden:gardenPosition(),board:activityRules.BOARD,trail:raceRun?activityRules.COURSE[raceRun.next]:goal,trailNumber:raceRun?raceRun.next+1:0,objects:O,resourceRevision,enemies:E,leon,nela,chest,treasure,baseLevel,basePos,campfire,fire:firePosition(),sea,looks:playerLooks,you:net.you,players:net.room?net.players.map(p=>({...p,point:p.id===net.you?P:remotePosition(p,time)})):emptyScenePlayers}
 }
 function updateView(){const active=!!islandView?.enabled;$('world3d').style.display=active?'block':'none';C.style.display=active?'none':'block';document.body.dataset.view=active?preferredCamera:'2d';$('viewButton').textContent=active?tr('Widok 3D'):tr('Widok 2D');$('viewButton').setAttribute('aria-pressed',String(active));$('cameraLeft').disabled=$('cameraRight').disabled=!active;$('cameraModeButton').disabled=!active;$('cameraModeButton').textContent=tr(preferredCamera==='first'?'Oczami postaci':'Zza postaci');$('cameraModeButton').setAttribute('aria-pressed',String(preferredCamera==='first'));$('viewHelp').textContent=active?tr('WASD / strzałki · E działaj · przeciągnij ekran lub Q/R: kamera'):tr('WASD / strzałki · E działaj · Shift sprint · spacja atak')}
 function switchView(){if(!islandView)return;preferredView=islandView.enabled?'2d':'3d';islandView.setEnabled(preferredView==='3d');viewHeading=null;resetInput();try{localStorage.setItem('myIslandViewV1',preferredView)}catch(e){}updateView()}
