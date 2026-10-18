@@ -81,6 +81,18 @@ test('unchanged base reuses its garden and fire positions between frames',()=>{
   assert.equal(g.run('sceneState().garden'),moved.garden);assert.equal(g.run('sceneState().fire'),moved.fire);
   g.close();
 });
+test('3D multiplayer reuses player and interpolation buffers between frames',()=>{
+  const g=game();g.run(`net.room='ABCDEFGH';net.you='p0';time=1000;net.players=[
+   {id:'p0',name:'Ja',slot:0,x:1500,y:1100,fromX:1500,fromY:1100,received:900},
+   {id:'p1',name:'Gość',slot:1,x:1700,y:1200,fromX:1600,fromY:1100,received:900}
+  ]`);
+  const first=g.run('sceneState()'),guest=first.players[1],point=guest.point;
+  g.run('time=1050');const second=g.run('sceneState()');
+  assert.equal(second.players,first.players);assert.equal(second.players[0],first.players[0]);assert.equal(second.players[1],guest);
+  assert.equal(second.players[0].point,g.run('P'));assert.equal(second.players[1].point,point);assert(point.x>1600&&point.y>1100);
+  assert.equal(g.run('Object.hasOwn(net.players[1],"point")'),false,'render buffers must not modify protocol snapshots');
+  g.close();
+});
 
 test('remote avatar appearance and motion reuse their frame buffers',()=>{
   const look={},same=colorsInto(look,{shirt:4,skin:2,hair:3,style:1});
