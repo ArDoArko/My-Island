@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, stabilizeSunShadow } from '../island-environment.mjs';
-import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateBaseFrame, updateBuildingState, updateChapterState } from '../island3d-src.mjs';
+import { cameraVector, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateBaseFrame, updateBuildingState, updateChapterState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { game } from './game-harness.mjs';
 
@@ -84,6 +84,16 @@ test('expedition markers compare visible fields without per-frame serialization'
   assert.equal(updateChapterState(cache,[{...markers[0],done:true}]),true,'mission progress must refresh its marker');
   assert.equal(updateChapterState(cache,[{...markers[0],label:'Wave'}]),true,'a language change must refresh the label');
   assert.equal(updateChapterState(cache,[]),true,'finishing the mission must remove its markers');
+});
+
+test('static scene anchors sample terrain only after their coordinates change',()=>{
+  const cache={};
+  assert.equal(updateTerrainAnchor(cache,{x:1630,y:1160},.9,.15),true);
+  assert.equal(cache.x,1630/80+.9);assert.equal(cache.z,1160/80+.15);assert.equal(cache.y,terrainHeight(cache.x,cache.z));
+  assert.equal(updateTerrainAnchor(cache,{x:1630,y:1160},.9,.15),false,'an equivalent fresh snapshot must reuse the terrain sample');
+  assert.equal(updateTerrainAnchor(cache,{x:1640,y:1160},.9,.15),true,'moving an anchor must resample terrain');
+  assert.equal(updateTerrainAnchor(cache,null),true);assert.equal(cache.valid,false);
+  assert.equal(updateTerrainAnchor(cache,null),false,'an absent anchor must also remain cached');
 });
 
 test('camera pose can reuse its vectors without changing first- or third-person geometry',()=>{
