@@ -441,7 +441,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     const s=getState(),seconds=now/1000;last=now;posedCharacters=0;surfaces.update();sky.material.uniforms.uTime.value=seconds;
     const area=s.interior;
     updateCampaignAreaPresentation(areaPresentationState,area,world,rooms,roomEntries,scene,hemi,sun);
-    const surface=area?0:ground(s.p.x,s.p.z);
+    const surface=area?0:sampleCampaignGround(campaignGroundCache,self.root,s.p.x,s.p.z,ground);
     self.root.visible=!s.boat||mode==='third';
     if(!s.boat){const reattached=attachSceneChild(scene,self.root);placeHuman(self,s.p,surface,s.heading,s.walking,seconds,reattached);}
     self.rig.visible=mode==='third';
@@ -493,7 +493,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       cameraRay.set(pose.target,cameraDirection);cameraRay.far=length;
       const hit=intersectRaycastInto(cameraRay,cameraBlockers,true,cameraHits).find(cameraHit);
       if(hit)pose.position.copy(pose.target).addScaledVector(cameraDirection,Math.max(.35,hit.distance-.22));
-      pose.position.y=Math.max(pose.position.y,ground(pose.position.x*SCALE,pose.position.z*SCALE)+.24);
+      pose.position.y=Math.max(pose.position.y,sampleCampaignGround(campaignGroundCache,camera,pose.position.x*SCALE,pose.position.z*SCALE,ground)+.24);
     }
     camera.position.copy(pose.position);camera.lookAt(pose.target);
     vegetation.update(camera.position);
