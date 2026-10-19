@@ -72,6 +72,14 @@ export function updateCampaignPoseState(cache,point,height,heading,walking,force
   return changed;
 }
 
+export function sampleCampaignGround(cache,key,x,z,sample){
+  let entry=cache.get(key);
+  if(entry&&entry.x===x&&entry.z===z)return entry.height;
+  if(!entry){entry={x:0,z:0,height:0};cache.set(key,entry);}
+  entry.x=x;entry.z=z;entry.height=sample(x,z);cache.misses=(cache.misses||0)+1;
+  return entry.height;
+}
+
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
   const renderer=rendererFactory({canvas,antialias:true,powerPreference:'high-performance'});
   const mobile=innerWidth<=700;
@@ -412,7 +420,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const tracer=new T.Line(new T.BufferGeometry().setAttribute('position',tracerPosition),new T.LineBasicMaterial({color:'#ffe8ad'}));tracer.frustumCulled=false;scene.add(tracer);
   const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()},cameraHits=[];
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
-  const goalState={},nearbyCandidates=[];
+  const goalState={},nearbyCandidates=[],campaignGroundCache=new Map();campaignGroundCache.misses=0;
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0,poseUpdates=0;
   const shadowState={},areaPresentationState={},releasedPresentationState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
@@ -450,7 +458,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       if(!visible)continue;
       const dx=g.x-s.p.x,dz=g.z-s.p.z,walking=g.hp>0&&dx*dx+dz*dz<210*210;
       guardWalking ||= walking;
-      placeHuman(p,g,g.area?0:ground(g.x,g.z),Math.atan2(s.p.x-g.x,s.p.z-g.z),walking,seconds,g.hp<=0);
+      placeHuman(p,g,g.area?0:sampleCampaignGround(campaignGroundCache,p,g.x,g.z,ground),Math.atan2(s.p.x-g.x,s.p.z-g.z),walking,seconds,g.hp<=0);
       if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y+=(g.area?0:.15);p.root.scale.setScalar(.8);}
       else {p.rig.rotation.x=0;p.arms[1].arm.rotation.x=-1.05;p.arms[1].forearm.rotation.x=-.35;}
     }
@@ -467,7 +475,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     }
     const g=goalInto(goalState,s).target,n=selectNearby(candidatesInto(nearbyCandidates,s),s.p),mark=n||g;
     halo.visible=!!mark;
-    if(mark)halo.position.set(mark.x/SCALE,(area?0:ground(mark.x,mark.z))+.08,mark.z/SCALE);
+    if(mark)halo.position.set(mark.x/SCALE,(area?0:sampleCampaignGround(campaignGroundCache,halo,mark.x,mark.z,ground))+.08,mark.z/SCALE);
     halo.scale.setScalar(1+Math.sin(seconds*3)*.10);
     handheld.visible=s.gun&&!s.boat&&mode==='first';
     handheld.position.z=s.shot?.025:0;
@@ -518,7 +526,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       unshadowedPalmTrunkTriangles:vegetation.treeBatches.filter(o=>!o.receiveShadow).reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
       palmCrownTriangles:vegetation.foliageBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
       lowDetailPalmBatches:vegetation.treeBatches.filter(o=>o.userData.lod.level==='low').length,
-      terrainTriangles:terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),shadowUpdates}),
+      terrainTriangles:terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),shadowUpdates,terrainHeightSamples:campaignGroundCache.misses}),
     dispose(){renderer.dispose();surfaces.dispose();const gs=new Set([...geos.values(),...vegetation.lodGeometries]),ms=new Set(mats.values());scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])ms.add(m);});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());paperMap.dispose();}
   };
 }

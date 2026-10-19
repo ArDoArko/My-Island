@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, createCampaignView, updateCampaignAreaPresentation, updateCampaignPoseState, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignPoseState, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -82,6 +82,18 @@ test('stationary campaign poses update only when their authored transform change
   point.x=21;assert.equal(updateCampaignPoseState(cache,point,.5,.25,false),true,'movement must invalidate the pose');
   assert.equal(updateCampaignPoseState(cache,point,.5,.25,true),true,'walking animation must update every frame');
   assert.equal(updateCampaignPoseState(cache,point,.5,.25,false,true),true,'a forced contact pose must bypass the cache');
+});
+
+test('stationary campaign objects reuse procedural terrain samples',()=>{
+  const cache=new Map(),guard={},marker={};let calls=0;
+  const sample=(x,z)=>{calls++;return x*.01-z*.02;};
+  assert.equal(sampleCampaignGround(cache,guard,120,-80,sample),2.8);
+  assert.equal(sampleCampaignGround(cache,guard,120,-80,sample),2.8);
+  assert.equal(sampleCampaignGround(cache,marker,120,-80,sample),2.8,'different scene objects keep independent entries');
+  assert.equal(calls,2,'unchanged positions must not resample the procedural terrain');
+  assert.equal(sampleCampaignGround(cache,guard,121,-80,sample),2.81);
+  assert.equal(calls,3,'moving an object must invalidate only its cached sample');
+  assert.equal(cache.misses,3);
 });
 
 test('real Three.js campaign geometry and both cameras run through every mission area without GPU rendering',()=>{
@@ -278,6 +290,8 @@ test('real Three.js campaign geometry and both cameras run through every mission
     }
     state.interior=null;state.boat=false;state.island='fortress';state.p={...C.docks.fortress};view.frame(1500);
     assert.equal(view.stats().posedCharacters,3,'fortress exterior should pose only the player and two outdoor guards');
+    const stationaryTerrainSamples=view.stats().terrainHeightSamples;view.frame(1517);
+    assert.equal(view.stats().terrainHeightSamples,stationaryTerrainSamples,'stationary exterior guards and objective must reuse terrain samples');
     state.interior='cellar';state.boat=false;state.key=state.paper=state.gun=true;
     state.released=C.PEOPLE.map(p=>p.id);state.walking=true;
     state.guards.forEach(g=>g.hp=0);view.frame(2000);
