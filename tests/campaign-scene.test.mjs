@@ -292,8 +292,12 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(view.stats().posedCharacters,3,'fortress exterior should pose only the player and two outdoor guards');
     const stationaryTerrainSamples=view.stats().terrainHeightSamples;view.frame(1517);
     assert.equal(view.stats().terrainHeightSamples,stationaryTerrainSamples,'stationary exterior guards and objective must reuse terrain samples');
+    state.released=C.PEOPLE.map(p=>p.id);state.walking=false;view.frame(1534);
+    assert.equal(view.stats().posedCharacters,8,'fortress escort should add all five released people');
+    const stationaryEscortSamples=view.stats().terrainHeightSamples;view.frame(1551);
+    assert.equal(view.stats().terrainHeightSamples,stationaryEscortSamples,'a stationary five-person escort must reuse terrain samples');
     state.interior='cellar';state.boat=false;state.key=state.paper=state.gun=true;
-    state.released=C.PEOPLE.map(p=>p.id);state.walking=true;
+    state.walking=true;
     state.guards.forEach(g=>g.hp=0);view.frame(2000);
     assert.equal(Array.from({length:5},(_,id)=>scene.getObjectByName('cell-door-'+id)).every(g=>!g.visible),true);
     assert(Number.isFinite(view.aim()));assert(view.vector(0,-1).x!==undefined);

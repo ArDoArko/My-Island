@@ -471,7 +471,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       model.root.visible=visible;
       if(!visible)continue;
       const point=freed?escortPoints[p.id]:p;
-      placeHuman(model,point,area?0:ground(point.x,point.z),s.heading,freed&&s.walking,seconds+p.id*.18);
+      placeHuman(model,point,area?0:sampleCampaignGround(campaignGroundCache,model,point.x,point.z,ground),s.heading,freed&&s.walking,seconds+p.id*.18);
     }
     const g=goalInto(goalState,s).target,n=selectNearby(candidatesInto(nearbyCandidates,s),s.p),mark=n||g;
     halo.visible=!!mark;
