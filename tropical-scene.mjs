@@ -136,6 +136,12 @@ export function updateSceneryLod(batches,cameraPosition){
   }
 }
 
+export function updateSceneryLodPosition(cache,batches,cameraPosition){
+  if(cache.ready&&cache.x===cameraPosition.x&&cache.y===cameraPosition.y&&cache.z===cameraPosition.z)return false;
+  cache.ready=true;cache.x=cameraPosition.x;cache.y=cameraPosition.y;cache.z=cameraPosition.z;
+  updateSceneryLod(batches,cameraPosition);return true;
+}
+
 export function decorateIslands(root,islands,{scale,height,surfaces,small=false,clear=()=>false,dense=false,lod=false}={}) {
   const palmTrunk=(radialSegments,heightSegments)=>{
     const geometry=new T.CylinderGeometry(.085,.16,1,radialSegments,heightSegments);geometry.translate(0,.5,0);
@@ -206,10 +212,10 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
     }
     rocks.castShadow=rocks.receiveShadow=true;rocks.instanceMatrix.needsUpdate=true;rocks.computeBoundingSphere();root.add(rocks);rockBatches.push(rocks);
   }
+  const lodBatches=[...treeBatches,...foliageBatches],lodPosition={};
   return {trees:treeBatches[0],foliage:foliageBatches[0],treeBatches,foliageBatches,rocks:rockBatches[0],rockBatches,
     lodGeometries:[trunk,distantTrunk,fronds,distantFronds],update(cameraPosition){
-      updateSceneryLod(treeBatches,cameraPosition);
-      updateSceneryLod(foliageBatches,cameraPosition);
+      return updateSceneryLodPosition(lodPosition,lodBatches,cameraPosition);
     }};
 }
 

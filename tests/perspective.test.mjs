@@ -4,7 +4,7 @@ import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow } from '../island-environment.mjs';
 import { cameraVector, fishPose, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateLeafWindCycle, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
-import { updateSceneryLod } from '../tropical-scene.mjs';
+import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
 
 test('eye-level camera follows real ground, ramp, floor and swimming height',()=>{
@@ -61,6 +61,16 @@ test('scenery LOD updates existing trunk and crown batches without joining them'
   camera.set(0,0,0);updateSceneryLod(trunks,camera);updateSceneryLod(crowns,camera);
   assert.equal(trunk.geometry,high);assert.equal(crown.geometry,high);assert.equal(trunk.receiveShadow,true);
   assert.equal(trunks[0],trunk);assert.equal(crowns[0],crown,'LOD updates must preserve the authored batch arrays');
+});
+
+test('scenery LOD reuses its result while the camera position is unchanged',()=>{
+  const cache={},camera=new T.Vector3(2,3,4),high={id:'near'},low={id:'far'};
+  const batch={geometry:null,userData:{lod:{high,low,distance:10,radius:0,center:new T.Vector3(),level:'low'}}};
+  assert.equal(updateSceneryLodPosition(cache,[batch],camera),true);assert.equal(batch.geometry,high);
+  batch.userData.lod.level='sentinel';
+  assert.equal(updateSceneryLodPosition(cache,[batch],camera),false,'a stationary camera must skip every batch distance test');
+  assert.equal(batch.userData.lod.level,'sentinel','the cached pass must not touch batch state');
+  camera.x=20;assert.equal(updateSceneryLodPosition(cache,[batch],camera),true);assert.equal(batch.geometry,low);
 });
 
 test('unchanged avatar appearance skips per-frame serialization and material work',()=>{

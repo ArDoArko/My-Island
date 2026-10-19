@@ -480,11 +480,10 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     }
     camera.position.copy(pose.position);camera.lookAt(pose.target);
     vegetation.update(camera.position);
-    stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,shadowOptions);
     const shadowAnimated=!s.paused&&(s.walking||s.boat||guardWalking);
     const updateShadow=updateCampaignShadowState(shadowState,s,shadowAnimated)||(shadowAnimated&&now-lastShadowUpdate>=1000/30);
     renderer.shadowMap.needsUpdate=updateShadow;
-    if(updateShadow){lastShadowUpdate=now;shadowUpdates++;}
+    if(updateShadow){stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,shadowOptions);lastShadowUpdate=now;shadowUpdates++;}
     ocean.update(seconds,camera.position);sky.position.copy(camera.position);
     tracer.visible=!!s.shot;
     if(s.shot){
