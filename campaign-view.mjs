@@ -66,6 +66,12 @@ export function updateCampaignWalkCycle(out,seconds,walking){
   return out;
 }
 
+export function updateCampaignPoseState(cache,point,height,heading,walking,force=false){
+  const changed=force||walking||!cache.ready||cache.x!==point.x||cache.z!==point.z||cache.height!==height||cache.heading!==heading||cache.walking!==walking;
+  cache.ready=true;cache.x=point.x;cache.z=point.z;cache.height=height;cache.heading=heading;cache.walking=walking;
+  return changed;
+}
+
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
   const renderer=rendererFactory({canvas,antialias:true,powerPreference:'high-performance'});
   const mobile=innerWidth<=700;
@@ -407,12 +413,15 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()},cameraHits=[];
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
   const goalState={},nearbyCandidates=[];
-  let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0;
+  let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0,poseUpdates=0;
   const shadowState={},areaPresentationState={},releasedPresentationState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
-  function placeHuman(person,p,height,heading,walking,seconds){
+  function placeHuman(person,p,height,heading,walking,seconds,force=false){
     posedCharacters++;
+    const poseState=person.root.userData.campaignPoseState||(person.root.userData.campaignPoseState={});
+    if(!updateCampaignPoseState(poseState,p,height,heading,walking,force))return;
+    poseUpdates++;
     person.root.position.set(p.x/SCALE,height,p.z/SCALE);person.root.rotation.set(0,0,0);person.rig.rotation.y=heading;
     const cycle=updateCampaignWalkCycle(walkCycle,seconds,walking);
     for(const leg of person.legs){const swing=(leg.side<0?-cycle.swing:cycle.swing)*cycle.step;leg.thigh.rotation.x=swing;leg.calf.rotation.x=Math.max(0,-swing);leg.shoe.rotation.x=-leg.calf.rotation.x*.6;}
@@ -426,7 +435,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     updateCampaignAreaPresentation(areaPresentationState,area,world,rooms,roomEntries,scene,hemi,sun);
     const surface=area?0:ground(s.p.x,s.p.z);
     self.root.visible=!s.boat||mode==='third';
-    if(!s.boat){attachSceneChild(scene,self.root);placeHuman(self,s.p,surface,s.heading,s.walking,seconds);}
+    if(!s.boat){const reattached=attachSceneChild(scene,self.root);placeHuman(self,s.p,surface,s.heading,s.walking,seconds,reattached);}
     self.rig.visible=mode==='third';
     boat.position.set((s.boat?s.p.x:docks[s.boatAt].x)/SCALE,.02,(s.boat?s.p.z:docks[s.boatAt].z)/SCALE);
     boat.rotation.y=s.boat?s.heading:Math.atan2(docks[s.boatAt].ux,docks[s.boatAt].uz);
@@ -441,7 +450,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       if(!visible)continue;
       const dx=g.x-s.p.x,dz=g.z-s.p.z,walking=g.hp>0&&dx*dx+dz*dz<210*210;
       guardWalking ||= walking;
-      placeHuman(p,g,g.area?0:ground(g.x,g.z),Math.atan2(s.p.x-g.x,s.p.z-g.z),walking,seconds);
+      placeHuman(p,g,g.area?0:ground(g.x,g.z),Math.atan2(s.p.x-g.x,s.p.z-g.z),walking,seconds,g.hp<=0);
       if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y+=(g.area?0:.15);p.root.scale.setScalar(.8);}
       else {p.rig.rotation.x=0;p.arms[1].arm.rotation.x=-1.05;p.arms[1].forearm.rotation.x=-.35;}
     }
@@ -503,7 +512,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
     stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,
-      palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,
+      palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,poseUpdates,
       palmLodDistanceChecks:vegetation.treeBatches.length+vegetation.foliageBatches.length,
       palmTrunkTriangles:vegetation.treeBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
       unshadowedPalmTrunkTriangles:vegetation.treeBatches.filter(o=>!o.receiveShadow).reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),

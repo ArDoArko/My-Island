@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, createCampaignView, updateCampaignAreaPresentation, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, createCampaignView, updateCampaignAreaPresentation, updateCampaignPoseState, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -73,6 +73,15 @@ test('campaign walk cycle shares exact trigonometric samples across each body',(
       assert(Math.abs(Math.max(0,-oldLeg)-Math.max(0,-newLeg))<1e-12);
     }
   }
+});
+
+test('stationary campaign poses update only when their authored transform changes',()=>{
+  const cache={},point={x:20,z:-40};
+  assert.equal(updateCampaignPoseState(cache,point,.5,.25,false),true);
+  assert.equal(updateCampaignPoseState(cache,point,.5,.25,false),false,'an unchanged idle person must reuse its body pose');
+  point.x=21;assert.equal(updateCampaignPoseState(cache,point,.5,.25,false),true,'movement must invalidate the pose');
+  assert.equal(updateCampaignPoseState(cache,point,.5,.25,true),true,'walking animation must update every frame');
+  assert.equal(updateCampaignPoseState(cache,point,.5,.25,false,true),true,'a forced contact pose must bypass the cache');
 });
 
 test('real Three.js campaign geometry and both cameras run through every mission area without GPU rendering',()=>{
@@ -229,6 +238,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),75208,'adaptive island meshes must remove oversampling');
     assert(terrainMeshes.every(o=>o.material.userData.fragmentNoiseLayers===3),'every island surface must use the three-layer terrain shader');
     assert.equal(view.stats().terrainTriangles,75208);
+    state.interior='cave';state.boat=false;state.p={x:0,z:115};state.walking=false;view.frame(500);
+    const stationaryPoseUpdates=view.stats().poseUpdates;view.frame(517);
+    assert.equal(view.stats().poseUpdates,stationaryPoseUpdates,'an unchanged idle campaign character must not rewrite its body pose');
     const sky=scene.getObjectByName('tropical-sky');view.frame(4321);
     assert.equal(sky.material.uniforms.uTime.value,4.321,'procedural clouds must drift with campaign time');
     assert.equal(sky.material.userData.fragmentNoiseLayers,3,'sky clouds must use three noise layers rather than four');
