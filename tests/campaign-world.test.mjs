@@ -87,9 +87,10 @@ test('the actual human pelvis rests on the seat and both boots rest on the deck 
     for(let j=0;j<p.count;j++)box.expandByPoint(point.fromBufferAttribute(p,j).applyMatrix4(matrix));
     return box;
   };
+  let mountChanges=0;
   try{
     for(const yaw of [0,Math.PI/2,Math.PI])for(const roll of [-.015,0,.015]){
-      boat.position.set(19,.02,-11);boat.rotation.set(0,yaw,roll);seatDriver(person,boat);root.updateMatrixWorld(true);
+      boat.position.set(19,.02,-11);boat.rotation.set(0,yaw,roll);mountChanges+=seatDriver(person,boat)?1:0;root.updateMatrixWorld(true);
       assert.equal(person.root.parent,boat);
       const pelvis=localBounds(person.hips.children[0]),seat=localBounds(boat.getObjectByName('boat-seat'));
       assert(Math.abs(pelvis.min.y-seat.max.y)<.005,'driver is suspended above the seat');
@@ -105,6 +106,7 @@ test('the actual human pelvis rests on the seat and both boots rest on the deck 
         assert(Math.abs(Math.hypot(point.x,point.y)-.20)<.065&&Math.abs(point.z)<.08,'hands miss the helm');
       }
     }
+    assert.equal(mountChanges,1,'stable boat frames must not reparent or repose the driver');
   }finally{
     root.traverse(o=>{if(o.geometry)geometries.set(o.geometry,true);if(o.material)materials.set(o.material,true);});
     for(const g of geometries.keys())g.dispose();for(const m of materials.keys())if(typeof m!=='string')m.dispose();

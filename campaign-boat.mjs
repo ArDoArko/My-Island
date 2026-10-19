@@ -42,8 +42,10 @@ export function buildMotorboat(root,{cube,ell,mat}) {
   return {boat,wake};
 }
 export function seatDriver(person,boat) {
+  if(person.root.parent===boat)return false;
   boat.add(person.root);person.root.position.set(0,0,HELM.seatZ);person.root.rotation.set(0,0,0);
   person.rig.rotation.set(0,0,0);person.hips.position.y=HELM.hips;
   for(const arm of person.arms){arm.arm.rotation.x=-.85;arm.arm.rotation.z=-arm.side*.18;arm.forearm.rotation.x=-.72;}
   for(const leg of person.legs){leg.thigh.rotation.x=-1.68;leg.calf.rotation.x=1.68;leg.shoe.rotation.x=0;}
+  return true;
 }
