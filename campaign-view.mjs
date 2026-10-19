@@ -13,6 +13,24 @@ export function attachSceneChild(parent,child){
   parent.add(child);return true;
 }
 
+export function updateCampaignAreaPresentation(cache,area,world,rooms,roomEntries,scene,hemi,sun){
+  if(cache.ready&&cache.area===area)return false;
+  cache.ready=true;cache.area=area;world.visible=!area;rooms.visible=!!area;
+  for(const [id,root] of roomEntries)root.visible=id===area;
+  scene.background.set(area?'#202c29':'#b9dbe5');scene.fog.color.copy(scene.background);
+  hemi.intensity=area?.65:2.0;sun.intensity=area?.15:2.8;return true;
+}
+
+export function updateReleasedPresentation(cache,released,releasedMask,cellBars){
+  const values=cache.values||(cache.values=[]);let changed=!cache.ready||values.length!==released.length;
+  for(let i=0;i<released.length;i++)if(values[i]!==released[i])changed=true;
+  if(!changed)return false;
+  cache.ready=true;values.length=released.length;releasedMask.fill(0);
+  for(let i=0;i<released.length;i++){const id=released[i];values[i]=id;releasedMask[id]=1;}
+  for(let i=0;i<cellBars.length;i++)cellBars[i].visible=!releasedMask[i];
+  return true;
+}
+
 export function updateCampaignShadowState(cache,state,animated=false){
   const area=state.interior||'',boat=!!state.boat,x=Math.round(state.p.x/20),z=Math.round(state.p.z/20),
     heading=Math.round(state.heading*12),boarded=!!state.boarded,guards=state.guards||[],released=state.released||[];
@@ -390,7 +408,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
   const goalState={},nearbyCandidates=[];
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0;
-  const shadowState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
+  const shadowState={},areaPresentationState={},releasedPresentationState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
   function placeHuman(person,p,height,heading,walking,seconds){
@@ -405,10 +423,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     if(!enabled||lost)return;
     const s=getState(),seconds=now/1000;last=now;posedCharacters=0;surfaces.update();sky.material.uniforms.uTime.value=seconds;
     const area=s.interior;
-    world.visible=!area;rooms.visible=!!area;
-    for(const [id,root] of roomEntries)root.visible=id===area;
-    scene.background.set(area?'#202c29':'#b9dbe5');scene.fog.color.copy(scene.background);
-    hemi.intensity=area?.65:2.0;sun.intensity=area?.15:2.8;
+    updateCampaignAreaPresentation(areaPresentationState,area,world,rooms,roomEntries,scene,hemi,sun);
     const surface=area?0:ground(s.p.x,s.p.z);
     self.root.visible=!s.boat||mode==='third';
     if(!s.boat){attachSceneChild(scene,self.root);placeHuman(self,s.p,surface,s.heading,s.walking,seconds);}
@@ -418,8 +433,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     boat.rotation.z=s.boat?Math.sin(seconds*2)*.015:0;wake.visible=s.boat&&s.walking;
     if(s.boat)seatDriver(self,boat);
     paperMesh.visible=!s.paper;hiddenGun.visible=s.paper&&!s.gun;
-    keyMesh.rotation.y=seconds;releasedMask.fill(0);for(const id of s.released)releasedMask[id]=1;
-    for(let i=0;i<cellBars.length;i++)cellBars[i].visible=!releasedMask[i];
+    keyMesh.rotation.y=seconds;updateReleasedPresentation(releasedPresentationState,s.released,releasedMask,cellBars);
     let guardWalking=false,bossDefeated=false;
     for(const g of s.guards){
       if(g.id==='boss')bossDefeated=g.hp<=0;

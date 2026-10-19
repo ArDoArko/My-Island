@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, createCampaignView, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment } from '../campaign-view.mjs';
+import { attachSceneChild, createCampaignView, updateCampaignAreaPresentation, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -16,6 +16,21 @@ test('campaign player reparents only when changing between boat and land',()=>{
   assert.equal(attachSceneChild(scene,player),true,'disembarking must restore the player to the scene');
   assert.equal(player.parent,scene);assert.deepEqual(scene.children,[sentinel,player]);
   assert.equal(attachSceneChild(scene,player),false,'subsequent on-foot frames must reuse the parent');
+});
+
+test('static campaign presentation changes only with the room or rescued people',()=>{
+  const areaCache={},world={},rooms={},roomEntries=[['cave',{}],['estate',{}],['cellar',{}]],scene={background:new T.Color(),fog:{color:new T.Color()}},hemi={},sun={};
+  assert.equal(updateCampaignAreaPresentation(areaCache,null,world,rooms,roomEntries,scene,hemi,sun),true);
+  assert.equal(world.visible,true);assert.equal(rooms.visible,false);assert.equal(hemi.intensity,2);assert.equal(sun.intensity,2.8);
+  assert.equal(updateCampaignAreaPresentation(areaCache,null,world,rooms,roomEntries,scene,hemi,sun),false);
+  assert.equal(updateCampaignAreaPresentation(areaCache,'cellar',world,rooms,roomEntries,scene,hemi,sun),true);
+  assert.equal(world.visible,false);assert.equal(rooms.visible,true);assert.equal(roomEntries[2][1].visible,true);
+  assert.equal(hemi.intensity,.65);assert.equal(sun.intensity,.15);assert(scene.background.equals(scene.fog.color));
+  const releaseCache={},mask=new Uint8Array(5),bars=Array.from({length:5},()=>({visible:true}));
+  assert.equal(updateReleasedPresentation(releaseCache,[1,3],mask,bars),true);
+  assert.deepEqual(Array.from(mask),[0,1,0,1,0]);assert.deepEqual(bars.map(bar=>bar.visible),[true,false,true,false,true]);
+  assert.equal(updateReleasedPresentation(releaseCache,[1,3],mask,bars),false);
+  assert.equal(updateReleasedPresentation(releaseCache,[1,3,4],mask,bars),true);assert.equal(bars[4].visible,false);
 });
 
 test('unchanged campaign shadows reuse primitive state without frame strings',()=>{
