@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignPoseState, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignNearby, updateCampaignPoseState, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -42,6 +42,21 @@ test('unchanged campaign shadows reuse primitive state without frame strings',()
   assert.equal(updateCampaignShadowState(cache,state,false),false);
   state.released=[0,3];assert.equal(updateCampaignShadowState(cache,state,false),true,'a released resident change must refresh shadows');
   assert.equal(updateCampaignShadowState(cache,state,true),true,'starting animation must refresh shadows immediately');
+});
+
+test('nearby campaign interaction selection updates only when its inputs change',()=>{
+  const cache={},candidates=[],state=C.fresh();
+  assert.equal(updateCampaignNearby(cache,state,candidates),true);
+  assert.equal(updateCampaignNearby(cache,state,candidates),false,'an unchanged player and mission state must reuse the nearby target');
+  state.p={...C.docks.home};assert.equal(updateCampaignNearby(cache,state,candidates),true,'player movement must refresh proximity immediately');
+  assert.equal(cache.nearby?.id,'dock-home');
+  state.boat=false;state.p={...C.docks.home.shore};state.island='home';
+  assert.equal(updateCampaignNearby(cache,state,candidates),true,'disembarking must replace boat interactions with land interactions');
+  assert.equal(cache.nearby?.id,'boat');
+  state.interior='cellar';state.p={...C.PEOPLE[0]};state.released=[];
+  assert.equal(updateCampaignNearby(cache,state,candidates),true);assert.equal(cache.nearby?.id,'cell-0');
+  state.released.push(0);assert.equal(updateCampaignNearby(cache,state,candidates),true,'freeing a person must refresh cellar interactions');
+  assert.notEqual(cache.nearby?.id,'cell-0');
 });
 
 test('escort formation updates reusable points around the player',()=>{
@@ -292,6 +307,10 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(view.stats().posedCharacters,3,'fortress exterior should pose only the player and two outdoor guards');
     const stationaryTerrainSamples=view.stats().terrainHeightSamples;view.frame(1517);
     assert.equal(view.stats().terrainHeightSamples,stationaryTerrainSamples,'stationary exterior guards and objective must reuse terrain samples');
+    const stationaryNearbySelections=view.stats().nearbySelections;view.frame(1525);
+    assert.equal(view.stats().nearbySelections,stationaryNearbySelections,'an unchanged campaign frame must reuse its nearby interaction selection');
+    state.p.x+=1;view.frame(1526);
+    assert.equal(view.stats().nearbySelections,stationaryNearbySelections+1,'player movement must refresh nearby interaction selection immediately');
     state.released=C.PEOPLE.map(p=>p.id);state.walking=false;view.frame(1534);
     assert.equal(view.stats().posedCharacters,8,'fortress escort should add all five released people');
     const stationaryEscortSamples=view.stats().terrainHeightSamples;view.frame(1551);
