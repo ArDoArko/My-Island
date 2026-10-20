@@ -419,6 +419,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const tracerPosition=new T.Float32BufferAttribute(new Float32Array(6),3);
   const tracer=new T.Line(new T.BufferGeometry().setAttribute('position',tracerPosition),new T.LineBasicMaterial({color:'#ffe8ad'}));tracer.frustumCulled=false;scene.add(tracer);
   const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()},cameraHits=[];
+  const cameraCollisionState={position:new T.Vector3()};let cameraRaycasts=0;
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
   const goalState={},nearbyCandidates=[],campaignGroundCache=new Map();campaignGroundCache.misses=0;
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0,poseUpdates=0;
@@ -489,11 +490,17 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       pose.position.z=T.MathUtils.clamp(pose.position.z,-5.0,8.1);
     }
     if(!area&&mode==='third'){
-      cameraDirection.subVectors(pose.position,pose.target);const length=cameraDirection.length();cameraDirection.normalize();
-      cameraRay.set(pose.target,cameraDirection);cameraRay.far=length;
-      const hit=intersectRaycastInto(cameraRay,cameraBlockers,true,cameraHits).find(cameraHit);
-      if(hit)pose.position.copy(pose.target).addScaledVector(cameraDirection,Math.max(.35,hit.distance-.22));
-      pose.position.y=Math.max(pose.position.y,sampleCampaignGround(campaignGroundCache,camera,pose.position.x*SCALE,pose.position.z*SCALE,ground)+.24);
+      const c=cameraCollisionState,p=pose.position,t=pose.target;
+      if(c.ready&&c.x===p.x&&c.y===p.y&&c.z===p.z&&c.tx===t.x&&c.ty===t.y&&c.tz===t.z)pose.position.copy(c.position);
+      else {
+        c.ready=true;c.x=p.x;c.y=p.y;c.z=p.z;c.tx=t.x;c.ty=t.y;c.tz=t.z;
+        cameraDirection.subVectors(p,t);const length=cameraDirection.length();cameraDirection.normalize();
+        cameraRay.set(t,cameraDirection);cameraRay.far=length;cameraRaycasts++;
+        const hit=intersectRaycastInto(cameraRay,cameraBlockers,true,cameraHits).find(cameraHit);
+        if(hit)p.copy(t).addScaledVector(cameraDirection,Math.max(.35,hit.distance-.22));
+        p.y=Math.max(p.y,sampleCampaignGround(campaignGroundCache,camera,p.x*SCALE,p.z*SCALE,ground)+.24);
+        c.position.copy(p);
+      }
     }
     camera.position.copy(pose.position);camera.lookAt(pose.target);
     vegetation.update(camera.position);
@@ -519,7 +526,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     get cameraMode(){return mode},get enabled(){return enabled&&!lost},
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
-    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,
+    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,
       palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,poseUpdates,
       palmLodDistanceChecks:vegetation.treeBatches.length+vegetation.foliageBatches.length,
       palmTrunkTriangles:vegetation.treeBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),

@@ -297,10 +297,12 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const stationaryEscortSamples=view.stats().terrainHeightSamples;view.frame(1551);
     assert.equal(view.stats().terrainHeightSamples,stationaryEscortSamples,'a stationary five-person escort must reuse terrain samples');
     state.released=[];view.setCamera('third');view.frame(1568);
-    const stationaryPlayerCameraSamples=view.stats().terrainHeightSamples;view.frame(1585);
+    const stationaryPlayerCameraSamples=view.stats().terrainHeightSamples,stationaryCameraRaycasts=view.stats().cameraRaycasts;view.frame(1585);
     assert.equal(view.stats().terrainHeightSamples,stationaryPlayerCameraSamples,'a stationary player and chase camera must reuse terrain samples');
+    assert.equal(view.stats().cameraRaycasts,stationaryCameraRaycasts,'an unchanged chase camera must reuse its static-scenery collision result');
     state.p.x+=1;view.frame(1602);
     assert.equal(view.stats().terrainHeightSamples,stationaryPlayerCameraSamples+2,'player movement must refresh player and chase-camera ground contact');
+    assert.equal(view.stats().cameraRaycasts,stationaryCameraRaycasts+1,'player movement must refresh chase-camera collision immediately');
     state.released=C.PEOPLE.map(p=>p.id);
     state.interior='cellar';state.boat=false;state.key=state.paper=state.gun=true;
     state.walking=true;
