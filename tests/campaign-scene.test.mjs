@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignGoal, updateCampaignNearby, updateCampaignPoseState, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignGoal, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -125,14 +125,30 @@ test('stationary campaign objects reuse procedural terrain samples',()=>{
   assert.equal(cache.misses,3);
 });
 
+test('campaign render scale adapts only after sustained frame pressure and recovers gradually',()=>{
+  const scale={};let ratio=1.5,now=0;
+  ratio=updateCampaignRenderScale(scale,now,ratio,1.5);
+  for(let i=0;i<62;i++)ratio=updateCampaignRenderScale(scale,now+=40,ratio,1.5);
+  assert.equal(ratio,1.5,'brief frame pressure must not change resolution');
+  ratio=updateCampaignRenderScale(scale,now+=40,ratio,1.5);
+  assert.equal(ratio,1.35,'sustained slow frames should reduce GPU fill rate one step');
+  ratio=updateCampaignRenderScale(scale,now+=1000,ratio,1.5);
+  assert.equal(ratio,1.35,'a background-tab pause must not count as a slow frame');
+  for(let i=0;i<313;i++)ratio=updateCampaignRenderScale(scale,now+=16,ratio,1.5);
+  assert.equal(ratio,1.45,'stable fast frames should recover quality gradually');
+  for(let round=0;round<8;round++)for(let i=0;i<63;i++)ratio=updateCampaignRenderScale(scale,now+=40,ratio,1.5);
+  assert.equal(ratio,.8,'adaptive resolution must retain a readable lower bound');
+});
+
 test('real Three.js campaign geometry and both cameras run through every mission area without GPU rendering',()=>{
   const dom=new JSDOM('<canvas></canvas>');
   const previous=Object.fromEntries(['document','innerWidth','innerHeight','devicePixelRatio'].map(k=>[k,globalThis[k]]));
   globalThis.document=dom.window.document;globalThis.innerWidth=900;globalThis.innerHeight=600;globalThis.devicePixelRatio=1;
   dom.window.HTMLCanvasElement.prototype.getContext=()=>new Proxy({}, {get:()=>()=>{}});
   let scene,camera,disposed=false;
+  let pixelRatio=1;
   const renderer={capabilities:{getMaxAnisotropy:()=>1},shadowMap:{},info:{render:{calls:0,triangles:0}},
-    setPixelRatio(){},setSize(){},render(s,c){scene=s;camera=c;s.updateMatrixWorld(true);c.updateMatrixWorld(true)},dispose(){disposed=true}};
+    setPixelRatio(value){pixelRatio=value},getPixelRatio(){return pixelRatio},setSize(){},render(s,c){scene=s;camera=c;s.updateMatrixWorld(true);c.updateMatrixWorld(true)},dispose(){disposed=true}};
   const state=C.fresh();let view;
   try{
     view=createCampaignView({canvas:document.querySelector('canvas'),getState:()=>state,makeHuman:buildHuman,rendererFactory:()=>renderer});

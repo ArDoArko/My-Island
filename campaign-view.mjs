@@ -108,10 +108,24 @@ export function sampleCampaignGround(cache,key,x,z,sample){
   return entry.height;
 }
 
+export function updateCampaignRenderScale(state,now,pixelRatio,maxPixelRatio){
+  if(!state.ready){state.ready=true;state.last=now;state.slow=0;state.fast=0;return pixelRatio;}
+  const elapsed=now-state.last;state.last=now;
+  // A background tab or debugger pause is not evidence that the GPU is slow.
+  if(elapsed<=0||elapsed>250)return pixelRatio;
+  if(elapsed>34){state.slow+=elapsed;state.fast=0;}
+  else if(elapsed<20){state.fast+=elapsed;state.slow=Math.max(0,state.slow-elapsed);}
+  else {state.slow=Math.max(0,state.slow-elapsed*.5);state.fast=Math.max(0,state.fast-elapsed);}
+  if(state.slow>=2500&&pixelRatio>.8){state.slow=0;state.fast=0;return Math.max(.8,Math.round((pixelRatio-.15)*100)/100);}
+  if(state.fast>=5000&&pixelRatio<maxPixelRatio){state.slow=0;state.fast=0;return Math.min(maxPixelRatio,Math.round((pixelRatio+.1)*100)/100);}
+  return pixelRatio;
+}
+
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
   const renderer=rendererFactory({canvas,antialias:true,powerPreference:'high-performance'});
   const mobile=innerWidth<=700;
-  renderer.setPixelRatio(Math.min(devicePixelRatio||1,mobile?1.1:1.5));
+  const maxPixelRatio=Math.min(devicePixelRatio||1,mobile?1.1:1.5);
+  renderer.setPixelRatio(maxPixelRatio);
   renderer.setSize(innerWidth,innerHeight,false);
   renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;
@@ -452,7 +466,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const goalState={},goalSelectionState={},nearbyState={},nearbyCandidates=[],campaignGroundCache=new Map();campaignGroundCache.misses=0;
   let goalSelections=0,nearbySelections=0;
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0,poseUpdates=0;
-  const shadowState={},areaPresentationState={},releasedPresentationState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
+  const shadowState={},areaPresentationState={},releasedPresentationState={},renderScaleState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
   function placeHuman(person,p,height,heading,walking,seconds,force=false){
@@ -547,6 +561,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     }
     if(oldArea!==area){oldArea=area;if(area)yaw=0;else if(g)yaw=Math.atan2(s.p.x-g.x,s.p.z-g.z);}
     renderer.render(scene,camera);
+    const pixelRatio=renderer.getPixelRatio(),nextPixelRatio=updateCampaignRenderScale(renderScaleState,now,pixelRatio,maxPixelRatio);
+    if(nextPixelRatio!==pixelRatio){renderer.setPixelRatio(nextPixelRatio);resize();}
   }
   function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);}
   function orbit(dx,dy=0){if(getState().paused)return;yaw+=dx;pitch=T.MathUtils.clamp(pitch+dy,mode==='first'?-.95:-.05,.75);}
@@ -558,7 +574,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     get cameraMode(){return mode},get enabled(){return enabled&&!lost},
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
-    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,goalSelections,nearbySelections,
+    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,goalSelections,nearbySelections,
       palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,poseUpdates,
       palmLodDistanceChecks:vegetation.treeBatches.length+vegetation.foliageBatches.length,
       palmTrunkTriangles:vegetation.treeBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
