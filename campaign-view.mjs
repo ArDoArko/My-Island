@@ -44,6 +44,21 @@ export function updateCampaignNearby(cache,state,candidates){
   cache.nearby=selectNearby(candidatesInto(candidates,state),state.p);return true;
 }
 
+export function updateCampaignGoal(cache,state,out,bossAlive=!!state.guards?.find(guard=>guard.id==='boss'&&guard.hp>0)){
+  const released=state.released||[],values=cache.released||(cache.released=[]);
+  let changed=!cache.ready||cache.x!==state.p.x||cache.z!==state.p.z||cache.area!==(state.interior||'')||cache.island!==state.island||
+    cache.boat!==!!state.boat||cache.complete!==!!state.complete||cache.docked!==!!state.docked||cache.tanked!==!!state.tanked||
+    cache.paper!==!!state.paper||cache.gun!==!!state.gun||cache.key!==!!state.key||cache.boarded!==!!state.boarded||
+    cache.bossAlive!==bossAlive||values.length!==released.length;
+  for(let i=0;i<released.length;i++)if(values[i]!==released[i])changed=true;
+  if(!changed)return false;
+  cache.ready=true;cache.x=state.p.x;cache.z=state.p.z;cache.area=state.interior||'';cache.island=state.island;cache.boat=!!state.boat;
+  cache.complete=!!state.complete;cache.docked=!!state.docked;cache.tanked=!!state.tanked;cache.paper=!!state.paper;cache.gun=!!state.gun;
+  cache.key=!!state.key;cache.boarded=!!state.boarded;cache.bossAlive=bossAlive;
+  values.length=released.length;for(let i=0;i<released.length;i++)values[i]=released[i];
+  goalInto(out,state);return true;
+}
+
 export function updateCampaignShadowState(cache,state,animated=false){
   const area=state.interior||'',boat=!!state.boat,x=Math.round(state.p.x/20),z=Math.round(state.p.z/20),
     heading=Math.round(state.heading*12),boarded=!!state.boarded,guards=state.guards||[],released=state.released||[];
@@ -434,8 +449,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()},cameraHits=[];
   const cameraCollisionState={position:new T.Vector3()};let cameraRaycasts=0;
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
-  const goalState={},nearbyState={},nearbyCandidates=[],campaignGroundCache=new Map();campaignGroundCache.misses=0;
-  let nearbySelections=0;
+  const goalState={},goalSelectionState={},nearbyState={},nearbyCandidates=[],campaignGroundCache=new Map();campaignGroundCache.misses=0;
+  let goalSelections=0,nearbySelections=0;
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0,poseUpdates=0;
   const shadowState={},areaPresentationState={},releasedPresentationState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
@@ -488,7 +503,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       const point=freed?escortPoints[p.id]:p;
       placeHuman(model,point,area?0:sampleCampaignGround(campaignGroundCache,model,point.x,point.z,ground),s.heading,freed&&s.walking,seconds+p.id*.18);
     }
-    const g=goalInto(goalState,s).target;
+    if(updateCampaignGoal(goalSelectionState,s,goalState,!bossDefeated))goalSelections++;
+    const g=goalState.target;
     if(updateCampaignNearby(nearbyState,s,nearbyCandidates))nearbySelections++;
     const n=nearbyState.nearby,mark=n||g;
     halo.visible=!!mark;
@@ -542,7 +558,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     get cameraMode(){return mode},get enabled(){return enabled&&!lost},
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
-    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,nearbySelections,
+    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,goalSelections,nearbySelections,
       palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,poseUpdates,
       palmLodDistanceChecks:vegetation.treeBatches.length+vegetation.foliageBatches.length,
       palmTrunkTriangles:vegetation.treeBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),

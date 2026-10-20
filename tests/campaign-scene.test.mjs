@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignNearby, updateCampaignPoseState, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignGoal, updateCampaignNearby, updateCampaignPoseState, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -57,6 +57,20 @@ test('nearby campaign interaction selection updates only when its inputs change'
   assert.equal(updateCampaignNearby(cache,state,candidates),true);assert.equal(cache.nearby?.id,'cell-0');
   state.released.push(0);assert.equal(updateCampaignNearby(cache,state,candidates),true,'freeing a person must refresh cellar interactions');
   assert.notEqual(cache.nearby?.id,'cell-0');
+});
+
+test('campaign objective selection reuses an unchanged story state',()=>{
+  const cache={},goal={},state=C.fresh();
+  assert.equal(updateCampaignGoal(cache,state,goal),true);assert.equal(goal.key,'dock-goal');
+  assert.equal(updateCampaignGoal(cache,state,goal),false,'an unchanged player and story state must reuse the objective');
+  state.docked=true;assert.equal(updateCampaignGoal(cache,state,goal),true);assert.equal(goal.key,'fuel-goal');
+  state.tanked=state.paper=state.gun=true;state.boat=false;state.island='fortress';state.interior='estate';
+  state.p={x:0,z:100};assert.equal(updateCampaignGoal(cache,state,goal,true),true);assert.equal(goal.key,'boss-goal');
+  state.guards.find(guard=>guard.id==='boss').hp=0;
+  assert.equal(updateCampaignGoal(cache,state,goal,false),true,'defeating the boss must expose the key immediately');assert.equal(goal.key,'key-goal');
+  state.key=true;state.interior='cellar';state.released=[0,1];
+  assert.equal(updateCampaignGoal(cache,state,goal,false),true);assert.equal(goal.target.id,2);
+  state.released=[0,2];assert.equal(updateCampaignGoal(cache,state,goal,false),true,'the rescued identities must invalidate the next-person marker');assert.equal(goal.target.id,1);
 });
 
 test('escort formation updates reusable points around the player',()=>{
@@ -307,9 +321,12 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(view.stats().posedCharacters,3,'fortress exterior should pose only the player and two outdoor guards');
     const stationaryTerrainSamples=view.stats().terrainHeightSamples;view.frame(1517);
     assert.equal(view.stats().terrainHeightSamples,stationaryTerrainSamples,'stationary exterior guards and objective must reuse terrain samples');
+    const stationaryGoalSelections=view.stats().goalSelections;view.frame(1521);
+    assert.equal(view.stats().goalSelections,stationaryGoalSelections,'an unchanged campaign frame must reuse its objective selection');
     const stationaryNearbySelections=view.stats().nearbySelections;view.frame(1525);
     assert.equal(view.stats().nearbySelections,stationaryNearbySelections,'an unchanged campaign frame must reuse its nearby interaction selection');
     state.p.x+=1;view.frame(1526);
+    assert.equal(view.stats().goalSelections,stationaryGoalSelections+1,'player movement must refresh pier-aware objective selection immediately');
     assert.equal(view.stats().nearbySelections,stationaryNearbySelections+1,'player movement must refresh nearby interaction selection immediately');
     state.released=C.PEOPLE.map(p=>p.id);state.walking=false;view.frame(1534);
     assert.equal(view.stats().posedCharacters,8,'fortress escort should add all five released people');
