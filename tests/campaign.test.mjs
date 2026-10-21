@@ -93,6 +93,31 @@ test('paused combat and cooldown stop while menus or a background tab are open',
   for(let i=0;i<30;i++)C.tick(s,.1);assert(s.hp<100);
 });
 
+test('paused campaign work renders once and invalidates on demand',()=>{
+  const cache={};
+  assert.equal(C.updateCampaignFrameState(cache,false),true);
+  assert.equal(C.updateCampaignFrameState(cache,true),true,'the first paused frame must draw');
+  assert.equal(C.updateCampaignFrameState(cache,true),false,'unchanged paused frames must stay idle');
+  assert.equal(C.updateCampaignFrameState(cache,true,true),true,'viewport or view changes must redraw once');
+  assert.equal(C.updateCampaignFrameState(cache,true),false);
+  assert.equal(C.updateCampaignFrameState(cache,false),true,'resuming must update immediately');
+});
+
+test('paused 2D fallback stops redrawing until invalidated or resumed',()=>{
+  const g=game();g.run('startCampaign();campaignUse3D=false');
+  g.frame();let campaignDrawCalls=0;g.context(g.element('campaign2d')).fillRect=()=>campaignDrawCalls++;
+  g.frame();const before=campaignDrawCalls;
+  g.run('toggle("campaignHelp",1)');g.frame();const pausedDrawCalls=campaignDrawCalls;
+  assert(pausedDrawCalls>before,'the first paused frame must draw the 2D scene');
+  g.frame();g.frame();assert.equal(campaignDrawCalls,pausedDrawCalls,'unchanged paused frames must stay idle');
+  g.run('resizeCampaign()');g.frame();const resizedDrawCalls=campaignDrawCalls;g.frame();
+  assert(resizedDrawCalls>pausedDrawCalls,'resize must redraw the paused 2D scene once');
+  assert.equal(campaignDrawCalls,resizedDrawCalls,'the resized paused frame must return to idle');
+  g.run('toggle("campaignHelp",0)');g.frame();
+  assert(campaignDrawCalls>resizedDrawCalls,'resuming must redraw immediately');
+  g.close();
+});
+
 test('village walls stop swept movement, streets and all docks stay reachable, and old campaign progress survives relocation',()=>{
   const s=C.fresh();s.boat=false;s.island='home';s.p={...C.docks.home.shore};
   const street=(x,z)=>({x:x+villageAnchor.x,z:z+villageAnchor.z});

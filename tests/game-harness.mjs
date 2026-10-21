@@ -64,6 +64,7 @@ export function game({ storage = {}, preferred = ['pl-PL'], storageBlocked = fal
     window, document: window.document, requests,
     run: code => runInContext(code, context),
     element: id => window.document.getElementById(id),
+    context(canvas) { return contexts.get(canvas); },
     frame(ms = 16.667) { now += ms; runInContext('loop(' + now + ')', context); },
     setPads(value) { controllers = value; },
     respond(callback) { responder = callback; },

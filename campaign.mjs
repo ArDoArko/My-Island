@@ -187,6 +187,12 @@ export function selectNearby(list,position) {
   }
   return best;
 }
+export function updateCampaignFrameState(cache,paused,invalidated=false) {
+  if(invalidated)cache.rendered=false;
+  if(!paused){cache.rendered=false;return true;}
+  if(cache.rendered)return false;
+  cache.rendered=true;return true;
+}
 export function nearby(s) {return selectNearby(candidates(s),s.p);}
 export function interact(s) {
   const target=nearby(s);if(!target){s.notice='closer';return false;}
