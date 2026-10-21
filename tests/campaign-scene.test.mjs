@@ -134,6 +134,10 @@ test('campaign render scale adapts only after sustained frame pressure and recov
   assert.equal(ratio,1.35,'sustained slow frames should reduce GPU fill rate one step');
   ratio=updateCampaignRenderScale(scale,now+=1000,ratio,1.5);
   assert.equal(ratio,1.35,'a background-tab pause must not count as a slow frame');
+  for(let i=0;i<400;i++)ratio=updateCampaignRenderScale(scale,now+=16,ratio,1.5,false);
+  assert.equal(ratio,1.35,'a paused game must not recover quality using its lighter workload');
+  ratio=updateCampaignRenderScale(scale,now+=16,ratio,1.5,true);
+  assert.equal(ratio,1.35,'resuming must start a fresh performance window');
   for(let i=0;i<313;i++)ratio=updateCampaignRenderScale(scale,now+=16,ratio,1.5);
   assert.equal(ratio,1.45,'stable fast frames should recover quality gradually');
   for(let round=0;round<8;round++)for(let i=0;i<63;i++)ratio=updateCampaignRenderScale(scale,now+=40,ratio,1.5);

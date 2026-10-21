@@ -108,7 +108,8 @@ export function sampleCampaignGround(cache,key,x,z,sample){
   return entry.height;
 }
 
-export function updateCampaignRenderScale(state,now,pixelRatio,maxPixelRatio){
+export function updateCampaignRenderScale(state,now,pixelRatio,maxPixelRatio,active=true){
+  if(!active){state.ready=true;state.last=now;state.slow=0;state.fast=0;return pixelRatio;}
   if(!state.ready){state.ready=true;state.last=now;state.slow=0;state.fast=0;return pixelRatio;}
   const elapsed=now-state.last;state.last=now;
   // A background tab or debugger pause is not evidence that the GPU is slow.
@@ -561,7 +562,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     }
     if(oldArea!==area){oldArea=area;if(area)yaw=0;else if(g)yaw=Math.atan2(s.p.x-g.x,s.p.z-g.z);}
     renderer.render(scene,camera);
-    const pixelRatio=renderer.getPixelRatio(),nextPixelRatio=updateCampaignRenderScale(renderScaleState,now,pixelRatio,maxPixelRatio);
+    const pixelRatio=renderer.getPixelRatio(),nextPixelRatio=updateCampaignRenderScale(renderScaleState,now,pixelRatio,maxPixelRatio,!s.paused);
     if(nextPixelRatio!==pixelRatio){renderer.setPixelRatio(nextPixelRatio);resize();}
   }
   function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);}
