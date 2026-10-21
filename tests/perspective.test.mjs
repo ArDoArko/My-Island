@@ -73,6 +73,18 @@ test('scenery LOD reuses its result while the camera position is unchanged',()=>
   camera.x=20;assert.equal(updateSceneryLodPosition(cache,[batch],camera),true);assert.equal(batch.geometry,low);
 });
 
+test('scenery LOD can debounce sub-metre camera movement without delaying real travel',()=>{
+  const cache={},camera=new T.Vector3(),high={id:'near'},low={id:'far'};
+  const batch={geometry:null,userData:{lod:{high,low,distance:10,radius:0,center:new T.Vector3(),level:'low'}}};
+  assert.equal(updateSceneryLodPosition(cache,[batch],camera,.5),true);
+  batch.userData.lod.level='sentinel';camera.set(.3,.2,.1);
+  assert.equal(updateSceneryLodPosition(cache,[batch],camera,.5),false,'movement below half a metre must reuse the prior LOD pass');
+  assert.equal(batch.userData.lod.level,'sentinel');
+  camera.set(.5,.01,0);
+  assert.equal(updateSceneryLodPosition(cache,[batch],camera,.5),true,'crossing the half-metre threshold must refresh LOD immediately');
+  assert.equal(batch.geometry,high);
+});
+
 test('unchanged avatar appearance skips per-frame serialization and material work',()=>{
   const person={};
   assert.equal(updateAppearanceKey(person,{shirt:'#123456',skin:'#abcdef',hair:'#333333',style:2}),true);

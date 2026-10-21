@@ -136,8 +136,11 @@ export function updateSceneryLod(batches,cameraPosition){
   }
 }
 
-export function updateSceneryLodPosition(cache,batches,cameraPosition){
-  if(cache.ready&&cache.x===cameraPosition.x&&cache.y===cameraPosition.y&&cache.z===cameraPosition.z)return false;
+export function updateSceneryLodPosition(cache,batches,cameraPosition,minMovement=0){
+  if(cache.ready){
+    const dx=cache.x-cameraPosition.x,dy=cache.y-cameraPosition.y,dz=cache.z-cameraPosition.z;
+    if(minMovement>0?dx*dx+dy*dy+dz*dz<minMovement*minMovement:dx===0&&dy===0&&dz===0)return false;
+  }
   cache.ready=true;cache.x=cameraPosition.x;cache.y=cameraPosition.y;cache.z=cameraPosition.z;
   updateSceneryLod(batches,cameraPosition);return true;
 }
@@ -214,8 +217,8 @@ export function decorateIslands(root,islands,{scale,height,surfaces,small=false,
   }
   const lodBatches=[...treeBatches,...foliageBatches],lodPosition={};
   return {trees:treeBatches[0],foliage:foliageBatches[0],treeBatches,foliageBatches,rocks:rockBatches[0],rockBatches,
-    lodGeometries:[trunk,distantTrunk,fronds,distantFronds],update(cameraPosition){
-      return updateSceneryLodPosition(lodPosition,lodBatches,cameraPosition);
+    lodGeometries:[trunk,distantTrunk,fronds,distantFronds],update(cameraPosition,minMovement=0){
+      return updateSceneryLodPosition(lodPosition,lodBatches,cameraPosition,minMovement);
     }};
 }
 

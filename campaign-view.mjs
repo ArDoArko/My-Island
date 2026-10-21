@@ -555,7 +555,9 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       }
     }
     camera.position.copy(pose.position);camera.lookAt(pose.target);
-    vegetation.update(camera.position);
+    // Palm LOD bands are tens of metres wide. Sampling after each half metre
+    // keeps transitions responsive without testing all 48 batches every frame.
+    vegetation.update(camera.position,.5);
     const shadowAnimated=!s.paused&&(s.walking||s.boat||guardWalking);
     const updateShadow=updateCampaignShadowState(shadowState,s,shadowAnimated)||(shadowAnimated&&now-lastShadowUpdate>=1000/30);
     renderer.shadowMap.needsUpdate=updateShadow;
