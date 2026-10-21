@@ -466,7 +466,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
   const goalState={},goalSelectionState={},nearbyState={},nearbyCandidates=[],campaignGroundCache=new Map();campaignGroundCache.misses=0;
   let goalSelections=0,nearbySelections=0;
-  let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0,poseUpdates=0;
+  let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0,poseUpdates=0,pausedFrameRendered=false;
   const shadowState={},areaPresentationState={},releasedPresentationState={},renderScaleState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
@@ -483,7 +483,12 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   }
   function frame(now) {
     if(!enabled||lost)return;
-    const s=getState(),seconds=now/1000;last=now;posedCharacters=0;surfaces.update();sky.material.uniforms.uTime.value=seconds;
+    const s=getState();
+    // A paused campaign is visually static. Draw its background once, then leave
+    // the GPU idle until play resumes or a camera/viewport change invalidates it.
+    if(s.paused&&pausedFrameRendered)return;
+    pausedFrameRendered=!!s.paused;
+    const seconds=now/1000;last=now;posedCharacters=0;surfaces.update();sky.material.uniforms.uTime.value=seconds;
     const area=s.interior;
     updateCampaignAreaPresentation(areaPresentationState,area,world,rooms,roomEntries,scene,hemi,sun);
     const surface=area?0:sampleCampaignGround(campaignGroundCache,self.root,s.p.x,s.p.z,ground);
@@ -565,16 +570,16 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     const pixelRatio=renderer.getPixelRatio(),nextPixelRatio=updateCampaignRenderScale(renderScaleState,now,pixelRatio,maxPixelRatio,!s.paused);
     if(nextPixelRatio!==pixelRatio){renderer.setPixelRatio(nextPixelRatio);resize();}
   }
-  function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);}
+  function resize(){pausedFrameRendered=false;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);}
   function orbit(dx,dy=0){if(getState().paused)return;yaw+=dx;pitch=T.MathUtils.clamp(pitch+dy,mode==='first'?-.95:-.05,.75);}
   canvas.addEventListener('pointerdown',e=>{if(getState().paused||e.button!==0)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);});
   canvas.addEventListener('pointermove',e=>{if(drag?.id!==e.pointerId)return;orbit(-(e.clientX-drag.x)*.006,(e.clientY-drag.y)*.005);drag.x=e.clientX;drag.y=e.clientY;});
   for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,()=>drag=null);
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;enabled=false;onLost?.();});
-  return {frame,resize,orbit,setCamera(value){mode=value==='first'?'first':'third';pitch=mode==='first'?.05:.22;},
+  return {frame,resize,orbit,setCamera(value){mode=value==='first'?'first':'third';pitch=mode==='first'?.05:.22;pausedFrameRendered=false;},
     get cameraMode(){return mode},get enabled(){return enabled&&!lost},
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
-    aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost},
+    aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost;if(enabled)pausedFrameRendered=false;},
     stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,goalSelections,nearbySelections,
       palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,poseUpdates,
       palmLodDistanceChecks:vegetation.treeBatches.length+vegetation.foliageBatches.length,

@@ -150,9 +150,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
   globalThis.document=dom.window.document;globalThis.innerWidth=900;globalThis.innerHeight=600;globalThis.devicePixelRatio=1;
   dom.window.HTMLCanvasElement.prototype.getContext=()=>new Proxy({}, {get:()=>()=>{}});
   let scene,camera,disposed=false;
-  let pixelRatio=1;
+  let pixelRatio=1,renderCalls=0;
   const renderer={capabilities:{getMaxAnisotropy:()=>1},shadowMap:{},info:{render:{calls:0,triangles:0}},
-    setPixelRatio(value){pixelRatio=value},getPixelRatio(){return pixelRatio},setSize(){},render(s,c){scene=s;camera=c;s.updateMatrixWorld(true);c.updateMatrixWorld(true)},dispose(){disposed=true}};
+    setPixelRatio(value){pixelRatio=value},getPixelRatio(){return pixelRatio},setSize(){},render(s,c){renderCalls++;scene=s;camera=c;s.updateMatrixWorld(true);c.updateMatrixWorld(true)},dispose(){disposed=true}};
   const state=C.fresh();let view;
   try{
     view=createCampaignView({canvas:document.querySelector('canvas'),getState:()=>state,makeHuman:buildHuman,rendererFactory:()=>renderer});
@@ -374,6 +374,11 @@ test('real Three.js campaign geometry and both cameras run through every mission
     state.walking=true;view.frame(3020);assert.equal(view.stats().shadowUpdates,stationaryShadow+2,'starting movement must refresh shadows immediately');
     view.frame(3030);assert.equal(view.stats().shadowUpdates,stationaryShadow+2,'moving shadows must be capped below 30 Hz');
     view.frame(3055);assert.equal(view.stats().shadowUpdates,stationaryShadow+3,'moving shadows must refresh after the 30 Hz interval');
+    state.walking=false;state.paused=true;const beforePauseRenders=renderCalls;view.frame(3100);view.frame(3117);
+    assert.equal(renderCalls,beforePauseRenders+1,'a static pause screen must render once instead of consuming GPU every frame');
+    view.resize();view.frame(3134);assert.equal(renderCalls,beforePauseRenders+2,'resizing must redraw a paused campaign once');
+    view.setCamera('first');view.frame(3151);assert.equal(renderCalls,beforePauseRenders+3,'changing camera must redraw a paused campaign once');
+    state.paused=false;view.frame(3168);assert.equal(renderCalls,beforePauseRenders+4,'resuming must render immediately');
     const before=camera.position.clone();view.setEnabled(false);state.p.x=80;view.frame(2100);assert(camera.position.equals(before));
   }finally{
     view?.dispose();assert(disposed);dom.window.close();
