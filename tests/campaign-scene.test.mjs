@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignGoal, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignGoal, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -111,6 +111,14 @@ test('stationary campaign poses update only when their authored transform change
   point.x=21;assert.equal(updateCampaignPoseState(cache,point,.5,.25,false),true,'movement must invalidate the pose');
   assert.equal(updateCampaignPoseState(cache,point,.5,.25,true),true,'walking animation must update every frame');
   assert.equal(updateCampaignPoseState(cache,point,.5,.25,false,true),true,'a forced contact pose must bypass the cache');
+});
+
+test('campaign guards walk only after their position really changes',()=>{
+  const cache={},guard={x:12,z:8};
+  assert.equal(updateCampaignMovement(cache,guard,true),false,'a newly observed stationary guard must start in an idle pose');
+  assert.equal(updateCampaignMovement(cache,guard,true),false,'proximity alone must not make a guard march in place');
+  guard.x+=.5;assert.equal(updateCampaignMovement(cache,guard,true),true,'real pursuit movement must animate the guard');
+  guard.x+=.5;assert.equal(updateCampaignMovement(cache,guard,false),false,'a defeated guard must never keep walking');
 });
 
 test('stationary campaign objects reuse procedural terrain samples',()=>{
@@ -339,6 +347,10 @@ test('real Three.js campaign geometry and both cameras run through every mission
     }
     state.interior=null;state.boat=false;state.island='fortress';state.p={...C.docks.fortress};view.frame(1500);
     assert.equal(view.stats().posedCharacters,3,'fortress exterior should pose only the player and two outdoor guards');
+    assert.equal(view.stats().movingGuards,0,'nearby stationary guards must not march in place');
+    state.guards.find(g=>!g.area).x+=1;view.frame(1508);
+    assert.equal(view.stats().movingGuards,1,'a guard that actually advances must animate its walk');
+    view.frame(1510);assert.equal(view.stats().movingGuards,0,'the walk must stop as soon as the guard position stops changing');
     const stationaryTerrainSamples=view.stats().terrainHeightSamples;view.frame(1517);
     assert.equal(view.stats().terrainHeightSamples,stationaryTerrainSamples,'stationary exterior guards and objective must reuse terrain samples');
     const stationaryGoalSelections=view.stats().goalSelections;view.frame(1521);

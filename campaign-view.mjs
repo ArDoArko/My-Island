@@ -100,6 +100,11 @@ export function updateCampaignPoseState(cache,point,height,heading,walking,force
   return changed;
 }
 
+export function updateCampaignMovement(cache,point,active=true){
+  const moving=!!(active&&cache.ready&&(cache.x!==point.x||cache.z!==point.z));
+  cache.ready=true;cache.x=point.x;cache.z=point.z;return moving;
+}
+
 export function sampleCampaignGround(cache,key,x,z,sample){
   let entry=cache.get(key);
   if(entry&&entry.x===x&&entry.z===z)return entry.height;
@@ -464,8 +469,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()},cameraHits=[];
   const cameraCollisionState={position:new T.Vector3()};let cameraRaycasts=0;
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
-  const goalState={},goalSelectionState={},nearbyState={},nearbyCandidates=[],campaignGroundCache=new Map();campaignGroundCache.misses=0;
-  let goalSelections=0,nearbySelections=0;
+  const goalState={},goalSelectionState={},nearbyState={},nearbyCandidates=[],campaignGroundCache=new Map(),guardMotionStates=new Map();campaignGroundCache.misses=0;
+  let goalSelections=0,nearbySelections=0,movingGuards=0;
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0,poseUpdates=0,pausedFrameRendered=false;
   const shadowState={},areaPresentationState={},releasedPresentationState={},renderScaleState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
@@ -501,12 +506,14 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     if(s.boat)seatDriver(self,boat);
     paperMesh.visible=!s.paper;hiddenGun.visible=s.paper&&!s.gun;
     keyMesh.rotation.y=seconds;updateReleasedPresentation(releasedPresentationState,s.released,releasedMask,cellBars);
-    let guardWalking=false,bossDefeated=false;
+    let guardWalking=false,bossDefeated=false;movingGuards=0;
     for(const g of s.guards){
       if(g.id==='boss')bossDefeated=g.hp<=0;
       const p=guardModels.get(g.id),visible=g.area===area&&!s.boat&&(!g.area||s.island==='fortress');p.root.visible=visible;
       if(!visible)continue;
-      const dx=g.x-s.p.x,dz=g.z-s.p.z,walking=g.hp>0&&dx*dx+dz*dz<210*210;
+      let motion=guardMotionStates.get(g.id);if(!motion){motion={};guardMotionStates.set(g.id,motion);}
+      const walking=updateCampaignMovement(motion,g,g.hp>0);
+      if(walking)movingGuards++;
       guardWalking ||= walking;
       placeHuman(p,g,g.area?0:sampleCampaignGround(campaignGroundCache,p,g.x,g.z,ground),Math.atan2(s.p.x-g.x,s.p.z-g.z),walking,seconds,g.hp<=0);
       if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y+=(g.area?0:.15);p.root.scale.setScalar(.8);}
@@ -582,7 +589,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     get cameraMode(){return mode},get enabled(){return enabled&&!lost},
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost;if(enabled)pausedFrameRendered=false;},
-    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,goalSelections,nearbySelections,
+    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,goalSelections,nearbySelections,movingGuards,
       palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,poseUpdates,
       palmLodDistanceChecks:vegetation.treeBatches.length+vegetation.foliageBatches.length,
       palmTrunkTriangles:vegetation.treeBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
