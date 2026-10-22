@@ -521,8 +521,9 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       const heading=updateCampaignGuardHeading(motion,Math.atan2(s.p.x-g.x,s.p.z-g.z),g.hp>0);
       if(walking)movingGuards++;
       guardWalking ||= walking;
-      placeHuman(p,g,g.area?0:sampleCampaignGround(campaignGroundCache,p,g.x,g.z,ground),heading,walking,seconds,false,g.hp<=0?'fallen':'armed');
-      if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y+=(g.area?0:.15);p.root.scale.setScalar(.8);}
+      const guardSurface=g.area?0:sampleCampaignGround(campaignGroundCache,p,g.x,g.z,ground);
+      placeHuman(p,g,guardSurface,heading,walking,seconds,false,g.hp<=0?'fallen':'armed');
+      if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y=guardSurface+(g.area?0:.15);p.root.scale.setScalar(.8);}
       else {p.rig.rotation.x=0;p.arms[1].arm.rotation.x=-1.05;p.arms[1].forearm.rotation.x=-.35;}
     }
     keyMesh.visible=!s.key&&bossDefeated;

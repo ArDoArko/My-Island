@@ -366,8 +366,10 @@ test('real Three.js campaign geometry and both cameras run through every mission
     view.frame(1510);assert.equal(view.stats().movingGuards,0,'the walk must stop as soon as the guard position stops changing');
     const exteriorGuards=state.guards.filter(g=>!g.area),exteriorHp=exteriorGuards.map(g=>g.hp);
     exteriorGuards.forEach(g=>g.hp=0);view.frame(1511);
+    const fallenHeights=exteriorGuards.map(g=>scene.getObjectByName('campaign-guard-'+g.id).position.y);
     const fallenPoseUpdates=view.stats().poseUpdates;view.frame(1512);
     assert.equal(view.stats().poseUpdates,fallenPoseUpdates,'unchanged defeated guards must reuse their fallen body poses');
+    assert.deepEqual(exteriorGuards.map(g=>scene.getObjectByName('campaign-guard-'+g.id).position.y),fallenHeights,'cached fallen guards must not rise above the terrain every frame');
     exteriorGuards.forEach((g,index)=>g.hp=exteriorHp[index]);view.frame(1513);
     const stationaryTerrainSamples=view.stats().terrainHeightSamples;view.frame(1517);
     assert.equal(view.stats().terrainHeightSamples,stationaryTerrainSamples,'stationary exterior guards and objective must reuse terrain samples');
