@@ -105,6 +105,11 @@ export function updateCampaignMovement(cache,point,active=true){
   cache.ready=true;cache.x=point.x;cache.z=point.z;return moving;
 }
 
+export function updateCampaignGuardHeading(cache,heading,active=true){
+  if(active||!cache.headingReady){cache.headingReady=true;cache.heading=heading;}
+  return cache.heading;
+}
+
 export function sampleCampaignGround(cache,key,x,z,sample){
   let entry=cache.get(key);
   if(entry&&entry.x===x&&entry.z===z)return entry.height;
@@ -513,9 +518,10 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       if(!visible)continue;
       let motion=guardMotionStates.get(g.id);if(!motion){motion={};guardMotionStates.set(g.id,motion);}
       const walking=updateCampaignMovement(motion,g,g.hp>0);
+      const heading=updateCampaignGuardHeading(motion,Math.atan2(s.p.x-g.x,s.p.z-g.z),g.hp>0);
       if(walking)movingGuards++;
       guardWalking ||= walking;
-      placeHuman(p,g,g.area?0:sampleCampaignGround(campaignGroundCache,p,g.x,g.z,ground),Math.atan2(s.p.x-g.x,s.p.z-g.z),walking,seconds,g.hp<=0);
+      placeHuman(p,g,g.area?0:sampleCampaignGround(campaignGroundCache,p,g.x,g.z,ground),heading,walking,seconds,g.hp<=0);
       if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y+=(g.area?0:.15);p.root.scale.setScalar(.8);}
       else {p.rig.rotation.x=0;p.arms[1].arm.rotation.x=-1.05;p.arms[1].forearm.rotation.x=-.35;}
     }

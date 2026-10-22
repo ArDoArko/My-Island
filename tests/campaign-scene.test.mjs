@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignGoal, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -119,6 +119,17 @@ test('campaign guards walk only after their position really changes',()=>{
   assert.equal(updateCampaignMovement(cache,guard,true),false,'proximity alone must not make a guard march in place');
   guard.x+=.5;assert.equal(updateCampaignMovement(cache,guard,true),true,'real pursuit movement must animate the guard');
   guard.x+=.5;assert.equal(updateCampaignMovement(cache,guard,false),false,'a defeated guard must never keep walking');
+});
+
+test('defeated campaign guards keep their final facing direction',()=>{
+  const cache={};
+  assert.equal(updateCampaignGuardHeading(cache,.25,true),.25);
+  assert.equal(updateCampaignGuardHeading(cache,1.1,false),.25,'a corpse must not rotate to track the moving player');
+  assert.equal(updateCampaignGuardHeading(cache,-.4,false),.25);
+  assert.equal(updateCampaignGuardHeading(cache,-.4,true),-.4,'a living guard must resume tracking immediately');
+  const loaded={};
+  assert.equal(updateCampaignGuardHeading(loaded,.8,false),.8,'an already defeated guard needs one stable initial heading');
+  assert.equal(updateCampaignGuardHeading(loaded,-.8,false),.8);
 });
 
 test('stationary campaign objects reuse procedural terrain samples',()=>{
