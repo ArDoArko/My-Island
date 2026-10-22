@@ -111,6 +111,8 @@ test('stationary campaign poses update only when their authored transform change
   point.x=21;assert.equal(updateCampaignPoseState(cache,point,.5,.25,false),true,'movement must invalidate the pose');
   assert.equal(updateCampaignPoseState(cache,point,.5,.25,true),true,'walking animation must update every frame');
   assert.equal(updateCampaignPoseState(cache,point,.5,.25,false,true),true,'a forced contact pose must bypass the cache');
+  assert.equal(updateCampaignPoseState(cache,point,.5,.25,false,false,'fallen'),true,'changing to a fallen pose must invalidate the cache once');
+  assert.equal(updateCampaignPoseState(cache,point,.5,.25,false,false,'fallen'),false,'an unchanged fallen person must reuse its body pose');
 });
 
 test('campaign guards walk only after their position really changes',()=>{
@@ -362,6 +364,11 @@ test('real Three.js campaign geometry and both cameras run through every mission
     state.guards.find(g=>!g.area).x+=1;view.frame(1508);
     assert.equal(view.stats().movingGuards,1,'a guard that actually advances must animate its walk');
     view.frame(1510);assert.equal(view.stats().movingGuards,0,'the walk must stop as soon as the guard position stops changing');
+    const exteriorGuards=state.guards.filter(g=>!g.area),exteriorHp=exteriorGuards.map(g=>g.hp);
+    exteriorGuards.forEach(g=>g.hp=0);view.frame(1511);
+    const fallenPoseUpdates=view.stats().poseUpdates;view.frame(1512);
+    assert.equal(view.stats().poseUpdates,fallenPoseUpdates,'unchanged defeated guards must reuse their fallen body poses');
+    exteriorGuards.forEach((g,index)=>g.hp=exteriorHp[index]);view.frame(1513);
     const stationaryTerrainSamples=view.stats().terrainHeightSamples;view.frame(1517);
     assert.equal(view.stats().terrainHeightSamples,stationaryTerrainSamples,'stationary exterior guards and objective must reuse terrain samples');
     const stationaryGoalSelections=view.stats().goalSelections;view.frame(1521);

@@ -94,9 +94,9 @@ export function updateCampaignWalkCycle(out,seconds,walking){
   return out;
 }
 
-export function updateCampaignPoseState(cache,point,height,heading,walking,force=false){
-  const changed=force||walking||!cache.ready||cache.x!==point.x||cache.z!==point.z||cache.height!==height||cache.heading!==heading||cache.walking!==walking;
-  cache.ready=true;cache.x=point.x;cache.z=point.z;cache.height=height;cache.heading=heading;cache.walking=walking;
+export function updateCampaignPoseState(cache,point,height,heading,walking,force=false,pose='standing'){
+  const changed=force||walking||!cache.ready||cache.x!==point.x||cache.z!==point.z||cache.height!==height||cache.heading!==heading||cache.walking!==walking||cache.pose!==pose;
+  cache.ready=true;cache.x=point.x;cache.z=point.z;cache.height=height;cache.heading=heading;cache.walking=walking;cache.pose=pose;
   return changed;
 }
 
@@ -480,10 +480,10 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const shadowState={},areaPresentationState={},releasedPresentationState={},renderScaleState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
-  function placeHuman(person,p,height,heading,walking,seconds,force=false){
+  function placeHuman(person,p,height,heading,walking,seconds,force=false,pose='standing'){
     posedCharacters++;
     const poseState=person.root.userData.campaignPoseState||(person.root.userData.campaignPoseState={});
-    if(!updateCampaignPoseState(poseState,p,height,heading,walking,force))return;
+    if(!updateCampaignPoseState(poseState,p,height,heading,walking,force,pose))return;
     poseUpdates++;
     person.root.position.set(p.x/SCALE,height,p.z/SCALE);person.root.rotation.set(0,0,0);person.rig.rotation.y=heading;
     const cycle=updateCampaignWalkCycle(walkCycle,seconds,walking);
@@ -521,7 +521,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       const heading=updateCampaignGuardHeading(motion,Math.atan2(s.p.x-g.x,s.p.z-g.z),g.hp>0);
       if(walking)movingGuards++;
       guardWalking ||= walking;
-      placeHuman(p,g,g.area?0:sampleCampaignGround(campaignGroundCache,p,g.x,g.z,ground),heading,walking,seconds,g.hp<=0);
+      placeHuman(p,g,g.area?0:sampleCampaignGround(campaignGroundCache,p,g.x,g.z,ground),heading,walking,seconds,false,g.hp<=0?'fallen':'armed');
       if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y+=(g.area?0:.15);p.root.scale.setScalar(.8);}
       else {p.rig.rotation.x=0;p.arms[1].arm.rotation.x=-1.05;p.arms[1].forearm.rotation.x=-.35;}
     }
