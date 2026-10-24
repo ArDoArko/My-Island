@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -42,6 +42,17 @@ test('unchanged campaign shadows reuse primitive state without frame strings',()
   assert.equal(updateCampaignShadowState(cache,state,false),false);
   state.released=[0,3];assert.equal(updateCampaignShadowState(cache,state,false),true,'a released resident change must refresh shadows');
   assert.equal(updateCampaignShadowState(cache,state,true),true,'starting animation must refresh shadows immediately');
+});
+
+test('stationary boats reuse their shadow map until real movement resumes',()=>{
+  const state={paused:false,boat:true,walking:false};
+  assert.equal(campaignShadowsAnimated(state,false),false,'being seated in an idle boat must not redraw the shadow map every frame');
+  state.walking=true;
+  assert.equal(campaignShadowsAnimated(state,false),true,'a moving boat must keep animated shadows responsive');
+  state.walking=false;
+  assert.equal(campaignShadowsAnimated(state,true),true,'moving guards must still animate shadows while the boat is idle');
+  state.paused=true;
+  assert.equal(campaignShadowsAnimated(state,true),false,'pause must freeze every animated shadow source');
 });
 
 test('nearby campaign interaction selection updates only when its inputs change',()=>{
