@@ -73,9 +73,12 @@ test('mobile ocean keeps coastal presentation with three noise layers',()=>{
   desktop.dispose();mobile.dispose();
 });
 
-test('landscape phones keep the mobile campaign rendering profile',()=>{
+test('phones and compact touch tablets keep the mobile campaign rendering profile',()=>{
   assert.equal(usesMobileCampaignProfile(390,844,5),true,'a portrait phone must use the mobile profile');
   assert.equal(usesMobileCampaignProfile(844,390,5),true,'the same phone must stay mobile after landscape rotation');
+  assert.equal(usesMobileCampaignProfile(1024,768,5),true,'a compact landscape tablet must not receive desktop rendering costs');
+  assert.equal(usesMobileCampaignProfile(820,1180,5),true,'a compact portrait tablet must keep the mobile profile');
+  assert.equal(usesMobileCampaignProfile(1024,768,0),false,'an equally sized non-touch desktop window can retain desktop presentation');
   assert.equal(usesMobileCampaignProfile(900,600,0),false,'a short desktop window must not be mistaken for a phone');
   assert.equal(usesMobileCampaignProfile(1280,800,5),false,'a large touch display can retain desktop presentation');
 });

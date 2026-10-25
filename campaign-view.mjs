@@ -166,7 +166,8 @@ export function updateCampaignRenderScale(state,now,pixelRatio,maxPixelRatio,act
 }
 
 export function usesMobileCampaignProfile(width,height,maxTouchPoints=0){
-  return width<=700||maxTouchPoints>0&&Math.min(width,height)<=700;
+  const shortEdge=Math.min(width,height),longEdge=Math.max(width,height);
+  return width<=700||maxTouchPoints>0&&(shortEdge<=700||longEdge<=1200);
 }
 
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
