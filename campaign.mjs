@@ -1,5 +1,5 @@
 import { ISLANDS,ISLAND_BY_ID,getIslandAt,SCALE,WORLD_VERSION,docks,points,GUARDS,VILLAGE,bounds,
-  estateCenter,fortressApproach,ground,terrainHeight,pierAt,migratePosition,migrateGuard } from './campaign-world.mjs';
+  estateCenter,fortressApproach,ground,terrainHeight,pierAtInto,migratePosition,migrateGuard } from './campaign-world.mjs';
 import { sceneryBlocked } from './campaign-scenery.mjs';
 import { islandElevation } from './archipelago-terrain.mjs';
 export { text } from './campaign-text.mjs';
@@ -63,6 +63,7 @@ function blocked(s,p) {
   }
   return false;
 }
+const allowedPier={};
 export function allowed(s,p) {
   if(!Number.isFinite(p.x)||!Number.isFinite(p.z))return false;
   if(s.interior)return p.x>=-110&&p.x<=110&&p.z>=-115&&p.z<=170&&!blocked(s,p);
@@ -72,7 +73,7 @@ export function allowed(s,p) {
     return true;
   }
   const i=ISLAND_BY_ID[s.island];
-  const pier=pierAt(p.x,p.z,s.island);if(pier)return !blocked(s,p);
+  const pier=pierAtInto(allowedPier,p.x,p.z,s.island);if(pier)return !blocked(s,p);
   const dx=p.x-i.x,dz=p.z-i.z,radius=i.radius*.99;
   return dx*dx+dz*dz<radius*radius&&terrainHeight(p.x,p.z,i)>.005&&!blocked(s,p);
 }
@@ -85,6 +86,7 @@ function lineClear(s,a,b) {
   }
   return true;
 }
+const movementPier={};
 export function move(s,dx,dz,dt,options) {
   if(![dx,dz,dt].every(Number.isFinite))return 0;
   const sprint=!!options?.sprint;
@@ -92,7 +94,7 @@ export function move(s,dx,dz,dt,options) {
   if(length>1){dx/=length;dz/=length;}
   if(!dx&&!dz)return 0;
   if(!s.boat&&!s.interior){
-    const pier=pierAt(s.p.x,s.p.z,s.island);
+    const pier=pierAtInto(movementPier,s.p.x,s.p.z,s.island);
     if(pier){
       const d=pier.dock,along=dx*d.ux+dz*d.uz,across=dx*d.uz-dz*d.ux;
       // Cardinal keys follow angled planks; sideways movement remains free.
@@ -279,10 +281,11 @@ function objectiveInto(out,s) {
   if(!s.boarded){out.key='boat-goal';out.target=docks.fortress.shore;return out;}
   out.key='home-goal';out.target=s.boat?docks.home:s.island==='home'?docks.home.shore:docks[s.island].shore;return out;
 }
+const goalPier={};
 export function goalInto(out,s) {
   objectiveInto(out,s);
   if(s.boat||s.interior||!out.target)return out;
-  const dock=docks[s.island],onPier=!!pierAt(s.p.x,s.p.z,s.island);
+  const dock=docks[s.island],onPier=!!pierAtInto(goalPier,s.p.x,s.p.z,s.island);
   if(out.target===dock.shore){if(!onPier&&dist(s.p,dock.land)>65)out.target=dock.land;}
   else if(onPier&&dist(s.p,dock.land)>45)out.target=dock.land;
   return out;

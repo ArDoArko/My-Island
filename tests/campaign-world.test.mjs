@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import * as T from 'three';
 import * as C from '../campaign.mjs';
 import { ISLANDS as original } from '../archipelago-layout.mjs';
-import { VILLAGE,pierAt,villageAnchor } from '../campaign-world.mjs';
+import { VILLAGE,pierAt,pierAtInto,villageAnchor } from '../campaign-world.mjs';
 import { createIslandTerrain } from '../archipelago-terrain.mjs';
 import { buildMotorboat,seatDriver } from '../campaign-boat.mjs';
 import { buildHuman } from '../island3d-src.mjs';
@@ -34,6 +34,16 @@ test('all six piers can be walked from the dry beach to the boat without steppin
     s.p={...d.shore};assert(C.interact(s));assert(s.boat);
     assert(C.interact(s));assert(!s.boat);s.boat=false;
   }
+});
+
+test('campaign movement can reuse pier probes without changing public results',()=>{
+  const probe={},dock=C.docks.home;
+  assert.equal(pierAtInto(probe,dock.land.x,dock.land.z,dock.id),probe);
+  const firstHeight=probe.height;
+  assert.equal(pierAtInto(probe,dock.shore.x,dock.shore.z,dock.id),probe);
+  assert(probe.height>firstHeight,'the reusable probe must retain the authored pier slope');
+  assert.equal(pierAtInto(probe,dock.land.x+dock.uz*(dock.width/2+1),dock.land.z-dock.ux*(dock.width/2+1),dock.id),null);
+  assert.notEqual(pierAt(dock.land.x,dock.land.z,dock.id),pierAt(dock.land.x,dock.land.z,dock.id),'the public helper must keep returning independent results');
 });
 
 test('0.19/0.20 campaign saves migrate once and preserve every mission stage and resource',()=>{

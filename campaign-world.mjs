@@ -20,9 +20,9 @@ export const docks = Object.fromEntries(ISLANDS.map((i,j)=>{
   const old=OLD_ISLANDS[j],distance=Math.hypot(old.dock.x-old.x,old.dock.z-old.z);
   const ux=(old.dock.x-old.x)/distance,uz=(old.dock.z-old.z)/distance;
   const coast=i.radius*islandCoastline(i,Math.atan2(uz,ux));
-  const at=r=>({x:i.x+ux*r,z:i.z+uz*r});
-  return [i.id,{id:i.id,...at(coast+320),ux,uz,land:at(coast-320),
-    end:at(coast+240),shore:at(coast+200),width:38,deck:.72}];
+  const at=r=>({x:i.x+ux*r,z:i.z+uz*r}),land=at(coast-320),end=at(coast+240);
+  return [i.id,{id:i.id,...at(coast+320),ux,uz,land,end,shore:at(coast+200),
+    length:Math.hypot(end.x-land.x,end.z-land.z),width:38,deck:.72}];
 }));
 export const villageAnchor = {x:docks.home.land.x-385,z:docks.home.land.z-40};
 export const VILLAGE = OLD_VILLAGE.map(b=>({...b,x:b.x+villageAnchor.x,z:b.z+villageAnchor.z,
@@ -70,19 +70,20 @@ export function terrainHeight(x,z,island=getIslandAt(x,z)) {
   }
   return y;
 }
-export function pierAt(x,z,islandId) {
+export function pierAtInto(out,x,z,islandId) {
   for(const d of islandId?[docks[islandId]]:Object.values(docks)){
     if(!d)continue;
     const dx=x-d.land.x,dz=z-d.land.z,along=dx*d.ux+dz*d.uz,across=dx*d.uz-dz*d.ux;
-    const length=Math.hypot(d.end.x-d.land.x,d.end.z-d.land.z);
-    if(along>=-.5&&along<=length+.5&&Math.abs(across)<=d.width/2){
+    if(along>=-.5&&along<=d.length+.5&&Math.abs(across)<=d.width/2){
       const start=terrainHeight(d.land.x,d.land.z);
-      return {dock:d,height:start+(d.deck-start)*Math.max(0,Math.min(1,along/length))};
+      out.dock=d;out.height=start+(d.deck-start)*Math.max(0,Math.min(1,along/d.length));return out;
     }
   }
   return null;
 }
-export function ground(x,z){return pierAt(x,z)?.height??terrainHeight(x,z);}
+export function pierAt(x,z,islandId){return pierAtInto({},x,z,islandId);}
+const groundPier={};
+export function ground(x,z){return pierAtInto(groundPier,x,z)?.height??terrainHeight(x,z);}
 export function pathClear(x,z) {
   return PATHS.some(path=>path.points.some((b,j)=>{
     if(!j)return false;const a=path.points[j-1],dx=b.x-a.x,dz=b.z-a.z;
