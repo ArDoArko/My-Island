@@ -216,6 +216,18 @@ test('decoded material clones stop scanning after their one required upload pass
   }finally{materials?.dispose();T.TextureLoader.prototype.load=original;}
 });
 
+test('campaign materials can cap mobile anisotropic texture sampling',()=>{
+  const original=T.TextureLoader.prototype.load;
+  T.TextureLoader.prototype.load=function(url,onLoad){const texture=new T.Texture({width:4,height:4});onLoad?.(texture);return texture;};
+  let mobile,desktop;
+  try{
+    const renderer={capabilities:{getMaxAnisotropy:()=>16}};
+    mobile=createMaterials(renderer,4);desktop=createMaterials(renderer);
+    assert.equal(mobile.surface('paving').map.anisotropy,4);
+    assert.equal(desktop.surface('paving').map.anisotropy,8);
+  }finally{mobile?.dispose();desktop?.dispose();T.TextureLoader.prototype.load=original;}
+});
+
 test('third-person damping is frame-rate independent and never overshoots a shoreline height change',()=>{
   const desired=new T.Vector3(4,3.2,-2),at30=new T.Vector3(0,-.4,0),at60=at30.clone();
   for(let i=0;i<30;i++)dampCameraVector(at30,desired,1/30,8);

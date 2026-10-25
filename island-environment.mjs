@@ -16,7 +16,7 @@ export function terrainMask(terrain) {
   ctx.fillStyle='#ff0000';ctx.beginPath();ctx.ellipse(1570,1160,290,200,0,0,Math.PI*2);ctx.fill();
   return c;
 }
-export function createMaterials(renderer) {
+export function createMaterials(renderer,anisotropyLimit=8) {
   const textures = new Map(), materials = new Map();
   const failedNames=new Set();
   let loaded=0,failed=0,syncPending=true,syncPasses=0;
@@ -26,7 +26,7 @@ export function createMaterials(renderer) {
     texture.userData.materialAssetName=name;
     texture.colorSpace = T.SRGBColorSpace;
     texture.wrapS = texture.wrapT = T.RepeatWrapping;
-    texture.anisotropy = Math.min(8,renderer.capabilities.getMaxAnisotropy());
+    texture.anisotropy = Math.min(anisotropyLimit,renderer.capabilities.getMaxAnisotropy());
     textures.set(name,texture);
   }
   function surface(name,color='#ffffff',repeat=1,bump=.035) {

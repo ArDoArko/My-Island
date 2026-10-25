@@ -179,7 +179,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   sun.castShadow=true;sun.shadow.mapSize.set(mobile?1024:2048,mobile?1024:2048);
   Object.assign(sun.shadow.camera,{left:-22,right:22,top:22,bottom:-22,near:.1,far:100});
   sun.shadow.normalBias=.025;scene.add(hemi,sun,sun.target);
-  const surfaces=createMaterials(renderer),mats=new Map(),geos=new Map();
+  const surfaces=createMaterials(renderer,mobile?4:8),mats=new Map(),geos=new Map();
   const mat=c=>{if(!mats.has(c))mats.set(c,surfaces.forColor(c)||new T.MeshStandardMaterial({color:c,roughness:.85}));return mats.get(c)};
   const geo=(key,fn)=>{if(!geos.has(key))geos.set(key,fn());return geos.get(key)};
   const mesh=(parent,g,m,p=[0,0,0],scale=[1,1,1])=>{
