@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
+import { attachSceneChild, campaignShadowInterval, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
 import { createOcean } from '../tropical-scene.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
@@ -124,6 +124,11 @@ test('hidden first-person walking does not animate an invisible player shadow',(
   assert.equal(campaignShadowsAnimated(state,false,false),true,'a moving boat remains a visible animated shadow source');
   state.boat=false;
   assert.equal(campaignShadowsAnimated(state,true,false),true,'moving guards must animate shadows independently of camera mode');
+});
+
+test('mobile campaign caps animated shadow maps at 20 Hz',()=>{
+  assert.equal(campaignShadowInterval(false),1000/30,'desktop keeps responsive 30 Hz moving shadows');
+  assert.equal(campaignShadowInterval(true),50,'the mobile profile renders at most twenty moving shadow maps per second');
 });
 
 test('nearby campaign interaction selection updates only when its inputs change',()=>{

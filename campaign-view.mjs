@@ -106,6 +106,10 @@ export function campaignShadowsAnimated(state,guardWalking=false,playerVisible=t
   return !state.paused&&!!(guardWalking||(state.walking&&(state.boat||playerVisible)));
 }
 
+export function campaignShadowInterval(mobile=false){
+  return 1000/(mobile?20:30);
+}
+
 export function updateEscortPoints(points,people,player,heading){
   const sin=Math.sin(heading),cos=Math.cos(heading);
   for(let i=0;i<people.length;i++){
@@ -174,6 +178,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const renderer=rendererFactory({canvas,antialias:true,powerPreference:'high-performance'});
   const mobile=usesMobileCampaignProfile(innerWidth,innerHeight,globalThis.navigator?.maxTouchPoints||0);
   const maxPixelRatio=Math.min(devicePixelRatio||1,mobile?1.1:1.5);
+  const shadowInterval=campaignShadowInterval(mobile);
   renderer.setPixelRatio(maxPixelRatio);
   renderer.setSize(innerWidth,innerHeight,false);
   renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;
@@ -557,7 +562,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     boat.rotation.z=s.boat?Math.sin(seconds*2)*.015:0;wake.visible=s.boat&&s.walking;
     if(s.boat&&playerVisible)seatDriver(self,boat);
     paperMesh.visible=!s.paper;hiddenGun.visible=s.paper&&!s.gun;
-    keyMesh.rotation.y=seconds;updateReleasedPresentation(releasedPresentationState,s.released,releasedMask,cellBars);
+    updateReleasedPresentation(releasedPresentationState,s.released,releasedMask,cellBars);
     let guardWalking=false,bossDefeated=false;movingGuards=0;
     for(const g of s.guards){
       if(g.id==='boss')bossDefeated=g.hp<=0;
@@ -574,6 +579,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       else {p.rig.rotation.x=0;p.arms[1].arm.rotation.x=-1.05;p.arms[1].forearm.rotation.x=-.35;}
     }
     keyMesh.visible=!s.key&&bossDefeated;
+    if(keyMesh.visible)keyMesh.rotation.y=seconds;
     const escortVisible=s.released.length&&!s.boarded&&!s.boat&&(area==='estate'||area==='cellar'||s.island==='fortress');
     if(escortVisible)updateEscortPoints(escortPoints,PEOPLE,s.p,s.heading);
     for(const p of PEOPLE){
@@ -593,7 +599,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     const n=nearbyState.nearby,mark=n||g;
     halo.visible=!!mark;
     if(mark)halo.position.set(mark.x/SCALE,(area?0:sampleCampaignGround(campaignGroundCache,halo,mark.x,mark.z,ground))+.08,mark.z/SCALE);
-    halo.scale.setScalar(1+Math.sin(seconds*3)*.10);
+    if(mark)halo.scale.setScalar(1+Math.sin(seconds*3)*.10);
     handheld.visible=s.gun&&!s.boat&&mode==='first';
     handheld.position.z=s.shot?.025:0;
     const cameraSurface=s.boat?.02+HELM.eye-1.64:surface;
@@ -625,7 +631,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     // First-person walking hides the player rig, so only the coarser position
     // invalidation is needed; no visible body animation can change the map.
     const shadowAnimated=campaignShadowsAnimated(s,guardWalking,mode==='third');
-    const updateShadow=updateCampaignShadowState(shadowState,s,shadowAnimated)||(shadowAnimated&&now-lastShadowUpdate>=1000/30);
+    const updateShadow=updateCampaignShadowState(shadowState,s,shadowAnimated)||(shadowAnimated&&now-lastShadowUpdate>=shadowInterval);
     renderer.shadowMap.needsUpdate=updateShadow;
     if(updateShadow){stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,shadowOptions);lastShadowUpdate=now;shadowUpdates++;}
     tracer.visible=!!s.shot;
