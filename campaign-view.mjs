@@ -81,11 +81,11 @@ export function updateCampaignGoal(cache,state,out,bossAlive=!!state.guards?.fin
   goalInto(out,state);return true;
 }
 
-export function updateCampaignAreaYaw(cache,area,player,target,yaw){
-  if(cache.ready&&cache.area===area)return yaw;
+export function updateCampaignAreaView(cache,area,player,target,yaw,pitch,defaultPitch,out){
+  if(cache.ready&&cache.area===area){out.yaw=yaw;out.pitch=pitch;return false;}
   cache.ready=true;cache.area=area;
-  if(area)return 0;
-  return target?Math.atan2(player.x-target.x,player.z-target.z):yaw;
+  out.yaw=area?0:target?Math.atan2(player.x-target.x,player.z-target.z):yaw;
+  out.pitch=defaultPitch;return true;
 }
 
 export function updateCampaignShadowState(cache,state,animated=false){
@@ -512,7 +512,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const goalState={},goalSelectionState={},nearbyState={},nearbyCandidates=[],campaignGroundCache=new Map(),guardMotionStates=new Map();campaignGroundCache.misses=0;
   let goalSelections=0,nearbySelections=0,movingGuards=0,exteriorUpdates=0;
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,posedCharacters=0,poseUpdates=0,pausedFrameRendered=false;
-  const shadowState={},terrainShadowState={},areaYawState={},areaPresentationState={},releasedPresentationState={},renderScaleState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
+  const shadowState={},terrainShadowState={},areaViewState={},areaView={},areaPresentationState={},releasedPresentationState={},renderScaleState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
   function placeHuman(person,p,height,heading,walking,seconds,force=false,pose='standing'){
@@ -575,7 +575,9 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     }
     if(updateCampaignGoal(goalSelectionState,s,goalState,!bossDefeated))goalSelections++;
     const g=goalState.target;
-    yaw=updateCampaignAreaYaw(areaYawState,area,s.p,g,yaw);
+    if(updateCampaignAreaView(areaViewState,area,s.p,g,yaw,pitch,mode==='first'?.05:.22,areaView)){
+      yaw=areaView.yaw;pitch=areaView.pitch;
+    }
     if(updateCampaignNearby(nearbyState,s,nearbyCandidates))nearbySelections++;
     const n=nearbyState.nearby,mark=n||g;
     halo.visible=!!mark;

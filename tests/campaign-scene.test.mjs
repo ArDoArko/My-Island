@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaYaw, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import { createOcean } from '../tropical-scene.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
@@ -35,13 +35,19 @@ test('static campaign presentation changes only with the room or rescued people'
 });
 
 test('area transitions orient the camera before their first rendered frame',()=>{
-  const cache={},player={x:100,z:200},target={x:40,z:80};
-  const exterior=updateCampaignAreaYaw(cache,null,player,target,1.7);
-  assert.equal(exterior,Math.atan2(60,120));
-  assert.equal(updateCampaignAreaYaw(cache,null,player,{x:999,z:999},.75),.75,'an unchanged area must preserve manual camera orbit');
-  assert.equal(updateCampaignAreaYaw(cache,'cave',player,target,1.2),0,'an interior must face its authored entrance on the first frame');
-  assert.equal(updateCampaignAreaYaw(cache,null,player,target,.9),Math.atan2(60,120),'leaving a room must face the current objective immediately');
-  assert.equal(updateCampaignAreaYaw({},null,player,null,.4),.4,'a completed campaign without a target must keep its current view');
+  const cache={},out={},player={x:100,z:200},target={x:40,z:80};
+  assert.equal(updateCampaignAreaView(cache,null,player,target,1.7,-.8,.05,out),true);
+  assert.deepEqual(out,{yaw:Math.atan2(60,120),pitch:.05});
+  assert.equal(updateCampaignAreaView(cache,null,player,{x:999,z:999},.75,-.6,.05,out),false);
+  assert.deepEqual(out,{yaw:.75,pitch:-.6},'an unchanged area must preserve manual camera orbit and tilt');
+  assert.equal(updateCampaignAreaView(cache,'cave',player,target,1.2,.7,.05,out),true);
+  assert.deepEqual(out,{yaw:0,pitch:.05},'an interior must face its authored entrance at eye level on the first frame');
+  updateCampaignAreaView(cache,'cellar',player,target,.9,-.5,.22,out);
+  assert.deepEqual(out,{yaw:0,pitch:.22},'third-person room transitions must restore their authored camera elevation');
+  updateCampaignAreaView(cache,null,player,target,.9,.6,.05,out);
+  assert.deepEqual(out,{yaw:Math.atan2(60,120),pitch:.05},'leaving a room must face the current objective at eye level immediately');
+  updateCampaignAreaView({},null,player,null,.4,-.3,.05,out);
+  assert.deepEqual(out,{yaw:.4,pitch:.05},'a completed campaign without a target must keep its heading and level its view');
 });
 
 test('interiors stop hidden ocean, sky and palm LOD animation',()=>{
