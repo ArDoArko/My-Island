@@ -261,7 +261,9 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   }
   addSupplyCache('jungle',points.supply.x,points.supply.z);
   const waterSize=Math.max(bounds.maxX-bounds.minX,bounds.maxZ-bounds.minZ)/SCALE+12000;
-  const ocean=createOcean(ISLANDS.map(i=>[i.x/SCALE,i.z/SCALE,i.radius/SCALE,i.radius/SCALE]),{size:waterSize,coastSeeds:ISLANDS.map(i=>i.coastSeed)});world.add(ocean.mesh);
+  const ocean=createOcean(ISLANDS.map(i=>[i.x/SCALE,i.z/SCALE,i.radius/SCALE,i.radius/SCALE]),{
+    size:waterSize,segments:mobile?48:72,coastSeeds:ISLANDS.map(i=>i.coastSeed),mobile
+  });world.add(ocean.mesh);
   const sky=createTropicalSky(5000);world.add(sky);
   const vegetation=decorateIslands(world,ISLANDS,{scale:SCALE,height:terrainHeight,surfaces,small:mobile,dense:true,lod:true,
     clear:(i,x,z)=>sceneryBlocked({x,z},i.id,VILLAGE)||(i.id==='home'&&pathClear(x,z))||

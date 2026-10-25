@@ -16,8 +16,11 @@ float fbmFast(vec2 p){float f=0.,a=.535714;for(int i=0;i<3;i++){f+=a*noiseFast(p
 
 // One ocean in both modes. Unequal wave directions and noise break up the old
 // high-frequency stripes; the coast uniforms give each shore its own shallows.
-export function createOcean(coasts,{size=900,segments=72,coastSeeds=[]}={}) {
+export function createOcean(coasts,{size=900,segments=72,coastSeeds=[],mobile=false}={}) {
   const shore=Array.from({length:9},(_,j)=>new T.Vector4(...(coasts[j]||[10000,10000,1,1])));
+  const oceanNoise=mobile?fastNoiseGLSL:noiseGLSL;
+  const ripple=mobile?'fbmFast(p*.52+vec2(uTime*.04,0.))':'fbm21(p*.52+vec2(uTime*.04,0.))';
+  const waveNoise=mobile?'0.':'(noise21(p*1.6+vec2(uTime*.09,-uTime*.07))-.5)*.10';
   const material=new T.ShaderMaterial({fog:true,uniforms:{...T.UniformsUtils.clone(T.UniformsLib.fog),
     uTime:{value:0},uEye:{value:new T.Vector3()},uCoasts:{value:shore},uCoastSeeds:{value:Array.from({length:9},(_,j)=>coastSeeds[j]??-100)}},
   vertexShader:`uniform float uTime;varying vec3 vWater;
@@ -29,10 +32,10 @@ export function createOcean(coasts,{size=900,segments=72,coastSeeds=[]}={}) {
     }`,
   fragmentShader:`uniform float uTime;uniform vec3 uEye;uniform vec4 uCoasts[9];uniform float uCoastSeeds[9];varying vec3 vWater;
     #include <fog_pars_fragment>
-    ${noiseGLSL}
+    ${oceanNoise}
     float wave(vec2 p){return sin(dot(p,vec2(.7,.3))+uTime*.8)*.046+
       sin(dot(p,vec2(-.43,.81))-uTime*.62)*.038+sin(dot(p,vec2(1.36,.67))+uTime*1.12)*.016+
-      (noise21(p*1.6+vec2(uTime*.09,-uTime*.07))-.5)*.10;}
+      ${waveNoise};}
     void main(){vec2 p=vWater.xz;float eps=.055,h=wave(p);
       vec3 n=normalize(vec3((h-wave(p+vec2(eps,0.)))/eps,1.,(h-wave(p+vec2(0.,eps)))/eps));
       vec3 view=normalize(uEye-vWater);float fresnel=.025+.975*pow(1.-max(dot(n,view),0.),5.);
@@ -41,7 +44,7 @@ export function createOcean(coasts,{size=900,segments=72,coastSeeds=[]}={}) {
         if(seed>-99.){float a=atan(delta.y,delta.x);boundary=.855+.07*sin(a*2.+seed)+.045*cos(a*3.-seed)+.025*sin(a*7.+seed);}
         coast=min(coast,(length(delta)-boundary)*min(c.z,c.w));}
       float shallow=1.-smoothstep(.0,3.4,coast);vec3 depth=mix(vec3(.008,.15,.21),vec3(.045,.47,.43),shallow);
-      float ripple=fbm21(p*.52+vec2(uTime*.04,0.));depth*=.94+ripple*.12;
+      float ripple=${ripple};depth*=.94+ripple*.12;
       vec3 reflection=mix(vec3(.58,.76,.82),vec3(.19,.46,.63),smoothstep(0.,.8,n.y-view.y));
       vec3 col=mix(depth,reflection,fresnel);
       float spark=pow(max(dot(reflect(-normalize(vec3(-.55,.82,-.36)),n),view),0.),170.);
@@ -53,7 +56,8 @@ export function createOcean(coasts,{size=900,segments=72,coastSeeds=[]}={}) {
       #include <fog_fragment>
     }`});
   const geometry=new T.PlaneGeometry(size,size,segments,segments);geometry.rotateX(-Math.PI/2);
-  material.userData.fragmentNoiseLayers=7;
+  material.userData.fragmentNoiseLayers=mobile?3:7;
+  material.userData.mobileQuality=mobile;
   const mesh=new T.Mesh(geometry,material);mesh.name='tropical-ocean';mesh.position.y=-.045;
   return {mesh,update(seconds,eye){material.uniforms.uTime.value=seconds;material.uniforms.uEye.value.copy(eye)},
     dispose(){geometry.dispose();material.dispose()}};

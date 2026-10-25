@@ -4,6 +4,7 @@ import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
 import { attachSceneChild, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { createOcean } from '../tropical-scene.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -43,6 +44,17 @@ test('interiors stop hidden ocean, sky and palm LOD animation',()=>{
   assert.equal(oceanUpdates,0);assert.equal(lodUpdates,0);assert.equal(sky.material.uniforms.uTime.value,0);
   assert.equal(updateCampaignExterior(null,2,camera,sky,ocean,vegetation),true);
   assert.equal(oceanUpdates,1);assert.equal(lodUpdates,1);assert.equal(sky.material.uniforms.uTime.value,2);assert(sky.position.equals(camera.position));
+});
+
+test('mobile ocean keeps coastal presentation with three noise layers',()=>{
+  const coasts=[[0,0,10,10]],desktop=createOcean(coasts),mobile=createOcean(coasts,{segments:48,mobile:true});
+  assert.equal(desktop.mesh.material.userData.fragmentNoiseLayers,7);
+  assert.equal(mobile.mesh.material.userData.fragmentNoiseLayers,3);
+  assert.equal(mobile.mesh.material.userData.mobileQuality,true);
+  assert.equal(mobile.mesh.geometry.parameters.widthSegments,48);
+  for(const token of ['uCoasts','shallow','fresnel','foam'])assert(mobile.mesh.material.fragmentShader.includes(token),`mobile water must retain ${token}`);
+  assert(!mobile.mesh.material.fragmentShader.includes('noise21(p*1.6'),'mobile wave normals must not pay for three extra noise samples per pixel');
+  desktop.dispose();mobile.dispose();
 });
 
 test('unchanged campaign shadows reuse primitive state without frame strings',()=>{
