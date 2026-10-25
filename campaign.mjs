@@ -71,9 +71,13 @@ export function allowed(s,p) {
   const i=ISLAND_BY_ID[s.island];
   return (!!pierAt(p.x,p.z,s.island)||dist(p,i)<i.radius*.99&&ground(p.x,p.z)>.005)&&!blocked(s,p);
 }
+const linePoint={x:0,z:0};
 function lineClear(s,a,b) {
-  const n=Math.ceil(dist(a,b)/12);
-  for(let j=1;j<n;j++)if(blocked(s,{x:a.x+(b.x-a.x)*j/n,z:a.z+(b.z-a.z)*j/n}))return false;
+  const dx=b.x-a.x,dz=b.z-a.z,n=Math.ceil(Math.hypot(dx,dz)/12);
+  for(let j=1;j<n;j++){
+    linePoint.x=a.x+dx*j/n;linePoint.z=a.z+dz*j/n;
+    if(blocked(s,linePoint))return false;
+  }
   return true;
 }
 export function move(s,dx,dz,dt,options) {

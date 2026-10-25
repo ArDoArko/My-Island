@@ -113,6 +113,15 @@ test('combat tick updates only active guards while reusing its movement candidat
   assert.deepEqual({x:gate.x,z:gate.z,cooldown:gate.cooldown},gateBefore,'a guard in another area must stay frozen');
 });
 
+test('combat sight sampling keeps mansion walls solid for pursuit and shooting',()=>{
+  const s=C.fresh(),center=C.estateCenter;s.boat=false;s.island='fortress';s.interior=null;s.gun=true;s.ammo=12;
+  s.p={x:center.x+100,z:center.z};s.guards.forEach(g=>g.hp=0);
+  const guard=s.guards.find(g=>g.id==='gate');guard.hp=2;guard.x=center.x-100;guard.z=center.z;guard.cooldown=0;
+  const before={x:guard.x,z:guard.z,hp:s.hp,ammo:s.ammo};
+  C.tick(s,.1);assert.deepEqual({x:guard.x,z:guard.z,hp:s.hp},{x:before.x,z:before.z,hp:before.hp},'the mansion must block pursuit and damage');
+  assert.equal(C.shoot(s,-Math.PI/2),true);assert.equal(guard.hp,2,'the mansion must block the player shot too');assert.equal(s.ammo,before.ammo-1);
+});
+
 test('paused campaign work renders once and invalidates on demand',()=>{
   const cache={};
   assert.equal(C.updateCampaignFrameState(cache,false),true);
