@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
 import { createOcean } from '../tropical-scene.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
@@ -71,6 +71,13 @@ test('mobile ocean keeps coastal presentation with three noise layers',()=>{
   for(const token of ['uCoasts','shallow','fresnel','foam'])assert(mobile.mesh.material.fragmentShader.includes(token),`mobile water must retain ${token}`);
   assert(!mobile.mesh.material.fragmentShader.includes('noise21(p*1.6'),'mobile wave normals must not pay for three extra noise samples per pixel');
   desktop.dispose();mobile.dispose();
+});
+
+test('landscape phones keep the mobile campaign rendering profile',()=>{
+  assert.equal(usesMobileCampaignProfile(390,844,5),true,'a portrait phone must use the mobile profile');
+  assert.equal(usesMobileCampaignProfile(844,390,5),true,'the same phone must stay mobile after landscape rotation');
+  assert.equal(usesMobileCampaignProfile(900,600,0),false,'a short desktop window must not be mistaken for a phone');
+  assert.equal(usesMobileCampaignProfile(1280,800,5),false,'a large touch display can retain desktop presentation');
 });
 
 test('only terrain inside the local sun projection samples the shadow map',()=>{

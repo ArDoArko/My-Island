@@ -165,9 +165,13 @@ export function updateCampaignRenderScale(state,now,pixelRatio,maxPixelRatio,act
   return pixelRatio;
 }
 
+export function usesMobileCampaignProfile(width,height,maxTouchPoints=0){
+  return width<=700||maxTouchPoints>0&&Math.min(width,height)<=700;
+}
+
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
   const renderer=rendererFactory({canvas,antialias:true,powerPreference:'high-performance'});
-  const mobile=innerWidth<=700;
+  const mobile=usesMobileCampaignProfile(innerWidth,innerHeight,globalThis.navigator?.maxTouchPoints||0);
   const maxPixelRatio=Math.min(devicePixelRatio||1,mobile?1.1:1.5);
   renderer.setPixelRatio(maxPixelRatio);
   renderer.setSize(innerWidth,innerHeight,false);
