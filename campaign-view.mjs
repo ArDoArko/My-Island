@@ -73,8 +73,8 @@ export function updateCampaignShadowState(cache,state,animated=false){
   return changed;
 }
 
-export function campaignShadowsAnimated(state,guardWalking=false){
-  return !state.paused&&!!(state.walking||guardWalking);
+export function campaignShadowsAnimated(state,guardWalking=false,playerVisible=true){
+  return !state.paused&&!!(guardWalking||(state.walking&&(state.boat||playerVisible)));
 }
 
 export function updateEscortPoints(points,people,player,heading){
@@ -576,7 +576,9 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     // Palm LOD bands are tens of metres wide. Sampling after each half metre
     // keeps transitions responsive without testing all 48 batches every frame.
     vegetation.update(camera.position,.5);
-    const shadowAnimated=campaignShadowsAnimated(s,guardWalking);
+    // First-person walking hides the player rig, so only the coarser position
+    // invalidation is needed; no visible body animation can change the map.
+    const shadowAnimated=campaignShadowsAnimated(s,guardWalking,mode==='third');
     const updateShadow=updateCampaignShadowState(shadowState,s,shadowAnimated)||(shadowAnimated&&now-lastShadowUpdate>=1000/30);
     renderer.shadowMap.needsUpdate=updateShadow;
     if(updateShadow){stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,shadowOptions);lastShadowUpdate=now;shadowUpdates++;}

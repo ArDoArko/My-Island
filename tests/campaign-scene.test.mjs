@@ -55,6 +55,16 @@ test('stationary boats reuse their shadow map until real movement resumes',()=>{
   assert.equal(campaignShadowsAnimated(state,true),false,'pause must freeze every animated shadow source');
 });
 
+test('hidden first-person walking does not animate an invisible player shadow',()=>{
+  const state={paused:false,boat:false,walking:true};
+  assert.equal(campaignShadowsAnimated(state,false,false),false,'a hidden first-person rig must not refresh shadows at 30 Hz');
+  assert.equal(campaignShadowsAnimated(state,false,true),true,'third-person walking must keep the visible player shadow animated');
+  state.boat=true;
+  assert.equal(campaignShadowsAnimated(state,false,false),true,'a moving boat remains a visible animated shadow source');
+  state.boat=false;
+  assert.equal(campaignShadowsAnimated(state,true,false),true,'moving guards must animate shadows independently of camera mode');
+});
+
 test('nearby campaign interaction selection updates only when its inputs change',()=>{
   const cache={},candidates=[],state=C.fresh();
   assert.equal(updateCampaignNearby(cache,state,candidates),true);
