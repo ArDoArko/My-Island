@@ -81,6 +81,13 @@ export function updateCampaignGoal(cache,state,out,bossAlive=!!state.guards?.fin
   goalInto(out,state);return true;
 }
 
+export function updateCampaignAreaYaw(cache,area,player,target,yaw){
+  if(cache.ready&&cache.area===area)return yaw;
+  cache.ready=true;cache.area=area;
+  if(area)return 0;
+  return target?Math.atan2(player.x-target.x,player.z-target.z):yaw;
+}
+
 export function updateCampaignShadowState(cache,state,animated=false){
   const area=state.interior||'',boat=!!state.boat,x=Math.round(state.p.x/20),z=Math.round(state.p.z/20),
     heading=Math.round(state.heading*12),boarded=!!state.boarded,guards=state.guards||[],released=state.released||[];
@@ -504,8 +511,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
   const goalState={},goalSelectionState={},nearbyState={},nearbyCandidates=[],campaignGroundCache=new Map(),guardMotionStates=new Map();campaignGroundCache.misses=0;
   let goalSelections=0,nearbySelections=0,movingGuards=0,exteriorUpdates=0;
-  let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0,poseUpdates=0,pausedFrameRendered=false;
-  const shadowState={},terrainShadowState={},areaPresentationState={},releasedPresentationState={},renderScaleState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
+  let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,posedCharacters=0,poseUpdates=0,pausedFrameRendered=false;
+  const shadowState={},terrainShadowState={},areaYawState={},areaPresentationState={},releasedPresentationState={},renderScaleState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
   function placeHuman(person,p,height,heading,walking,seconds,force=false,pose='standing'){
@@ -568,6 +575,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     }
     if(updateCampaignGoal(goalSelectionState,s,goalState,!bossDefeated))goalSelections++;
     const g=goalState.target;
+    yaw=updateCampaignAreaYaw(areaYawState,area,s.p,g,yaw);
     if(updateCampaignNearby(nearbyState,s,nearbyCandidates))nearbySelections++;
     const n=nearbyState.nearby,mark=n||g;
     halo.visible=!!mark;
@@ -611,7 +619,6 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     if(s.shot){
       updateLineSegment(tracerPosition,s.shot.from,s.shot.to,surface+1.35);
     }
-    if(oldArea!==area){oldArea=area;if(area)yaw=0;else if(g)yaw=Math.atan2(s.p.x-g.x,s.p.z-g.z);}
     renderer.render(scene,camera);
     const pixelRatio=renderer.getPixelRatio(),nextPixelRatio=updateCampaignRenderScale(renderScaleState,now,pixelRatio,maxPixelRatio,!s.paused);
     if(nextPixelRatio!==pixelRatio){renderer.setPixelRatio(nextPixelRatio);resize();}
