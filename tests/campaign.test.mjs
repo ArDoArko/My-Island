@@ -101,6 +101,18 @@ test('paused combat and cooldown stop while menus or a background tab are open',
   for(let i=0;i<30;i++)C.tick(s,.1);assert(s.hp<100);
 });
 
+test('combat tick updates only active guards while reusing its movement candidate',()=>{
+  const s=C.fresh();s.boat=false;s.interior='estate';s.gun=true;s.p={x:0,z:100};
+  const hall=s.guards.find(g=>g.id==='hall'),boss=s.guards.find(g=>g.id==='boss'),gate=s.guards.find(g=>g.id==='gate');
+  boss.hp=0;
+  const hallBefore={x:hall.x,z:hall.z,cooldown:hall.cooldown},bossBefore={x:boss.x,z:boss.z,cooldown:boss.cooldown},gateBefore={x:gate.x,z:gate.z,cooldown:gate.cooldown};
+  C.tick(s,.1);
+  assert(C.dist(hall,hallBefore)>0,'the live guard in the current area must still pursue the player');
+  assert(hall.cooldown<hallBefore.cooldown,'the active guard cooldown must still advance');
+  assert.deepEqual({x:boss.x,z:boss.z,cooldown:boss.cooldown},bossBefore,'a defeated guard must stay frozen');
+  assert.deepEqual({x:gate.x,z:gate.z,cooldown:gate.cooldown},gateBefore,'a guard in another area must stay frozen');
+});
+
 test('paused campaign work renders once and invalidates on demand',()=>{
   const cache={};
   assert.equal(C.updateCampaignFrameState(cache,false),true);

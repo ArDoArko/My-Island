@@ -110,17 +110,19 @@ function guardsIn(s) {
   if(s.boat||s.interior==='cave'||s.interior==='cellar')return [];
   return s.guards.filter(g=>g.area===s.interior&&g.hp>0);
 }
+const guardStep={x:0,z:0};
 export function tick(s,dt,{paused=false}={}) {
   if(paused)return;dt=clamp(dt,0,.1);s.elapsed+=dt;
   if(s.shot&&s.elapsed-s.shot.at>.15)s.shot=null;
-  if(!s.gun)return;
-  for(const g of guardsIn(s)){
+  if(!s.gun||s.boat||s.interior==='cave'||s.interior==='cellar')return;
+  for(const g of s.guards){
+    if(g.area!==s.interior||g.hp<=0)continue;
     const distance=dist(g,s.p);g.cooldown=Math.max(0,g.cooldown-dt);
     if(distance>210||!lineClear(s,g,s.p))continue;
     if(distance>65){
-      const next={x:g.x+(s.p.x-g.x)/distance*34*dt,z:g.z+(s.p.z-g.z)/distance*34*dt};
-      if(!blocked(s,next)&&(!s.interior?getIslandAt(next.x,next.z)?.id==='fortress':Math.abs(next.x)<100&&next.z<145)){
-        g.x=next.x;g.z=next.z;
+      guardStep.x=g.x+(s.p.x-g.x)/distance*34*dt;guardStep.z=g.z+(s.p.z-g.z)/distance*34*dt;
+      if(!blocked(s,guardStep)&&(!s.interior?getIslandAt(guardStep.x,guardStep.z)?.id==='fortress':Math.abs(guardStep.x)<100&&guardStep.z<145)){
+        g.x=guardStep.x;g.z=guardStep.z;
       }
     }
     if(distance<145&&g.cooldown<=0){
