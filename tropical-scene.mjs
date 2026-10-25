@@ -14,6 +14,12 @@ float noiseFast(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
  return mix(mix(hashFast(i),hashFast(i+vec2(1.,0.)),f.x),mix(hashFast(i+vec2(0.,1.)),hashFast(i+vec2(1.)),f.x),f.y);}
 float fbmFast(vec2 p){float f=0.,a=.535714;for(int i=0;i<3;i++){f+=a*noiseFast(p);p=mat2(.8,-.6,.6,.8)*p*2.07+7.3;a*=.5;}return f;}`;
 
+const mobileTerrainNoiseGLSL=`
+float hashTerrain(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noiseTerrain(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(hashTerrain(i),hashTerrain(i+vec2(1.,0.)),f.x),mix(hashTerrain(i+vec2(0.,1.)),hashTerrain(i+vec2(1.)),f.x),f.y);}
+float fbmTerrain(vec2 p){float f=0.,a=.666667;for(int i=0;i<2;i++){f+=a*noiseTerrain(p);p=mat2(.8,-.6,.6,.8)*p*2.07+7.3;a*=.5;}return f;}`;
+
 // One ocean in both modes. Unequal wave directions and noise break up the old
 // high-frequency stripes; the coast uniforms give each shore its own shallows.
 export function createOcean(coasts,{size=900,segments=72,coastSeeds=[],mobile=false}={}) {
@@ -84,25 +90,30 @@ export function createTropicalSky(radius=420) {
 
 // A separate sand/grass/rock splat is used by the archipelago. Beach vertices
 // sample sand rather than tinting a grass photograph yellow.
-export function islandMaterial(surfaces,scale) {
+export function islandMaterial(surfaces,scale,{mobile=false}={}) {
   const m=new T.MeshStandardMaterial({roughness:1,color:'#ffffff',vertexColors:true});
-  m.userData.fragmentNoiseLayers=3;
+  m.userData.fragmentNoiseLayers=mobile?2:3;
+  m.userData.fragmentTextureSamples=mobile?3:4;
+  m.userData.mobileQuality=mobile;
+  const terrainNoise=mobile?mobileTerrainNoiseGLSL:fastNoiseGLSL;
+  const noiseFunction=mobile?'fbmTerrain':'fbmFast';
+  const grassSample=mobile?'texture2D(uGrass,uv).rgb':`mix(texture2D(uGrass,uv).rgb,texture2D(uGrass,uv*1.37+offset).rgb,.38)`;
   m.onBeforeCompile=shader=>{
     Object.assign(shader.uniforms,{uGrass:{value:surfaces.textures.get('grass')},uSand:{value:surfaces.textures.get('sand')},uRock:{value:surfaces.textures.get('rock')}});
     shader.vertexShader=shader.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vIslandPosition;varying vec3 vIslandNormal;')
       .replace('#include <begin_vertex>',`#include <begin_vertex>\nvIslandPosition=position;vIslandNormal=normalize(normal*vec3(${scale.toFixed(1)},1.,${scale.toFixed(1)}));`);
     shader.fragmentShader=shader.fragmentShader.replace('#include <common>',`#include <common>
-      varying vec3 vIslandPosition;varying vec3 vIslandNormal;uniform sampler2D uGrass;uniform sampler2D uSand;uniform sampler2D uRock;${fastNoiseGLSL}`)
+      varying vec3 vIslandPosition;varying vec3 vIslandNormal;uniform sampler2D uGrass;uniform sampler2D uSand;uniform sampler2D uRock;${terrainNoise}`)
       .replace('#include <map_fragment>',`
         vec2 uv=vIslandPosition.xz/${scale.toFixed(1)}*.34;
-        float n=fbmFast(uv*.46);vec2 offset=vec2(17.3,8.1);
-        vec3 grass=mix(texture2D(uGrass,uv).rgb,texture2D(uGrass,uv*1.37+offset).rgb,.38);
+        float n=${noiseFunction}(uv*.46);vec2 offset=vec2(17.3,8.1);
+        vec3 grass=${grassSample};
         vec3 sand=texture2D(uSand,uv*.8).rgb,rock=texture2D(uRock,uv*.62).rgb;
         float beach=1.-smoothstep(.025,.34,vIslandPosition.y);
         float slope=1.-abs(normalize(vIslandNormal).y);float cliff=smoothstep(.44,.76,slope)*(1.-beach);
         diffuseColor.rgb*=mix(mix(grass,sand,beach),rock,cliff)*(.82+n*.28);`);
   };
-  m.customProgramCacheKey=()=>`tropical-island-${scale}`;return m;
+  m.customProgramCacheKey=()=>`tropical-island-${scale}-${mobile?'mobile':'full'}`;return m;
 }
 
 export function palmFronds(detail=14) {

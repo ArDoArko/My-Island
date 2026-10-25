@@ -261,7 +261,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       c.toArray(colours,j*3);
     }
     land.geometry.setAttribute('color',new T.BufferAttribute(colours,3));land.geometry.computeVertexNormals();
-    land.material.dispose();land.material=islandMaterial(surfaces,SCALE);
+    land.material.dispose();land.material=islandMaterial(surfaces,SCALE,{mobile});
     land.material.vertexColors=true;world.add(land);
     const dock=docks[i.id],bridge=new T.Group(),start=terrainHeight(dock.land.x,dock.land.z);
     bridge.name='pier-'+i.id;bridge.position.set(dock.land.x/SCALE,start,dock.land.z/SCALE);

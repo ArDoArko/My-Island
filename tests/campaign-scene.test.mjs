@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
 import { attachSceneChild, campaignShadowInterval, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
-import { createOcean } from '../tropical-scene.mjs';
+import { createOcean, islandMaterial } from '../tropical-scene.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -70,6 +70,24 @@ test('mobile ocean keeps coastal presentation with three noise layers',()=>{
   assert.equal(mobile.mesh.geometry.parameters.widthSegments,48);
   for(const token of ['uCoasts','shallow','fresnel','foam'])assert(mobile.mesh.material.fragmentShader.includes(token),`mobile water must retain ${token}`);
   assert(!mobile.mesh.material.fragmentShader.includes('noise21(p*1.6'),'mobile wave normals must not pay for three extra noise samples per pixel');
+  desktop.dispose();mobile.dispose();
+});
+
+test('mobile islands keep biome textures with fewer terrain shader samples',()=>{
+  const textures=new Map(['grass','sand','rock'].map(name=>[name,{name}])),surfaces={textures};
+  const compile=material=>{
+    const shader={uniforms:{},vertexShader:'#include <common>\n#include <begin_vertex>',fragmentShader:'#include <common>\n#include <map_fragment>'};
+    material.onBeforeCompile(shader);return shader;
+  };
+  const desktop=islandMaterial(surfaces,C.SCALE),mobile=islandMaterial(surfaces,C.SCALE,{mobile:true});
+  const desktopShader=compile(desktop),mobileShader=compile(mobile);
+  assert.deepEqual({noise:desktop.userData.fragmentNoiseLayers,textures:desktop.userData.fragmentTextureSamples},{noise:3,textures:4});
+  assert.deepEqual({noise:mobile.userData.fragmentNoiseLayers,textures:mobile.userData.fragmentTextureSamples},{noise:2,textures:3});
+  for(const token of ['uGrass','uSand','uRock','beach','cliff'])assert(mobileShader.fragmentShader.includes(token),`mobile terrain must retain ${token}`);
+  assert(mobileShader.fragmentShader.includes('for(int i=0;i<2;i++)'),'mobile terrain noise must stop after two layers');
+  assert(!mobileShader.fragmentShader.includes('uv*1.37+offset'),'mobile grass must avoid the second texture lookup');
+  assert(desktopShader.fragmentShader.includes('uv*1.37+offset'),'desktop terrain keeps the full grass blend');
+  assert.notEqual(mobile.customProgramCacheKey(),desktop.customProgramCacheKey());
   desktop.dispose();mobile.dispose();
 });
 
