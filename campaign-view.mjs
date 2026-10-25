@@ -21,6 +21,13 @@ export function updateCampaignAreaPresentation(cache,area,world,rooms,roomEntrie
   hemi.intensity=area?.65:2.0;sun.intensity=area?.15:2.8;return true;
 }
 
+export function updateCampaignExterior(area,seconds,camera,sky,ocean,vegetation){
+  if(area)return false;
+  sky.material.uniforms.uTime.value=seconds;
+  vegetation.update(camera.position,.5);
+  ocean.update(seconds,camera.position);sky.position.copy(camera.position);return true;
+}
+
 export function updateReleasedPresentation(cache,released,releasedMask,cellBars){
   const values=cache.values||(cache.values=[]);let changed=!cache.ready||values.length!==released.length;
   for(let i=0;i<released.length;i++)if(values[i]!==released[i])changed=true;
@@ -479,7 +486,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const cameraCollisionState={position:new T.Vector3()};let cameraRaycasts=0;
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
   const goalState={},goalSelectionState={},nearbyState={},nearbyCandidates=[],campaignGroundCache=new Map(),guardMotionStates=new Map();campaignGroundCache.misses=0;
-  let goalSelections=0,nearbySelections=0,movingGuards=0;
+  let goalSelections=0,nearbySelections=0,movingGuards=0,exteriorUpdates=0;
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0,poseUpdates=0,pausedFrameRendered=false;
   const shadowState={},areaPresentationState={},releasedPresentationState={},renderScaleState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
@@ -502,7 +509,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     // the GPU idle until play resumes or a camera/viewport change invalidates it.
     if(s.paused&&pausedFrameRendered)return;
     pausedFrameRendered=!!s.paused;
-    const seconds=now/1000;last=now;posedCharacters=0;surfaces.update();sky.material.uniforms.uTime.value=seconds;
+    const seconds=now/1000;last=now;posedCharacters=0;surfaces.update();
     const area=s.interior;
     updateCampaignAreaPresentation(areaPresentationState,area,world,rooms,roomEntries,scene,hemi,sun);
     const surface=area?0:sampleCampaignGround(campaignGroundCache,self.root,s.p.x,s.p.z,ground);
@@ -573,16 +580,15 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       }
     }
     camera.position.copy(pose.position);camera.lookAt(pose.target);
-    // Palm LOD bands are tens of metres wide. Sampling after each half metre
-    // keeps transitions responsive without testing all 48 batches every frame.
-    vegetation.update(camera.position,.5);
+    // The hidden archipelago must not scan 48 palm LOD batches or animate its
+    // ocean and sky while an interior room is the only visible environment.
+    if(updateCampaignExterior(area,seconds,camera,sky,ocean,vegetation))exteriorUpdates++;
     // First-person walking hides the player rig, so only the coarser position
     // invalidation is needed; no visible body animation can change the map.
     const shadowAnimated=campaignShadowsAnimated(s,guardWalking,mode==='third');
     const updateShadow=updateCampaignShadowState(shadowState,s,shadowAnimated)||(shadowAnimated&&now-lastShadowUpdate>=1000/30);
     renderer.shadowMap.needsUpdate=updateShadow;
     if(updateShadow){stabilizeSunShadow(sun,s.p.x/SCALE,s.p.z/SCALE,shadowOptions);lastShadowUpdate=now;shadowUpdates++;}
-    ocean.update(seconds,camera.position);sky.position.copy(camera.position);
     tracer.visible=!!s.shot;
     if(s.shot){
       updateLineSegment(tracerPosition,s.shot.from,s.shot.to,surface+1.35);
@@ -603,7 +609,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost;if(enabled)pausedFrameRendered=false;},
     stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,goalSelections,nearbySelections,movingGuards,
-      palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,poseUpdates,
+      palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,poseUpdates,exteriorUpdates,
       palmLodDistanceChecks:vegetation.treeBatches.length+vegetation.foliageBatches.length,
       palmTrunkTriangles:vegetation.treeBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
       unshadowedPalmTrunkTriangles:vegetation.treeBatches.filter(o=>!o.receiveShadow).reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),

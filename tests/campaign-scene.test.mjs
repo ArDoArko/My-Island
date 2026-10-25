@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -31,6 +31,18 @@ test('static campaign presentation changes only with the room or rescued people'
   assert.deepEqual(Array.from(mask),[0,1,0,1,0]);assert.deepEqual(bars.map(bar=>bar.visible),[true,false,true,false,true]);
   assert.equal(updateReleasedPresentation(releaseCache,[1,3],mask,bars),false);
   assert.equal(updateReleasedPresentation(releaseCache,[1,3,4],mask,bars),true);assert.equal(bars[4].visible,false);
+});
+
+test('interiors stop hidden ocean, sky and palm LOD animation',()=>{
+  const camera={position:new T.Vector3(2,3,4)},sky={material:{uniforms:{uTime:{value:0}}},position:new T.Vector3()};
+  let oceanUpdates=0,lodUpdates=0;
+  const ocean={update(seconds,position){oceanUpdates++;assert.equal(seconds,2);assert.equal(position,camera.position);}};
+  const vegetation={update(position,threshold){lodUpdates++;assert.equal(position,camera.position);assert.equal(threshold,.5);}};
+  assert.equal(updateCampaignExterior('cave',1,camera,sky,ocean,vegetation),false);
+  assert.equal(updateCampaignExterior('estate',1.5,camera,sky,ocean,vegetation),false);
+  assert.equal(oceanUpdates,0);assert.equal(lodUpdates,0);assert.equal(sky.material.uniforms.uTime.value,0);
+  assert.equal(updateCampaignExterior(null,2,camera,sky,ocean,vegetation),true);
+  assert.equal(oceanUpdates,1);assert.equal(lodUpdates,1);assert.equal(sky.material.uniforms.uTime.value,2);assert(sky.position.equals(camera.position));
 });
 
 test('unchanged campaign shadows reuse primitive state without frame strings',()=>{
@@ -345,7 +357,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     const stationaryPoseUpdates=view.stats().poseUpdates;view.frame(517);
     assert.equal(view.stats().poseUpdates,stationaryPoseUpdates,'an unchanged idle campaign character must not rewrite its body pose');
     const sky=scene.getObjectByName('tropical-sky');view.frame(4321);
-    assert.equal(sky.material.uniforms.uTime.value,4.321,'procedural clouds must drift with campaign time');
+    assert.equal(sky.material.uniforms.uTime.value,0,'hidden exterior shaders must stay idle inside the cave');
+    state.interior=null;state.boat=true;state.p={...C.docks.home};view.frame(4338);
+    assert.equal(sky.material.uniforms.uTime.value,4.338,'procedural clouds must resume at current campaign time outdoors');
     assert.equal(sky.material.userData.fragmentNoiseLayers,3,'sky clouds must use three noise layers rather than four');
     assert.match(sky.material.fragmentShader,/for\(int i=0;i<3;i\+\+\)/,'sky FBM must compile exactly three octaves');
     for(const d of Object.values(C.docks)){
