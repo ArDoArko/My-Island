@@ -30,6 +30,14 @@ test('campaign interaction selection stays linear, strict and stable on ties',()
   assert.equal(C.selectNearby([{id:'dock-home',x:125,z:0}],position),null,'the docking radius stays strict');
 });
 
+test('campaign movement reports real travel without changing collision or fuel rules',()=>{
+  const s=C.fresh(),before={...s.p},fuel=s.fuel;
+  const moved=C.move(s,1,0,.05);
+  assert.equal(moved,C.dist(before,s.p));assert(moved>0);assert(s.fuel<fuel,'boat travel must still consume fuel');
+  assert.equal(C.move(s,0,0,.05),0,'an idle frame must report no walking');
+  assert.equal(C.move(s,NaN,0,.05),0,'invalid input must not enter movement or animation');
+});
+
 test('3D campaign targets reuse candidate and objective buffers',()=>{
   const s=C.fresh(),candidates=[],goal={};s.interior='cave';
   assert.equal(C.candidatesInto(candidates,s),candidates);const first=candidates[0];

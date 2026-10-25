@@ -76,11 +76,12 @@ function lineClear(s,a,b) {
   for(let j=1;j<n;j++)if(blocked(s,{x:a.x+(b.x-a.x)*j/n,z:a.z+(b.z-a.z)*j/n}))return false;
   return true;
 }
-export function move(s,dx,dz,dt,{sprint=false}={}) {
-  if(![dx,dz,dt].every(Number.isFinite))return;
+export function move(s,dx,dz,dt,options) {
+  if(![dx,dz,dt].every(Number.isFinite))return 0;
+  const sprint=!!options?.sprint;
   dt=clamp(dt,0,.1);const length=Math.hypot(dx,dz);
   if(length>1){dx/=length;dz/=length;}
-  if(!dx&&!dz)return;
+  if(!dx&&!dz)return 0;
   if(!s.boat&&!s.interior){
     const pier=pierAt(s.p.x,s.p.z,s.island);
     if(pier){
@@ -94,14 +95,16 @@ export function move(s,dx,dz,dt,{sprint=false}={}) {
   s.heading=Math.atan2(dx,dz);
   const speed=s.boat?(s.fuel>0?260:40):sprint?115:78;
   const travel=Math.hypot(dx,dz)*speed*dt,n=Math.max(1,Math.ceil(travel/6));
-  const before={...s.p};
+  const beforeX=s.p.x,beforeZ=s.p.z,candidate={x:beforeX,z:beforeZ};
   for(let j=0;j<n;j++){
-    const x={x:s.p.x+dx*speed*dt/n,z:s.p.z};
-    if(allowed(s,x))s.p.x=x.x;
-    const z={x:s.p.x,z:s.p.z+dz*speed*dt/n};
-    if(allowed(s,z))s.p.z=z.z;
+    candidate.x=s.p.x+dx*speed*dt/n;candidate.z=s.p.z;
+    if(allowed(s,candidate))s.p.x=candidate.x;
+    candidate.x=s.p.x;candidate.z=s.p.z+dz*speed*dt/n;
+    if(allowed(s,candidate))s.p.z=candidate.z;
   }
-  if(s.boat)s.fuel=Math.max(0,s.fuel-dist(before,s.p)*.0008);
+  const moved=Math.hypot(s.p.x-beforeX,s.p.z-beforeZ);
+  if(s.boat)s.fuel=Math.max(0,s.fuel-moved*.0008);
+  return moved;
 }
 function guardsIn(s) {
   if(s.boat||s.interior==='cave'||s.interior==='cellar')return [];
