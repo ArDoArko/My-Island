@@ -430,7 +430,8 @@ test('real Three.js campaign geometry and both cameras run through every mission
       view.setCamera(mode);
       for(const area of [null,'cave','estate','cellar']){
         state.interior=area;state.boat=!area;state.p=area?{x:0,z:115}:{...C.docks.home};view.frame(1000);view.frame(1017);
-        assert.equal(view.stats().posedCharacters,{null:0,cave:1,estate:1,cellar:6}[area],`hidden character poses still run in ${area||'boat'} mode`);
+        const expectedPoses=mode==='first'?{null:0,cave:0,estate:0,cellar:5}:{null:0,cave:1,estate:1,cellar:6};
+        assert.equal(view.stats().posedCharacters,expectedPoses[area],`hidden character poses still run in ${mode}/${area||'boat'} mode`);
         assert(camera.isPerspectiveCamera);assert(camera.position.toArray().every(Number.isFinite));
         const rooms=scene.getObjectByName('cellar').parent;
         for(const room of rooms.children)assert.equal(room.visible,room.name===area);
@@ -445,7 +446,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
       }
     }
     state.interior=null;state.boat=false;state.island='fortress';state.p={...C.docks.fortress};view.frame(1500);
-    assert.equal(view.stats().posedCharacters,3,'fortress exterior should pose only the player and two outdoor guards');
+    assert.equal(view.stats().posedCharacters,2,'first person should pose only the two visible outdoor guards');
     assert.equal(view.stats().movingGuards,0,'nearby stationary guards must not march in place');
     state.guards.find(g=>!g.area).x+=1;view.frame(1508);
     assert.equal(view.stats().movingGuards,1,'a guard that actually advances must animate its walk');
@@ -467,7 +468,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(view.stats().goalSelections,stationaryGoalSelections+1,'player movement must refresh pier-aware objective selection immediately');
     assert.equal(view.stats().nearbySelections,stationaryNearbySelections+1,'player movement must refresh nearby interaction selection immediately');
     state.released=C.PEOPLE.map(p=>p.id);state.walking=false;view.frame(1534);
-    assert.equal(view.stats().posedCharacters,8,'fortress escort should add all five released people');
+    assert.equal(view.stats().posedCharacters,7,'first-person fortress escort should add five people without posing the hidden player');
     const stationaryEscortSamples=view.stats().terrainHeightSamples;view.frame(1551);
     assert.equal(view.stats().terrainHeightSamples,stationaryEscortSamples,'a stationary five-person escort must reuse terrain samples');
     state.released=[];view.setCamera('third');view.frame(1568);

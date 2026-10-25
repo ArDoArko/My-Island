@@ -543,13 +543,19 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     updateCampaignAreaPresentation(areaPresentationState,area,world,rooms,roomEntries,scene,hemi,sun);
     updateCampaignTerrainShadows(terrainShadowState,area,s.p,ISLANDS,terrainMeshes);
     const surface=area?0:sampleCampaignGround(campaignGroundCache,self.root,s.p.x,s.p.z,ground);
-    self.root.visible=!s.boat||mode==='third';
-    if(!s.boat){const reattached=attachSceneChild(scene,self.root);placeHuman(self,s.p,surface,s.heading,s.walking,seconds,reattached);}
-    self.rig.visible=mode==='third';
+    const playerVisible=mode==='third';
+    self.root.visible=playerVisible;
+    if(!s.boat){
+      const reattached=attachSceneChild(scene,self.root);
+      // First-person hands have their own camera model. Do not animate the
+      // hidden full body until the player switches back to third person.
+      if(playerVisible)placeHuman(self,s.p,surface,s.heading,s.walking,seconds,reattached);
+    }
+    self.rig.visible=playerVisible;
     boat.position.set((s.boat?s.p.x:docks[s.boatAt].x)/SCALE,.02,(s.boat?s.p.z:docks[s.boatAt].z)/SCALE);
     boat.rotation.y=s.boat?s.heading:Math.atan2(docks[s.boatAt].ux,docks[s.boatAt].uz);
     boat.rotation.z=s.boat?Math.sin(seconds*2)*.015:0;wake.visible=s.boat&&s.walking;
-    if(s.boat)seatDriver(self,boat);
+    if(s.boat&&playerVisible)seatDriver(self,boat);
     paperMesh.visible=!s.paper;hiddenGun.visible=s.paper&&!s.gun;
     keyMesh.rotation.y=seconds;updateReleasedPresentation(releasedPresentationState,s.released,releasedMask,cellBars);
     let guardWalking=false,bossDefeated=false;movingGuards=0;
