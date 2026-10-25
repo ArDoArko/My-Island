@@ -122,6 +122,16 @@ test('combat sight sampling keeps mansion walls solid for pursuit and shooting',
   assert.equal(C.shoot(s,-Math.PI/2),true);assert.equal(guard.hp,2,'the mansion must block the player shot too');assert.equal(s.ammo,before.ammo-1);
 });
 
+test('shooting selects the nearest active guard in one stable pass',()=>{
+  const s=C.fresh();s.boat=false;s.interior='estate';s.gun=true;s.ammo=12;s.p={x:0,z:100};
+  const hall=s.guards.find(g=>g.id==='hall'),boss=s.guards.find(g=>g.id==='boss'),gate=s.guards.find(g=>g.id==='gate');
+  hall.x=0;hall.z=50;hall.hp=2;boss.x=0;boss.z=0;boss.hp=3;gate.x=0;gate.z=75;gate.hp=3;
+  assert.equal(C.shoot(s,Math.PI),true);
+  assert.equal(hall.hp,1,'the nearest live guard in the current area must be hit');
+  assert.equal(boss.hp,3,'a farther valid guard must remain untouched');
+  assert.equal(gate.hp,3,'a nearer guard in another area must be ignored');
+});
+
 test('paused campaign work renders once and invalidates on demand',()=>{
   const cache={};
   assert.equal(C.updateCampaignFrameState(cache,false),true);

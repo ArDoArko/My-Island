@@ -115,10 +115,6 @@ export function move(s,dx,dz,dt,options) {
   if(s.boat)s.fuel=Math.max(0,s.fuel-moved*.0008);
   return moved;
 }
-function guardsIn(s) {
-  if(s.boat||s.interior==='cave'||s.interior==='cellar')return [];
-  return s.guards.filter(g=>g.area===s.interior&&g.hp>0);
-}
 const guardStep={x:0,z:0};
 export function tick(s,dt,{paused=false}={}) {
   if(paused)return;dt=clamp(dt,0,.1);s.elapsed+=dt;
@@ -151,11 +147,17 @@ export function shoot(s,yaw=s.heading) {
   s.lastShot=s.elapsed;
   if(s.ammo<=0){s.notice='empty';return false;}
   s.ammo--;const dx=Math.sin(yaw),dz=Math.cos(yaw);
-  const targets=guardsIn(s).filter(g=>{
-    const d=dist(g,s.p),dot=((g.x-s.p.x)*dx+(g.z-s.p.z)*dz)/Math.max(1,d);
-    return d<220&&dot>.86&&lineClear(s,s.p,g);
-  }).sort((a,b)=>dist(a,s.p)-dist(b,s.p));
-  const g=targets[0];if(g){g.hp--;s.notice=g.hp<=0?'guard-down':'hit';}
+  let g=null,bestDistanceSquared=220*220;
+  if(s.interior!=='cave'&&s.interior!=='cellar'){
+    for(const candidate of s.guards){
+      if(candidate.area!==s.interior||candidate.hp<=0)continue;
+      const gx=candidate.x-s.p.x,gz=candidate.z-s.p.z,distanceSquared=gx*gx+gz*gz;
+      if(distanceSquared>=bestDistanceSquared)continue;
+      const distance=Math.sqrt(distanceSquared),dot=(gx*dx+gz*dz)/Math.max(1,distance);
+      if(dot>.86&&lineClear(s,s.p,candidate)){g=candidate;bestDistanceSquared=distanceSquared;}
+    }
+  }
+  if(g){g.hp--;s.notice=g.hp<=0?'guard-down':'hit';}
   s.shot={at:s.elapsed,from:{...s.p},to:g?{x:g.x,z:g.z}:{x:s.p.x+dx*200,z:s.p.z+dz*200}};
   return true;
 }
