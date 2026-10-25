@@ -28,6 +28,21 @@ export function updateCampaignExterior(area,seconds,camera,sky,ocean,vegetation)
   ocean.update(seconds,camera.position);sky.position.copy(camera.position);return true;
 }
 
+export function updateCampaignTerrainShadows(cache,area,point,islands,terrains,margin=800,minMovement=200){
+  if(cache.ready&&cache.area===area){
+    const dx=cache.x-point.x,dz=cache.z-point.z;
+    if(dx*dx+dz*dz<minMovement*minMovement)return false;
+  }
+  cache.ready=true;cache.area=area;cache.x=point.x;cache.z=point.z;let changed=false,active=0;
+  for(let i=0;i<terrains.length;i++){
+    const island=islands[i],dx=point.x-island.x,dz=point.z-island.z,
+      receive=!area&&dx*dx+dz*dz<=(island.radius+margin)**2;
+    if(terrains[i].receiveShadow!==receive){terrains[i].receiveShadow=receive;changed=true;}
+    if(receive)active++;
+  }
+  cache.active=active;return changed;
+}
+
 export function updateReleasedPresentation(cache,released,releasedMask,cellBars){
   const values=cache.values||(cache.values=[]);let changed=!cache.ready||values.length!==released.length;
   for(let i=0;i<released.length;i++)if(values[i]!==released[i])changed=true;
@@ -490,7 +505,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const goalState={},goalSelectionState={},nearbyState={},nearbyCandidates=[],campaignGroundCache=new Map(),guardMotionStates=new Map();campaignGroundCache.misses=0;
   let goalSelections=0,nearbySelections=0,movingGuards=0,exteriorUpdates=0;
   let yaw=0,pitch=.05,mode='first',last=0,enabled=true,lost=false,drag=null,oldArea,posedCharacters=0,poseUpdates=0,pausedFrameRendered=false;
-  const shadowState={},areaPresentationState={},releasedPresentationState={},renderScaleState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
+  const shadowState={},terrainShadowState={},areaPresentationState={},releasedPresentationState={},renderScaleState={};let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const initial=getState(),initialGoal=goal(initial).target;
   if(initialGoal)yaw=Math.atan2(initial.p.x-initialGoal.x,initial.p.z-initialGoal.z);
   function placeHuman(person,p,height,heading,walking,seconds,force=false,pose='standing'){
@@ -514,6 +529,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     const seconds=now/1000;last=now;posedCharacters=0;surfaces.update();
     const area=s.interior;
     updateCampaignAreaPresentation(areaPresentationState,area,world,rooms,roomEntries,scene,hemi,sun);
+    updateCampaignTerrainShadows(terrainShadowState,area,s.p,ISLANDS,terrainMeshes);
     const surface=area?0:sampleCampaignGround(campaignGroundCache,self.root,s.p.x,s.p.z,ground);
     self.root.visible=!s.boat||mode==='third';
     if(!s.boat){const reattached=attachSceneChild(scene,self.root);placeHuman(self,s.p,surface,s.heading,s.walking,seconds,reattached);}
@@ -617,7 +633,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       unshadowedPalmTrunkTriangles:vegetation.treeBatches.filter(o=>!o.receiveShadow).reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
       palmCrownTriangles:vegetation.foliageBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
       lowDetailPalmBatches:vegetation.treeBatches.filter(o=>o.userData.lod.level==='low').length,
-      terrainTriangles:terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),shadowUpdates,terrainHeightSamples:campaignGroundCache.misses}),
+      terrainTriangles:terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),shadowReceivingTerrains:terrainShadowState.active,
+      shadowUpdates,terrainHeightSamples:campaignGroundCache.misses}),
     dispose(){renderer.dispose();surfaces.dispose();const gs=new Set([...geos.values(),...vegetation.lodGeometries]),ms=new Set(mats.values());scene.traverse(o=>{if(o.geometry)gs.add(o.geometry);if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])ms.add(m);});gs.forEach(g=>g.dispose());ms.forEach(m=>m.dispose());paperMap.dispose();}
   };
 }

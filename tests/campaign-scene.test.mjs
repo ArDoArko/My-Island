@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
+import { attachSceneChild, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation } from '../campaign-view.mjs';
 import { createOcean } from '../tropical-scene.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
@@ -55,6 +55,17 @@ test('mobile ocean keeps coastal presentation with three noise layers',()=>{
   for(const token of ['uCoasts','shallow','fresnel','foam'])assert(mobile.mesh.material.fragmentShader.includes(token),`mobile water must retain ${token}`);
   assert(!mobile.mesh.material.fragmentShader.includes('noise21(p*1.6'),'mobile wave normals must not pay for three extra noise samples per pixel');
   desktop.dispose();mobile.dispose();
+});
+
+test('only terrain inside the local sun projection samples the shadow map',()=>{
+  const islands=[{x:0,z:0,radius:9000},{x:30000,z:0,radius:5000}],terrains=[{receiveShadow:true},{receiveShadow:true}],cache={};
+  assert.equal(updateCampaignTerrainShadows(cache,null,{x:0,z:0},islands,terrains),true);
+  assert.deepEqual(terrains.map(o=>o.receiveShadow),[true,false]);assert.equal(cache.active,1);
+  assert.equal(updateCampaignTerrainShadows(cache,null,{x:50,z:0},islands,terrains),false,'sub-ten-metre travel must reuse the receiver selection');
+  assert.equal(updateCampaignTerrainShadows(cache,null,{x:24250,z:0},islands,terrains),true);
+  assert.deepEqual(terrains.map(o=>o.receiveShadow),[false,true],'an approaching boat must enable the destination before reaching its nominal coast');
+  assert.equal(updateCampaignTerrainShadows(cache,'cave',{x:0,z:0},islands,terrains),true);
+  assert.deepEqual(terrains.map(o=>o.receiveShadow),[false,false]);assert.equal(cache.active,0);
 });
 
 test('unchanged campaign shadows reuse primitive state without frame strings',()=>{
@@ -365,7 +376,9 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert.equal(terrainMeshes.reduce((n,o)=>n+o.geometry.index.count/3,0),75208,'adaptive island meshes must remove oversampling');
     assert(terrainMeshes.every(o=>o.material.userData.fragmentNoiseLayers===3),'every island surface must use the three-layer terrain shader');
     assert.equal(view.stats().terrainTriangles,75208);
+    assert.equal(view.stats().shadowReceivingTerrains,1,'only the terrain beside the starting boat should sample the local shadow map');
     state.interior='cave';state.boat=false;state.p={x:0,z:115};state.walking=false;view.frame(500);
+    assert.equal(view.stats().shadowReceivingTerrains,0,'hidden exterior terrain must not keep a shadow-receiving shader inside rooms');
     const stationaryPoseUpdates=view.stats().poseUpdates;view.frame(517);
     assert.equal(view.stats().poseUpdates,stationaryPoseUpdates,'an unchanged idle campaign character must not rewrite its body pose');
     const sky=scene.getObjectByName('tropical-sky');view.frame(4321);
