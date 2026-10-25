@@ -9,5 +9,7 @@ export const VILLAGE = Object.freeze([
   {x:-225,z:110,w:90,d:75,h:4.5,color:'#c5d1d0',shutter:'#7a6a58'}
 ]);
 export function sceneryBlocked(p, island,village=VILLAGE) {
-  return island==='home'&&village.some(b=>Math.abs(p.x-b.x)<b.w/2+7&&Math.abs(p.z-b.z)<b.d/2+7);
+  if(island!=='home')return false;
+  for(const b of village)if(Math.abs(p.x-b.x)<b.w/2+7&&Math.abs(p.z-b.z)<b.d/2+7)return true;
+  return false;
 }

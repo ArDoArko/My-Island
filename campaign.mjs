@@ -1,5 +1,5 @@
 import { ISLANDS,ISLAND_BY_ID,getIslandAt,SCALE,WORLD_VERSION,docks,points,GUARDS,VILLAGE,bounds,
-  estateCenter,fortressApproach,ground,pierAt,migratePosition,migrateGuard } from './campaign-world.mjs';
+  estateCenter,fortressApproach,ground,terrainHeight,pierAt,migratePosition,migrateGuard } from './campaign-world.mjs';
 import { sceneryBlocked } from './campaign-scenery.mjs';
 import { islandElevation } from './archipelago-terrain.mjs';
 export { text } from './campaign-text.mjs';
@@ -67,9 +67,14 @@ export function allowed(s,p) {
   if(!Number.isFinite(p.x)||!Number.isFinite(p.z))return false;
   if(s.interior)return p.x>=-110&&p.x<=110&&p.z>=-115&&p.z<=170&&!blocked(s,p);
   if(p.x<bounds.minX||p.x>bounds.maxX||p.z<bounds.minZ||p.z>bounds.maxZ)return false;
-  if(s.boat)return !ISLANDS.some(i=>dist(p,i)<i.radius&&islandElevation(i,p.x,p.z)>-.025);
+  if(s.boat){
+    for(const i of ISLANDS){const dx=p.x-i.x,dz=p.z-i.z;if(dx*dx+dz*dz<i.radius*i.radius&&islandElevation(i,p.x,p.z)>-.025)return false;}
+    return true;
+  }
   const i=ISLAND_BY_ID[s.island];
-  return (!!pierAt(p.x,p.z,s.island)||dist(p,i)<i.radius*.99&&ground(p.x,p.z)>.005)&&!blocked(s,p);
+  const pier=pierAt(p.x,p.z,s.island);if(pier)return !blocked(s,p);
+  const dx=p.x-i.x,dz=p.z-i.z,radius=i.radius*.99;
+  return dx*dx+dz*dz<radius*radius&&terrainHeight(p.x,p.z,i)>.005&&!blocked(s,p);
 }
 const linePoint={x:0,z:0};
 function lineClear(s,a,b) {
