@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, campaignShadowInterval, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
+import { attachSceneChild, campaignShadowInterval, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignCameraTransform, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
 import { createOcean, createTropicalSky, islandMaterial } from '../tropical-scene.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
@@ -17,6 +17,16 @@ test('campaign player reparents only when changing between boat and land',()=>{
   assert.equal(attachSceneChild(scene,player),true,'disembarking must restore the player to the scene');
   assert.equal(player.parent,scene);assert.deepEqual(scene.children,[sentinel,player]);
   assert.equal(attachSceneChild(scene,player),false,'subsequent on-foot frames must reuse the parent');
+});
+
+test('a stationary campaign camera reuses its position and look direction',()=>{
+  const cache={},camera=new T.PerspectiveCamera(),position=new T.Vector3(3,2,-4),target=new T.Vector3(1,1,0);
+  assert.equal(updateCampaignCameraTransform(cache,camera,position,target),true);
+  const quaternion=camera.quaternion.clone();
+  assert.equal(updateCampaignCameraTransform(cache,camera,position,target),false,'an unchanged view must skip a duplicate lookAt calculation');
+  assert(camera.position.equals(position));assert(camera.quaternion.equals(quaternion));
+  target.x+=1;assert.equal(updateCampaignCameraTransform(cache,camera,position,target),true,'orbiting must refresh the camera immediately');
+  assert(!camera.quaternion.equals(quaternion));
 });
 
 test('static campaign presentation changes only with the room or rescued people',()=>{

@@ -88,6 +88,14 @@ export function updateCampaignAreaView(cache,area,player,target,yaw,pitch,defaul
   out.pitch=defaultPitch;return true;
 }
 
+export function updateCampaignCameraTransform(cache,camera,position,target){
+  if(cache.ready&&cache.x===position.x&&cache.y===position.y&&cache.z===position.z&&
+    cache.tx===target.x&&cache.ty===target.y&&cache.tz===target.z)return false;
+  cache.ready=true;cache.x=position.x;cache.y=position.y;cache.z=position.z;
+  cache.tx=target.x;cache.ty=target.y;cache.tz=target.z;
+  camera.position.copy(position);camera.lookAt(target);return true;
+}
+
 export function updateCampaignShadowState(cache,state,animated=false){
   const area=state.interior||'',boat=!!state.boat,x=Math.round(state.p.x/20),z=Math.round(state.p.z/20),
     heading=Math.round(state.heading*12),boarded=!!state.boarded,guards=state.guards||[],released=state.released||[];
@@ -517,7 +525,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   const tracerPosition=new T.Float32BufferAttribute(new Float32Array(6),3);
   const tracer=new T.Line(new T.BufferGeometry().setAttribute('position',tracerPosition),new T.LineBasicMaterial({color:'#ffe8ad'}));tracer.frustumCulled=false;scene.add(tracer);
   const cameraRay=new T.Raycaster(),cameraDirection=new T.Vector3(),cameraPoseBuffer={position:new T.Vector3(),target:new T.Vector3()},cameraHits=[];
-  const cameraCollisionState={position:new T.Vector3()};let cameraRaycasts=0;
+  const cameraCollisionState={position:new T.Vector3()},cameraTransformState={};let cameraRaycasts=0,cameraUpdates=0;
   const cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.6},cameraHit=hit=>hit.distance>.2,shadowOptions={height:25};
   const goalState={},goalSelectionState={},nearbyState={},nearbyCandidates=[],campaignGroundCache=new Map(),guardMotionStates=new Map();campaignGroundCache.misses=0;
   let goalSelections=0,nearbySelections=0,movingGuards=0,exteriorUpdates=0;
@@ -623,7 +631,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
         c.position.copy(p);
       }
     }
-    camera.position.copy(pose.position);camera.lookAt(pose.target);
+    if(updateCampaignCameraTransform(cameraTransformState,camera,pose.position,pose.target))cameraUpdates++;
     // The hidden archipelago must not scan 48 palm LOD batches or animate its
     // ocean and sky while an interior room is the only visible environment.
     if(updateCampaignExterior(area,seconds,camera,sky,ocean,vegetation))exteriorUpdates++;
@@ -651,7 +659,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     get cameraMode(){return mode},get enabled(){return enabled&&!lost},
     vector:(x,z)=>({x:x*Math.cos(yaw)+z*Math.sin(yaw),z:-x*Math.sin(yaw)+z*Math.cos(yaw)}),
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost;if(enabled)pausedFrameRendered=false;},
-    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,goalSelections,nearbySelections,movingGuards,
+    stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,cameraUpdates,goalSelections,nearbySelections,movingGuards,
       palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,poseUpdates,exteriorUpdates,
       palmLodDistanceChecks:vegetation.treeBatches.length+vegetation.foliageBatches.length,
       palmTrunkTriangles:vegetation.treeBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
