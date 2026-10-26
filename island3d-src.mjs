@@ -55,9 +55,8 @@ export function updateAvatarFrameCycle(out,seconds){
   const armPhase=seconds*1.3;
   out.idleHip=Math.sin(seconds*1.7);out.idleArmSin=Math.sin(armPhase);out.idleArmCos=Math.cos(armPhase);return out;
 }
-export function updateLeafWindCycle(out,seconds){
-  const x=seconds*.7,z=seconds*.6;
-  out.xSin=Math.sin(x);out.xCos=Math.cos(x);out.zSin=Math.sin(z);out.zCos=Math.cos(z);return out;
+export function resourceMatricesNeedUpdate(renderedRevision,nextRevision){
+  return renderedRevision!==nextRevision;
 }
 export function updateBoarGait(out,seconds){
   const swing=Math.sin(seconds*6)*.15;
@@ -355,29 +354,28 @@ export function create({canvas,terrain,getState,onLost}) {
     shell:new T.InstancedMesh(new T.SphereGeometry(1,12,6,0,Math.PI),mat('#f1d0b7'),400)
   };
   for(const b of Object.values(batches)){b.count=0;b.castShadow=true;b.receiveShadow=true;b.frustumCulled=false;scene.add(b);}
-  let renderedResourceRevision=-1,resourceLeaves=[],resourceStaticUpdates=0;const leafWindCycle={xSin:0,xCos:1,zSin:0,zCos:1};
-  function resources(objects,seconds,revision){
-    if(revision!==renderedResourceRevision){
-      const counts={tree:0,rock:0,food:0,shell:0};resourceLeaves=[];
+  let renderedResourceRevision=-1,resourceStaticUpdates=0;
+  function resources(objects,revision){
+    if(resourceMatricesNeedUpdate(renderedResourceRevision,revision)){
+      const counts={tree:0,leaves:0,rock:0,food:0,shell:0};
       for(const o of objects){
         const x=o.x/SCALE,z=o.y/SCALE,y=terrainHeight(x,z),p=o.phase||0;
         if(o.t==='tree'){
           const phaseSin=Math.sin(p),phaseCos=Math.cos(p),size=.84+.17*Math.sin(o.x*.033+o.y*.027),height=1.35+.28*phaseCos;
           dummy.position.set(x,y,z);dummy.rotation.set(.03*phaseSin,p,.04*phaseCos);dummy.scale.set(size,height,size);dummy.updateMatrix();batches.tree.setMatrixAt(counts.tree++,dummy.matrix);
-          resourceLeaves.push({x:x+.16*size*phaseCos,y:y+4.3*height,z:z-.16*size*phaseSin,p,size,phaseSin,phaseCos});
+          // The vertex shader supplies continuous wind. Keep the instance
+          // transforms static so palms do not rebuild and upload a matrix
+          // buffer every frame.
+          dummy.position.set(x+.16*size*phaseCos,y+4.3*height,z-.16*size*phaseSin);dummy.rotation.set(0,p,0);
+          dummy.scale.set(size,size,size);dummy.updateMatrix();batches.leaves.setMatrixAt(counts.leaves++,dummy.matrix);
         }else if(batches[o.t]){
           dummy.position.set(x,y+(o.t==='rock'?.23:o.t==='food'?.13:.025),z);dummy.rotation.set(0,p,0);
           dummy.scale.set(...(o.t==='rock'?[.34+.18*Math.abs(Math.sin(p)),.3,.4]:o.t==='food'?[.15,.13,.15]:[.12,.04,.14]));dummy.updateMatrix();batches[o.t].setMatrixAt(counts[o.t]++,dummy.matrix);
         }
       }
-      for(const key of ['tree','rock','food','shell']){batches[key].count=counts[key];batches[key].instanceMatrix.needsUpdate=true;}
+      for(const key of ['tree','leaves','rock','food','shell']){batches[key].count=counts[key];batches[key].instanceMatrix.needsUpdate=true;}
       renderedResourceRevision=revision;resourceStaticUpdates++;
     }
-    updateLeafWindCycle(leafWindCycle,seconds);let count=0;
-    for(const leaf of resourceLeaves){dummy.position.set(leaf.x,leaf.y,leaf.z);
-      dummy.rotation.set((leafWindCycle.xSin*leaf.phaseCos+leafWindCycle.xCos*leaf.phaseSin)*.025,leaf.p,(leafWindCycle.zCos*leaf.phaseCos-leafWindCycle.zSin*leaf.phaseSin)*.025);
-      dummy.scale.set(leaf.size,leaf.size,leaf.size);dummy.updateMatrix();batches.leaves.setMatrixAt(count++,dummy.matrix);}
-    batches.leaves.count=count;batches.leaves.instanceMatrix.needsUpdate=true;
   }
 
   const signs=new Set(),signPosition=new T.Vector3();
@@ -551,7 +549,7 @@ export function create({canvas,terrain,getState,onLost}) {
     updateName(guide,s.labels?.nela,'#609991');
     const x=s.P.x/SCALE,z=s.P.y/SCALE;
     materials.update();meadow.update(seconds,frameBase);leafWind.value=seconds;sky.material.uniforms.uTime.value=seconds;
-    resources(s.objects,seconds,s.resourceRevision);updateFish(s.fishes,seconds,s.sea);updateChapters(s.chapterMarkers,seconds);
+    resources(s.objects,s.resourceRevision);updateFish(s.fishes,seconds,s.sea);updateChapters(s.chapterMarkers,seconds);
     animatePerson(self,s.P,Number.isFinite(s.heading)?s.heading:facing[s.face]||0,s.moving,seconds,step,s.fast?5.25:3,s.sea,s.raft,s.motion,s.spear,s.blocked,avatarRigNeedsPose(cameraMode));
     merchant.root.visible=guide.root.visible=true;
     animatePerson(merchant,s.leon,Math.atan2(x-s.leon.x/SCALE,z-s.leon.y/SCALE),false,seconds,step,0,s.sea);

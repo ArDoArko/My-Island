@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, islandShadowInterval, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateIslandFrameState, updateLeafWindCycle, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, islandShadowInterval, legPose, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -140,18 +140,12 @@ test('avatar animation shares exact phase and heading samples across each body',
   }
 });
 
-test('resource palms share exact wind samples across every phase',()=>{
-  const cycle={};
-  for(const seconds of [0,.37,4.9]){
-    assert.equal(updateLeafWindCycle(cycle,seconds),cycle);
-    for(const phase of [0,.31,2.8,6.1]){
-      const phaseSin=Math.sin(phase),phaseCos=Math.cos(phase);
-      const x=cycle.xSin*phaseCos+cycle.xCos*phaseSin;
-      const z=cycle.zCos*phaseCos-cycle.zSin*phaseSin;
-      assert(Math.abs(x-Math.sin(seconds*.7+phase))<1e-12);
-      assert(Math.abs(z-Math.cos(seconds*.6+phase))<1e-12);
-    }
-  }
+test('resource instance matrices upload only for a new geometry revision',()=>{
+  assert.equal(resourceMatricesNeedUpdate(-1,0),true);
+  assert.equal(resourceMatricesNeedUpdate(0,0),false);
+  assert.equal(resourceMatricesNeedUpdate(0,1),true);
+  assert.equal(resourceMatricesNeedUpdate('island-a','island-a'),false);
+  assert.equal(resourceMatricesNeedUpdate('island-a','island-b'),true);
 });
 
 test('boars share one gait sample across all four alternating legs',()=>{
