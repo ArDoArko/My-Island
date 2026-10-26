@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, campaignShadowInterval, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignCameraTransform, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignGuardPresentation, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
+import { attachSceneChild, campaignShadowInterval, campaignShadowsAnimated, createCampaignView, freezeCampaignStaticTransforms, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignCameraTransform, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignGuardPresentation, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
 import { createOcean, createTropicalSky, islandMaterial, updateCameraFollowingSky } from '../tropical-scene.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
@@ -17,6 +17,18 @@ test('campaign player reparents only when changing between boat and land',()=>{
   assert.equal(attachSceneChild(scene,player),true,'disembarking must restore the player to the scene');
   assert.equal(player.parent,scene);assert.deepEqual(scene.children,[sentinel,player]);
   assert.equal(attachSceneChild(scene,player),false,'subsequent on-foot frames must reuse the parent');
+});
+
+test('campaign freezes static world matrices without freezing dynamic branches',()=>{
+  const scene=new T.Group(),root=new T.Group(),building=new T.Group(),dynamic=new T.Group(),dynamicChild=new T.Group();
+  root.position.set(2,0,0);building.position.set(3,0,0);dynamic.position.set(4,0,0);dynamic.add(dynamicChild);root.add(building,dynamic);scene.add(root);
+  assert.equal(freezeCampaignStaticTransforms(root,[dynamic]),2);
+  assert.equal(root.matrixAutoUpdate,false);assert.equal(root.matrixWorldAutoUpdate,false);
+  assert.equal(building.matrixAutoUpdate,false);assert.equal(building.matrixWorldAutoUpdate,false);
+  assert.equal(dynamic.matrixAutoUpdate,true);assert.equal(dynamic.matrixWorldAutoUpdate,true);
+  assert.equal(building.getWorldPosition(new T.Vector3()).x,5);
+  dynamic.position.x=7;scene.updateMatrixWorld(true);
+  assert.equal(dynamicChild.getWorldPosition(new T.Vector3()).x,9,'a moving excluded branch must still inherit its frozen parent transform');
 });
 
 test('a stationary campaign camera reuses its position and look direction',()=>{
@@ -558,6 +570,7 @@ test('real Three.js campaign geometry and both cameras run through every mission
     assert(Number.isFinite(view.aim()));assert(view.vector(0,-1).x!==undefined);
     assert.equal(view.stats().cameraBlockers,2,'camera collision must use only the static village and estate blockers');
     assert.deepEqual({palmBatches:view.stats().palmBatches,largestPalmBatch:view.stats().largestPalmBatch},{palmBatches:24,largestPalmBatch:373});
+    assert(view.stats().frozenStaticTransforms>100,'the campaign must freeze its large static world instead of composing it every frame');
     assert.equal(renderer.shadowMap.autoUpdate,false,'the 2048px campaign shadow map must not render unconditionally');
     state.walking=false;const stationaryShadow=view.stats().shadowUpdates;view.frame(3000);
     assert.equal(view.stats().shadowUpdates,stationaryShadow+1,'stopping animation must refresh shadows once');

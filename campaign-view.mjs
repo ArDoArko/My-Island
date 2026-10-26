@@ -13,6 +13,16 @@ export function attachSceneChild(parent,child){
   parent.add(child);return true;
 }
 
+export function freezeCampaignStaticTransforms(root,dynamicRoots=[]){
+  const dynamic=new Set(dynamicRoots);root.updateWorldMatrix(true,true);let frozen=0;
+  const visit=object=>{
+    if(dynamic.has(object))return;
+    object.updateMatrix();object.matrixAutoUpdate=false;object.matrixWorldAutoUpdate=false;frozen++;
+    for(const child of object.children)visit(child);
+  };
+  visit(root);return frozen;
+}
+
 export function updateCampaignAreaPresentation(cache,area,world,rooms,roomEntries,scene,hemi,sun){
   if(cache.ready&&cache.area===area)return false;
   cache.ready=true;cache.area=area;world.visible=!area;rooms.visible=!!area;
@@ -482,6 +492,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     const lamp=ell(cellarStatic,'#ffe4a8',[x,2.34,-6.20],[.15,.20,.11]);lamp.material=lanternMaterial;
   }
   cellar.userData.cellarDetails={cells:5,hinges:10,padlocks:5,lamps:3,bedding:5};batchGroup(cellarStatic);
+  const frozenWorldTransforms=freezeCampaignStaticTransforms(world,[boat,sky]);
+  const frozenRoomTransforms=freezeCampaignStaticTransforms(rooms,[keyMesh]);
   function prepareCampaignPerson(person,style,prefix){
     const selected=person.hairStyles[style],selectedHair=new Set();selected.name=`${prefix}-hair-${style}`;selected.visible=true;
     selected.traverse(o=>{if(o.isMesh)selectedHair.add(o)});
@@ -668,6 +680,7 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
     aim:()=>yaw+Math.PI,setEnabled(v){enabled=!!v&&!lost;if(enabled)pausedFrameRendered=false;},
     stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),eye:camera.position.toArray(),camera:mode,cameraBlockers:cameraBlockers.length,cameraRaycasts,cameraUpdates,goalSelections,nearbySelections,movingGuards,
       palmBatches:vegetation.treeBatches.length,largestPalmBatch:Math.max(...vegetation.treeBatches.map(o=>o.count)),posedCharacters,poseUpdates,exteriorUpdates,
+      frozenStaticTransforms:frozenWorldTransforms+frozenRoomTransforms,
       palmLodDistanceChecks:vegetation.treeBatches.length+vegetation.foliageBatches.length,
       palmTrunkTriangles:vegetation.treeBatches.reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
       unshadowedPalmTrunkTriangles:vegetation.treeBatches.filter(o=>!o.receiveShadow).reduce((n,o)=>n+o.count*o.geometry.index.count/3,0),
