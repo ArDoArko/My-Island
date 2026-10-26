@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
-import { attachSceneChild, campaignShadowInterval, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignCameraTransform, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
+import { attachSceneChild, campaignShadowInterval, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignCameraTransform, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignGuardPresentation, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
 import { createOcean, createTropicalSky, islandMaterial } from '../tropical-scene.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
@@ -238,6 +238,20 @@ test('stationary campaign poses update only when their authored transform change
   assert.equal(updateCampaignPoseState(cache,point,.5,.25,false,true),true,'a forced contact pose must bypass the cache');
   assert.equal(updateCampaignPoseState(cache,point,.5,.25,false,false,'fallen'),true,'changing to a fallen pose must invalidate the cache once');
   assert.equal(updateCampaignPoseState(cache,point,.5,.25,false,false,'fallen'),false,'an unchanged fallen person must reuse its body pose');
+});
+
+test('stationary campaign guards reuse their armed or fallen presentation',()=>{
+  const person={root:new T.Group(),rig:new T.Group(),arms:[{arm:new T.Group(),forearm:new T.Group()},{arm:new T.Group(),forearm:new T.Group()}]};
+  assert.equal(updateCampaignGuardPresentation(person,.4,false,true,true),true);
+  assert.equal(person.rig.rotation.x,0);assert.equal(person.arms[1].arm.rotation.x,-1.05);assert.equal(person.arms[1].forearm.rotation.x,-.35);
+  person.rig.rotation.x=.25;person.arms[1].arm.rotation.x=.5;person.arms[1].forearm.rotation.x=.75;
+  assert.equal(updateCampaignGuardPresentation(person,.4,false,true,false),false,'an unchanged armed guard must not rewrite its bones');
+  assert.equal(person.rig.rotation.x,.25);assert.equal(person.arms[1].arm.rotation.x,.5);assert.equal(person.arms[1].forearm.rotation.x,.75);
+  assert.equal(updateCampaignGuardPresentation(person,.4,false,false,true),true);
+  assert.equal(person.rig.rotation.x,-Math.PI/2);assert.equal(person.root.position.y,.55);assert.equal(person.root.scale.x,.8);
+  person.root.position.y=2;person.root.scale.setScalar(.6);
+  assert.equal(updateCampaignGuardPresentation(person,.4,false,false,false),false,'an unchanged fallen guard must not rewrite its transform');
+  assert.equal(person.root.position.y,2);assert.equal(person.root.scale.x,.6);
 });
 
 test('campaign guards walk only after their position really changes',()=>{

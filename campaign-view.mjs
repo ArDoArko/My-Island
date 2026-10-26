@@ -145,6 +145,13 @@ export function updateCampaignPoseState(cache,point,height,heading,walking,force
   return changed;
 }
 
+export function updateCampaignGuardPresentation(person,surface,inside,alive,poseChanged){
+  if(!poseChanged)return false;
+  if(!alive){person.rig.rotation.x=-Math.PI/2;person.root.position.y=surface+(inside?0:.15);person.root.scale.setScalar(.8);}
+  else {person.rig.rotation.x=0;person.arms[1].arm.rotation.x=-1.05;person.arms[1].forearm.rotation.x=-.35;}
+  return true;
+}
+
 export function updateCampaignMovement(cache,point,active=true){
   const moving=!!(active&&cache.ready&&(cache.x!==point.x||cache.z!==point.z));
   cache.ready=true;cache.x=point.x;cache.z=point.z;return moving;
@@ -536,13 +543,14 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
   function placeHuman(person,p,height,heading,walking,seconds,force=false,pose='standing'){
     posedCharacters++;
     const poseState=person.root.userData.campaignPoseState||(person.root.userData.campaignPoseState={});
-    if(!updateCampaignPoseState(poseState,p,height,heading,walking,force,pose))return;
+    if(!updateCampaignPoseState(poseState,p,height,heading,walking,force,pose))return false;
     poseUpdates++;
     person.root.position.set(p.x/SCALE,height,p.z/SCALE);person.root.rotation.set(0,0,0);person.rig.rotation.y=heading;
     const cycle=updateCampaignWalkCycle(walkCycle,seconds,walking);
     for(const leg of person.legs){const swing=(leg.side<0?-cycle.swing:cycle.swing)*cycle.step;leg.thigh.rotation.x=swing;leg.calf.rotation.x=Math.max(0,-swing);leg.shoe.rotation.x=-leg.calf.rotation.x*.6;}
     for(const a of person.arms){a.arm.rotation.x=walking?(a.side<0?cycle.swing:-cycle.swing)*.25:0;a.arm.rotation.z=0;a.forearm.rotation.x=-.18;}
     person.hips.position.y=.87+cycle.bounce*.009;
+    return true;
   }
   function frame(now) {
     if(!enabled||lost)return;
@@ -581,9 +589,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       if(walking)movingGuards++;
       guardWalking ||= walking;
       const guardSurface=g.area?0:sampleCampaignGround(campaignGroundCache,p,g.x,g.z,ground);
-      placeHuman(p,g,guardSurface,heading,walking,seconds,false,g.hp<=0?'fallen':'armed');
-      if(g.hp<=0){p.rig.rotation.x=-Math.PI/2;p.root.position.y=guardSurface+(g.area?0:.15);p.root.scale.setScalar(.8);}
-      else {p.rig.rotation.x=0;p.arms[1].arm.rotation.x=-1.05;p.arms[1].forearm.rotation.x=-.35;}
+      const poseChanged=placeHuman(p,g,guardSurface,heading,walking,seconds,false,g.hp<=0?'fallen':'armed');
+      updateCampaignGuardPresentation(p,guardSurface,!!g.area,g.hp>0,poseChanged);
     }
     keyMesh.visible=!s.key&&bossDefeated;
     if(keyMesh.visible)keyMesh.rotation.y=seconds;
