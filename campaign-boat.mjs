@@ -3,6 +3,11 @@ import * as T from 'three';
 // The driver is a child of the hull: seat, body and feet share yaw and rocking.
 // Measurements are in metres, in the same coordinate system as buildHuman.
 export const HELM = {seatZ:-.28,seatTop:.72,hips:.84,eye:1.65};
+export function freezeMotorboatParts(boat){
+  let count=0;
+  boat.traverse(part=>{if(part===boat)return;part.updateMatrix();part.matrixAutoUpdate=false;count++;});
+  boat.userData.staticPartCount=count;return count;
+}
 export function buildMotorboat(root,{cube,ell,mat}) {
   const boat=new T.Group();boat.name='campaign-boat';root.add(boat);
   ell(boat,'#233f52',[0,.05,0],[.85,.36,1.9]);
@@ -39,6 +44,7 @@ export function buildMotorboat(root,{cube,ell,mat}) {
   const wake=new T.Mesh(new T.PlaneGeometry(1.5,5),new T.MeshBasicMaterial({color:'#d0ebe6',transparent:true,opacity:.25,depthWrite:false}));
   wake.rotation.x=-Math.PI/2;wake.position.set(0,.03,-3.3);boat.add(wake);
   boat.userData.boatDetails={rails:10,gauges:3,navigationLights:2};
+  freezeMotorboatParts(boat);
   return {boat,wake};
 }
 export function seatDriver(person,boat) {

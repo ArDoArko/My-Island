@@ -5,7 +5,7 @@ import * as C from '../campaign.mjs';
 import { ISLANDS as original } from '../archipelago-layout.mjs';
 import { VILLAGE,pierAt,pierAtInto,villageAnchor } from '../campaign-world.mjs';
 import { createIslandTerrain } from '../archipelago-terrain.mjs';
-import { buildMotorboat,seatDriver } from '../campaign-boat.mjs';
+import { buildMotorboat,freezeMotorboatParts,seatDriver } from '../campaign-boat.mjs';
 import { buildHuman } from '../island3d-src.mjs';
 
 test('campaign terrain is hundreds of metres across with unscaled houses and a separate legacy world',()=>{
@@ -79,6 +79,18 @@ test('cardinal keyboard and touch directions traverse each angled pier in both d
   }
 });
 
+test('motorboat keeps authored detail transforms out of the per-frame matrix composer',()=>{
+  const boat=new T.Group(),dashboard=new T.Group(),wheel=new T.Mesh(new T.BoxGeometry(),new T.MeshBasicMaterial());
+  wheel.position.set(.2,1,.4);dashboard.add(wheel);boat.add(dashboard);
+  assert.equal(freezeMotorboatParts(boat),2);
+  assert.equal(boat.matrixAutoUpdate,true,'the moving hull must keep its live transform');
+  assert.equal(dashboard.matrixAutoUpdate,false);assert.equal(wheel.matrixAutoUpdate,false);
+  assert.equal(boat.userData.staticPartCount,2);
+  boat.position.set(4,.02,-3);boat.rotation.y=.7;boat.updateMatrixWorld(true);
+  assert(wheel.getWorldPosition(new T.Vector3()).distanceTo(boat.position)>0,'frozen details must still follow hull movement');
+  wheel.geometry.dispose();wheel.material.dispose();
+});
+
 test('the actual human pelvis rests on the seat and both boots rest on the deck under yaw and roll',()=>{
   const root=new T.Group(),materials=new Map(),geometries=new Map();
   const mat=c=>{if(!materials.has(c))materials.set(c,new T.MeshStandardMaterial({color:c}));return materials.get(c);};
@@ -87,6 +99,7 @@ test('the actual human pelvis rests on the seat and both boots rest on the deck 
   const ell=(parent,c,p,s)=>mesh(parent,new T.SphereGeometry(1,16,12),c,p,s);
   const {boat}=buildMotorboat(root,{cube,ell,mat}),person=buildHuman();
   assert.deepEqual(boat.userData.boatDetails,{rails:10,gauges:3,navigationLights:2});
+  assert(boat.userData.staticPartCount>10);assert(boat.children.every(part=>!part.matrixAutoUpdate),'built boat details must be frozen before the driver boards');
   const rails=boat.getObjectByName('boat-rails'),gauges=boat.getObjectByName('boat-gauges');
   assert(rails.isInstancedMesh&&rails.count===10&&rails.boundingSphere,'motorboat rails must stay in one cullable batch');
   assert(gauges.isInstancedMesh&&gauges.count===3&&gauges.boundingSphere,'dashboard gauges must stay in one cullable batch');
