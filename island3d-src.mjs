@@ -48,6 +48,17 @@ export function updateIslandFrameState(cache,paused,invalidated=false){
   if(cache.rendered)return false;
   cache.rendered=true;return true;
 }
+export function freezeLegacyStaticTransforms(root){
+  root.updateWorldMatrix(true,true);
+  let frozen=0;
+  root.traverse(object=>{
+    object.updateMatrix();
+    object.matrixAutoUpdate=false;
+    object.matrixWorldAutoUpdate=false;
+    frozen++;
+  });
+  return frozen;
+}
 export function avatarRigNeedsPose(cameraMode='first'){
   return cameraMode!=='first';
 }
@@ -342,6 +353,7 @@ export function create({canvas,terrain,getState,onLost}) {
     clear:(i,x,z)=>sceneryBlocked({x,z},i.id)||(i.id==='home'&&(Math.abs(z-40)<55||Math.abs(x-23)<45))});
   addVillage(distantScenery,{scale:distantScale,height:distantHeight,surfaces:materials,helpers:{cube,tube,ell}});
   scene.add(archipelago);
+  const frozenStaticTransforms=freezeLegacyStaticTransforms(ground)+freezeLegacyStaticTransforms(archipelago);
   const meadow=addGroundCover(scene,terrainHeight,SCALE,splat,small);
   const ocean=createOcean([...coasts.map(([x,z,rx,rz])=>[x/SCALE,z/SCALE,rx/SCALE,rz/SCALE]),
     ...ISLANDS.map(i=>[archipelago.position.x+i.x/distantScale,i.z/distantScale,i.radius*.955/distantScale,i.radius*.955/distantScale])]);
@@ -644,6 +656,6 @@ export function create({canvas,terrain,getState,onLost}) {
   function removePerson(person){scene.remove(person.root);if(person.tag){signs.delete(person.tag);person.tag.material.map.dispose();person.tag.material.dispose();}}
   function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;lastShadowUpdate=-Infinity;if(enabled)updateIslandFrameState(frameState,true,true);return enabled;}
   function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();land.dispose();ocean.dispose();sky.geometry.dispose();sky.material.dispose();archipelago.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});map.dispose();meadow.dispose();materials.dispose();leafMat.dispose();for(const b of [...Object.values(batches),...fishBatches]){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
-  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,visibleFish,camera:cameraMode,eye:camera.position.toArray(),cameraRaycasts,resourceStaticUpdates,shadowUpdates,materials:materials.stats()})};
+  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,visibleFish,camera:cameraMode,eye:camera.position.toArray(),cameraRaycasts,resourceStaticUpdates,shadowUpdates,frozenStaticTransforms,materials:materials.stats()})};
 }
 

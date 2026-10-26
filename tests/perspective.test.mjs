@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, heldRigNeedsPose, islandShadowInterval, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -28,6 +28,20 @@ test('paused legacy 3D work renders once and invalidates on demand',()=>{
   assert.equal(updateIslandFrameState(cache,true,true),true,'camera, viewport or context changes must redraw once');
   assert.equal(updateIslandFrameState(cache,true),false);
   assert.equal(updateIslandFrameState(cache,false),true,'resuming must render immediately');
+});
+
+test('legacy static landscape reuses frozen local and world matrices',()=>{
+  const scene=new T.Group(),root=new T.Group(),child=new T.Group();
+  root.position.x=2;child.position.x=3;root.add(child);scene.add(root);
+  assert.equal(freezeLegacyStaticTransforms(root),2);
+  assert.equal(root.matrixAutoUpdate,false);
+  assert.equal(root.matrixWorldAutoUpdate,false);
+  assert.equal(child.matrixAutoUpdate,false);
+  assert.equal(child.matrixWorldAutoUpdate,false);
+  assert.equal(child.getWorldPosition(new T.Vector3()).x,5);
+  const matrix=child.matrixWorld.clone();
+  scene.updateMatrixWorld(true);
+  assert(child.matrixWorld.equals(matrix));
 });
 
 test('legacy first-person view skips the hidden full-body pose',()=>{
