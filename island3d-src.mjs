@@ -62,6 +62,10 @@ export function freezeLegacyStaticTransforms(root){
 export function avatarRigNeedsPose(cameraMode='first'){
   return cameraMode!=='first';
 }
+export function legacyPersonNeedsPose(point,focus,maxDistance=24){
+  const dx=point.x-focus.x,dy=point.y-focus.y,range=maxDistance*SCALE;
+  return dx*dx+dy*dy<=range*range;
+}
 export function heldRigNeedsPose(cameraMode='first',playing=false,holding=false,wet=false){
   return cameraMode==='first'&&playing&&holding&&!wet;
 }
@@ -442,7 +446,7 @@ export function create({canvas,terrain,getState,onLost}) {
   }
   let frameBase=null,frameElevation=0;const frameBaseCache={},avatarFrameCycle={idleHip:0,idleArmSin:0,idleArmCos:0},avatarPoseCycle={yawSin:0,yawCos:1,phaseSin:0,phaseCos:1};
   const legPoseBuffer={hip:0,knee:0},fishPoseBuffer={x:0,z:0,y:0,yaw:0,yawSin:0,yawCos:1};
-  function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false,poseRig=true) {
+  function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false,poseRig=true,showRig=poseRig) {
     const x=point.x/SCALE,z=point.y/SCALE,wet=sea(point.x,point.y);
     const surface=wet?0:walkSurface(x,z,frameBase,frameElevation);
     person.root.position.set(x,surface+(wet?(raft?.18:-.95):0),z);
@@ -466,10 +470,11 @@ export function create({canvas,terrain,getState,onLost}) {
         arm.arm.rotation.z=-arm.side*.07;arm.forearm.rotation.x=active?-.22:-.08;
         if(swimming){arm.arm.rotation.x=-Math.PI/2+(cycle.phaseSin*SIDE_COS+cycle.phaseCos*arm.side*SIDE_SIN)*.35;arm.forearm.rotation.x=-.28;}
       }
-      actionPose(person,motion);person.spear.visible=!!spear&&!wet&&!motion;
+      actionPose(person,motion);
       if(blocked){person.arms[0].arm.rotation.x=-1;person.arms[0].forearm.rotation.x=-1;}
     }
-    person.rig.visible=poseRig;person.raft.visible=!!(wet&&raft);person.raft.rotation.y=person.yaw;
+    person.spear.visible=!!spear&&!wet&&!motion;
+    person.rig.visible=showRig;person.raft.visible=!!(wet&&raft);person.raft.rotation.y=person.yaw;
     if(person.tag)person.tag.visible=Math.hypot(x-self.root.position.x,z-self.root.position.z)<13;
     person.lastX=x;person.lastZ=z;
   }
@@ -589,8 +594,8 @@ export function create({canvas,terrain,getState,onLost}) {
     resources(s.objects,s.resourceRevision);updateFish(s.fishes,seconds,s.sea,s.P);visibleFish=fishBatches[0].count;updateChapters(s.chapterMarkers,seconds);
     animatePerson(self,s.P,Number.isFinite(s.heading)?s.heading:facing[s.face]||0,s.moving,seconds,step,s.fast?5.25:3,s.sea,s.raft,s.motion,s.spear,s.blocked,avatarRigNeedsPose(cameraMode));
     merchant.root.visible=guide.root.visible=true;
-    animatePerson(merchant,s.leon,Math.atan2(x-s.leon.x/SCALE,z-s.leon.y/SCALE),false,seconds,step,0,s.sea);
-    animatePerson(guide,s.nela,Math.atan2(x-s.nela.x/SCALE,z-s.nela.y/SCALE),false,seconds,step,0,s.sea);
+    animatePerson(merchant,s.leon,Math.atan2(x-s.leon.x/SCALE,z-s.leon.y/SCALE),false,seconds,step,0,s.sea,false,null,false,false,legacyPersonNeedsPose(s.leon,s.P),true);
+    animatePerson(guide,s.nela,Math.atan2(x-s.nela.x/SCALE,z-s.nela.y/SCALE),false,seconds,step,0,s.sea,false,null,false,false,legacyPersonNeedsPose(s.nela,s.P),true);
     present.clear();
     for(const p of s.players){
       if(p.id===s.you)continue;present.add(p.id);let person=people.get(p.id),look;
@@ -601,7 +606,7 @@ export function create({canvas,terrain,getState,onLost}) {
       const dx=person.lastX===null?0:p.point.x/SCALE-person.lastX,dz=person.lastZ===null?0:p.point.y/SCALE-person.lastZ;
       const heading=p.moving&&Math.hypot(dx,dz)>.002?Math.atan2(dx,dz):facing[p.face]||0;
       const motion=updateRemoteMotion(person.remoteMotion,p.motion,p.received,now);
-      animatePerson(person,p.point,heading,p.moving,seconds,step,3,s.sea,false,motion,s.spearOwned&&!p.spearStowed,p.blocked);
+      animatePerson(person,p.point,heading,p.moving,seconds,step,3,s.sea,false,motion,s.spearOwned&&!p.spearStowed,p.blocked,legacyPersonNeedsPose(p.point,s.P),true);
     }
     for(const [id,p] of people)if(!present.has(id)){removePerson(p);people.delete(id);}
     updateLook(self,s.appearance||colors());

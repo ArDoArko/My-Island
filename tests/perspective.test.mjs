@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -47,6 +47,13 @@ test('legacy static landscape reuses frozen local and world matrices',()=>{
 test('legacy first-person view skips the hidden full-body pose',()=>{
   assert.equal(avatarRigNeedsPose('first'),false,'first-person hands have their own camera model');
   assert.equal(avatarRigNeedsPose('third'),true,'third person must restore the complete animated body immediately');
+});
+
+test('distant legacy people skip bone posing outside the visible-detail radius',()=>{
+  const focus={x:1000,y:2000};
+  assert.equal(legacyPersonNeedsPose({x:1000+24*80,y:2000},focus),true,'the detail boundary remains fully animated');
+  assert.equal(legacyPersonNeedsPose({x:1000+24*80+1,y:2000},focus),false,'a distant rig can reuse its last pose');
+  assert.equal(legacyPersonNeedsPose({x:1000,y:2000+8*80},focus),true,'nearby interaction distance keeps full body animation');
 });
 
 test('legacy held arms update only while they are actually visible',()=>{
