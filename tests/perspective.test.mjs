@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, islandShadowInterval, legPose, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, heldRigNeedsPose, islandShadowInterval, legPose, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -33,6 +33,14 @@ test('paused legacy 3D work renders once and invalidates on demand',()=>{
 test('legacy first-person view skips the hidden full-body pose',()=>{
   assert.equal(avatarRigNeedsPose('first'),false,'first-person hands have their own camera model');
   assert.equal(avatarRigNeedsPose('third'),true,'third person must restore the complete animated body immediately');
+});
+
+test('legacy held arms update only while they are actually visible',()=>{
+  assert.equal(heldRigNeedsPose('first',true,true,false),true);
+  assert.equal(heldRigNeedsPose('third',true,true,false),false);
+  assert.equal(heldRigNeedsPose('first',false,true,false),false);
+  assert.equal(heldRigNeedsPose('first',true,false,false),false);
+  assert.equal(heldRigNeedsPose('first',true,true,true),false);
 });
 
 test('eye-level camera follows real ground, ramp, floor and swimming height',()=>{

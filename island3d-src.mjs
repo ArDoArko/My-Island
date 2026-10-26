@@ -51,6 +51,9 @@ export function updateIslandFrameState(cache,paused,invalidated=false){
 export function avatarRigNeedsPose(cameraMode='first'){
   return cameraMode!=='first';
 }
+export function heldRigNeedsPose(cameraMode='first',playing=false,holding=false,wet=false){
+  return cameraMode==='first'&&playing&&holding&&!wet;
+}
 export function updateAvatarFrameCycle(out,seconds){
   const armPhase=seconds*1.3;
   out.idleHip=Math.sin(seconds*1.7);out.idleArmSin=Math.sin(armPhase);out.idleArmCos=Math.cos(armPhase);return out;
@@ -604,10 +607,11 @@ export function create({canvas,terrain,getState,onLost}) {
     // Bound on-screen labels in pixels, including at very close talking range.
     scaleWorldLabels(signs,camera,innerWidth,signPosition);
     const holding=!!s.spear||!!s.motion&&(s.motion.kind==='gather'||s.motion.kind==='fish'||s.motion.kind==='cook');
-    held.visible=cameraMode==='first'&&s.play&&holding&&!s.sea(s.P.x,s.P.y);
-    heldSpear.visible=!!s.spear&&!s.motion;for(const [key,o] of heldToolEntries)o.visible=s.motion?.kind===key;
-    held.position.y=bob*.4;held.rotation.x=s.motion?Math.sin(s.motion.phase*Math.PI*2)*.07:0;
-    hand.material=mat(s.appearance?.skin||'#dda879');sleeve.material=mat(s.appearance?.shirt||'#4c9cba');
+    const poseHeld=cameraMode==='first'&&s.play&&holding&&heldRigNeedsPose(cameraMode,s.play,holding,s.sea(s.P.x,s.P.y));
+    held.visible=poseHeld;
+    if(poseHeld){heldSpear.visible=!!s.spear&&!s.motion;for(const [key,o] of heldToolEntries)o.visible=s.motion?.kind===key;
+      held.position.y=bob*.4;held.rotation.x=s.motion?Math.sin(s.motion.phase*Math.PI*2)*.07:0;
+      hand.material=mat(s.appearance?.skin||'#dda879');sleeve.material=mat(s.appearance?.shirt||'#4c9cba');}
     const updateShadow=now-lastShadowUpdate>=shadowInterval;
     renderer.shadowMap.needsUpdate=updateShadow;
     if(updateShadow){stabilizeSunShadow(sun,x,z);lastShadowUpdate=now;shadowUpdates++;}
