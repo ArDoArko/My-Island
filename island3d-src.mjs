@@ -48,6 +48,9 @@ export function updateIslandFrameState(cache,paused,invalidated=false){
   if(cache.rendered)return false;
   cache.rendered=true;return true;
 }
+export function avatarRigNeedsPose(cameraMode='first'){
+  return cameraMode!=='first';
+}
 export function updateAvatarFrameCycle(out,seconds){
   const armPhase=seconds*1.3;
   out.idleHip=Math.sin(seconds*1.7);out.idleArmSin=Math.sin(armPhase);out.idleArmCos=Math.cos(armPhase);return out;
@@ -407,32 +410,34 @@ export function create({canvas,terrain,getState,onLost}) {
   }
   let frameBase=null,frameElevation=0;const frameBaseCache={},avatarFrameCycle={idleHip:0,idleArmSin:0,idleArmCos:0},avatarPoseCycle={yawSin:0,yawCos:1,phaseSin:0,phaseCos:1};
   const legPoseBuffer={hip:0,knee:0},fishPoseBuffer={x:0,z:0,y:0,yaw:0,yawSin:0,yawCos:1};
-  function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false) {
+  function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false,poseRig=true) {
     const x=point.x/SCALE,z=point.y/SCALE,wet=sea(point.x,point.y);
     const surface=wet?0:walkSurface(x,z,frameBase,frameElevation);
     person.root.position.set(x,surface+(wet?(raft?.18:-.95):0),z);
     person.yaw+=angleDelta(person.yaw,lookYaw)*Math.min(1,step*12);person.rig.rotation.y=person.yaw;
     const active=isMoving&&speed>.05;person.phase+=active?step*(speed>4?10:7):0;
-    const amount=active?(speed>4?.31:.22):0,phase=person.phase,swimming=wet&&!raft;
-    const cycle=updateAvatarPoseCycle(avatarPoseCycle,phase,person.yaw,active,swimming,avatarFrameCycle);
-    person.hips.position.y=cycle.hips;
-    for(const leg of person.legs){
-      const phaseSin=leg.side<0?-cycle.phaseSin:cycle.phaseSin,phaseCos=leg.side<0?-cycle.phaseCos:cycle.phaseCos;
-      const stride=phaseSin*amount,lift=active?Math.max(0,phaseCos)*.105:0;
-      const sx=x+cycle.yawCos*leg.side*.115+cycle.yawSin*stride;
-      const sz=z-cycle.yawSin*leg.side*.115+cycle.yawCos*stride;
-      const slope=wet?0:walkSurface(sx,sz,frameBase,frameElevation)-surface;
-      const pose=legPose(-person.hips.position.y+.07+slope+lift,stride,legPoseBuffer);
-      leg.thigh.rotation.x=pose.hip;leg.calf.rotation.x=pose.knee;leg.shoe.rotation.x=-pose.hip-pose.knee;
+    if(poseRig){
+      const amount=active?(speed>4?.31:.22):0,phase=person.phase,swimming=wet&&!raft;
+      const cycle=updateAvatarPoseCycle(avatarPoseCycle,phase,person.yaw,active,swimming,avatarFrameCycle);
+      person.hips.position.y=cycle.hips;
+      for(const leg of person.legs){
+        const phaseSin=leg.side<0?-cycle.phaseSin:cycle.phaseSin,phaseCos=leg.side<0?-cycle.phaseCos:cycle.phaseCos;
+        const stride=phaseSin*amount,lift=active?Math.max(0,phaseCos)*.105:0;
+        const sx=x+cycle.yawCos*leg.side*.115+cycle.yawSin*stride;
+        const sz=z-cycle.yawSin*leg.side*.115+cycle.yawCos*stride;
+        const slope=wet?0:walkSurface(sx,sz,frameBase,frameElevation)-surface;
+        const pose=legPose(-person.hips.position.y+.07+slope+lift,stride,legPoseBuffer);
+        leg.thigh.rotation.x=pose.hip;leg.calf.rotation.x=pose.knee;leg.shoe.rotation.x=-pose.hip-pose.knee;
+      }
+      for(const arm of person.arms){
+        arm.arm.rotation.x=active?(arm.side<0?cycle.phaseSin:-cycle.phaseSin)*.45:(avatarFrameCycle.idleArmSin*SIDE_COS+avatarFrameCycle.idleArmCos*arm.side*SIDE_SIN)*.025;
+        arm.arm.rotation.z=-arm.side*.07;arm.forearm.rotation.x=active?-.22:-.08;
+        if(swimming){arm.arm.rotation.x=-Math.PI/2+(cycle.phaseSin*SIDE_COS+cycle.phaseCos*arm.side*SIDE_SIN)*.35;arm.forearm.rotation.x=-.28;}
+      }
+      actionPose(person,motion);person.spear.visible=!!spear&&!wet&&!motion;
+      if(blocked){person.arms[0].arm.rotation.x=-1;person.arms[0].forearm.rotation.x=-1;}
     }
-    for(const arm of person.arms){
-      arm.arm.rotation.x=active?(arm.side<0?cycle.phaseSin:-cycle.phaseSin)*.45:(avatarFrameCycle.idleArmSin*SIDE_COS+avatarFrameCycle.idleArmCos*arm.side*SIDE_SIN)*.025;
-      arm.arm.rotation.z=-arm.side*.07;arm.forearm.rotation.x=active?-.22:-.08;
-      if(swimming){arm.arm.rotation.x=-Math.PI/2+(cycle.phaseSin*SIDE_COS+cycle.phaseCos*arm.side*SIDE_SIN)*.35;arm.forearm.rotation.x=-.28;}
-    }
-    actionPose(person,motion);
-    person.raft.visible=!!(wet&&raft);person.raft.rotation.y=person.yaw;person.spear.visible=!!spear&&!wet&&!motion;
-    if(blocked){person.arms[0].arm.rotation.x=-1;person.arms[0].forearm.rotation.x=-1;}
+    person.rig.visible=poseRig;person.raft.visible=!!(wet&&raft);person.raft.rotation.y=person.yaw;
     if(person.tag)person.tag.visible=Math.hypot(x-self.root.position.x,z-self.root.position.z)<13;
     person.lastX=x;person.lastZ=z;
   }
@@ -547,7 +552,7 @@ export function create({canvas,terrain,getState,onLost}) {
     const x=s.P.x/SCALE,z=s.P.y/SCALE;
     materials.update();meadow.update(seconds,frameBase);leafWind.value=seconds;sky.material.uniforms.uTime.value=seconds;
     resources(s.objects,seconds,s.resourceRevision);updateFish(s.fishes,seconds,s.sea);updateChapters(s.chapterMarkers,seconds);
-    animatePerson(self,s.P,Number.isFinite(s.heading)?s.heading:facing[s.face]||0,s.moving,seconds,step,s.fast?5.25:3,s.sea,s.raft,s.motion,s.spear,s.blocked);
+    animatePerson(self,s.P,Number.isFinite(s.heading)?s.heading:facing[s.face]||0,s.moving,seconds,step,s.fast?5.25:3,s.sea,s.raft,s.motion,s.spear,s.blocked,avatarRigNeedsPose(cameraMode));
     merchant.root.visible=guide.root.visible=true;
     animatePerson(merchant,s.leon,Math.atan2(x-s.leon.x/SCALE,z-s.leon.y/SCALE),false,seconds,step,0,s.sea);
     animatePerson(guide,s.nela,Math.atan2(x-s.nela.x/SCALE,z-s.nela.y/SCALE),false,seconds,step,0,s.sea);
@@ -574,7 +579,6 @@ export function create({canvas,terrain,getState,onLost}) {
     const nearest=nearestWithin(s.objects,s.P);
     marker.visible=!!(s.play&&!s.paused&&nearest);if(nearest&&updateTerrainAnchor(markerAnchor,nearest))marker.position.set(markerAnchor.x,markerAnchor.y+.03,markerAnchor.z);
     for(let i=0;i<birds.length;i++){const b=birds[i];b.position.set(19+Math.sin(seconds*.08+i*1.7)*8,7+Math.sin(seconds*.2+i)*.5,12+Math.cos(seconds*.1+i*1.3)*5);b.rotation.y=seconds*.1+i;b.scale.y=1+Math.sin(seconds*7+i)*.5;}
-    self.rig.visible=cameraMode!=='first';
     const bob=s.moving&&!s.paused?Math.sin(self.phase*2)*.012:0;
     cameraPoseState.x=x;cameraPoseState.z=z;cameraPoseState.surface=self.root.position.y;cameraPoseState.yaw=yaw;cameraPoseState.pitch=pitch;
     cameraPoseState.mode=cameraMode;cameraPoseState.distance=zoom*(camera.aspect<.85?1.12:1);cameraPoseState.bob=bob;
