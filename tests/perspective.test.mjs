@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, islandShadowInterval, legPose, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, islandShadowInterval, legPose, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -154,6 +154,15 @@ test('boars share one gait sample across all four alternating legs',()=>{
     assert.equal(updateBoarGait(gait,seconds),gait);
     for(let leg=0;leg<4;leg++)assert(Math.abs(gait[leg]-Math.sin(seconds*6+leg*Math.PI)*.15)<1e-12);
   }
+});
+
+test('stationary boars reuse ground contact and reset their gait only once',()=>{
+  const state={};
+  assert.deepEqual(updateBoarFrameState(state,null,null,4,8,false),{moved:true,walking:false,pose:true});
+  assert.deepEqual(updateBoarFrameState(state,4,8,4,8,false),{moved:false,walking:false,pose:false});
+  assert.deepEqual(updateBoarFrameState(state,4,8,4.01,8,false),{moved:true,walking:true,pose:true});
+  assert.deepEqual(updateBoarFrameState(state,4.01,8,4.01,8,true),{moved:false,walking:false,pose:true});
+  assert.deepEqual(updateBoarFrameState(state,4.01,8,4.01,8,false),{moved:false,walking:false,pose:false});
 });
 
 test('leg and fish animation update reusable pose buffers',()=>{
