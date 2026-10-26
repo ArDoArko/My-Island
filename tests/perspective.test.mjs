@@ -1,11 +1,19 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
-import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow } from '../island-environment.mjs';
+import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
 import { cameraVector, fishPose, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateLeafWindCycle, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
+
+test('both 3D modes avoid an unused stencil buffer without losing antialiasing',()=>{
+  const canvas={id:'game'},options=webglRendererOptions(canvas);
+  assert.equal(options.canvas,canvas);
+  assert.equal(options.stencil,false);
+  assert.equal(options.antialias,true);
+  assert.equal(options.powerPreference,'high-performance');
+});
 
 test('eye-level camera follows real ground, ramp, floor and swimming height',()=>{
   const layout=baseLayout({x:1900,y:1250},3),elevation=baseElevation(layout);

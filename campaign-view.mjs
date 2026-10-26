@@ -3,7 +3,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ISLANDS,VILLAGE,PATHS,market,estateCenter,pathClear,terrainHeight,bounds } from './campaign-world.mjs';
 import { buildMotorboat,seatDriver,HELM } from './campaign-boat.mjs';
 import { createIslandTerrain } from './archipelago-terrain.mjs';
-import { createMaterials, cameraPose, intersectRaycastInto, stabilizeSunShadow } from './island-environment.mjs';
+import { createMaterials, cameraPose, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from './island-environment.mjs';
 import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
 import { sceneryBlocked } from './campaign-scenery.mjs';
 import { SCALE, docks, points, PEOPLE, ground, goal, goalInto, candidatesInto, selectNearby } from './campaign.mjs';
@@ -175,9 +175,7 @@ export function usesMobileCampaignProfile(width,height,maxTouchPoints=0){
 }
 
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
-  // The campaign never uses stencil masks. Avoid allocating and carrying that
-  // unused framebuffer attachment, while retaining depth and MSAA.
-  const renderer=rendererFactory({canvas,antialias:true,stencil:false,powerPreference:'high-performance'});
+  const renderer=rendererFactory(webglRendererOptions(canvas));
   const mobile=usesMobileCampaignProfile(innerWidth,innerHeight,globalThis.navigator?.maxTouchPoints||0);
   const maxPixelRatio=Math.min(devicePixelRatio||1,mobile?1.1:1.5);
   const shadowInterval=campaignShadowInterval(mobile);

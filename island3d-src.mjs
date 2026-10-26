@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { BOARD, baseLayout } from './island-play.mjs';
 import { colors, colorsInto, motionPose, MOTIONS } from './character.mjs';
-import { createMaterials, cameraPose, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, addGroundCover, detailBase, terrainMask } from './island-environment.mjs';
+import { createMaterials, cameraPose, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, addGroundCover, detailBase, terrainMask, webglRendererOptions } from './island-environment.mjs';
 import { createArchipelagoGroup, islandElevation } from './archipelago-terrain.mjs';
 import { ISLANDS, getIslandAt } from './archipelago-layout.mjs';
 import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
@@ -251,7 +251,7 @@ export function updateFishPart(out,pose,x,y,z,sx,sy,sz,rx=0){
 }
 
 export function create({canvas,terrain,getState,onLost}) {
-  const renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+  const renderer=new T.WebGLRenderer(webglRendererOptions(canvas));
   const small=innerWidth<=700;
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,small?1.25:1.6));
   renderer.setSize(innerWidth,innerHeight,false);

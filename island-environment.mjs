@@ -4,6 +4,9 @@ import * as T from 'three';
 const ROOT = 'assets/materials-v018/';
 const names = ['paving','sand','grass','plaster','teal','roof','wood','rock','leaf'];
 const wood = new Set(['#a68854','#876742','#845f3f','#7d654b','#866642','#a98961','#765734','#9a743e','#786040','#8a6d49','#927652','#6e5942']);
+export function webglRendererOptions(canvas) {
+  return {canvas,antialias:true,stencil:false,powerPreference:'high-performance'};
+}
 export function terrainMask(terrain) {
   const c=document.createElement('canvas');c.width=terrain.width;c.height=terrain.height;
   const ctx=c.getContext('2d');ctx.scale(c.width/4600,c.height/2900);
