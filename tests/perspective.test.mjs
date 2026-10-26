@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, heldRigNeedsPose, islandShadowInterval, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, heldRigNeedsPose, islandShadowInterval, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -295,6 +295,16 @@ test('camera raycasts reuse and clear their result array',()=>{
   assert.equal(intersectRaycastInto(raycaster,[mesh],false,hits),identity);assert(hits.length>0);assert(hits.every(hit=>!hit.stale));
   assert.equal(intersectRaycastInto(raycaster,[],false,hits),identity);assert.equal(hits.length,0);
   mesh.geometry.dispose();mesh.material.dispose();
+});
+
+test('stationary third-person camera reuses collision until its pose or obstacles change',()=>{
+  const cache={},position=new T.Vector3(3,2,-4),target=new T.Vector3(1,1,0);
+  assert.equal(updateCameraCollisionState(cache,position,target,2),true);
+  cache.position=new T.Vector3(2.5,2,-3.5);
+  assert.equal(updateCameraCollisionState(cache,position,target,2),false,'the same view must reuse its raycast result');
+  assert(cache.position.equals(new T.Vector3(2.5,2,-3.5)),'the cached resolved camera position must remain intact');
+  position.x+=.01;assert.equal(updateCameraCollisionState(cache,position,target,2),true,'camera movement must raycast again');
+  assert.equal(updateCameraCollisionState(cache,position,target,3),true,'rebuilt obstacles must invalidate a stationary view');
 });
 
 test('sun focus stays aligned with shadow texels while following the player',()=>{

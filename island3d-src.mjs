@@ -58,6 +58,12 @@ export function replaceCameraObstacle(obstacles,index,next){
   if(obstacles[index]===next)return false;
   obstacles[index]=next;next.updateWorldMatrix(true,true);return true;
 }
+export function updateCameraCollisionState(cache,position,target,revision=0){
+  if(cache.ready&&cache.revision===revision&&cache.x===position.x&&cache.y===position.y&&cache.z===position.z&&
+    cache.tx===target.x&&cache.ty===target.y&&cache.tz===target.z)return false;
+  cache.ready=true;cache.revision=revision;cache.x=position.x;cache.y=position.y;cache.z=position.z;
+  cache.tx=target.x;cache.ty=target.y;cache.tz=target.z;return true;
+}
 export function updateAvatarFrameCycle(out,seconds){
   const armPhase=seconds*1.3;
   out.idleHip=Math.sin(seconds*1.7);out.idleArmSin=Math.sin(armPhase);out.idleArmCos=Math.cos(armPhase);return out;
@@ -473,7 +479,7 @@ export function create({canvas,terrain,getState,onLost}) {
   const trailRing=new T.Mesh(new T.RingGeometry(.93,1.06,40),new T.MeshBasicMaterial({color:'#54e4ef',transparent:true,opacity:.85,side:T.DoubleSide,depthWrite:false}));trailRing.rotation.x=-Math.PI/2;trailRing.position.y=.04;trailRoot.add(trailRing);
   const trailBeam=mesh(trailRoot,new T.CylinderGeometry(.035,.035,1,8),new T.MeshBasicMaterial({color:'#76eff7',transparent:true,opacity:.5}),[0,1.25,0],[1,2.5,1],false);
   let trailTag=null,trailNumber=0;
-  const buildingsState={};let buildings=new T.Group(),fireLight=null,flame=null,cutaway=[];scene.add(buildings);
+  const buildingsState={};let buildings=new T.Group(),fireLight=null,flame=null,cutaway=[],cameraObstacleRevision=0;scene.add(buildings);
   function updateBuildings(s){
     const n=s.activities?.completed||0,ready=n>=3&&s.activities.gardenClaimed<n;
     if(!updateBuildingState(buildingsState,s))return;
@@ -493,7 +499,7 @@ export function create({canvas,terrain,getState,onLost}) {
       flame=mesh(f,new T.ConeGeometry(.17,.46,8),new T.MeshBasicMaterial({color:'#ffb647',transparent:true,opacity:.88}),[0,.28,0]);
       fireLight=new T.PointLight('#ffa145',2.5,4);fireLight.position.y=.5;f.add(fireLight);
     }
-    replaceCameraObstacle(cameraObstacles,0,buildings);
+    if(replaceCameraObstacle(cameraObstacles,0,buildings))cameraObstacleRevision++;
   }
   const boars=[],boarGait=[0,0,0,0];
   function newBoar(){const root=new T.Group();scene.add(root);ell(root,'#765745',[0,.29,0],[.24,.25,.43]);ell(root,'#765745',[0,.3,.4],[.19,.18,.2]);ell(root,'#ae8b68',[0,.26,.58],[.11,.065,.065]);for(const side of [-1,1]){const ear=mesh(root,new T.ConeGeometry(.08,.17,3),mat('#644937'),[side*.13,.47,.43]);ear.rotation.z=side*.45;}const legs=[];for(const x of [-.17,.17])for(const z of [-.27,.24])legs.push(tube(root,'#5e493b',[x,.105,z],[.037,.2,.037]));return {root,legs,lastX:null,lastZ:null,walking:false,frameState:{moved:true,walking:false,pose:true}};}
@@ -538,6 +544,7 @@ export function create({canvas,terrain,getState,onLost}) {
   const target=new T.Vector3(),cameraTarget=new T.Vector3(),desired=new T.Vector3(),lastPoint=new T.Vector3();
   const cameraPoseBuffer={position:desired,target},cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.8,bob:0};
   const cameraDirection=new T.Vector3(),cameraRay=new T.Raycaster(),cameraObstacles=[buildings,stall],cameraHits=[];
+  const cameraCollisionState={position:new T.Vector3()};let cameraRaycasts=0;
   const cameraHit=hit=>hit.object.isMesh&&hit.distance>.1;
   function orbit(dx,dy=0){if(!enabled||getState().paused)return;yaw+=dx;pitch=clamp(pitch+dy,cameraMode==='first'?-1.12:-.05,cameraMode==='first'?1.12:.75);}
   function setCamera(mode){cameraMode=mode==='third'?'third':'first';pitch=mode==='third'?.22:0;camera.fov=mode==='third'?58:72;camera.updateProjectionMatrix();drag=null;first=true;updateIslandFrameState(frameState,true,true);}
@@ -581,7 +588,7 @@ export function create({canvas,terrain,getState,onLost}) {
     }
     for(const [id,p] of people)if(!present.has(id)){removePerson(p);people.delete(id);}
     updateLook(self,s.appearance||colors());
-    if(updateTerrainAnchor(stallAnchor,s.leon,.9,.15)){stall.position.set(stallAnchor.x,stallAnchor.y,stallAnchor.z);stall.updateWorldMatrix(true,true);}
+    if(updateTerrainAnchor(stallAnchor,s.leon,.9,.15)){stall.position.set(stallAnchor.x,stallAnchor.y,stallAnchor.z);stall.updateWorldMatrix(true,true);cameraObstacleRevision++;}
     if(updateTerrainAnchor(chestAnchor,s.chest))chestRoot.position.set(chestAnchor.x,chestAnchor.y,chestAnchor.z);chestRoot.visible=!s.treasure;
     updateBuildings(s);updateBoars(s.enemies,seconds);
     const indoors=frameBase&&Math.abs(s.P.x-frameBase.floor.x)<frameBase.floor.w/2&&Math.abs(s.P.y-frameBase.floor.y)<frameBase.floor.h/2;
@@ -596,11 +603,15 @@ export function create({canvas,terrain,getState,onLost}) {
     cameraPose(cameraPoseState,cameraPoseBuffer);
     if(cameraMode==='third'){
       desired.y=Math.max(desired.y,terrainHeight(desired.x,desired.z)+.55);
-      // Pull in the camera rather than viewing the character through a wall.
-      cameraDirection.subVectors(desired,target);const distance=cameraDirection.length();cameraDirection.normalize();
-      cameraRay.set(target,cameraDirection);cameraRay.near=.08;cameraRay.far=distance;
-      const hit=intersectRaycastInto(cameraRay,cameraObstacles,true,cameraHits).find(cameraHit);
-      if(hit)desired.copy(target).addScaledVector(cameraDirection,Math.max(.35,hit.distance-.15));
+      const c=cameraCollisionState;
+      if(updateCameraCollisionState(c,desired,target,cameraObstacleRevision)){
+        // Pull in the camera rather than viewing the character through a wall.
+        cameraDirection.subVectors(desired,target);const distance=cameraDirection.length();cameraDirection.normalize();
+        cameraRay.set(target,cameraDirection);cameraRay.near=.08;cameraRay.far=distance;cameraRaycasts++;
+        const hit=intersectRaycastInto(cameraRay,cameraObstacles,true,cameraHits).find(cameraHit);
+        if(hit)desired.copy(target).addScaledVector(cameraDirection,Math.max(.35,hit.distance-.15));
+        c.position.copy(desired);
+      }else desired.copy(c.position);
     }
     // First person follows exactly. Third person damps both the rig and its
     // look target so a shoreline height change cannot snap the viewing angle.
@@ -628,6 +639,6 @@ export function create({canvas,terrain,getState,onLost}) {
   function removePerson(person){scene.remove(person.root);if(person.tag){signs.delete(person.tag);person.tag.material.map.dispose();person.tag.material.dispose();}}
   function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;lastShadowUpdate=-Infinity;if(enabled)updateIslandFrameState(frameState,true,true);return enabled;}
   function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();land.dispose();ocean.dispose();sky.geometry.dispose();sky.material.dispose();archipelago.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});map.dispose();meadow.dispose();materials.dispose();leafMat.dispose();for(const b of [...Object.values(batches),...fishBatches]){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
-  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,camera:cameraMode,eye:camera.position.toArray(),resourceStaticUpdates,shadowUpdates,materials:materials.stats()})};
+  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,camera:cameraMode,eye:camera.position.toArray(),cameraRaycasts,resourceStaticUpdates,shadowUpdates,materials:materials.stats()})};
 }
 
