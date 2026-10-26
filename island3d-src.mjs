@@ -250,15 +250,20 @@ export function updateFishPart(out,pose,x,y,z,sx,sy,sz,rx=0){
   out.rotation.set(rx,pose.yaw,0);out.scale.set(sx,sy,sz);out.updateMatrix();return out;
 }
 
+export function islandShadowInterval(small=false){
+  return 1000/(small?20:30);
+}
+
 export function create({canvas,terrain,getState,onLost}) {
   const renderer=new T.WebGLRenderer(webglRendererOptions(canvas));
   const small=innerWidth<=700;
+  const shadowInterval=islandShadowInterval(small);
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,small?1.25:1.6));
   renderer.setSize(innerWidth,innerHeight,false);
   renderer.outputColorSpace=T.SRGBColorSpace;
   renderer.toneMapping=T.ACESFilmicToneMapping;
   renderer.toneMappingExposure=.94;
-  renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;
   const scene=new T.Scene();scene.background=new T.Color('#c5dbe5');scene.fog=new T.Fog('#c5dbe5',70,240);
   const camera=new T.PerspectiveCamera(72,innerWidth/innerHeight,.04,350);scene.add(camera);
   const hemi=new T.HemisphereLight('#c9e3ff','#71694d',1.85);scene.add(hemi);
@@ -498,6 +503,7 @@ export function create({canvas,terrain,getState,onLost}) {
     const b=new T.Line(g,new T.LineBasicMaterial({color:'#fff7de'}));scene.add(b);birds.push(b);
   }
   let yaw=Math.atan2(-130,-60),pitch=0,zoom=4.8,enabled=true,first=true,last=0,drag=null,lost=false,slow=0,cameraMode='first';
+  let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const held=new T.Group();camera.add(held);
   const sleeve=tube(held,'#52625f',[.28,-.36,-.42],[.10,.34,.10]);sleeve.rotation.x=-.65;
   const hand=ell(held,'#dda879',[.29,-.27,-.58],[.055,.08,.055]);
@@ -517,7 +523,7 @@ export function create({canvas,terrain,getState,onLost}) {
   const end=e=>{if(drag?.id===e.pointerId)drag=null;};for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,end);
   canvas.addEventListener('wheel',e=>{if(!enabled||getState().paused)return;e.preventDefault();if(cameraMode==='first'){camera.fov=clamp(camera.fov+e.deltaY*.025,58,85);camera.updateProjectionMatrix();}else zoom=clamp(zoom+e.deltaY*.004,2.5,8);},{passive:false});
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;enabled=false;drag=null;onLost();});
-  canvas.addEventListener('webglcontextrestored',()=>{lost=false;first=true;});
+  canvas.addEventListener('webglcontextrestored',()=>{lost=false;first=true;lastShadowUpdate=-Infinity;});
   function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
   function frame(now){
     if(!enabled||lost)return;
@@ -584,15 +590,17 @@ export function create({canvas,terrain,getState,onLost}) {
     heldSpear.visible=!!s.spear&&!s.motion;for(const [key,o] of heldToolEntries)o.visible=s.motion?.kind===key;
     held.position.y=bob*.4;held.rotation.x=s.motion?Math.sin(s.motion.phase*Math.PI*2)*.07:0;
     hand.material=mat(s.appearance?.skin||'#dda879');sleeve.material=mat(s.appearance?.shirt||'#4c9cba');
-    stabilizeSunShadow(sun,x,z);
+    const updateShadow=now-lastShadowUpdate>=shadowInterval;
+    renderer.shadowMap.needsUpdate=updateShadow;
+    if(updateShadow){stabilizeSunShadow(sun,x,z);lastShadowUpdate=now;shadowUpdates++;}
     sky.position.copy(camera.position);ocean.update(seconds,camera.position);
     renderer.render(scene,camera);
     if(s.play&&step>.038)slow+=step;else slow=Math.max(0,slow-step);
     if(slow>3&&renderer.getPixelRatio()>.85){renderer.setPixelRatio(Math.max(.85,renderer.getPixelRatio()-.15));resize();slow=0;}
   }
   function removePerson(person){scene.remove(person.root);if(person.tag){signs.delete(person.tag);person.tag.material.map.dispose();person.tag.material.dispose();}}
-  function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;return enabled;}
+  function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;lastShadowUpdate=-Infinity;return enabled;}
   function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();land.dispose();ocean.dispose();sky.geometry.dispose();sky.material.dispose();archipelago.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});map.dispose();meadow.dispose();materials.dispose();leafMat.dispose();for(const b of [...Object.values(batches),...fishBatches]){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
-  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,camera:cameraMode,eye:camera.position.toArray(),resourceStaticUpdates,materials:materials.stats()})};
+  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,camera:cameraMode,eye:camera.position.toArray(),resourceStaticUpdates,shadowUpdates,materials:materials.stats()})};
 }
 
