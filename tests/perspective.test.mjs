@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, heldRigNeedsPose, islandShadowInterval, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, heldRigNeedsPose, islandShadowInterval, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -197,6 +197,13 @@ test('fish parts update one reusable transform without scale arrays',()=>{
   assert(Math.abs(part.position.x-(pose.x+pose.yawSin*-.2+pose.yawCos*.04))<1e-12);
   assert(Math.abs(part.position.z-(pose.z+pose.yawCos*-.2-pose.yawSin*.04))<1e-12);
   assert.deepEqual(part.scale.toArray(),[.09,.1,.22]);assert.deepEqual(part.rotation.toArray().slice(0,3),[Math.PI/2,.7,0]);
+});
+
+test('decorative fish keep full animation detail within twenty metres of the player',()=>{
+  const player={x:1500,y:1100};
+  assert.equal(fishWithinRenderRange({x:1500+20*80,y:1100},player),true,'the render boundary stays inclusive');
+  assert.equal(fishWithinRenderRange({x:1500+20*80+1,y:1100},player),false,'far schools must not upload animated matrices');
+  assert.equal(fishWithinRenderRange({x:1500,y:1100-12*80},player),true,'nearby water life remains rendered');
 });
 
 test('base terrain layout and elevation stay cached until the saved base changes',()=>{

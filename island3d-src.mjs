@@ -271,6 +271,10 @@ export function fishPose(point,seconds,sea,out={}){
   out.x=x/SCALE;out.z=y/SCALE;out.y=.055+Math.sin(seconds*3+phase)*.008;
   out.yaw=Math.atan2(angleCos,-angleSin);out.yawSin=angleCos;out.yawCos=-angleSin;return out;
 }
+export function fishWithinRenderRange(point,focus,maxDistance=20*SCALE){
+  const dx=point.x-focus.x,dy=point.y-focus.y;
+  return dx*dx+dy*dy<=maxDistance*maxDistance;
+}
 export function updateFishPart(out,pose,x,y,z,sx,sy,sz,rx=0){
   out.position.set(pose.x+pose.yawSin*z+pose.yawCos*x,pose.y+y,pose.z+pose.yawCos*z-pose.yawSin*x);
   out.rotation.set(rx,pose.yaw,0);out.scale.set(sx,sy,sz);out.updateMatrix();return out;
@@ -507,7 +511,8 @@ export function create({canvas,terrain,getState,onLost}) {
 
   const fishBatches=[new T.InstancedMesh(ball(),mat('#adddd0',{roughness:.4}),96),new T.InstancedMesh(new T.ConeGeometry(1,1,3),mat('#668e93'),96),new T.InstancedMesh(new T.ConeGeometry(1,1,3),mat('#779da0'),96)];
   for(const b of fishBatches){b.count=0;b.frustumCulled=false;scene.add(b);}
-  function updateFish(list,seconds,sea){let count=0;for(const f of list||[]){const p=fishPose(f,seconds,sea,fishPoseBuffer);if(!p||count>=96)continue;
+  let visibleFish=0;
+  function updateFish(list,seconds,sea,focus){let count=0;for(const f of list||[]){if(!fishWithinRenderRange(f,focus))continue;const p=fishPose(f,seconds,sea,fishPoseBuffer);if(!p||count>=96)continue;
     updateFishPart(dummy,p,0,0,0,.09,.045,.22);fishBatches[0].setMatrixAt(count,dummy.matrix);
     updateFishPart(dummy,p,0,0,-.25,.095,.12,.025,Math.PI/2);fishBatches[1].setMatrixAt(count,dummy.matrix);
     updateFishPart(dummy,p,0,.045,-.02,.04,.10,.11);fishBatches[2].setMatrixAt(count,dummy.matrix);count++;
@@ -569,7 +574,7 @@ export function create({canvas,terrain,getState,onLost}) {
     updateName(guide,s.labels?.nela,'#609991');
     const x=s.P.x/SCALE,z=s.P.y/SCALE;
     materials.update();meadow.update(seconds,frameBase);leafWind.value=seconds;sky.material.uniforms.uTime.value=seconds;
-    resources(s.objects,s.resourceRevision);updateFish(s.fishes,seconds,s.sea);updateChapters(s.chapterMarkers,seconds);
+    resources(s.objects,s.resourceRevision);updateFish(s.fishes,seconds,s.sea,s.P);visibleFish=fishBatches[0].count;updateChapters(s.chapterMarkers,seconds);
     animatePerson(self,s.P,Number.isFinite(s.heading)?s.heading:facing[s.face]||0,s.moving,seconds,step,s.fast?5.25:3,s.sea,s.raft,s.motion,s.spear,s.blocked,avatarRigNeedsPose(cameraMode));
     merchant.root.visible=guide.root.visible=true;
     animatePerson(merchant,s.leon,Math.atan2(x-s.leon.x/SCALE,z-s.leon.y/SCALE),false,seconds,step,0,s.sea);
@@ -639,6 +644,6 @@ export function create({canvas,terrain,getState,onLost}) {
   function removePerson(person){scene.remove(person.root);if(person.tag){signs.delete(person.tag);person.tag.material.map.dispose();person.tag.material.dispose();}}
   function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;lastShadowUpdate=-Infinity;if(enabled)updateIslandFrameState(frameState,true,true);return enabled;}
   function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();land.dispose();ocean.dispose();sky.geometry.dispose();sky.material.dispose();archipelago.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});map.dispose();meadow.dispose();materials.dispose();leafMat.dispose();for(const b of [...Object.values(batches),...fishBatches]){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
-  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,camera:cameraMode,eye:camera.position.toArray(),cameraRaycasts,resourceStaticUpdates,shadowUpdates,materials:materials.stats()})};
+  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,visibleFish,camera:cameraMode,eye:camera.position.toArray(),cameraRaycasts,resourceStaticUpdates,shadowUpdates,materials:materials.stats()})};
 }
 
