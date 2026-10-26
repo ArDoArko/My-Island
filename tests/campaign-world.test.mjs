@@ -5,7 +5,7 @@ import * as C from '../campaign.mjs';
 import { ISLANDS as original } from '../archipelago-layout.mjs';
 import { VILLAGE,pierAt,pierAtInto,villageAnchor } from '../campaign-world.mjs';
 import { createIslandTerrain } from '../archipelago-terrain.mjs';
-import { buildMotorboat,freezeMotorboatParts,seatDriver } from '../campaign-boat.mjs';
+import { buildMotorboat,freezeMotorboatParts,seatDriver,updateMotorboatTransform } from '../campaign-boat.mjs';
 import { buildHuman } from '../island3d-src.mjs';
 
 test('campaign terrain is hundreds of metres across with unscaled houses and a separate legacy world',()=>{
@@ -89,6 +89,18 @@ test('motorboat keeps authored detail transforms out of the per-frame matrix com
   boat.position.set(4,.02,-3);boat.rotation.y=.7;boat.updateMatrixWorld(true);
   assert(wheel.getWorldPosition(new T.Vector3()).distanceTo(boat.position)>0,'frozen details must still follow hull movement');
   wheel.geometry.dispose();wheel.material.dispose();
+});
+
+test('a docked motorboat composes its hull once and resumes live transforms under way',()=>{
+  const boat=new T.Group(),wake=new T.Group();boat.add(wake);
+  assert.equal(updateMotorboatTransform(boat,wake,4,-3,.7,false,2,false),true);
+  assert.equal(boat.matrixAutoUpdate,false);assert.equal(wake.visible,false);
+  const matrix=boat.matrix.clone();
+  assert.equal(updateMotorboatTransform(boat,wake,4,-3,.7,false,9,true),false,'idle water time must not recompose a docked hull');
+  assert(matrix.equals(boat.matrix),'the cached dock transform must remain byte-for-byte stable');
+  assert.equal(updateMotorboatTransform(boat,wake,4.5,-2.8,.8,true,9,true),true);
+  assert.equal(boat.matrixAutoUpdate,true,'the hull must return to live composition while driving');
+  assert.equal(wake.visible,true);
 });
 
 test('the actual human pelvis rests on the seat and both boots rest on the deck under yaw and roll',()=>{

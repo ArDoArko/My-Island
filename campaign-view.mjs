@@ -1,7 +1,7 @@
 import * as T from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ISLANDS,VILLAGE,PATHS,market,estateCenter,pathClear,terrainHeight,bounds } from './campaign-world.mjs';
-import { buildMotorboat,seatDriver,HELM } from './campaign-boat.mjs';
+import { buildMotorboat,seatDriver,updateMotorboatTransform,HELM } from './campaign-boat.mjs';
 import { createIslandTerrain } from './archipelago-terrain.mjs';
 import { createMaterials, cameraPose, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from './island-environment.mjs';
 import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
@@ -557,9 +557,8 @@ export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFac
       if(playerVisible)placeHuman(self,s.p,surface,s.heading,s.walking,seconds,reattached);
     }
     self.rig.visible=playerVisible;
-    boat.position.set((s.boat?s.p.x:docks[s.boatAt].x)/SCALE,.02,(s.boat?s.p.z:docks[s.boatAt].z)/SCALE);
-    boat.rotation.y=s.boat?s.heading:Math.atan2(docks[s.boatAt].ux,docks[s.boatAt].uz);
-    boat.rotation.z=s.boat?Math.sin(seconds*2)*.015:0;wake.visible=s.boat&&s.walking;
+    updateMotorboatTransform(boat,wake,(s.boat?s.p.x:docks[s.boatAt].x)/SCALE,(s.boat?s.p.z:docks[s.boatAt].z)/SCALE,
+      s.boat?s.heading:Math.atan2(docks[s.boatAt].ux,docks[s.boatAt].uz),s.boat,seconds,s.walking);
     if(s.boat&&playerVisible)seatDriver(self,boat);
     paperMesh.visible=!s.paper;hiddenGun.visible=s.paper&&!s.gun;
     updateReleasedPresentation(releasedPresentationState,s.released,releasedMask,cellBars);

@@ -8,6 +8,18 @@ export function freezeMotorboatParts(boat){
   boat.traverse(part=>{if(part===boat)return;part.updateMatrix();part.matrixAutoUpdate=false;count++;});
   boat.userData.staticPartCount=count;return count;
 }
+export function updateMotorboatTransform(boat,wake,x,z,heading,moving,seconds=0,walking=false){
+  const state=boat.userData.motorboatFrameState||(boat.userData.motorboatFrameState={});
+  const roll=moving?Math.sin(seconds*2)*.015:0;
+  const changed=!state.ready||state.x!==x||state.z!==z||state.heading!==heading||state.roll!==roll||state.moving!==moving;
+  boat.matrixAutoUpdate=!!moving;
+  if(changed){
+    boat.position.set(x,.02,z);boat.rotation.set(0,heading,roll);
+    if(!moving)boat.updateMatrix();
+    state.ready=true;state.x=x;state.z=z;state.heading=heading;state.roll=roll;state.moving=!!moving;
+  }
+  wake.visible=!!moving&&!!walking;return changed;
+}
 export function buildMotorboat(root,{cube,ell,mat}) {
   const boat=new T.Group();boat.name='campaign-boat';root.add(boat);
   ell(boat,'#233f52',[0,.05,0],[.85,.36,1.9]);
