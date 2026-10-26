@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
 import { attachSceneChild, campaignShadowInterval, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
-import { createOcean, islandMaterial } from '../tropical-scene.mjs';
+import { createOcean, createTropicalSky, islandMaterial } from '../tropical-scene.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -89,6 +89,16 @@ test('mobile islands keep biome textures with fewer terrain shader samples',()=>
   assert(desktopShader.fragmentShader.includes('uv*1.37+offset'),'desktop terrain keeps the full grass blend');
   assert.notEqual(mobile.customProgramCacheKey(),desktop.customProgramCacheKey());
   desktop.dispose();mobile.dispose();
+});
+
+test('mobile sky keeps moving clouds with two noise layers',()=>{
+  const desktop=createTropicalSky(),mobile=createTropicalSky(420,{mobile:true});
+  assert.equal(desktop.material.userData.fragmentNoiseLayers,3);
+  assert.equal(mobile.material.userData.fragmentNoiseLayers,2);
+  assert.equal(mobile.material.userData.mobileQuality,true);
+  assert.match(mobile.material.fragmentShader,/for\(int i=0;i<2;i\+\+\)/);
+  for(const token of ['uTime','cloud','sun'])assert(mobile.material.fragmentShader.includes(token),`mobile sky must retain ${token}`);
+  desktop.geometry.dispose();desktop.material.dispose();mobile.geometry.dispose();mobile.material.dispose();
 });
 
 test('phones and compact touch tablets keep the mobile campaign rendering profile',()=>{

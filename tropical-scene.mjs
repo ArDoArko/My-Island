@@ -14,11 +14,11 @@ float noiseFast(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
  return mix(mix(hashFast(i),hashFast(i+vec2(1.,0.)),f.x),mix(hashFast(i+vec2(0.,1.)),hashFast(i+vec2(1.)),f.x),f.y);}
 float fbmFast(vec2 p){float f=0.,a=.535714;for(int i=0;i<3;i++){f+=a*noiseFast(p);p=mat2(.8,-.6,.6,.8)*p*2.07+7.3;a*=.5;}return f;}`;
 
-const mobileTerrainNoiseGLSL=`
-float hashTerrain(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-float noiseTerrain(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
- return mix(mix(hashTerrain(i),hashTerrain(i+vec2(1.,0.)),f.x),mix(hashTerrain(i+vec2(0.,1.)),hashTerrain(i+vec2(1.)),f.x),f.y);}
-float fbmTerrain(vec2 p){float f=0.,a=.666667;for(int i=0;i<2;i++){f+=a*noiseTerrain(p);p=mat2(.8,-.6,.6,.8)*p*2.07+7.3;a*=.5;}return f;}`;
+const liteNoiseGLSL=`
+float hashLite(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float noiseLite(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(hashLite(i),hashLite(i+vec2(1.,0.)),f.x),mix(hashLite(i+vec2(0.,1.)),hashLite(i+vec2(1.)),f.x),f.y);}
+float fbmLite(vec2 p){float f=0.,a=.666667;for(int i=0;i<2;i++){f+=a*noiseLite(p);p=mat2(.8,-.6,.6,.8)*p*2.07+7.3;a*=.5;}return f;}`;
 
 // One ocean in both modes. Unequal wave directions and noise break up the old
 // high-frequency stripes; the coast uniforms give each shore its own shallows.
@@ -69,20 +69,22 @@ export function createOcean(coasts,{size=900,segments=72,coastSeeds=[],mobile=fa
     dispose(){geometry.dispose();material.dispose()}};
 }
 
-export function createTropicalSky(radius=420) {
+export function createTropicalSky(radius=420,{mobile=false}={}) {
+  const cloudNoise=mobile?liteNoiseGLSL:fastNoiseGLSL,cloudFunction=mobile?'fbmLite':'fbmFast';
   const material=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,uniforms:{uTime:{value:0}},
   vertexShader:'varying vec3 vSky;void main(){vSky=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-  fragmentShader:`uniform float uTime;varying vec3 vSky;${fastNoiseGLSL}
+  fragmentShader:`uniform float uTime;varying vec3 vSky;${cloudNoise}
   void main(){vec3 dir=normalize(vSky);float h=dir.y;
     vec3 col=mix(vec3(.65,.79,.84),vec3(.095,.34,.59),smoothstep(-.02,.8,h));
-    vec2 p=dir.xz/max(.1,h)*2.3+vec2(uTime*.006,uTime*.0025);float n=fbmFast(p);
+    vec2 p=dir.xz/max(.1,h)*2.3+vec2(uTime*.006,uTime*.0025);float n=${cloudFunction}(p);
     float cloud=smoothstep(.52,.70,n)*smoothstep(.025,.20,h);
     col=mix(col,mix(vec3(.62,.69,.71),vec3(.98,.96,.89),smoothstep(.50,.70,n)),cloud);
     float sun=pow(max(dot(dir,normalize(vec3(-.55,.82,-.36))),0.),70.);col+=vec3(.35,.24,.12)*sun;
     gl_FragColor=vec4(col,1.);
     #include <colorspace_fragment>
   }`});
-  material.userData.fragmentNoiseLayers=3;
+  material.userData.fragmentNoiseLayers=mobile?2:3;
+  material.userData.mobileQuality=mobile;
   const mesh=new T.Mesh(new T.SphereGeometry(radius,32,20),material);
   mesh.name='tropical-sky';mesh.renderOrder=-10;mesh.frustumCulled=false;
   return mesh;
@@ -95,8 +97,8 @@ export function islandMaterial(surfaces,scale,{mobile=false}={}) {
   m.userData.fragmentNoiseLayers=mobile?2:3;
   m.userData.fragmentTextureSamples=mobile?3:4;
   m.userData.mobileQuality=mobile;
-  const terrainNoise=mobile?mobileTerrainNoiseGLSL:fastNoiseGLSL;
-  const noiseFunction=mobile?'fbmTerrain':'fbmFast';
+  const terrainNoise=mobile?liteNoiseGLSL:fastNoiseGLSL;
+  const noiseFunction=mobile?'fbmLite':'fbmFast';
   const grassSample=mobile?'texture2D(uGrass,uv).rgb':`mix(texture2D(uGrass,uv).rgb,texture2D(uGrass,uv*1.37+offset).rgb,.38)`;
   m.onBeforeCompile=shader=>{
     Object.assign(shader.uniforms,{uGrass:{value:surfaces.textures.get('grass')},uSand:{value:surfaces.textures.get('sand')},uRock:{value:surfaces.textures.get('rock')}});
