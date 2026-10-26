@@ -4,7 +4,7 @@ import { colors, colorsInto, motionPose, MOTIONS } from './character.mjs';
 import { createMaterials, cameraPose, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, addGroundCover, detailBase, terrainMask, webglRendererOptions } from './island-environment.mjs';
 import { createArchipelagoGroup, islandElevation } from './archipelago-terrain.mjs';
 import { ISLANDS, getIslandAt } from './archipelago-layout.mjs';
-import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
+import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage, updateCameraFollowingSky } from './tropical-scene.mjs';
 import { sceneryBlocked } from './campaign-scenery.mjs';
 import { createCampaignView, drawCampaign2D } from './campaign-view.mjs';
 export { drawCampaign2D };
@@ -636,7 +636,7 @@ export function create({canvas,terrain,getState,onLost}) {
     const updateShadow=now-lastShadowUpdate>=shadowInterval;
     renderer.shadowMap.needsUpdate=updateShadow;
     if(updateShadow){stabilizeSunShadow(sun,x,z);lastShadowUpdate=now;shadowUpdates++;}
-    sky.position.copy(camera.position);ocean.update(seconds,camera.position);
+    updateCameraFollowingSky(sky,camera.position);ocean.update(seconds,camera.position);
     renderer.render(scene,camera);
     if(s.play&&step>.038)slow+=step;else slow=Math.max(0,slow-step);
     if(slow>3&&renderer.getPixelRatio()>.85){renderer.setPixelRatio(Math.max(.85,renderer.getPixelRatio()-.15));resize();slow=0;}

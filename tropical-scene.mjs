@@ -64,9 +64,20 @@ export function createOcean(coasts,{size=900,segments=72,coastSeeds=[],mobile=fa
   const geometry=new T.PlaneGeometry(size,size,segments,segments);geometry.rotateX(-Math.PI/2);
   material.userData.fragmentNoiseLayers=mobile?3:7;
   material.userData.mobileQuality=mobile;
-  const mesh=new T.Mesh(geometry,material);mesh.name='tropical-ocean';mesh.position.y=-.045;
-  return {mesh,update(seconds,eye){material.uniforms.uTime.value=seconds;material.uniforms.uEye.value.copy(eye)},
+  const mesh=new T.Mesh(geometry,material);mesh.name='tropical-ocean';mesh.position.y=-.045;mesh.matrixAutoUpdate=false;mesh.updateMatrix();
+  const eyeState={ready:false,x:0,y:0,z:0};
+  return {mesh,update(seconds,eye){
+      material.uniforms.uTime.value=seconds;
+      if(eyeState.ready&&eyeState.x===eye.x&&eyeState.y===eye.y&&eyeState.z===eye.z)return false;
+      eyeState.ready=true;eyeState.x=eye.x;eyeState.y=eye.y;eyeState.z=eye.z;material.uniforms.uEye.value.copy(eye);return true;
+    },
     dispose(){geometry.dispose();material.dispose()}};
+}
+
+export function updateCameraFollowingSky(sky,eye){
+  const state=sky.userData.cameraFollowState||(sky.userData.cameraFollowState={});
+  if(state.ready&&state.x===eye.x&&state.y===eye.y&&state.z===eye.z)return false;
+  state.ready=true;state.x=eye.x;state.y=eye.y;state.z=eye.z;sky.position.copy(eye);sky.updateMatrix();return true;
 }
 
 export function createTropicalSky(radius=420,{mobile=false}={}) {
@@ -86,7 +97,7 @@ export function createTropicalSky(radius=420,{mobile=false}={}) {
   material.userData.fragmentNoiseLayers=mobile?2:3;
   material.userData.mobileQuality=mobile;
   const mesh=new T.Mesh(new T.SphereGeometry(radius,32,20),material);
-  mesh.name='tropical-sky';mesh.renderOrder=-10;mesh.frustumCulled=false;
+  mesh.name='tropical-sky';mesh.renderOrder=-10;mesh.frustumCulled=false;mesh.matrixAutoUpdate=false;mesh.updateMatrix();
   return mesh;
 }
 

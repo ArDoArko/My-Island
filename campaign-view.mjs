@@ -4,7 +4,7 @@ import { ISLANDS,VILLAGE,PATHS,market,estateCenter,pathClear,terrainHeight,bound
 import { buildMotorboat,seatDriver,updateMotorboatTransform,HELM } from './campaign-boat.mjs';
 import { createIslandTerrain } from './archipelago-terrain.mjs';
 import { createMaterials, cameraPose, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from './island-environment.mjs';
-import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage } from './tropical-scene.mjs';
+import { createOcean, createTropicalSky, islandMaterial, decorateIslands, addVillage, updateCameraFollowingSky } from './tropical-scene.mjs';
 import { sceneryBlocked } from './campaign-scenery.mjs';
 import { SCALE, docks, points, PEOPLE, ground, goal, goalInto, candidatesInto, selectNearby } from './campaign.mjs';
 
@@ -25,7 +25,7 @@ export function updateCampaignExterior(area,seconds,camera,sky,ocean,vegetation)
   if(area)return false;
   sky.material.uniforms.uTime.value=seconds;
   vegetation.update(camera.position,.5);
-  ocean.update(seconds,camera.position);sky.position.copy(camera.position);return true;
+  ocean.update(seconds,camera.position);updateCameraFollowingSky(sky,camera.position);return true;
 }
 
 export function updateCampaignTerrainShadows(cache,area,point,islands,terrains,margin=800,minMovement=200){

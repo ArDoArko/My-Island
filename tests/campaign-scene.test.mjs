@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom';
 import * as T from 'three';
 import { buildHuman } from '../island3d-src.mjs';
 import { attachSceneChild, campaignShadowInterval, campaignShadowsAnimated, createCampaignView, sampleCampaignGround, updateCampaignAreaPresentation, updateCampaignAreaView, updateCampaignCameraTransform, updateCampaignExterior, updateCampaignGoal, updateCampaignGuardHeading, updateCampaignGuardPresentation, updateCampaignMovement, updateCampaignNearby, updateCampaignPoseState, updateCampaignRenderScale, updateCampaignShadowState, updateCampaignTerrainShadows, updateCampaignWalkCycle, updateEscortPoints, updateLineSegment, updateReleasedPresentation, usesMobileCampaignProfile } from '../campaign-view.mjs';
-import { createOcean, createTropicalSky, islandMaterial } from '../tropical-scene.mjs';
+import { createOcean, createTropicalSky, islandMaterial, updateCameraFollowingSky } from '../tropical-scene.mjs';
 import * as C from '../campaign.mjs';
 import { VILLAGE } from '../campaign-world.mjs';
 
@@ -61,7 +61,7 @@ test('area transitions orient the camera before their first rendered frame',()=>
 });
 
 test('interiors stop hidden ocean, sky and palm LOD animation',()=>{
-  const camera={position:new T.Vector3(2,3,4)},sky={material:{uniforms:{uTime:{value:0}}},position:new T.Vector3()};
+  const camera={position:new T.Vector3(2,3,4)},sky=new T.Group();sky.material={uniforms:{uTime:{value:0}}};
   let oceanUpdates=0,lodUpdates=0;
   const ocean={update(seconds,position){oceanUpdates++;assert.equal(seconds,2);assert.equal(position,camera.position);}};
   const vegetation={update(position,threshold){lodUpdates++;assert.equal(position,camera.position);assert.equal(threshold,.5);}};
@@ -70,6 +70,19 @@ test('interiors stop hidden ocean, sky and palm LOD animation',()=>{
   assert.equal(oceanUpdates,0);assert.equal(lodUpdates,0);assert.equal(sky.material.uniforms.uTime.value,0);
   assert.equal(updateCampaignExterior(null,2,camera,sky,ocean,vegetation),true);
   assert.equal(oceanUpdates,1);assert.equal(lodUpdates,1);assert.equal(sky.material.uniforms.uTime.value,2);assert(sky.position.equals(camera.position));
+});
+
+test('stationary tropical water and sky reuse their camera-dependent transforms',()=>{
+  const eye=new T.Vector3(3,2,-4),ocean=createOcean([[0,0,10,10]]),sky=createTropicalSky();
+  assert.equal(ocean.mesh.matrixAutoUpdate,false);assert.equal(sky.matrixAutoUpdate,false);
+  assert.equal(ocean.update(1,eye),true);assert.equal(updateCameraFollowingSky(sky,eye),true);
+  const oceanEye=ocean.mesh.material.uniforms.uEye.value.clone(),skyMatrix=sky.matrix.clone();
+  assert.equal(ocean.update(2,eye),false,'stationary water must reuse its eye uniform');
+  assert.equal(updateCameraFollowingSky(sky,eye),false,'stationary sky must reuse its matrix');
+  assert.equal(ocean.mesh.material.uniforms.uTime.value,2,'waves must keep animating while the camera is still');
+  assert(ocean.mesh.material.uniforms.uEye.value.equals(oceanEye));assert(sky.matrix.equals(skyMatrix));
+  eye.x+=1;assert.equal(ocean.update(3,eye),true);assert.equal(updateCameraFollowingSky(sky,eye),true);
+  assert.equal(sky.position.x,4);ocean.dispose();sky.geometry.dispose();sky.material.dispose();
 });
 
 test('mobile ocean keeps coastal presentation with three noise layers',()=>{
