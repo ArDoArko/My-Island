@@ -175,7 +175,9 @@ export function usesMobileCampaignProfile(width,height,maxTouchPoints=0){
 }
 
 export function createCampaignView({canvas,getState,makeHuman,onLost,rendererFactory=options=>new T.WebGLRenderer(options)}) {
-  const renderer=rendererFactory({canvas,antialias:true,powerPreference:'high-performance'});
+  // The campaign never uses stencil masks. Avoid allocating and carrying that
+  // unused framebuffer attachment, while retaining depth and MSAA.
+  const renderer=rendererFactory({canvas,antialias:true,stencil:false,powerPreference:'high-performance'});
   const mobile=usesMobileCampaignProfile(innerWidth,innerHeight,globalThis.navigator?.maxTouchPoints||0);
   const maxPixelRatio=Math.min(devicePixelRatio||1,mobile?1.1:1.5);
   const shadowInterval=campaignShadowInterval(mobile);

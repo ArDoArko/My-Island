@@ -285,13 +285,15 @@ test('real Three.js campaign geometry and both cameras run through every mission
   const previous=Object.fromEntries(['document','innerWidth','innerHeight','devicePixelRatio'].map(k=>[k,globalThis[k]]));
   globalThis.document=dom.window.document;globalThis.innerWidth=900;globalThis.innerHeight=600;globalThis.devicePixelRatio=1;
   dom.window.HTMLCanvasElement.prototype.getContext=()=>new Proxy({}, {get:()=>()=>{}});
-  let scene,camera,disposed=false;
+  let scene,camera,disposed=false,rendererOptions;
   let pixelRatio=1,renderCalls=0;
   const renderer={capabilities:{getMaxAnisotropy:()=>1},shadowMap:{},info:{render:{calls:0,triangles:0}},
     setPixelRatio(value){pixelRatio=value},getPixelRatio(){return pixelRatio},setSize(){},render(s,c){renderCalls++;scene=s;camera=c;s.updateMatrixWorld(true);c.updateMatrixWorld(true)},dispose(){disposed=true}};
   const state=C.fresh();let view;
   try{
-    view=createCampaignView({canvas:document.querySelector('canvas'),getState:()=>state,makeHuman:buildHuman,rendererFactory:()=>renderer});
+    view=createCampaignView({canvas:document.querySelector('canvas'),getState:()=>state,makeHuman:buildHuman,rendererFactory:options=>(rendererOptions=options,renderer)});
+    assert.equal(rendererOptions.stencil,false,'the campaign must not allocate an unused stencil framebuffer');
+    assert.equal(rendererOptions.antialias,true,'removing stencil must preserve edge antialiasing');
     assert.equal(view.cameraMode,'first');view.frame(0);
     const houses=[];scene.traverse(o=>{if(o.name==='village-house')houses.push(o);});assert.equal(houses.length,6);
     assert.equal(houses.reduce((n,o)=>n+o.children.length,0),0,'house meshes must move into the street-wide batch');
