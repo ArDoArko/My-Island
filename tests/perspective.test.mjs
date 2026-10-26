@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, heldRigNeedsPose, islandShadowInterval, legPose, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, heldRigNeedsPose, islandShadowInterval, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -41,6 +41,15 @@ test('legacy held arms update only while they are actually visible',()=>{
   assert.equal(heldRigNeedsPose('first',false,true,false),false);
   assert.equal(heldRigNeedsPose('first',true,false,false),false);
   assert.equal(heldRigNeedsPose('first',true,true,true),false);
+});
+
+test('rebuilt legacy bases replace the stale third-person camera obstacle',()=>{
+  const stale=new T.Group(),next=new T.Group(),wall=new T.Object3D(),obstacles=[stale,{name:'stall'}];
+  next.position.x=3;wall.position.x=2;next.add(wall);
+  assert.equal(replaceCameraObstacle(obstacles,0,next),true);
+  assert.equal(obstacles[0],next);assert.equal(obstacles[1].name,'stall');
+  assert.equal(wall.matrixWorld.elements[12],5,'the rebuilt wall must have a current world matrix before the same-frame raycast');
+  assert.equal(replaceCameraObstacle(obstacles,0,next),false,'an unchanged obstacle must not traverse its hierarchy again');
 });
 
 test('eye-level camera follows real ground, ramp, floor and swimming height',()=>{

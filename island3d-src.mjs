@@ -54,6 +54,10 @@ export function avatarRigNeedsPose(cameraMode='first'){
 export function heldRigNeedsPose(cameraMode='first',playing=false,holding=false,wet=false){
   return cameraMode==='first'&&playing&&holding&&!wet;
 }
+export function replaceCameraObstacle(obstacles,index,next){
+  if(obstacles[index]===next)return false;
+  obstacles[index]=next;next.updateWorldMatrix(true,true);return true;
+}
 export function updateAvatarFrameCycle(out,seconds){
   const armPhase=seconds*1.3;
   out.idleHip=Math.sin(seconds*1.7);out.idleArmSin=Math.sin(armPhase);out.idleArmCos=Math.cos(armPhase);return out;
@@ -489,6 +493,7 @@ export function create({canvas,terrain,getState,onLost}) {
       flame=mesh(f,new T.ConeGeometry(.17,.46,8),new T.MeshBasicMaterial({color:'#ffb647',transparent:true,opacity:.88}),[0,.28,0]);
       fireLight=new T.PointLight('#ffa145',2.5,4);fireLight.position.y=.5;f.add(fireLight);
     }
+    replaceCameraObstacle(cameraObstacles,0,buildings);
   }
   const boars=[],boarGait=[0,0,0,0];
   function newBoar(){const root=new T.Group();scene.add(root);ell(root,'#765745',[0,.29,0],[.24,.25,.43]);ell(root,'#765745',[0,.3,.4],[.19,.18,.2]);ell(root,'#ae8b68',[0,.26,.58],[.11,.065,.065]);for(const side of [-1,1]){const ear=mesh(root,new T.ConeGeometry(.08,.17,3),mat('#644937'),[side*.13,.47,.43]);ear.rotation.z=side*.45;}const legs=[];for(const x of [-.17,.17])for(const z of [-.27,.24])legs.push(tube(root,'#5e493b',[x,.105,z],[.037,.2,.037]));return {root,legs,lastX:null,lastZ:null,walking:false,frameState:{moved:true,walking:false,pose:true}};}
@@ -576,7 +581,7 @@ export function create({canvas,terrain,getState,onLost}) {
     }
     for(const [id,p] of people)if(!present.has(id)){removePerson(p);people.delete(id);}
     updateLook(self,s.appearance||colors());
-    if(updateTerrainAnchor(stallAnchor,s.leon,.9,.15))stall.position.set(stallAnchor.x,stallAnchor.y,stallAnchor.z);
+    if(updateTerrainAnchor(stallAnchor,s.leon,.9,.15)){stall.position.set(stallAnchor.x,stallAnchor.y,stallAnchor.z);stall.updateWorldMatrix(true,true);}
     if(updateTerrainAnchor(chestAnchor,s.chest))chestRoot.position.set(chestAnchor.x,chestAnchor.y,chestAnchor.z);chestRoot.visible=!s.treasure;
     updateBuildings(s);updateBoars(s.enemies,seconds);
     const indoors=frameBase&&Math.abs(s.P.x-frameBase.floor.x)<frameBase.floor.w/2&&Math.abs(s.P.y-frameBase.floor.y)<frameBase.floor.h/2;
