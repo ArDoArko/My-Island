@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { cameraVector, fishPose, islandShadowInterval, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateLeafWindCycle, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { cameraVector, fishPose, islandShadowInterval, legPose, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarGait, updateBuildingState, updateChapterState, updateFishPart, updateIslandFrameState, updateLeafWindCycle, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -18,6 +18,16 @@ test('both 3D modes avoid an unused stencil buffer without losing antialiasing',
 test('legacy 3D shadows use bounded refresh rates without reducing their resolution',()=>{
   assert.equal(islandShadowInterval(false),1000/30,'desktop shadows keep a responsive thirty hertz cadence');
   assert.equal(islandShadowInterval(true),50,'small-screen shadows render at most twenty times per second');
+});
+
+test('paused legacy 3D work renders once and invalidates on demand',()=>{
+  const cache={};
+  assert.equal(updateIslandFrameState(cache,false),true);
+  assert.equal(updateIslandFrameState(cache,true),true,'the first paused frame must draw');
+  assert.equal(updateIslandFrameState(cache,true),false,'unchanged paused frames must leave animation work and the GPU idle');
+  assert.equal(updateIslandFrameState(cache,true,true),true,'camera, viewport or context changes must redraw once');
+  assert.equal(updateIslandFrameState(cache,true),false);
+  assert.equal(updateIslandFrameState(cache,false),true,'resuming must render immediately');
 });
 
 test('eye-level camera follows real ground, ramp, floor and swimming height',()=>{

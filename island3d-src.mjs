@@ -42,6 +42,12 @@ export function updateRemoteMotion(out,motion,received,now){
   if(!(remaining>0))return null;
   out.kind=motion.kind;out.phase=1-remaining/(MOTIONS[motion.kind]||1000);return out;
 }
+export function updateIslandFrameState(cache,paused,invalidated=false){
+  if(invalidated)cache.rendered=false;
+  if(!paused){cache.rendered=false;return true;}
+  if(cache.rendered)return false;
+  cache.rendered=true;return true;
+}
 export function updateAvatarFrameCycle(out,seconds){
   const armPhase=seconds*1.3;
   out.idleHip=Math.sin(seconds*1.7);out.idleArmSin=Math.sin(armPhase);out.idleArmCos=Math.cos(armPhase);return out;
@@ -503,6 +509,7 @@ export function create({canvas,terrain,getState,onLost}) {
     const b=new T.Line(g,new T.LineBasicMaterial({color:'#fff7de'}));scene.add(b);birds.push(b);
   }
   let yaw=Math.atan2(-130,-60),pitch=0,zoom=4.8,enabled=true,first=true,last=0,drag=null,lost=false,slow=0,cameraMode='first';
+  const frameState={};
   let lastShadowUpdate=-Infinity,shadowUpdates=0;
   const held=new T.Group();camera.add(held);
   const sleeve=tube(held,'#52625f',[.28,-.36,-.42],[.10,.34,.10]);sleeve.rotation.x=-.65;
@@ -517,17 +524,21 @@ export function create({canvas,terrain,getState,onLost}) {
   const cameraDirection=new T.Vector3(),cameraRay=new T.Raycaster(),cameraObstacles=[buildings,stall],cameraHits=[];
   const cameraHit=hit=>hit.object.isMesh&&hit.distance>.1;
   function orbit(dx,dy=0){if(!enabled||getState().paused)return;yaw+=dx;pitch=clamp(pitch+dy,cameraMode==='first'?-1.12:-.05,cameraMode==='first'?1.12:.75);}
-  function setCamera(mode){cameraMode=mode==='third'?'third':'first';pitch=mode==='third'?.22:0;camera.fov=mode==='third'?58:72;camera.updateProjectionMatrix();drag=null;first=true;}
+  function setCamera(mode){cameraMode=mode==='third'?'third':'first';pitch=mode==='third'?.22:0;camera.fov=mode==='third'?58:72;camera.updateProjectionMatrix();drag=null;first=true;updateIslandFrameState(frameState,true,true);}
   canvas.addEventListener('pointerdown',e=>{const s=getState();if(!enabled||!s.play||s.paused||e.button>0||drag)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);});
   canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;orbit(-(e.clientX-drag.x)*.006,(e.clientY-drag.y)*.005);drag.x=e.clientX;drag.y=e.clientY;});
   const end=e=>{if(drag?.id===e.pointerId)drag=null;};for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,end);
   canvas.addEventListener('wheel',e=>{if(!enabled||getState().paused)return;e.preventDefault();if(cameraMode==='first'){camera.fov=clamp(camera.fov+e.deltaY*.025,58,85);camera.updateProjectionMatrix();}else zoom=clamp(zoom+e.deltaY*.004,2.5,8);},{passive:false});
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();lost=true;enabled=false;drag=null;onLost();});
-  canvas.addEventListener('webglcontextrestored',()=>{lost=false;first=true;lastShadowUpdate=-Infinity;});
-  function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+  canvas.addEventListener('webglcontextrestored',()=>{lost=false;first=true;lastShadowUpdate=-Infinity;updateIslandFrameState(frameState,true,true);});
+  function resize(){updateIslandFrameState(frameState,true,true);renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
   function frame(now){
     if(!enabled||lost)return;
-    const s=getState(),seconds=now/1000,step=last?clamp((now-last)/1000,0,.06):1/60;last=now;updateAvatarFrameCycle(avatarFrameCycle,seconds);
+    const s=getState();
+    // A paused island is visually static. Draw one background frame for the
+    // menu, then leave both animation work and the GPU idle until invalidated.
+    if(!updateIslandFrameState(frameState,s.paused))return;
+    const seconds=now/1000,step=last?clamp((now-last)/1000,0,.06):1/60;last=now;updateAvatarFrameCycle(avatarFrameCycle,seconds);
     updateBaseFrame(frameBaseCache,s.basePos,s.baseLevel);frameBase=frameBaseCache.layout;frameElevation=frameBaseCache.elevation;
     updateName(boardPerson,s.labels?.board,'#ffe087');if(boardPerson.tag){boardPerson.tag.position.y=1.65;boardPerson.tag.scale.set(1.4,.36,1)}
     trailRoot.visible=!!s.trail;if(s.trail){if(updateTerrainAnchor(trailAnchor,s.trail))trailRoot.position.set(trailAnchor.x,trailAnchor.y,trailAnchor.z);trailBeam.material.opacity=.35+.13*Math.sin(seconds*3);if(trailNumber!==s.trailNumber||trailTag?.userData.text!==(s.trailNumber===4?s.labels?.finish||'4':s.trailNumber?String(s.trailNumber):s.trail.label)){if(trailTag){signs.delete(trailTag);trailRoot.remove(trailTag);trailTag.material.map.dispose();trailTag.material.dispose()}trailNumber=s.trailNumber;trailTag=textSprite(trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label,'#54e4ef');trailTag.userData.text=trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label;trailTag.position.y=1.5;trailTag.scale.set(s.trailNumber?1:2.45,.4,1);trailRoot.add(trailTag)}}
@@ -599,7 +610,7 @@ export function create({canvas,terrain,getState,onLost}) {
     if(slow>3&&renderer.getPixelRatio()>.85){renderer.setPixelRatio(Math.max(.85,renderer.getPixelRatio()-.15));resize();slow=0;}
   }
   function removePerson(person){scene.remove(person.root);if(person.tag){signs.delete(person.tag);person.tag.material.map.dispose();person.tag.material.dispose();}}
-  function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;lastShadowUpdate=-Infinity;return enabled;}
+  function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;lastShadowUpdate=-Infinity;if(enabled)updateIslandFrameState(frameState,true,true);return enabled;}
   function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();land.dispose();ocean.dispose();sky.geometry.dispose();sky.material.dispose();archipelago.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});map.dispose();meadow.dispose();materials.dispose();leafMat.dispose();for(const b of [...Object.values(batches),...fishBatches]){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
   return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,camera:cameraMode,eye:camera.position.toArray(),resourceStaticUpdates,shadowUpdates,materials:materials.stats()})};
 }
