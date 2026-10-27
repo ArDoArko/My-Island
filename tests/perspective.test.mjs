@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateLegacyRigPoseLod, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -54,6 +54,20 @@ test('distant legacy people skip bone posing outside the visible-detail radius',
   assert.equal(legacyPersonNeedsPose({x:1000+24*80,y:2000},focus),true,'the detail boundary remains fully animated');
   assert.equal(legacyPersonNeedsPose({x:1000+24*80+1,y:2000},focus),false,'a distant rig can reuse its last pose');
   assert.equal(legacyPersonNeedsPose({x:1000,y:2000+8*80},focus),true,'nearby interaction distance keeps full body animation');
+});
+
+test('distant legacy rigs freeze local bones while their whole body can still move',()=>{
+  const scene=new T.Group(),rig=new T.Group(),bone=new T.Group();
+  bone.position.x=2;rig.add(bone);scene.add(rig);
+  assert.equal(updateLegacyRigPoseLod(rig,false),true);
+  assert.equal(rig.matrixAutoUpdate,true,'the character heading remains dynamic');
+  assert.equal(bone.matrixAutoUpdate,false,'the unchanged local bone pose is frozen');
+  rig.position.x=3;scene.updateMatrixWorld(true);
+  assert.equal(bone.getWorldPosition(new T.Vector3()).x,5,'a frozen local pose still follows its moving character');
+  assert.equal(updateLegacyRigPoseLod(rig,false),false,'an unchanged LOD state avoids another hierarchy walk');
+  assert.equal(updateLegacyRigPoseLod(rig,true),true);
+  bone.position.x=4;scene.updateMatrixWorld(true);
+  assert.equal(bone.getWorldPosition(new T.Vector3()).x,7,'nearby bones resume live local transforms immediately');
 });
 
 test('legacy held arms update only while they are actually visible',()=>{

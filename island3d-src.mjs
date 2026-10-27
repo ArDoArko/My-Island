@@ -66,6 +66,17 @@ export function legacyPersonNeedsPose(point,focus,maxDistance=24){
   const dx=point.x-focus.x,dy=point.y-focus.y,range=maxDistance*SCALE;
   return dx*dx+dy*dy<=range*range;
 }
+export function updateLegacyRigPoseLod(rig,active=true){
+  if(rig.userData.poseLodActive===active)return false;
+  rig.userData.poseLodActive=active;
+  const visit=object=>{
+    if(!active)object.updateMatrix();
+    object.matrixAutoUpdate=active;
+    for(const child of object.children)visit(child);
+  };
+  for(const child of rig.children)visit(child);
+  return true;
+}
 export function heldRigNeedsPose(cameraMode='first',playing=false,holding=false,wet=false){
   return cameraMode==='first'&&playing&&holding&&!wet;
 }
@@ -451,6 +462,7 @@ export function create({canvas,terrain,getState,onLost}) {
     const surface=wet?0:walkSurface(x,z,frameBase,frameElevation);
     person.root.position.set(x,surface+(wet?(raft?.18:-.95):0),z);
     person.yaw+=angleDelta(person.yaw,lookYaw)*Math.min(1,step*12);person.rig.rotation.y=person.yaw;
+    updateLegacyRigPoseLod(person.rig,poseRig);
     const active=isMoving&&speed>.05;person.phase+=active?step*(speed>4?10:7):0;
     if(poseRig){
       const amount=active?(speed>4?.31:.22):0,phase=person.phase,swimming=wet&&!raft;
