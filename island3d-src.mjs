@@ -341,6 +341,10 @@ export function updateFishPart(out,pose,x,y,z,sx,sy,sz,rx=0){
   out.position.set(pose.x+pose.yawSin*z+pose.yawCos*x,pose.y+y,pose.z+pose.yawCos*z-pose.yawSin*x);
   out.rotation.set(rx,pose.yaw,0);out.scale.set(sx,sy,sz);out.updateMatrix();return out;
 }
+export function commitFishBatches(batches,count){
+  for(const batch of batches){batch.count=count;if(count>0)batch.instanceMatrix.needsUpdate=true;}
+  return count>0?batches.length:0;
+}
 
 export function islandShadowInterval(small=false){
   return 1000/(small?20:30);
@@ -581,7 +585,7 @@ export function create({canvas,terrain,getState,onLost}) {
     updateFishPart(dummy,p,0,0,0,.09,.045,.22);fishBatches[0].setMatrixAt(count,dummy.matrix);
     updateFishPart(dummy,p,0,0,-.25,.095,.12,.025,Math.PI/2);fishBatches[1].setMatrixAt(count,dummy.matrix);
     updateFishPart(dummy,p,0,.045,-.02,.04,.10,.11);fishBatches[2].setMatrixAt(count,dummy.matrix);count++;
-  }for(const b of fishBatches){b.count=count;b.instanceMatrix.needsUpdate=true;}}
+  }commitFishBatches(fishBatches,count);}
   const chapterState={};let chapterRoots=[];
   function updateChapters(list,seconds){
     if(updateChapterState(chapterState,list)){labelRevision++;for(const root of chapterRoots){scene.remove(root);root.traverse(o=>{if(o.isSprite){signs.delete(o);o.material.map.dispose();o.material.dispose();}if(o.userData.privateGeometry)o.geometry.dispose();});}chapterRoots=[];
