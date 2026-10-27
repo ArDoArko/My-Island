@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateLegacyPersonRoot, updateLegacyPersonSurface, updateLegacyRigHeading, updateLegacyRigPoseLod, updateLegacyYaw, updateNearestWithin, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateLegacyPersonRoot, updateLegacyPersonSurface, updateLegacyRigHeading, updateLegacyRigPoseLod, updateLegacyYaw, updateNearestWithin, updateTerrainAnchor, updateWorldLabelScales, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -167,6 +167,16 @@ test('world labels keep their pixel cap without traversing unrelated scene objec
   scaleWorldLabels(labels,camera,1000,scratch);
   assert.equal(label.scale.x,10,'a distant label must restore its authored scale');
   assert.equal(label.userData.signScale.x,10,'the reusable base scale must not be overwritten by capping');
+});
+
+test('stationary world labels reuse their distance scaling pass',()=>{
+  const cache={},camera=new T.PerspectiveCamera(72,1,.1,200),label=new T.Sprite(),labels=new Set([label]),scratch=new T.Vector3();
+  camera.position.set(1,2,3);camera.updateProjectionMatrix();label.position.set(4,2,3);label.scale.set(2,.4,1);
+  assert.equal(updateWorldLabelScales(cache,labels,camera,1000,1,scratch),true);
+  assert.equal(updateWorldLabelScales(cache,labels,camera,1000,1,scratch),false,'an unchanged camera and label revision must skip the full pass');
+  camera.position.x=2;assert.equal(updateWorldLabelScales(cache,labels,camera,1000,1,scratch),true,'camera travel must rescale labels immediately');
+  assert.equal(updateWorldLabelScales(cache,labels,camera,1000,2,scratch),true,'moving a label must invalidate the cached pass');
+  camera.fov=58;camera.updateProjectionMatrix();assert.equal(updateWorldLabelScales(cache,labels,camera,1000,2,scratch),true,'zoom changes must preserve the pixel cap');
 });
 
 test('scenery LOD updates existing trunk and crown batches without joining them',()=>{

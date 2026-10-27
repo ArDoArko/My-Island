@@ -139,6 +139,14 @@ export function scaleWorldLabels(labels,camera,width,position=new T.Vector3()){
   }
   return count;
 }
+export function updateWorldLabelScales(cache,labels,camera,width,revision=0,position=new T.Vector3()){
+  const projection=camera.projectionMatrix.elements[0],count=labels.size;
+  if(cache.ready&&cache.x===camera.position.x&&cache.y===camera.position.y&&cache.z===camera.position.z&&
+    cache.width===width&&cache.projection===projection&&cache.revision===revision&&cache.count===count)return false;
+  cache.ready=true;cache.x=camera.position.x;cache.y=camera.position.y;cache.z=camera.position.z;
+  cache.width=width;cache.projection=projection;cache.revision=revision;cache.count=count;
+  scaleWorldLabels(labels,camera,width,position);return true;
+}
 export function legPose(y,z,out={}) {
   const upper=.43,lower=.43,d=clamp(Math.hypot(y,z),.08,upper+lower-.005);
   out.hip=-Math.atan2(z,-y)-Math.acos(clamp((upper*upper+d*d-lower*lower)/(2*upper*d),-1,1));
@@ -455,13 +463,13 @@ export function create({canvas,terrain,getState,onLost}) {
     }
   }
 
-  const signs=new Set(),signPosition=new T.Vector3();
+  const signs=new Set(),signPosition=new T.Vector3(),labelScaleState={};let labelRevision=0;
   function textSprite(text,color='#ffe9b5') {
     const c=document.createElement('canvas');c.width=512;c.height=96;const ctx=c.getContext('2d');
     ctx.fillStyle='#123e43';ctx.beginPath();ctx.roundRect(6,10,500,76,25);ctx.fill();ctx.fillStyle=color;
     ctx.font='700 29px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(text).slice(0,45),256,48,480);
     const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;
-    const sprite=new T.Sprite(new T.SpriteMaterial({map:texture,depthTest:true,transparent:true}));sprite.scale.set(2.45,.46,1);sprite.position.y=2.32;signs.add(sprite);return sprite;
+    const sprite=new T.Sprite(new T.SpriteMaterial({map:texture,depthTest:true,transparent:true}));sprite.scale.set(2.45,.46,1);sprite.position.y=2.32;signs.add(sprite);labelRevision++;return sprite;
   }
   const shirtColors=['#4c9cba','#df8168','#9974c7','#76b677'];
   function human(look={},kind='player',name=''){const person=buildHuman(look,kind,{ell,cube,tube,mesh,mat,geo});scene.add(person.root);person.name=name;person.tag=null;if(name){person.tag=textSprite(name,look.shirt);person.root.add(person.tag);}return person;}
@@ -488,7 +496,7 @@ export function create({canvas,terrain,getState,onLost}) {
   function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false,poseRig=true,showRig=poseRig) {
     const sample=person.surfaceCache||(person.surfaceCache={});updateLegacyPersonSurface(sample,point,sea,frameBase,frameElevation);
     const {x,z,wet,surface}=sample;
-    updateLegacyPersonRoot(person.root,person.rootTransformCache||(person.rootTransformCache={}),x,surface+(wet?(raft?.18:-.95):0),z);
+    if(updateLegacyPersonRoot(person.root,person.rootTransformCache||(person.rootTransformCache={}),x,surface+(wet?(raft?.18:-.95):0),z)&&person.tag)labelRevision++;
     person.yaw=updateLegacyYaw(person.yaw,lookYaw,step);
     updateLegacyRigPoseLod(person.rig,poseRig);updateLegacyRigHeading(person.rig,person.yaw,poseRig);
     const active=isMoving&&speed>.05;person.phase+=active?step*(speed>4?10:7):0;
@@ -576,7 +584,7 @@ export function create({canvas,terrain,getState,onLost}) {
   }for(const b of fishBatches){b.count=count;b.instanceMatrix.needsUpdate=true;}}
   const chapterState={};let chapterRoots=[];
   function updateChapters(list,seconds){
-    if(updateChapterState(chapterState,list)){for(const root of chapterRoots){scene.remove(root);root.traverse(o=>{if(o.isSprite){signs.delete(o);o.material.map.dispose();o.material.dispose();}if(o.userData.privateGeometry)o.geometry.dispose();});}chapterRoots=[];
+    if(updateChapterState(chapterState,list)){labelRevision++;for(const root of chapterRoots){scene.remove(root);root.traverse(o=>{if(o.isSprite){signs.delete(o);o.material.map.dispose();o.material.dispose();}if(o.userData.privateGeometry)o.geometry.dispose();});}chapterRoots=[];
       for(const point of list||[]){if(point.type==='return')continue;const root=new T.Group();root.position.set(point.x/SCALE,terrainHeight(point.x/SCALE,point.y/SCALE),point.y/SCALE);scene.add(root);chapterRoots.push(root);
         const ring=new T.Mesh(new T.RingGeometry(.4,.46,28),mat(point.done?'#6d9c89':'#8cebd5',{side:T.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.y=.03;ring.userData.privateGeometry=true;root.add(ring);
         if(point.type==='fragment'){cube(root,'#e1c587',[0,.38,0],[.37,.45,.06]);cube(root,'#a68752',[0,.18,-.035],[.035,.42,.035]);cube(root,'#826b4d',[0,.4,.035],[.19,.022,.02]);}
@@ -625,8 +633,8 @@ export function create({canvas,terrain,getState,onLost}) {
     if(!updateIslandFrameState(frameState,s.paused))return;
     const seconds=now/1000,step=last?clamp((now-last)/1000,0,.06):1/60;last=now;updateAvatarFrameCycle(avatarFrameCycle,seconds);
     updateBaseFrame(frameBaseCache,s.basePos,s.baseLevel);frameBase=frameBaseCache.layout;frameElevation=frameBaseCache.elevation;
-    updateName(boardPerson,s.labels?.board,'#ffe087');if(boardPerson.tag){boardPerson.tag.position.y=1.65;boardPerson.tag.scale.set(1.4,.36,1)}
-    trailRoot.visible=!!s.trail;if(s.trail){if(updateTerrainAnchor(trailAnchor,s.trail))trailRoot.position.set(trailAnchor.x,trailAnchor.y,trailAnchor.z);trailBeam.material.opacity=.35+.13*Math.sin(seconds*3);if(trailNumber!==s.trailNumber||trailTag?.userData.text!==(s.trailNumber===4?s.labels?.finish||'4':s.trailNumber?String(s.trailNumber):s.trail.label)){if(trailTag){signs.delete(trailTag);trailRoot.remove(trailTag);trailTag.material.map.dispose();trailTag.material.dispose()}trailNumber=s.trailNumber;trailTag=textSprite(trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label,'#54e4ef');trailTag.userData.text=trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label;trailTag.position.y=1.5;trailTag.scale.set(s.trailNumber?1:2.45,.4,1);trailRoot.add(trailTag)}}
+    updateName(boardPerson,s.labels?.board,'#ffe087');if(boardPerson.tag&&!boardPerson.tag.userData.boardScale){boardPerson.tag.position.y=1.65;boardPerson.tag.scale.set(1.4,.36,1);boardPerson.tag.userData.boardScale=true;}
+    trailRoot.visible=!!s.trail;if(s.trail){if(updateTerrainAnchor(trailAnchor,s.trail)){trailRoot.position.set(trailAnchor.x,trailAnchor.y,trailAnchor.z);labelRevision++;}trailBeam.material.opacity=.35+.13*Math.sin(seconds*3);if(trailNumber!==s.trailNumber||trailTag?.userData.text!==(s.trailNumber===4?s.labels?.finish||'4':s.trailNumber?String(s.trailNumber):s.trail.label)){if(trailTag){signs.delete(trailTag);trailRoot.remove(trailTag);trailTag.material.map.dispose();trailTag.material.dispose()}trailNumber=s.trailNumber;trailTag=textSprite(trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label,'#54e4ef');trailTag.userData.text=trailNumber===4?s.labels?.finish||'4':trailNumber?String(trailNumber):s.trail.label;trailTag.position.y=1.5;trailTag.scale.set(s.trailNumber?1:2.45,.4,1);trailRoot.add(trailTag)}}
     updateName(merchant,s.labels?.leon,'#b49966');
     updateName(guide,s.labels?.nela,'#609991');
     const x=s.P.x/SCALE,z=s.P.y/SCALE;
@@ -683,7 +691,7 @@ export function create({canvas,terrain,getState,onLost}) {
     }
     camera.lookAt(cameraMode==='first'?target:cameraTarget);lastPoint.copy(self.root.position);
     // Bound on-screen labels in pixels, including at very close talking range.
-    scaleWorldLabels(signs,camera,innerWidth,signPosition);
+    updateWorldLabelScales(labelScaleState,signs,camera,innerWidth,labelRevision,signPosition);
     const holding=!!s.spear||!!s.motion&&(s.motion.kind==='gather'||s.motion.kind==='fish'||s.motion.kind==='cook');
     const poseHeld=cameraMode==='first'&&s.play&&holding&&heldRigNeedsPose(cameraMode,s.play,holding,s.sea(s.P.x,s.P.y));
     held.visible=poseHeld;
@@ -698,7 +706,7 @@ export function create({canvas,terrain,getState,onLost}) {
     if(s.play&&step>.038)slow+=step;else slow=Math.max(0,slow-step);
     if(slow>3&&renderer.getPixelRatio()>.85){renderer.setPixelRatio(Math.max(.85,renderer.getPixelRatio()-.15));resize();slow=0;}
   }
-  function removePerson(person){scene.remove(person.root);if(person.tag){signs.delete(person.tag);person.tag.material.map.dispose();person.tag.material.dispose();}}
+  function removePerson(person){scene.remove(person.root);if(person.tag){signs.delete(person.tag);labelRevision++;person.tag.material.map.dispose();person.tag.material.dispose();}}
   function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;lastShadowUpdate=-Infinity;if(enabled)updateIslandFrameState(frameState,true,true);return enabled;}
   function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();land.dispose();ocean.dispose();sky.geometry.dispose();sky.material.dispose();archipelago.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});map.dispose();meadow.dispose();materials.dispose();leafMat.dispose();for(const b of [...Object.values(batches),...fishBatches]){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
   return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,visibleFish,camera:cameraMode,eye:camera.position.toArray(),cameraRaycasts,resourceStaticUpdates,nearbyResourceScans:nearestState.scans||0,shadowUpdates,frozenStaticTransforms,materials:materials.stats()})};
