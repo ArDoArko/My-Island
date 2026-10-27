@@ -80,8 +80,18 @@ export function updateLegacyRigPoseLod(rig,active=true){
     object.matrixAutoUpdate=active;
     for(const child of object.children)visit(child);
   };
-  for(const child of rig.children)visit(child);
+  visit(rig);
   return true;
+}
+export function updateLegacyRigHeading(rig,heading,active=true){
+  if(rig.userData.poseHeading===heading)return false;
+  rig.userData.poseHeading=heading;rig.rotation.y=heading;
+  if(!active)rig.updateMatrix();
+  return true;
+}
+export function updateLegacyYaw(current,target,step){
+  const delta=angleDelta(current,target),amount=Math.min(1,step*12);
+  return Math.abs(delta)*(1-amount)<.0001?target:current+delta*amount;
 }
 export function heldRigNeedsPose(cameraMode='first',playing=false,holding=false,wet=false){
   return cameraMode==='first'&&playing&&holding&&!wet;
@@ -479,8 +489,8 @@ export function create({canvas,terrain,getState,onLost}) {
     const sample=person.surfaceCache||(person.surfaceCache={});updateLegacyPersonSurface(sample,point,sea,frameBase,frameElevation);
     const {x,z,wet,surface}=sample;
     updateLegacyPersonRoot(person.root,person.rootTransformCache||(person.rootTransformCache={}),x,surface+(wet?(raft?.18:-.95):0),z);
-    person.yaw+=angleDelta(person.yaw,lookYaw)*Math.min(1,step*12);person.rig.rotation.y=person.yaw;
-    updateLegacyRigPoseLod(person.rig,poseRig);
+    person.yaw=updateLegacyYaw(person.yaw,lookYaw,step);
+    updateLegacyRigPoseLod(person.rig,poseRig);updateLegacyRigHeading(person.rig,person.yaw,poseRig);
     const active=isMoving&&speed>.05;person.phase+=active?step*(speed>4?10:7):0;
     if(poseRig){
       const amount=active?(speed>4?.31:.22):0,phase=person.phase,swimming=wet&&!raft;
