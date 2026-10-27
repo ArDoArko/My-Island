@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateLegacyPersonRoot, updateLegacyPersonSurface, updateLegacyRigPoseLod, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateLegacyPersonRoot, updateLegacyPersonSurface, updateLegacyRigPoseLod, updateNearestWithin, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -138,6 +138,15 @@ test('nearest interaction preserves the strict radius and stable distance tie',(
   assert.deepEqual(objects,snapshot,'finding an interaction must not reorder the world objects');
   assert.equal(nearestWithin([edge],{x:0,y:0}),undefined,'the exact radius boundary stays excluded');
   assert.equal(nearestWithin([inside],{x:0,y:0}),inside,'an object just inside the radius stays included');
+});
+
+test('stationary legacy interaction reuses its resource scan',()=>{
+  const cache={},point={x:0,y:0},first={id:'first',x:3,y:4},second={id:'second',x:12,y:0},objects=[first,second];
+  assert.equal(updateNearestWithin(cache,objects,point,7),true);assert.equal(cache.nearest,first);assert.equal(cache.scans,1);
+  assert.equal(updateNearestWithin(cache,objects,{...point},7),false,'an unchanged player must not rescan every resource');assert.equal(cache.scans,1);
+  assert.equal(updateNearestWithin(cache,objects,{x:10,y:0},7),true,'movement must refresh the nearest interaction');assert.equal(cache.nearest,second);
+  objects.splice(1,1);assert.equal(updateNearestWithin(cache,objects,{x:10,y:0},8),true,'collecting a resource must invalidate the cached result');assert.equal(cache.nearest,first);
+  assert.equal(updateNearestWithin(cache,[second],{x:10,y:0},8),true,'a replaced resource snapshot must refresh even at the same revision');assert.equal(cache.nearest,second);
 });
 
 test('world labels keep their pixel cap without traversing unrelated scene objects',()=>{

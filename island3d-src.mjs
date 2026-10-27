@@ -37,6 +37,12 @@ export function nearestWithin(objects,point,radius=75){
   }
   return nearest;
 }
+export function updateNearestWithin(cache,objects,point,revision=0,radius=75){
+  const x=point?.x??null,y=point?.y??null;
+  if(cache.ready&&cache.objects===objects&&cache.revision===revision&&cache.x===x&&cache.y===y&&cache.radius===radius)return false;
+  cache.ready=true;cache.objects=objects;cache.revision=revision;cache.x=x;cache.y=y;cache.radius=radius;
+  cache.nearest=nearestWithin(objects,point,radius);cache.scans=(cache.scans||0)+1;return true;
+}
 export function updateRemoteMotion(out,motion,received,now){
   const remaining=motion&&motion.remaining-(now-received);
   if(!(remaining>0))return null;
@@ -588,7 +594,7 @@ export function create({canvas,terrain,getState,onLost}) {
   const heldToolEntries=Object.entries(heldTools),facing={down:0,up:Math.PI,left:-Math.PI/2,right:Math.PI/2},present=new Set();
   held.traverse(o=>{if(o.isMesh){o.castShadow=false;o.receiveShadow=false;o.frustumCulled=false;}});
   const target=new T.Vector3(),cameraTarget=new T.Vector3(),desired=new T.Vector3(),lastPoint=new T.Vector3();
-  const cameraPoseBuffer={position:desired,target},cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.8,bob:0};
+  const cameraPoseBuffer={position:desired,target},cameraPoseState={x:0,z:0,surface:0,yaw:0,pitch:0,mode:'first',distance:4.8,bob:0},nearestState={};
   const cameraDirection=new T.Vector3(),cameraRay=new T.Raycaster(),cameraObstacles=[buildings,stall],cameraHits=[];
   const cameraCollisionState={position:new T.Vector3()};let cameraRaycasts=0;
   const cameraHit=hit=>hit.object.isMesh&&hit.distance>.1;
@@ -640,7 +646,7 @@ export function create({canvas,terrain,getState,onLost}) {
     const indoors=frameBase&&Math.abs(s.P.x-frameBase.floor.x)<frameBase.floor.w/2&&Math.abs(s.P.y-frameBase.floor.y)<frameBase.floor.h/2;
     for(const material of cutaway){material.opacity=indoors&&cameraMode==='third'?.23:1;material.depthWrite=!(indoors&&cameraMode==='third');}
     if(flame){flame.scale.y=1+Math.sin(seconds*13)*.18;fireLight.intensity=2.5+Math.sin(seconds*17)*.4;}
-    const nearest=nearestWithin(s.objects,s.P);
+    updateNearestWithin(nearestState,s.objects,s.P,s.resourceRevision);const nearest=nearestState.nearest;
     marker.visible=!!(s.play&&!s.paused&&nearest);if(nearest&&updateTerrainAnchor(markerAnchor,nearest))marker.position.set(markerAnchor.x,markerAnchor.y+.03,markerAnchor.z);
     for(let i=0;i<birds.length;i++){const b=birds[i];b.position.set(19+Math.sin(seconds*.08+i*1.7)*8,7+Math.sin(seconds*.2+i)*.5,12+Math.cos(seconds*.1+i*1.3)*5);b.rotation.y=seconds*.1+i;b.scale.y=1+Math.sin(seconds*7+i)*.5;}
     const bob=s.moving&&!s.paused?Math.sin(self.phase*2)*.012:0;
@@ -685,6 +691,6 @@ export function create({canvas,terrain,getState,onLost}) {
   function removePerson(person){scene.remove(person.root);if(person.tag){signs.delete(person.tag);person.tag.material.map.dispose();person.tag.material.dispose();}}
   function setEnabled(value){enabled=!!value&&!lost;drag=null;first=true;last=0;lastShadowUpdate=-Infinity;if(enabled)updateIslandFrameState(frameState,true,true);return enabled;}
   function dispose(){enabled=false;renderer.dispose();groundGeo.dispose();land.dispose();ocean.dispose();sky.geometry.dispose();sky.material.dispose();archipelago.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose();});map.dispose();meadow.dispose();materials.dispose();leafMat.dispose();for(const b of [...Object.values(batches),...fishBatches]){b.geometry.dispose();b.dispose();}for(const g of geos.values())g.dispose();for(const m of mats.values())m.dispose();}
-  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,visibleFish,camera:cameraMode,eye:camera.position.toArray(),cameraRaycasts,resourceStaticUpdates,shadowUpdates,frozenStaticTransforms,materials:materials.stats()})};
+  return {frame,resize,orbit,setEnabled,setCamera,dispose,vector:(x,y)=>cameraVector(x,y,yaw),get enabled(){return enabled;},get yaw(){return yaw;},get cameraMode(){return cameraMode;},stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,pixelRatio:renderer.getPixelRatio(),people:people.size+3,visibleFish,camera:cameraMode,eye:camera.position.toArray(),cameraRaycasts,resourceStaticUpdates,nearbyResourceScans:nearestState.scans||0,shadowUpdates,frozenStaticTransforms,materials:materials.stats()})};
 }
 
