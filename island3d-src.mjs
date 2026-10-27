@@ -144,6 +144,13 @@ export function updateBaseFrame(cache,pos,level){
   cache.ready=true;cache.x=x;cache.y=y;cache.level=baseLevel;
   cache.layout=baseLayout(pos,level);cache.elevation=baseElevation(cache.layout);return true;
 }
+export function updateLegacyPersonSurface(cache,point,sea,layout,elevation){
+  const pointX=point?.x??null,pointY=point?.y??null;
+  if(cache.ready&&cache.pointX===pointX&&cache.pointY===pointY&&cache.sea===sea&&cache.layout===layout&&cache.elevation===elevation)return false;
+  cache.ready=true;cache.pointX=pointX;cache.pointY=pointY;cache.sea=sea;cache.layout=layout;cache.elevation=elevation;
+  cache.x=pointX/SCALE;cache.z=pointY/SCALE;cache.wet=sea(pointX,pointY);
+  cache.surface=cache.wet?0:walkSurface(cache.x,cache.z,layout,elevation);return true;
+}
 export function updateBuildingState(cache,state={}){
   const activities=state.activities||{},completed=activities.completed||0,baseX=state.basePos?.x??null,baseY=state.basePos?.y??null;
   const level=state.baseLevel??null,campfire=state.campfire??null,fireX=state.fire?.x??null,fireY=state.fire?.y??null;
@@ -281,7 +288,7 @@ export function buildHuman(look={},kind='player',helpers={}){
     const raft=new T.Group();root.add(raft);for(let i=0;i<5;i++){const log=tube(raft,'#a17d48',[(i-2)*.25,.08,0],[.115,1.7,.115]);log.rotation.x=Math.PI/2;}for(const z of [-.5,.5])cube(raft,'#6e5937',[0,.19,z],[1.24,.05,.1]);raft.visible=false;
     const shirtParts=[],skinParts=[],hairParts=[];
     rig.traverse(o=>{if(o.isMesh){if(o.material===mat(shirt))shirtParts.push(o);if(o.material===mat(skin))skinParts.push(o);if(o.material===mat(hair))hairParts.push(o);}});
-    return {root,rig,hips,head,arms,legs,spear,raft,shirtParts,skinParts,hairParts,hairStyles,props,yaw:0,lastX:null,lastZ:null,phase:0};
+    return {root,rig,hips,head,arms,legs,spear,raft,shirtParts,skinParts,hairParts,hairStyles,props,yaw:0,lastX:null,lastZ:null,phase:0,surfaceCache:{}};
 }
 
 export function actionPose(person,motion){
@@ -458,8 +465,8 @@ export function create({canvas,terrain,getState,onLost}) {
   let frameBase=null,frameElevation=0;const frameBaseCache={},avatarFrameCycle={idleHip:0,idleArmSin:0,idleArmCos:0},avatarPoseCycle={yawSin:0,yawCos:1,phaseSin:0,phaseCos:1};
   const legPoseBuffer={hip:0,knee:0},fishPoseBuffer={x:0,z:0,y:0,yaw:0,yawSin:0,yawCos:1};
   function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false,poseRig=true,showRig=poseRig) {
-    const x=point.x/SCALE,z=point.y/SCALE,wet=sea(point.x,point.y);
-    const surface=wet?0:walkSurface(x,z,frameBase,frameElevation);
+    const sample=person.surfaceCache||(person.surfaceCache={});updateLegacyPersonSurface(sample,point,sea,frameBase,frameElevation);
+    const {x,z,wet,surface}=sample;
     person.root.position.set(x,surface+(wet?(raft?.18:-.95):0),z);
     person.yaw+=angleDelta(person.yaw,lookYaw)*Math.min(1,step*12);person.rig.rotation.y=person.yaw;
     updateLegacyRigPoseLod(person.rig,poseRig);

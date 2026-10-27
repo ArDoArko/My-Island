@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateLegacyRigPoseLod, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateLegacyPersonSurface, updateLegacyRigPoseLod, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -68,6 +68,19 @@ test('distant legacy rigs freeze local bones while their whole body can still mo
   assert.equal(updateLegacyRigPoseLod(rig,true),true);
   bone.position.x=4;scene.updateMatrixWorld(true);
   assert.equal(bone.getWorldPosition(new T.Vector3()).x,7,'nearby bones resume live local transforms immediately');
+});
+
+test('stationary legacy people reuse their water and ground sample',()=>{
+  const cache={},point={x:800,y:960},layout=baseLayout({x:1900,y:1250},3),elevation=baseElevation(layout);let seaCalls=0;
+  const sea=()=>{seaCalls++;return false;};
+  assert.equal(updateLegacyPersonSurface(cache,point,sea,layout,elevation),true);
+  assert.equal(cache.x,10);assert.equal(cache.z,12);assert.equal(cache.wet,false);assert.equal(cache.surface,walkSurface(10,12,layout,elevation));
+  assert.equal(updateLegacyPersonSurface(cache,{...point},sea,layout,elevation),false,'fresh network snapshots at the same coordinates must reuse the sample');
+  assert.equal(seaCalls,1,'an unchanged person must not query the shoreline again');
+  assert.equal(updateLegacyPersonSurface(cache,{x:801,y:960},sea,layout,elevation),true,'movement must refresh the sample immediately');
+  assert.equal(updateLegacyPersonSurface(cache,{x:801,y:960},sea,{...layout},elevation),true,'a rebuilt base layout must invalidate the walking surface');
+  assert.equal(updateLegacyPersonSurface(cache,{x:801,y:960},()=>true,cache.layout,elevation),true,'a changed shoreline source must refresh water state');
+  assert.equal(cache.wet,true);assert.equal(cache.surface,0);
 });
 
 test('legacy held arms update only while they are actually visible',()=>{
