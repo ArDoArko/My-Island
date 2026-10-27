@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateLegacyPersonSurface, updateLegacyRigPoseLod, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateLegacyPersonRoot, updateLegacyPersonSurface, updateLegacyRigPoseLod, updateTerrainAnchor, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -81,6 +81,16 @@ test('stationary legacy people reuse their water and ground sample',()=>{
   assert.equal(updateLegacyPersonSurface(cache,{x:801,y:960},sea,{...layout},elevation),true,'a rebuilt base layout must invalidate the walking surface');
   assert.equal(updateLegacyPersonSurface(cache,{x:801,y:960},()=>true,cache.layout,elevation),true,'a changed shoreline source must refresh water state');
   assert.equal(cache.wet,true);assert.equal(cache.surface,0);
+});
+
+test('stationary legacy character roots reuse their composed matrix',()=>{
+  const scene=new T.Group(),root=new T.Group(),child=new T.Group(),cache={};child.position.x=2;root.add(child);scene.add(root);
+  assert.equal(updateLegacyPersonRoot(root,cache,3,1,4),true);
+  assert.equal(root.matrixAutoUpdate,false,'the unchanged local root transform must stay frozen');
+  scene.updateMatrixWorld(true);assert.equal(child.getWorldPosition(new T.Vector3()).x,5);
+  const matrix=root.matrix.clone();assert.equal(updateLegacyPersonRoot(root,cache,3,1,4),false);assert(root.matrix.equals(matrix));
+  assert.equal(updateLegacyPersonRoot(root,cache,6,-.95,8),true,'walking or entering water must compose the new root immediately');
+  scene.updateMatrixWorld(true);const position=child.getWorldPosition(new T.Vector3());assert.equal(position.x,8);assert.equal(position.y,-.95);assert.equal(position.z,8);
 });
 
 test('legacy held arms update only while they are actually visible',()=>{

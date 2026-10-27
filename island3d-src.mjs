@@ -151,6 +151,11 @@ export function updateLegacyPersonSurface(cache,point,sea,layout,elevation){
   cache.x=pointX/SCALE;cache.z=pointY/SCALE;cache.wet=sea(pointX,pointY);
   cache.surface=cache.wet?0:walkSurface(cache.x,cache.z,layout,elevation);return true;
 }
+export function updateLegacyPersonRoot(root,cache,x,y,z){
+  if(cache.ready&&cache.x===x&&cache.y===y&&cache.z===z)return false;
+  cache.ready=true;cache.x=x;cache.y=y;cache.z=z;
+  root.position.set(x,y,z);root.updateMatrix();root.matrixAutoUpdate=false;return true;
+}
 export function updateBuildingState(cache,state={}){
   const activities=state.activities||{},completed=activities.completed||0,baseX=state.basePos?.x??null,baseY=state.basePos?.y??null;
   const level=state.baseLevel??null,campfire=state.campfire??null,fireX=state.fire?.x??null,fireY=state.fire?.y??null;
@@ -288,7 +293,7 @@ export function buildHuman(look={},kind='player',helpers={}){
     const raft=new T.Group();root.add(raft);for(let i=0;i<5;i++){const log=tube(raft,'#a17d48',[(i-2)*.25,.08,0],[.115,1.7,.115]);log.rotation.x=Math.PI/2;}for(const z of [-.5,.5])cube(raft,'#6e5937',[0,.19,z],[1.24,.05,.1]);raft.visible=false;
     const shirtParts=[],skinParts=[],hairParts=[];
     rig.traverse(o=>{if(o.isMesh){if(o.material===mat(shirt))shirtParts.push(o);if(o.material===mat(skin))skinParts.push(o);if(o.material===mat(hair))hairParts.push(o);}});
-    return {root,rig,hips,head,arms,legs,spear,raft,shirtParts,skinParts,hairParts,hairStyles,props,yaw:0,lastX:null,lastZ:null,phase:0,surfaceCache:{}};
+    return {root,rig,hips,head,arms,legs,spear,raft,shirtParts,skinParts,hairParts,hairStyles,props,yaw:0,lastX:null,lastZ:null,phase:0,surfaceCache:{},rootTransformCache:{}};
 }
 
 export function actionPose(person,motion){
@@ -467,7 +472,7 @@ export function create({canvas,terrain,getState,onLost}) {
   function animatePerson(person,point,lookYaw,isMoving,seconds,step,speed,sea,raft=false,motion=null,spear=false,blocked=false,poseRig=true,showRig=poseRig) {
     const sample=person.surfaceCache||(person.surfaceCache={});updateLegacyPersonSurface(sample,point,sea,frameBase,frameElevation);
     const {x,z,wet,surface}=sample;
-    person.root.position.set(x,surface+(wet?(raft?.18:-.95):0),z);
+    updateLegacyPersonRoot(person.root,person.rootTransformCache||(person.rootTransformCache={}),x,surface+(wet?(raft?.18:-.95):0),z);
     person.yaw+=angleDelta(person.yaw,lookYaw)*Math.min(1,step*12);person.rig.rotation.y=person.yaw;
     updateLegacyRigPoseLod(person.rig,poseRig);
     const active=isMoving&&speed>.05;person.phase+=active?step*(speed>4?10:7):0;
