@@ -201,6 +201,10 @@ export function updateChapterState(cache,list=[]){
   }
   values.length=offset;cache.ready=true;cache.count=list.length;return changed;
 }
+export function updateChapterPulse(root,seconds){
+  if(root.userData.done)return false;
+  root.children[0].scale.setScalar(1+Math.sin(seconds*2.8)*.05);return true;
+}
 export function updateTerrainAnchor(cache,point,offsetX=0,offsetZ=0){
   const pointX=point?.x??null,pointY=point?.y??null;
   if(cache.ready&&cache.pointX===pointX&&cache.pointY===pointY&&cache.offsetX===offsetX&&cache.offsetZ===offsetZ)return false;
@@ -598,7 +602,7 @@ export function create({canvas,terrain,getState,onLost}) {
         const tag=textSprite(point.label,point.done?'#b5d1c5':'#ffe9b5');tag.position.y=point.type==='signal'?1.95:1.35;root.add(tag);root.userData.done=point.done;
       }
     }
-    for(const root of chapterRoots)root.children[0].scale.setScalar(root.userData.done?1:1+Math.sin(seconds*2.8)*.05);
+    for(const root of chapterRoots)updateChapterPulse(root,seconds);
   }
   const birds=[];for(let i=0;i<4;i++){
     const g=new T.BufferGeometry().setFromPoints([new T.Vector3(-.3,0,0),new T.Vector3(0,-.08,0),new T.Vector3(.3,0,0)]);

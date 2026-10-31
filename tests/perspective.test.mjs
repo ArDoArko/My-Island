@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as T from 'three';
 import { cameraPose, createMaterials, dampCameraVector, intersectRaycastInto, stabilizeSunShadow, webglRendererOptions } from '../island-environment.mjs';
-import { avatarRigNeedsPose, cameraVector, commitFishBatches, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterState, updateFishPart, updateIslandFrameState, updateLegacyPersonRoot, updateLegacyPersonSurface, updateLegacyRigHeading, updateLegacyRigPoseLod, updateLegacyYaw, updateNearestWithin, updateTerrainAnchor, updateWorldLabelScales, terrainHeight } from '../island3d-src.mjs';
+import { avatarRigNeedsPose, cameraVector, commitFishBatches, fishPose, fishWithinRenderRange, freezeLegacyStaticTransforms, heldRigNeedsPose, islandShadowInterval, legacyPersonNeedsPose, legPose, replaceCameraObstacle, resourceMatricesNeedUpdate, walkSurface, baseElevation, nearestWithin, scaleWorldLabels, updateAppearanceKey, updateAvatarFrameCycle, updateAvatarPoseCycle, updateBaseFrame, updateBoarFrameState, updateBoarGait, updateBuildingState, updateCameraCollisionState, updateChapterPulse, updateChapterState, updateFishPart, updateIslandFrameState, updateLegacyPersonRoot, updateLegacyPersonSurface, updateLegacyRigHeading, updateLegacyRigPoseLod, updateLegacyYaw, updateNearestWithin, updateTerrainAnchor, updateWorldLabelScales, terrainHeight } from '../island3d-src.mjs';
 import { baseLayout } from '../island-play.mjs';
 import { updateSceneryLod, updateSceneryLodPosition } from '../tropical-scene.mjs';
 import { game } from './game-harness.mjs';
@@ -324,6 +324,17 @@ test('expedition markers compare visible fields without per-frame serialization'
   assert.equal(updateChapterState(cache,[{...markers[0],done:true}]),true,'mission progress must refresh its marker');
   assert.equal(updateChapterState(cache,[{...markers[0],label:'Wave'}]),true,'a language change must refresh the label');
   assert.equal(updateChapterState(cache,[]),true,'finishing the mission must remove its markers');
+});
+
+test('completed expedition markers skip static per-frame scale writes',()=>{
+  let writes=0,value=1;
+  const root={userData:{done:true},children:[{scale:{setScalar(next){writes++;value=next}}}]};
+  assert.equal(updateChapterPulse(root,1),false);
+  assert.equal(writes,0,'a completed marker must preserve its build-time scale without dirtying its matrix');
+  root.userData.done=false;
+  assert.equal(updateChapterPulse(root,1),true);
+  assert.equal(writes,1,'an active marker must keep pulsing');
+  assert.equal(value,1+Math.sin(2.8)*.05);
 });
 
 test('static scene anchors sample terrain only after their coordinates change',()=>{
